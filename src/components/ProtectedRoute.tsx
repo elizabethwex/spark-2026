@@ -5,9 +5,9 @@ import type { ReactNode } from "react";
 
 /**
  * ProtectedRoute Component
- * 
- * Wraps routes that require authentication.
- * Redirects to /login if user is not authenticated.
+ *
+ * Wraps routes that require a signed-in prototype session.
+ * Redirects to /login only after the user has signed out (see AuthContext).
  */
 interface ProtectedRouteProps {
   children: ReactNode;
