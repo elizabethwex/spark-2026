@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Routes, Route } from "react-router-dom";
+import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground";
 import { ReimbursementProvider } from "@/pages/reimburse/ReimbursementContext";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
@@ -39,8 +40,8 @@ const LoginPage = React.lazy(() => import("@/pages/Login"));
 // Theming Engine (Partner Admin)
 const ThemingEnginePage = React.lazy(() => import("@/pages/ThemingEnginePage"));
 
-// Modern Receipt Preview
-const ModernReceiptPage = React.lazy(() => import("@/pages/ModernReceipt"));
+// Modern documentation preview
+const ModernDocumentPage = React.lazy(() => import("@/pages/ModernDocument"));
 
 
 /**
@@ -128,8 +129,8 @@ export function AppRoutes() {
         {/* Theming Engine - no LightModeBoundary so preview can toggle dark */}
         <Route path="theming-engine" element={<ProtectedRoute><ThemingEnginePage /></ProtectedRoute>} />
 
-        {/* Modern Receipt Preview */}
-        <Route path="modern-receipt" element={<ModernReceiptPage />} />
+        {/* Modern documentation preview */}
+        <Route path="modern-document" element={<ModernDocumentPage />} />
 
         
         {/* Catch-all for 404 */}
@@ -141,7 +142,7 @@ export function AppRoutes() {
 
 function NotFoundPage() {
   return (
-    <div className="text-center py-12">
+    <div className="min-h-screen text-center py-12 px-4" style={consumerPageBackgroundStyle}>
       <h1 className="text-2xl font-display font-semibold text-foreground mb-2">
         Page Not Found
       </h1>

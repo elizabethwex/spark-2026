@@ -1,8 +1,12 @@
 import { Camera, Clock, Activity, ShieldCheck } from 'lucide-react';
+import { consumerPageBackgroundStyle } from '@/constants/consumerPageBackground';
 
-export default function ModernReceipt() {
+export default function ModernDocument() {
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50 p-4 font-sans text-gray-900">
+    <div
+      className="flex items-center justify-center min-h-screen p-4 font-sans text-gray-900"
+      style={consumerPageBackgroundStyle}
+    >
       <div className="w-full max-w-md bg-white rounded-[24px] shadow-xl shadow-gray-200/40 p-8 border border-gray-200">
         
         {/* Header */}
@@ -23,13 +27,13 @@ export default function ModernReceipt() {
 
         {/* Hero Typography */}
         <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 leading-[1.1] mb-4">
-          Missing receipt <br />
+          Missing documentation <br />
           <span className="text-gray-300">required.</span>
         </h1>
 
         {/* Description */}
         <p className="text-gray-600 text-base mb-8 leading-relaxed">
-          Upload your receipt for Dr. Miller to complete this FSA claim.
+          Upload your documentation for Dr. Miller to complete this FSA claim.
         </p>
 
         {/* Transaction Sub-card */}
@@ -52,7 +56,7 @@ export default function ModernReceipt() {
         <div className="space-y-3">
           <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3.5 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-sm">
             <Camera className="w-5 h-5" />
-            Upload receipt
+            Upload documentation
           </button>
 
           <button className="w-full text-center py-3.5 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-xl transition-colors">

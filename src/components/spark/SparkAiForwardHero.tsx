@@ -305,10 +305,10 @@ export function SparkAiForwardHero() {
                     </span>
                   </div>
                   <h2 className="text-[24px] font-bold leading-[32px] tracking-[-0.456px] text-black">
-                    Missing Receipt Required
+                    Missing Documentation Required
                   </h2>
                   <p className="text-[16px] leading-[24.75px] text-[#5f6a94]">
-                    Upload your receipt for Dr. Miller in under a minute.
+                    Upload your documentation for Dr. Miller in under a minute.
                   </p>
                 </motion.div>
               )}
@@ -326,7 +326,7 @@ export function SparkAiForwardHero() {
                   className="flex flex-col"
                 >
                   <p className="text-[16px] leading-[24.75px] text-[#5f6a94]">
-                    Upload your receipt for Dr. Miller in under a minute.
+                    Upload your documentation for Dr. Miller in under a minute.
                   </p>
                 </motion.div>
               )}
@@ -344,7 +344,7 @@ export function SparkAiForwardHero() {
                   className="flex flex-col"
                 >
                   <p className="text-[16px] leading-[24.75px] text-[#5f6a94]">
-                    Reviewing your receipt…
+                    Reviewing your documentation…
                   </p>
                 </motion.div>
               )}
@@ -362,7 +362,7 @@ export function SparkAiForwardHero() {
                   className="flex flex-col gap-[4px]"
                 >
                   <p className="text-[16px] font-semibold leading-[24.75px] text-[#16a34a]">
-                    Receipt uploaded
+                    Document uploaded
                   </p>
                   <p className="text-[14px] leading-[22px] text-[#5f6a94]">
                     We've added it to this claim.
@@ -415,7 +415,7 @@ export function SparkAiForwardHero() {
                     onClick={() => setUploadPhase("options")}
                   >
                     <Camera className="h-[15.75px] w-[15.75px]" />
-                    Upload receipt & file
+                    Upload documentation & file
                   </Button>
                   <button
                     type="button"
@@ -539,7 +539,7 @@ export function SparkAiForwardHero() {
                     />
                   </svg>
                   <p className="text-[14px] font-medium text-[#5f6a94]">
-                    Reviewing your receipt…
+                    Reviewing your documentation…
                   </p>
                   <style>{`
                     @keyframes uploadSweep {
@@ -594,7 +594,7 @@ export function SparkAiForwardHero() {
                   </motion.div>
                   <div className="flex flex-col items-center gap-[4px]">
                     <p className="text-[14px] font-semibold text-[#16a34a]">
-                      Receipt uploaded
+                      Document uploaded
                     </p>
                     <p className="text-[12px] text-[#5f6a94]">
                       We've added it to this claim.

@@ -1,6 +1,7 @@
 import { type FormEvent, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ConsumerNavigation } from "@/components/layout/ConsumerNavigation";
+import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground";
 import { useReimbursement } from "./ReimbursementContext";
 import {
   Button,
@@ -224,7 +225,7 @@ export default function ReimburseMyself() {
 
   const renderVision = () => {
     const isFSA = formData.account.includes("fsa");
-    const receiptRequired = isFSA && !manualEntryMode;
+    const documentationRequired = isFSA && !manualEntryMode;
     const showFormFields = uploadedFile || manualEntryMode || isAnalyzing;
 
     const isAutoFilled = (field: string) => autoFilledFields.has(field);
@@ -250,7 +251,7 @@ export default function ReimburseMyself() {
             <CheckCircle2 className="h-4 w-4" />
             <AlertTitle>Form auto-filled</AlertTitle>
             <AlertDescription>
-              We extracted details from your receipt. Review and adjust as needed.
+              We extracted details from your document. Review and adjust as needed.
             </AlertDescription>
           </Alert>
         )}
@@ -259,17 +260,17 @@ export default function ReimburseMyself() {
           <Card className="lg:col-span-2">
             <form onSubmit={handleSubmit}>
               <CardContent className="space-y-6 p-6">
-                {/* Receipt Upload - Primary Focus */}
+                {/* Documentation upload - primary focus */}
                 {!showFormFields && (
                   <div className="space-y-4">
                     <div className="flex items-center gap-2">
-                      <Label className="text-lg font-semibold text-foreground">Upload receipt</Label>
+                      <Label className="text-lg font-semibold text-foreground">Upload documentation</Label>
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <Info className="h-4 w-4 text-muted-foreground cursor-help" />
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p className="text-sm">Upload itemized receipt or EOB. We&apos;ll extract details automatically.</p>
+                          <p className="text-sm">Upload itemized documentation or EOB. We&apos;ll extract details automatically.</p>
                         </TooltipContent>
                       </Tooltip>
                     </div>
@@ -310,7 +311,7 @@ export default function ReimburseMyself() {
 
                     {/* Skip Option */}
                     <div className="flex items-center justify-center gap-2 pt-2">
-                      <span className="text-sm text-muted-foreground">Don&apos;t have a receipt?</span>
+                      <span className="text-sm text-muted-foreground">Don&apos;t have documentation?</span>
                       <Button
                         type="button"
                         intent="primary"
@@ -320,13 +321,13 @@ export default function ReimburseMyself() {
                       >
                         Enter manually
                       </Button>
-                      {receiptRequired && (
+                      {documentationRequired && (
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Info className="h-3.5 w-3.5 text-warning" />
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p className="text-sm">Receipt required for FSA accounts</p>
+                            <p className="text-sm">Documentation required for FSA accounts</p>
                           </TooltipContent>
                         </Tooltip>
                       )}
@@ -341,7 +342,7 @@ export default function ReimburseMyself() {
                       <div className="flex items-center gap-3 rounded-lg border-2 border-primary/20 bg-primary/5 p-4">
                         <Spinner className="h-5 w-5 text-primary" />
                         <div>
-                          <p className="text-sm font-medium text-foreground">Analyzing receipt...</p>
+                          <p className="text-sm font-medium text-foreground">Analyzing document...</p>
                           <p className="text-xs text-muted-foreground">Extracting details from your document</p>
                         </div>
                       </div>
@@ -561,7 +562,7 @@ export default function ReimburseMyself() {
                           <div>
                             <p className="text-sm font-medium mb-1">What documents are required?</p>
                             <p className="text-xs text-muted-foreground">
-                              Itemized receipt or EOB with provider, patient, date, and amount.
+                              Itemized documentation or EOB with provider, patient, date, and amount.
                             </p>
                           </div>
                           <div>
@@ -636,7 +637,7 @@ export default function ReimburseMyself() {
 
   return (
     <>
-      <div className="min-h-screen bg-[#F1FAFE]">
+      <div className="min-h-screen" style={consumerPageBackgroundStyle}>
         <ConsumerNavigation />
 
         <div className="mx-auto max-w-[1440px] px-8 py-8">

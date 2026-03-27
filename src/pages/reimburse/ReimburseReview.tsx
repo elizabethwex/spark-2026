@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { ConsumerNavigation } from "@/components/layout/ConsumerNavigation";
+import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground";
 import { useReimbursement } from "./ReimbursementContext";
 import {
   Button,
@@ -44,7 +45,7 @@ export default function ReimburseReview() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F1FAFE]">
+    <div className="min-h-screen" style={consumerPageBackgroundStyle}>
       <ConsumerNavigation />
 
       <div className="mx-auto max-w-[1440px] px-8 py-8">

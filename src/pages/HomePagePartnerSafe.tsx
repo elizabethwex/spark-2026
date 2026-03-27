@@ -11,6 +11,7 @@ import { PromoBanner } from "@/components/sections/PromoBanner";
 import { TasksSection } from "@/components/sections/TasksSection";
 import { ConsumerFooter } from "@/components/layout/Footer";
 import { HSAPlannerCard } from "@/components/HSAPlannerCard";
+import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground";
 
 /**
  * Partner-safe homepage: traditional dashboard without the prominent AI chat bar.
@@ -19,7 +20,7 @@ export default function HomePagePartnerSafe() {
   const { homeLayoutMode: layoutMode } = usePrototype();
 
   return (
-    <div className="min-h-screen bg-slate-50/50 font-['Inter']">
+    <div className="min-h-screen font-['Inter']" style={consumerPageBackgroundStyle}>
       <ConsumerNavigation />
 
       <main className="w-full max-w-[1280px] mx-auto px-6 sm:px-8 py-8 space-y-8">

@@ -19,6 +19,7 @@ import {
 } from "@wexinc-healthbenefits/ben-ui-kit";
 import { ConsumerFooter } from "@/components/layout/Footer";
 import { ConsumerNavigation } from "@/components/layout/ConsumerNavigation";
+import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground";
 import { Pencil, Info, Plus, Calendar, X, Trash2, MoreVertical, Eye, RefreshCw, AlertCircle, User, Users, HeartPlus, ShieldCheck, Landmark, CreditCard, Bell, UserLock, Lock, SquareArrowRight } from "lucide-react";
 
 type SubPage = "my-profile" | "dependents" | "beneficiaries" | "authorized-signers" | "banking" | "debit-card" | "login-security" | "communication" | "report-lost-stolen" | "order-replacement-card";
@@ -3695,7 +3696,7 @@ export default function MyProfile() {
                             WEX Benefit Card follow up notice has been sent
                           </h4>
                           <p className="text-sm font-normal leading-6 tracking-[-0.084px] text-foreground">
-                            Automatically alert when a debit card follow up notice has been sent about on of your purchases. Helps to quickly know when a receipt needs to be supplied.
+                            Automatically alert when a debit card follow up notice has been sent about on of your purchases. Helps to quickly know when documentation needs to be supplied.
                           </p>
                         </div>
                         <div className="flex items-center" style={{ gap: "153px" }}>
@@ -3893,7 +3894,7 @@ export default function MyProfile() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F1FAFE]">
+    <div className="min-h-screen" style={consumerPageBackgroundStyle}>
       <ConsumerNavigation />
 
       {/* Main Content */}
