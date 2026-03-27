@@ -1,8 +1,8 @@
-# GitHub Pages for elizabethwex/spark-2026 (personal fork).
-# Repo → Settings → Secrets → add ARTIFACTORY_NPM_TOKEN (JFrog token for @wexinc-healthbenefits).
-# Repo → Settings → Pages → Build: Deploy from branch → gh-pages / / (root).
+# Build and publish static site to the gh-pages branch.
+# Settings → Pages: deploy from branch gh-pages / (root).
+# Secret ARTIFACTORY_NPM_TOKEN: required for @wexinc-healthbenefits (see .npmrc) until a public UI path exists.
 
-name: GitHub Pages (personal)
+name: GitHub Pages
 
 on:
   push:
@@ -14,7 +14,6 @@ permissions:
 
 jobs:
   build-and-deploy:
-    if: github.repository == 'elizabethwex/spark-2026'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -24,12 +23,12 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'npm'
 
-      - name: Configure npm (Artifactory)
+      - name: Configure npm for private scope
         env:
           NPM_TOKEN: ${{ secrets.ARTIFACTORY_NPM_TOKEN }}
         run: |
           if [ -z "${NPM_TOKEN}" ]; then
-            echo "::error::Add repository secret ARTIFACTORY_NPM_TOKEN for @wexinc-healthbenefits installs."
+            echo "::error::Add repository secret ARTIFACTORY_NPM_TOKEN (matches local Artifactory npm auth for @wexinc-healthbenefits)."
             exit 1
           fi
           npm config set @wexinc-healthbenefits:registry https://usartifactorywexinc.jfrog.io/artifactory/api/npm/benefits-npm/
