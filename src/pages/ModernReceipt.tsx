@@ -1,4 +1,3 @@
-import React from 'react';
 import { Camera, Clock, Activity, ShieldCheck } from 'lucide-react';
 
 export default function ModernReceipt() {

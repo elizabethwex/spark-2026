@@ -34,7 +34,7 @@ const letterVariants = {
     transition: {
       opacity: { duration: 0.25 },
       filter: { duration: 0.4 },
-      y: { type: "spring", stiffness: 80, damping: 20 },
+      y: { type: "spring" as const, stiffness: 80, damping: 20 },
     },
   },
 };

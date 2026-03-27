@@ -7,34 +7,8 @@ import {
   sparkLpfsaSummary,
 } from "@/data/sparkAiForwardMock";
 
-function SpendRing({ days, spendByTag }: { days: number; spendByTag?: string }) {
-  return (
-    <div className="group relative flex h-[7.5rem] w-[7.5rem] shrink-0 items-center justify-center">
-      <div
-        className="absolute inset-0 rounded-full"
-        style={{
-          background: `conic-gradient(hsl(var(--primary)) ${(days / 33) * 360}deg, hsl(var(--muted) / 0.35) 0deg)`,
-        }}
-      />
-      <div className="absolute inset-[5px] flex flex-col items-center justify-center rounded-full bg-white">
-        <span className="text-2xl font-bold text-foreground">{days}</span>
-        <span className="max-w-[4.5rem] text-center text-[9px] font-semibold uppercase leading-tight tracking-wide text-muted-foreground">
-          Days to spend
-        </span>
-      </div>
-      {spendByTag && (
-        <div className="pointer-events-none absolute -top-8 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap opacity-0 transition-opacity group-hover:opacity-100">
-          <span className="rounded-md bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-900 shadow-sm">
-            {spendByTag}
-          </span>
-        </div>
-      )}
-    </div>
-  );
-}
-
 function useInView(options?: IntersectionObserverInit) {
-  const ref = useRef<any>(null);
+  const ref = useRef<HTMLDivElement | null>(null);
   const [isInView, setIsInView] = useState(false);
 
   useEffect(() => {

@@ -57,7 +57,11 @@ export function SparkAiForwardHero() {
 
   const shouldAnimate = isFirstVisit && !prefersReducedMotion;
 
-  const restrainedSpring = { type: "spring", stiffness: 200, damping: 20 };
+  const restrainedSpring = {
+    type: "spring" as const,
+    stiffness: 200,
+    damping: 20,
+  };
 
   const containerVariants = {
     hidden: { opacity: 0, y: 4 },
@@ -292,7 +296,6 @@ export function SparkAiForwardHero() {
                   transition={{
                     duration: 0.4,
                     ease: [0.2, 0, 0, 1],
-                    exit: { duration: 0.25, ease: [0.3, 0, 0.8, 0.15] },
                   }}
                   className="flex flex-col gap-[12px] overflow-hidden"
                 >
@@ -319,7 +322,6 @@ export function SparkAiForwardHero() {
                   transition={{
                     duration: 0.4,
                     ease: [0.2, 0, 0, 1],
-                    exit: { duration: 0.25, ease: [0.3, 0, 0.8, 0.15] },
                   }}
                   className="flex flex-col"
                 >
@@ -338,7 +340,6 @@ export function SparkAiForwardHero() {
                   transition={{
                     duration: 0.4,
                     ease: [0.2, 0, 0, 1],
-                    exit: { duration: 0.25, ease: [0.3, 0, 0.8, 0.15] },
                   }}
                   className="flex flex-col"
                 >
@@ -357,7 +358,6 @@ export function SparkAiForwardHero() {
                   transition={{
                     duration: 0.4,
                     ease: [0.2, 0, 0, 1],
-                    exit: { duration: 0.25, ease: [0.3, 0, 0.8, 0.15] },
                   }}
                   className="flex flex-col gap-[4px]"
                 >
@@ -406,7 +406,6 @@ export function SparkAiForwardHero() {
                   transition={{
                     duration: 0.4,
                     ease: [0.2, 0, 0, 1],
-                    exit: { duration: 0.25, ease: [0.3, 0, 0.8, 0.15] },
                   }}
                   className="flex flex-col items-center justify-center gap-[16px] overflow-hidden"
                 >
@@ -436,7 +435,6 @@ export function SparkAiForwardHero() {
                   transition={{
                     duration: 0.4,
                     ease: [0.2, 0, 0, 1],
-                    exit: { duration: 0.25, ease: [0.3, 0, 0.8, 0.15] },
                   }}
                   className="flex flex-col items-center gap-[12px] w-full min-h-[160px]"
                 >
@@ -508,7 +506,6 @@ export function SparkAiForwardHero() {
                   transition={{
                     duration: 0.4,
                     ease: [0.2, 0, 0, 1],
-                    exit: { duration: 0.25, ease: [0.3, 0, 0.8, 0.15] },
                   }}
                   className="flex flex-col items-center justify-center gap-[16px] min-h-[160px]"
                 >
@@ -563,7 +560,6 @@ export function SparkAiForwardHero() {
                   transition={{
                     duration: 0.4,
                     ease: [0.2, 0, 0, 1],
-                    exit: { duration: 0.25, ease: [0.3, 0, 0.8, 0.15] },
                   }}
                   className="flex flex-col items-center justify-center gap-[16px] min-h-[160px]"
                 >

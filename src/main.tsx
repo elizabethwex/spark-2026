@@ -2,8 +2,9 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { AppProviders } from '@wexinc-healthbenefits/ben-ui-kit'
-import '@wex/design-tokens'
+// Kit styles first; local tokens last so design-tokens.json output wins for :root / .dark variables.
 import './index.css'
+import '@wex/design-tokens'
 import App from './App.tsx'
 
 createRoot(document.getElementById('root')!).render(

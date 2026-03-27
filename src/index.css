@@ -1,4 +1,4 @@
-/* Design tokens are imported via packages/design-tokens in main.tsx */
+/* Semantic colors: packages/design-tokens (imported after this file in main.tsx). Kit: structure + components. */
 @import '@wexinc-healthbenefits/ben-ui-kit/styles.css';
 
 @import "tailwindcss";
