@@ -3,11 +3,8 @@ import type { ReactNode } from "react";
 
 /**
  * Authentication Context Interface
- * 
- * Manages authentication state for the application:
- * - Tracks if user is authenticated
- * - Provides login/logout functions
- * - Persists state in sessionStorage
+ *
+ * Prototype: default signed-in; logout persists "signed out" until login again.
  */
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -21,28 +18,26 @@ const SESSION_STORAGE_KEY = "wex_auth_authenticated";
 
 /**
  * AuthProvider
- * 
- * Provides authentication state management for the entire application.
- * State persists in sessionStorage until browser session ends or logout.
+ *
+ * Prototype behavior: users start signed in (no login gate) until they choose
+ * Log out. Explicit "false" in sessionStorage keeps them on the login flow
+ * across refresh; any other/missing value treats the session as signed in.
  */
 export function AuthProvider({ children }: { children: ReactNode }) {
-  // Initialize from sessionStorage on mount
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
     if (typeof window !== "undefined") {
       const stored = sessionStorage.getItem(SESSION_STORAGE_KEY);
-      return stored === "true";
+      return stored !== "false";
     }
-    return false;
+    return true;
   });
 
-  // Sync sessionStorage when state changes
   useEffect(() => {
     if (typeof window !== "undefined") {
-      if (isAuthenticated) {
-        sessionStorage.setItem(SESSION_STORAGE_KEY, "true");
-      } else {
-        sessionStorage.removeItem(SESSION_STORAGE_KEY);
-      }
+      sessionStorage.setItem(
+        SESSION_STORAGE_KEY,
+        isAuthenticated ? "true" : "false"
+      );
     }
   }, [isAuthenticated]);
 

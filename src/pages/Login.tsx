@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
-import { Button, Card, CardContent, Checkbox, FloatLabel, toast } from "@wexinc-healthbenefits/ben-ui-kit"
-import { Eye, EyeOff, AlertCircle, Mail, MessageSquare, ChevronRight } from "lucide-react"
+import { Button, Card, CardContent, FloatLabel, toast } from "@wexinc-healthbenefits/ben-ui-kit"
+import { Eye, EyeOff, AlertCircle, Mail, MessageSquare, ChevronRight, UserLock } from "lucide-react"
 import { useAuth } from "@/context/AuthContext"
 
 interface LoginProps {
@@ -10,7 +10,7 @@ interface LoginProps {
 export default function Login({ onLoginSuccess }: LoginProps) {
   const { login } = useAuth()
   const wexLogoUrl = `${import.meta.env.BASE_URL}WEX_Logo_Red_Vector.svg`
-  const loginBgUrl = `${import.meta.env.BASE_URL}login-bg.svg`
+  const loginBgUrl = `${import.meta.env.BASE_URL}wexbrand_loginbg.svg`
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1)
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
@@ -20,7 +20,6 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   const [resendTimer, setResendTimer] = useState(13)
   const [generatedCode, setGeneratedCode] = useState("")
   const [codeError, setCodeError] = useState(false)
-  const [saveUsername, setSaveUsername] = useState(false)
   const [selectedMfaMethod, setSelectedMfaMethod] = useState<'email' | 'sms'>('email')
 
   // Debug instrumentation (Debug Mode)
@@ -147,30 +146,24 @@ export default function Login({ onLoginSuccess }: LoginProps) {
     }
   }, [step, resendTimer])
 
-  // Load saved username on mount
-  useEffect(() => {
-    const savedUsername = localStorage.getItem('wex_saved_username')
-    if (savedUsername) {
-      setUsername(savedUsername)
-      setSaveUsername(true)
-    }
-  }, [])
-
   const handleUsernameSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (username.trim()) {
-      // Save username if checkbox is checked
-      if (saveUsername) {
-        localStorage.setItem('wex_saved_username', username.trim())
-      }
       setStep(2)
     }
   }
 
   const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Validate credentials
-    const isValidCredentials = username.trim() === "ux@wex.com" && password.trim() === "UXprototype123!"
+    // Validate credentials (both prototype accounts share the same experience).
+    // Username/password checks are case-insensitive so copy/paste and casing variants still work.
+    const trimmedUsername = username.trim()
+    const usernameLower = trimmedUsername.toLowerCase()
+    const isValidUsername =
+      usernameLower === "ux@wex.com" || usernameLower === "ux-nicole"
+    const passwordOk =
+      password.trim().toLowerCase() === "uxprototype123!"
+    const isValidCredentials = isValidUsername && passwordOk
     
     if (!isValidCredentials) {
       setPasswordError(true)
@@ -217,13 +210,6 @@ export default function Login({ onLoginSuccess }: LoginProps) {
 
   const handleEditUsername = () => {
     setStep(1)
-  }
-
-  const handleSaveUsernameChange = (checked: boolean) => {
-    setSaveUsername(checked)
-    if (!checked) {
-      localStorage.removeItem('wex_saved_username')
-    }
   }
 
   const handleTryAnotherMethod = () => {
@@ -284,8 +270,13 @@ export default function Login({ onLoginSuccess }: LoginProps) {
       <div className="relative z-10 min-h-screen flex flex-col">
         {/* Login Card */}
         <div className="flex-1 flex items-center justify-center px-4 py-8">
-          <Card className="w-full max-w-[402px] shadow-[0px_8px_16px_0px_rgba(2,13,36,0.15),0px_0px_1px_0px_rgba(2,13,36,0.3)] border-0">
-            <CardContent className="p-8">
+          {/* variant="elevated" = large shadow (shadow-lg, hover:shadow-xl) per ben-ui-kit; inline radius overrides kit token */}
+          <Card
+            variant="elevated"
+            className="w-full max-w-[402px] overflow-hidden border-0"
+            style={{ borderRadius: "16px" }}
+          >
+            <CardContent className="p-8" style={{ borderRadius: "16px" }}>
               <div className="flex flex-col gap-6">
                 {/* Logo + Title + Subtext */}
                 <div className="flex flex-col gap-6 items-center">
@@ -322,24 +313,10 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                         className="text-[16px] leading-6 tracking-[-0.176px]"
                       />
 
-                      {/* Save Username Checkbox and Forgot Username Link */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Checkbox
-                            id="save-username"
-                            checked={saveUsername}
-                            onCheckedChange={(checked) => handleSaveUsernameChange(checked as boolean)}
-                          />
-                          <label 
-                            htmlFor="save-username" 
-                            className="text-[16px] font-normal leading-6 tracking-[-0.176px] text-foreground cursor-pointer"
-                          >
-                            Save Username
-                          </label>
-                        </div>
+                      <div className="w-full text-left">
                         <button
                           type="button"
-                          className="text-[16px] font-normal leading-6 tracking-[-0.176px] text-[hsl(var(--wex-primary))] hover:underline"
+                          className="text-[14px] font-normal leading-6 tracking-[-0.084px] text-[hsl(var(--wex-primary))] hover:underline"
                         >
                           Forgot Username
                         </button>
@@ -353,6 +330,27 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                         Continue
                       </Button>
                     </form>
+
+                    {/* OR — Continue with Passkey */}
+                    <div className="flex flex-col gap-5 w-full">
+                      <div className="flex items-center gap-3 w-full" aria-hidden="true">
+                        <div className="h-px flex-1 bg-border min-w-0" />
+                        <span className="text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground shrink-0">
+                          OR
+                        </span>
+                        <div className="h-px flex-1 bg-border min-w-0" />
+                      </div>
+                      <Button
+                        type="button"
+                        intent="primary"
+                        variant="outline"
+                        size="md"
+                        className="inline-flex w-full h-10 items-center justify-center gap-2 rounded-lg text-[14px] font-medium leading-6 tracking-[-0.084px] border-border text-foreground hover:bg-muted/50"
+                      >
+                        <UserLock className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                        Continue with Passkey
+                      </Button>
+                    </div>
 
                     {/* Sign Up Link */}
                     <div className="flex gap-2 items-center justify-start text-[16px] leading-6 tracking-[-0.176px]">
@@ -429,7 +427,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                       {/* Forgot Password Link */}
                       <button
                         type="button"
-                        className="text-[16px] text-[hsl(var(--wex-primary))] hover:underline text-left tracking-[-0.176px]"
+                        className="text-left text-[14px] font-normal leading-6 tracking-[-0.084px] text-[hsl(var(--wex-primary))] hover:underline"
                       >
                         Forgot password
                       </button>
