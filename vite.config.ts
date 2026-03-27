@@ -3,9 +3,17 @@ import react from '@vitejs/plugin-react'
 import path from 'node:path'
 import { tokensCSSPlugin } from './vite-plugins/tokens-css'
 
+// GitHub project pages live at https://<user>.github.io/<repo>/ — assets need /<repo>/ base in CI.
+const githubRepo = process.env.GITHUB_REPOSITORY ?? ''
+const repoSegment = githubRepo.includes('/') ? githubRepo.split('/')[1] : ''
+const base =
+  process.env.GITHUB_ACTIONS === 'true' && repoSegment
+    ? `/${repoSegment}/`
+    : '/'
+
 // https://vite.dev/config/
 export default defineConfig(() => ({
-  base: '/',
+  base,
   plugins: [
     react(),
     tokensCSSPlugin(), // Generate CSS from JSON at build time

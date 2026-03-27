@@ -1,0 +1,52 @@
+# GitHub Pages for elizabethwex/spark-2026 (personal fork).
+# Repo → Settings → Secrets → add ARTIFACTORY_NPM_TOKEN (JFrog token for @wexinc-healthbenefits).
+# Repo → Settings → Pages → Build: Deploy from branch → gh-pages / / (root).
+
+name: GitHub Pages (personal)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    if: github.repository == 'elizabethwex/spark-2026'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Configure npm (Artifactory)
+        env:
+          NPM_TOKEN: ${{ secrets.ARTIFACTORY_NPM_TOKEN }}
+        run: |
+          if [ -z "${NPM_TOKEN}" ]; then
+            echo "::error::Add repository secret ARTIFACTORY_NPM_TOKEN for @wexinc-healthbenefits installs."
+            exit 1
+          fi
+          npm config set @wexinc-healthbenefits:registry https://usartifactorywexinc.jfrog.io/artifactory/api/npm/benefits-npm/
+          npm config set //usartifactorywexinc.jfrog.io/artifactory/api/npm/benefits-npm/:_authToken "${NPM_TOKEN}"
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./dist
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+          commit_message: 'Deploy GitHub Pages: ${{ github.sha }}'

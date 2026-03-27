@@ -11,6 +11,8 @@ permissions:
 
 jobs:
   build-and-deploy:
+    # WEX org only: uses JFrog OIDC. Personal forks use github-pages.yml instead.
+    if: github.repository == 'wex-benefits/spark-2026'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout main branch
