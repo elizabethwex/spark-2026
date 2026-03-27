@@ -1,0 +1,42 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+.npm-cache
+dist
+dist-ssr
+
+# Design tokens generated files (not committed)
+packages/design-tokens/dist/
+packages/design-tokens/css/
+packages/design-tokens/scss/
+packages/design-tokens/ios/
+packages/design-tokens/android/
+packages/design-tokens/design-tokens.ts
+packages/design-tokens/index.css
+packages/design-tokens/.style-dictionary-tokens.json
+# Note: design-tokens.json is the source file (committed), not generated
+*.local
+.vite
+
+# Playwright / A11y Testing
+test-results
+playwright-report
+playwright/.cache
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

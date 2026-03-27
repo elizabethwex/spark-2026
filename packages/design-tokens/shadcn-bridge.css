@@ -1,0 +1,103 @@
+/* ============================================================
+   SHADCN SEMANTIC BRIDGE
+   ============================================================
+   This file maps WEX tokens to shadcn semantic variables.
+   
+   This file is HAND-AUTHORED (semantic decisions require intent).
+   It will NOT become a Style Dictionary output.
+   
+   RULES:
+   - All values MUST reference --wex-* variables
+   - NO raw HSL values allowed
+   - State variants (hover, active) are included for Tailwind utilities
+   ============================================================ */
+
+:root {
+  /* ===== BACKGROUNDS ===== */
+  --background: var(--wex-content-bg);
+  --foreground: var(--wex-text);
+
+  /* ===== CARD ===== */
+  --card: var(--wex-content-bg);
+  --card-foreground: var(--wex-text);
+
+  /* ===== POPOVER ===== */
+  --popover: var(--wex-content-bg);
+  --popover-foreground: var(--wex-text);
+
+  /* ===== BRAND ===== */
+  --brand-red: var(--wex-brand-red);
+
+  /* ===== PRIMARY (with state) ===== */
+  --primary: var(--wex-primary);
+  --primary-foreground: var(--wex-primary-contrast);
+  --primary-hover: var(--wex-primary-hover);
+
+  /* ===== LINK (for text links) ===== */
+  --link: var(--wex-link);
+  --link-hover: var(--wex-link-hover);
+  --link-active: var(--wex-link-active);
+
+  /* ===== SECONDARY (with state) ===== */
+  --secondary: var(--wex-content-border);
+  --secondary-foreground: var(--wex-text);
+  --secondary-hover: var(--wex-surface-subtle);
+
+  /* ===== MUTED ===== */
+  --muted: var(--wex-surface-subtle);
+  --muted-foreground: var(--wex-text-muted);
+
+  /* ===== ACCENT (subtle interactive hover surface) ===== */
+  --accent: var(--wex-surface-subtle);
+  --accent-foreground: var(--wex-text);
+
+  /* ===== DESTRUCTIVE (with state) ===== */
+  --destructive: var(--wex-destructive);
+  --destructive-foreground: var(--wex-destructive-foreground);
+  --destructive-hover: var(--wex-destructive-hover);
+
+  /* ===== SUCCESS (with state) ===== */
+  --success: var(--wex-success);
+  --success-foreground: var(--wex-success-foreground);
+  --success-hover: var(--wex-success-hover);
+
+  /* ===== WARNING (with state) ===== */
+  --warning: var(--wex-warning);
+  --warning-foreground: var(--wex-warning-foreground);
+  --warning-hover: var(--wex-warning-hover);
+
+  /* ===== INFO (with state) ===== */
+  --info: var(--wex-info);
+  --info-foreground: var(--wex-info-foreground);
+  --info-hover: var(--wex-info-hover);
+
+  /* ===== BORDERS & INPUTS ===== */
+  --border: var(--wex-content-border);
+  --input: var(--wex-input-border);
+  --ring: var(--wex-focus-ring-color);
+
+  /* ===== RADII ===== */
+  --radius: var(--wex-radius-md);
+
+  /* ===== SIDEBAR (maps to existing surface tokens) ===== */
+  --sidebar-background: var(--wex-content-bg);
+  --sidebar-foreground: var(--wex-text);
+  --sidebar-primary: var(--wex-primary);
+  --sidebar-primary-foreground: var(--wex-primary-contrast);
+  --sidebar-accent: var(--wex-surface-subtle);
+  --sidebar-accent-foreground: var(--wex-text);
+  --sidebar-border: var(--wex-content-border);
+  --sidebar-ring: var(--wex-focus-ring-color);
+
+  /* ===== CHART (placeholder - requires brand guidance) ===== */
+  --chart-1: var(--wex-chart-1);
+  --chart-2: var(--wex-chart-2);
+  --chart-3: var(--wex-chart-3);
+  --chart-4: var(--wex-chart-4);
+  --chart-5: var(--wex-chart-5);
+}
+
+.dark {
+  /* ===== SECONDARY (dark mode hover adjustment) ===== */
+  --secondary-hover: var(--wex-content-border);
+}

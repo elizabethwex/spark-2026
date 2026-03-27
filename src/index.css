@@ -1,0 +1,427 @@
+/* Design tokens are imported via packages/design-tokens in main.tsx */
+@import '@wexinc-healthbenefits/ben-ui-kit/styles.css';
+
+@import "tailwindcss";
+@config "../tailwind.config.ts";
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+
+  button,
+  a,
+  [role="button"],
+  [role="checkbox"],
+  [role="radio"],
+  [role="tab"],
+  [role="menuitem"],
+  [role="link"],
+  [role="switch"],
+  [role="option"],
+  input[type="checkbox"],
+  input[type="radio"],
+  input[type="submit"],
+  input[type="button"],
+  select,
+  summary,
+  label {
+    cursor: pointer;
+  }
+
+  /* Text selection colors */
+  ::selection {
+    background-color: hsl(var(--wex-palette-blue-100));
+    color: hsl(var(--wex-palette-blue-900));
+  }
+  .dark ::selection {
+    background-color: hsl(var(--wex-palette-blue-800));
+    color: hsl(var(--wex-palette-blue-100));
+  }
+}
+
+
+@layer utilities {
+  /* Hide scrollbar while maintaining scroll functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hide default Radix sheet close button when a custom close is provided */
+  .hide-default-sheet-close > button[data-radix-dialog-close],
+  [data-radix-dialog-content].hide-default-sheet-close
+    > button[data-radix-dialog-close] {
+    display: none !important;
+  }
+  
+  /* Indeterminate progress bar animation */
+  @keyframes progress-indeterminate {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(300%);
+    }
+  }
+  .animate-progress-indeterminate {
+    animation: progress-indeterminate 1.5s ease-in-out infinite;
+  }
+}
+
+/* ============================================================
+   SONNER TOAST OVERRIDES
+   ============================================================
+   Sonner has internal styling with high specificity.
+   These overrides ensure proper text contrast for all toast variants.
+   Uses Layer 3 component tokens for granular theming.
+   ============================================================ */
+@layer components {
+  /* Default toast - white background and border */
+  [data-sonner-toast]:not([data-type]) {
+    background: rgba(255, 255, 255, 1) !important;
+    border-color: rgba(255, 255, 255, 1) !important;
+  }
+
+  /* Error/Destructive toast - Layer 3 tokens */
+  [data-sonner-toast][data-type="error"] {
+    --normal-bg: hsl(var(--wex-component-toast-destructive-bg));
+    --normal-border: hsl(var(--wex-component-toast-destructive-border));
+    --normal-text: hsl(var(--wex-component-toast-destructive-fg));
+    background: var(--normal-bg) !important;
+    border-color: var(--normal-border) !important;
+    color: var(--normal-text) !important;
+  }
+  [data-sonner-toast][data-type="error"] [data-title],
+  [data-sonner-toast][data-type="error"] [data-description] {
+    color: hsl(var(--wex-component-toast-destructive-fg)) !important;
+  }
+
+  /* Success toast - Layer 3 tokens */
+  [data-sonner-toast][data-type="success"] {
+    --normal-bg: hsl(var(--wex-component-toast-success-bg));
+    --normal-border: hsl(var(--wex-component-toast-success-border));
+    --normal-text: hsl(var(--wex-component-toast-success-fg));
+    background: var(--normal-bg) !important;
+    border-color: var(--normal-border) !important;
+    color: var(--normal-text) !important;
+  }
+  [data-sonner-toast][data-type="success"] [data-title],
+  [data-sonner-toast][data-type="success"] [data-description] {
+    color: hsl(var(--wex-component-toast-success-fg)) !important;
+  }
+
+  /* Warning toast - Layer 2 (no dedicated Layer 3 tokens yet) */
+  [data-sonner-toast][data-type="warning"] {
+    --normal-bg: hsl(var(--warning));
+    --normal-border: hsl(var(--warning));
+    --normal-text: hsl(var(--warning-foreground));
+    background: var(--normal-bg) !important;
+    border-color: var(--normal-border) !important;
+    color: var(--normal-text) !important;
+  }
+  [data-sonner-toast][data-type="warning"] [data-title],
+  [data-sonner-toast][data-type="warning"] [data-description] {
+    color: hsl(var(--warning-foreground)) !important;
+  }
+
+  /* Info toast - Layer 3 tokens */
+  [data-sonner-toast][data-type="info"] {
+    --normal-bg: hsl(var(--wex-component-toast-info-bg));
+    --normal-border: hsl(var(--wex-component-toast-info-border));
+    --normal-text: hsl(var(--wex-component-toast-info-fg));
+    background: var(--normal-bg) !important;
+    border-color: var(--normal-border) !important;
+    color: var(--normal-text) !important;
+  }
+  [data-sonner-toast][data-type="info"] [data-title],
+  [data-sonner-toast][data-type="info"] [data-description] {
+    color: hsl(var(--wex-component-toast-info-fg)) !important;
+  }
+}
+
+/* ============================================================
+   MESH ANIMATIONS
+   ============================================================ */
+@keyframes mesh-drift {
+  0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+  33% { transform: translate(15%, -10%) rotate(10deg) scale(1.1); }
+  66% { transform: translate(-10%, 15%) rotate(-10deg) scale(0.9); }
+  100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+}
+
+.animate-mesh {
+  animation: mesh-drift 25s infinite ease-in-out;
+  will-change: transform;
+}
+
+.animate-mesh-slow {
+  animation: mesh-drift 35s infinite reverse ease-in-out;
+  will-change: transform;
+}
+
+.animate-mesh-delayed {
+  animation: mesh-drift 30s infinite 2s ease-in-out;
+  will-change: transform;
+}
+
+/* SPARK AI-forward hero: soft readable base + drifting color wash */
+@keyframes spark-hero-drift-a {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.88;
+  }
+  100% {
+    transform: translate(2.5%, -2%) scale(1.06);
+    opacity: 1;
+  }
+}
+
+@keyframes spark-hero-drift-b {
+  0% {
+    transform: translate(0, 0) scale(1.05);
+    opacity: 0.75;
+  }
+  100% {
+    transform: translate(-3%, 2.5%) scale(1);
+    opacity: 0.95;
+  }
+}
+
+.spark-hero-root {
+  position: relative;
+  overflow: hidden;
+}
+
+.spark-hero-bg-base {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    125deg,
+    #f0f2ff 0%,
+    #ffffff 42%,
+    #fafbff 58%,
+    #fff1f2 100%
+  );
+}
+
+.spark-hero-bg-layer-a {
+  position: absolute;
+  inset: -15%;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+      ellipse 55% 48% at 18% 28%,
+      rgba(59, 7, 100, 0.11) 0%,
+      transparent 58%
+    ),
+    radial-gradient(
+      ellipse 45% 42% at 88% 72%,
+      rgba(190, 18, 60, 0.09) 0%,
+      transparent 52%
+    );
+  animation: spark-hero-drift-a 22s ease-in-out infinite alternate;
+  will-change: transform, opacity;
+}
+
+.spark-hero-bg-layer-b {
+  position: absolute;
+  inset: -12%;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+      ellipse 50% 55% at 75% 22%,
+      rgba(91, 33, 182, 0.08) 0%,
+      transparent 50%
+    ),
+    radial-gradient(ellipse 40% 40% at 30% 85%, rgba(157, 23, 77, 0.06) 0%, transparent 48%);
+  animation: spark-hero-drift-b 26s ease-in-out infinite alternate;
+  will-change: transform, opacity;
+}
+
+.spark-hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spark-hero-bg-layer-a,
+  .spark-hero-bg-layer-b {
+    animation: none;
+    transform: none;
+    opacity: 0.9;
+  }
+}
+
+/* WEX AI kit — search send control (matches logo gradient) */
+.wex-ai-gradient-send {
+  background: linear-gradient(135deg, #3b0764 0%, #5b21b6 42%, #9d174d 78%, #be123c 100%);
+}
+
+.wex-ai-gradient-send:hover {
+  background: linear-gradient(135deg, #2e0550 0%, #4c1d95 42%, #831843 78%, #9f1239 100%);
+}
+
+/* ============================================================
+   PRISM SYNTAX HIGHLIGHTING OVERRIDES
+   WEX Design System themed - adapts to light/dark mode
+   ============================================================ */
+
+/* Base code styling */
+pre[class*="language-"],
+code[class*="language-"] {
+  background: transparent !important;
+  text-shadow: none !important;
+  color: hsl(var(--foreground));
+}
+
+/* Comments - muted */
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: hsl(var(--muted-foreground));
+  font-style: italic;
+}
+
+/* Punctuation - subtle foreground */
+.token.punctuation {
+  color: hsl(var(--muted-foreground));
+}
+
+/* Properties, tags, numbers - primary blue */
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: hsl(var(--primary));
+}
+
+/* Strings, inserted - success green */
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+  color: hsl(var(--success));
+}
+
+/* Operators, entities - foreground */
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+  color: hsl(var(--foreground));
+}
+
+/* Keywords - destructive/brand red */
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: hsl(var(--brand-red));
+}
+
+/* Functions, class names - info blue/cyan */
+.token.function,
+.token.class-name {
+  color: hsl(var(--info));
+}
+
+/* Regex, variables - warning amber */
+.token.regex,
+.token.important,
+.token.variable {
+  color: hsl(var(--warning));
+}
+
+/* ============================================================
+   BEN-UI-KIT COMPONENT OVERRIDES
+   ============================================================
+   Ensures ben-ui-kit components work correctly with Tailwind.
+   Placed at the end for highest specificity.
+   ============================================================ */
+
+/* Tabs component - make tablist full width */
+[role="tablist"].inline-flex.h-10.items-center.gap-1.border-b.border-wex-tabs-divider {
+  width: 100% !important;
+}
+
+/* Workspace component - explicit background overrides for higher specificity */
+@layer utilities {
+  /* Main workspace panel */
+  .bg-wex-workspace-bg {
+    background-color: hsl(var(--wex-component-workspace-bg)) !important;
+  }
+  
+  /* Main content area */
+  .bg-wex-workspace-main-bg {
+    background-color: hsl(var(--wex-component-workspace-main-bg)) !important;
+  }
+  
+  /* Sidebar */
+  .bg-wex-workspace-sidebar-bg {
+    background-color: hsl(var(--wex-component-workspace-sidebar-bg)) !important;
+  }
+  
+  /* Header */
+  .bg-wex-workspace-header-bg {
+    background-color: hsl(var(--wex-component-workspace-header-bg)) !important;
+  }
+  
+  /* Footer */
+  .bg-wex-workspace-footer-bg {
+    background-color: hsl(var(--wex-component-workspace-footer-bg)) !important;
+  }
+}
+
+/* ============================================================
+   CHECKBOX INDETERMINATE STATE FIX
+   ============================================================
+   Ensures indeterminate checkboxes display correctly with minus icon
+   ============================================================ */
+button[role="checkbox"][data-state="indeterminate"] {
+  background-color: hsl(var(--wex-component-checkbox-checked-bg)) !important;
+  border-color: hsl(var(--wex-component-checkbox-checked-bg)) !important;
+}
+
+/* Use descendant selector: SVG is inside span (button > span > svg), not direct child */
+button[role="checkbox"][data-state="indeterminate"] svg {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Message Center bulk action bar - white checkbox when indeterminate */
+.bg-primary button[role="checkbox"][data-state="indeterminate"] {
+  background-color: white !important;
+  border-color: white !important;
+}
+
+.bg-primary button[role="checkbox"][data-state="indeterminate"] svg {
+  color: hsl(var(--primary)) !important;
+}
+
+/* Message Center bulk action bar - white checkbox when checked */
+.bg-primary button[role="checkbox"][data-state="checked"] {
+  background-color: white !important;
+  border-color: white !important;
+}
+
+.bg-primary button[role="checkbox"][data-state="checked"] svg {
+  color: hsl(var(--primary)) !important;
+}
