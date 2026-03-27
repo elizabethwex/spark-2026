@@ -17,7 +17,7 @@
     "@nivo/bar": "^0.99.0",
     "@radix-ui/react-slot": "^1.2.4",
     "@tailwindcss/postcss": "^4.2.1",
-    "@wexinc-healthbenefits/ben-ui-kit": "^0.3.25",
+    "@wexinc-healthbenefits/ben-ui-kit": "0.3.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
