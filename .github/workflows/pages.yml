@@ -1,6 +1,8 @@
 # Build and publish static site to the gh-pages branch.
 # Settings → Pages: deploy from branch gh-pages / (root).
-# Secret ARTIFACTORY_NPM_TOKEN: required for @wexinc-healthbenefits (see .npmrc) until a public UI path exists.
+#
+# Secrets: ARTIFACTORY_NPM_TOKEN (JFrog identity token for npm).
+# Optional Variables: ARTIFACTORY_BENEFITS_NPM_REPO = benefits-npm-prod if non-prod repo fails.
 
 name: GitHub Pages
 
@@ -20,40 +22,43 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: package-lock.json
 
-      - name: Configure npm for private scope
+      - name: Write .npmrc for CI
         env:
-          NPM_TOKEN: ${{ secrets.ARTIFACTORY_NPM_TOKEN }}
-          # Optional repo variable: set to benefits-npm-prod if your token only resolves packages there.
+          ARTIFACTORY_NPM_TOKEN: ${{ secrets.ARTIFACTORY_NPM_TOKEN }}
           BENEFITS_NPM_REPO: ${{ vars.ARTIFACTORY_BENEFITS_NPM_REPO }}
+        shell: bash
         run: |
-          if [ -z "${NPM_TOKEN}" ]; then
-            echo "::error::Add repository secret ARTIFACTORY_NPM_TOKEN (matches local Artifactory npm auth for @wexinc-healthbenefits)."
+          set -euo pipefail
+          if [[ -z "${ARTIFACTORY_NPM_TOKEN}" ]]; then
+            echo "::error::Add repository secret ARTIFACTORY_NPM_TOKEN (Settings → Secrets and variables → Actions)."
             exit 1
           fi
           REPO="${BENEFITS_NPM_REPO:-benefits-npm}"
-          REG_URL="https://usartifactorywexinc.jfrog.io/artifactory/api/npm/${REPO}/"
           echo "Using Artifactory npm virtual repo: ${REPO}"
-          npm config set registry https://registry.npmjs.org/
-          npm config set @wexinc-healthbenefits:registry "${REG_URL}"
-          npm config set "//usartifactorywexinc.jfrog.io/artifactory/api/npm/${REPO}/:_authToken" "${NPM_TOKEN}"
-          npm config set "//usartifactorywexinc.jfrog.io/artifactory/api/npm/${REPO}/:always-auth" true
+          # Replace project .npmrc so the token is applied reliably (no \${VAR} expansion quirks).
+          {
+            echo "registry=https://registry.npmjs.org/"
+            echo "@wexinc-healthbenefits:registry=https://usartifactorywexinc.jfrog.io/artifactory/api/npm/${REPO}/"
+            echo "//usartifactorywexinc.jfrog.io/artifactory/api/npm/${REPO}/:_authToken=${ARTIFACTORY_NPM_TOKEN}"
+            echo "//usartifactorywexinc.jfrog.io/artifactory/api/npm/${REPO}/:always-auth=true"
+          } > .npmrc
 
       - name: Install dependencies
-        # npm install (not npm ci): lockfile may omit integrity for Artifactory tarballs; install still respects package-lock.
-        run: npm install --ignore-scripts --no-audit --no-fund
+        run: npm install --ignore-scripts --no-audit --no-fund --legacy-peer-deps
 
       - name: Build
         run: npm run build
 
       - name: Deploy to gh-pages
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
           publish_dir: ./dist
-          user_name: 'github-actions[bot]'
-          user_email: 'github-actions[bot]@users.noreply.github.com'
-          commit_message: 'Deploy GitHub Pages: ${{ github.sha }}'
+          user_name: "github-actions[bot]"
+          user_email: "github-actions[bot]@users.noreply.github.com"
+          commit_message: "Deploy GitHub Pages: ${{ github.sha }}"
