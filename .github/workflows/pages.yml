@@ -26,16 +26,24 @@ jobs:
       - name: Configure npm for private scope
         env:
           NPM_TOKEN: ${{ secrets.ARTIFACTORY_NPM_TOKEN }}
+          # Optional repo variable: set to benefits-npm-prod if your token only resolves packages there.
+          BENEFITS_NPM_REPO: ${{ vars.ARTIFACTORY_BENEFITS_NPM_REPO }}
         run: |
           if [ -z "${NPM_TOKEN}" ]; then
             echo "::error::Add repository secret ARTIFACTORY_NPM_TOKEN (matches local Artifactory npm auth for @wexinc-healthbenefits)."
             exit 1
           fi
-          npm config set @wexinc-healthbenefits:registry https://usartifactorywexinc.jfrog.io/artifactory/api/npm/benefits-npm/
-          npm config set //usartifactorywexinc.jfrog.io/artifactory/api/npm/benefits-npm/:_authToken "${NPM_TOKEN}"
+          REPO="${BENEFITS_NPM_REPO:-benefits-npm}"
+          REG_URL="https://usartifactorywexinc.jfrog.io/artifactory/api/npm/${REPO}/"
+          echo "Using Artifactory npm virtual repo: ${REPO}"
+          npm config set registry https://registry.npmjs.org/
+          npm config set @wexinc-healthbenefits:registry "${REG_URL}"
+          npm config set "//usartifactorywexinc.jfrog.io/artifactory/api/npm/${REPO}/:_authToken" "${NPM_TOKEN}"
+          npm config set "//usartifactorywexinc.jfrog.io/artifactory/api/npm/${REPO}/:always-auth" true
 
       - name: Install dependencies
-        run: npm ci --ignore-scripts
+        # npm install (not npm ci): lockfile may omit integrity for Artifactory tarballs; install still respects package-lock.
+        run: npm install --ignore-scripts --no-audit --no-fund
 
       - name: Build
         run: npm run build
