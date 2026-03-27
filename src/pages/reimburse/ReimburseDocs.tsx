@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ConsumerNavigation } from "@/components/layout/ConsumerNavigation";
+import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground";
 import { useReimbursement } from "./ReimbursementContext";
 import {
   Button,
@@ -33,7 +34,7 @@ export default function ReimburseDocs() {
 
   const handleMockUpload = () => {
     // Mock upload - add a file when button is clicked
-    const newFile = { name: "Receipt.pdf", size: "184 KB", status: "uploaded" as const, date: "Jan 16" };
+    const newFile = { name: "Document.pdf", size: "184 KB", status: "uploaded" as const, date: "Jan 16" };
     const newUploads = [...uploads, newFile];
     setUploads(newUploads);
     updateState({ uploadedFiles: newUploads });
@@ -49,7 +50,7 @@ export default function ReimburseDocs() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F1FAFE]">
+    <div className="min-h-screen" style={consumerPageBackgroundStyle}>
       <ConsumerNavigation />
 
       <div className="mx-auto max-w-[1440px] px-8 py-8">
@@ -73,7 +74,7 @@ export default function ReimburseDocs() {
 
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-base font-semibold text-foreground">Receipt or Documentation</h2>
+                  <h2 className="text-base font-semibold text-foreground">Supporting documentation</h2>
                   <Info className="h-4 w-4 text-muted-foreground" />
                 </div>
 

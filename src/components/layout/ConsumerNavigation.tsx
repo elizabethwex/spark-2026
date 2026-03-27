@@ -21,7 +21,6 @@ import {
   User,
   House,
   Wallet,
-  Receipt,
   FileText,
   ChevronDown,
   Languages,
@@ -38,7 +37,7 @@ import { PrototypeFloatingControls } from "@/components/PrototypeFloatingControl
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   "home": House,
   "wallet": Wallet,
-  "receipt": Receipt,
+  "document": FileText,
   "file-text": FileText,
 };
 

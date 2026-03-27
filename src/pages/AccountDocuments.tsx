@@ -9,6 +9,7 @@ import {
 } from "@wexinc-healthbenefits/ben-ui-kit";
 import { ConsumerNavigation } from "@/components/layout/ConsumerNavigation";
 import { ConsumerFooter } from "@/components/layout/Footer";
+import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground";
 import { Download, FileText } from "lucide-react";
 
 const years = ["2025", "2024", "2023", "2022", "2021"];
@@ -43,7 +44,7 @@ export default function AccountDocuments() {
   }, [selectedYear]);
 
   return (
-    <div className="min-h-screen bg-[#F1FAFE]">
+    <div className="min-h-screen" style={consumerPageBackgroundStyle}>
       <ConsumerNavigation />
 
       {/* Main Content */}
