@@ -5,6 +5,22 @@ import { ReimbursementProvider } from "@/pages/reimburse/ReimbursementContext";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { LightModeBoundary } from "@/components/LightModeBoundary";
+import { useAppModeHotkey } from "@/hooks/useAppModeHotkey";
+
+// iOS app mode shell
+const AppShell = React.lazy(() =>
+  import("@/components/app-shell/AppShell").then((m) => ({ default: m.AppShell }))
+);
+
+// iOS app screen pages
+const AppHomePage           = React.lazy(() => import("@/pages/app/AppHome"));
+const AppAccountOverviewPage = React.lazy(() => import("@/pages/app/AppAccountOverview"));
+const AppAccountDetailPage  = React.lazy(() => import("@/pages/app/AppAccountDetail"));
+const AppClaimsOverviewPage = React.lazy(() => import("@/pages/app/AppClaimsOverview"));
+const AppClaimsDetailPage   = React.lazy(() => import("@/pages/app/AppClaimsDetail"));
+const AppMessageCenterPage  = React.lazy(() => import("@/pages/app/AppMessageCenter"));
+const AppMyAccountPage      = React.lazy(() => import("@/pages/app/AppMyAccount"));
+const AppAssistIQPage       = React.lazy(() => import("@/pages/app/AppAssistIQ"));
 
 // Consumer Experience page - standalone route
 const HomePage = React.lazy(() => import("@/pages/HomePage"));
@@ -55,9 +71,12 @@ function PageLoader() {
   );
 }
 
-/**
- * Application routes configuration
- */
+/** Mounts the Cmd+M hotkey inside the Router context */
+function AppModeHotkey() {
+  useAppModeHotkey();
+  return null;
+}
+
 export function AppRoutes() {
   // Wrap consumer-facing pages to enforce light mode without persisting it
   const withConsumerLight = (node: React.ReactNode) => (
@@ -73,6 +92,7 @@ export function AppRoutes() {
 
   return (
     <React.Suspense fallback={<PageLoader />}>
+      <AppModeHotkey />
       <ScrollToTop />
       <Routes>
         {/* Login route */}
@@ -132,7 +152,18 @@ export function AppRoutes() {
         {/* Modern documentation preview */}
         <Route path="modern-document" element={<ModernDocumentPage />} />
 
-        
+        {/* iOS Mobile App — /app/* (no auth gate, direct-link accessible on phone) */}
+        <Route path="app" element={<AppShell />}>
+          <Route index element={<AppHomePage />} />
+          <Route path="account" element={<AppAccountOverviewPage />} />
+          <Route path="account/:id" element={<AppAccountDetailPage />} />
+          <Route path="claims" element={<AppClaimsOverviewPage />} />
+          <Route path="claims/:id" element={<AppClaimsDetailPage />} />
+          <Route path="messages" element={<AppMessageCenterPage />} />
+          <Route path="my-account" element={<AppMyAccountPage />} />
+          <Route path="assist-iq" element={<AppAssistIQPage />} />
+        </Route>
+
         {/* Catch-all for 404 */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
