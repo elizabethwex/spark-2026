@@ -323,17 +323,6 @@ export const navigationItems = [
       { label: "Lifestyle Spending Account", href: "/account-overview?account=lifestyle" },
     ],
   },
-  { label: "Claims", href: "/claims", icon: "document", hasDropdown: false },
-  {
-    label: "Resources",
-    href: "#",
-    icon: "file-text",
-    hasDropdown: true,
-    subItems: [
-      { label: "Resources", href: "/resources" },
-      { label: "Forms & Documents", href: "/resources?section=forms" },
-      { label: "Videos & Guides", href: "/resources?section=videos" },
-      { label: "FAQs", href: "/resources?section=faqs" },
-    ],
-  },
+  { label: "Claims & Payments", href: "/claims", icon: "document", hasDropdown: false },
+  { label: "Messages", href: "/message-center", icon: "mail", hasDropdown: false },
 ];

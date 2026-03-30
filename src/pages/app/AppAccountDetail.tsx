@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { Wallet, ArrowUpRight, ArrowDownLeft, Check, Clock, X } from "lucide-react";
 import { AppNavBar } from "@/components/app-shell/AppNavBar";
 import { AppCard } from "@/components/app-shell/primitives/AppCard";
@@ -37,7 +37,6 @@ const ACCOUNT_META: Record<string, { name: string; balance: string; color: strin
 
 export default function AppAccountDetail() {
   const { id = "hsa" } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const [selectedTx, setSelectedTx] = useState<TxItem | null>(null);
   const meta = ACCOUNT_META[id] ?? ACCOUNT_META["hsa"];
 
