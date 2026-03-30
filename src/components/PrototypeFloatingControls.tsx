@@ -44,7 +44,7 @@ export function PrototypeFloatingControls() {
           className="h-auto min-h-8 px-1 py-1.5 text-[10px] font-semibold leading-tight"
           onClick={() => setHomepageMode("ai-forward")}
         >
-          AI forward
+          Modern
         </Button>
         <Button
           type="button"

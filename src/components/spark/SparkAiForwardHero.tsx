@@ -362,7 +362,7 @@ export function SparkAiForwardHero() {
                   className="flex flex-col gap-[4px]"
                 >
                   <p className="text-[16px] font-semibold leading-[24.75px] text-[#16a34a]">
-                    Document uploaded
+                    Documentation uploaded
                   </p>
                   <p className="text-[14px] leading-[22px] text-[#5f6a94]">
                     We've added it to this claim.
@@ -415,7 +415,7 @@ export function SparkAiForwardHero() {
                     onClick={() => setUploadPhase("options")}
                   >
                     <Camera className="h-[15.75px] w-[15.75px]" />
-                    Upload documentation & file
+                    Upload document & file
                   </Button>
                   <button
                     type="button"
@@ -594,7 +594,7 @@ export function SparkAiForwardHero() {
                   </motion.div>
                   <div className="flex flex-col items-center gap-[4px]">
                     <p className="text-[14px] font-semibold text-[#16a34a]">
-                      Document uploaded
+                      Documentation uploaded
                     </p>
                     <p className="text-[12px] text-[#5f6a94]">
                       We've added it to this claim.

@@ -9,7 +9,6 @@ import { TransactionsAndLinks } from "@/components/sections/TransactionsAndLinks
 import { InfoCardsSection } from "@/components/sections/InfoCardsSection";
 import { QuickViewSection } from "@/components/sections/QuickViewSection";
 import { PromoBanner } from "@/components/sections/PromoBanner";
-import { TasksSection } from "@/components/sections/TasksSection";
 import { ConsumerFooter } from "@/components/layout/Footer";
 import { HSAPlannerCard } from "@/components/HSAPlannerCard";
 import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground";
@@ -39,9 +38,6 @@ export default function HomePagePartnerSafe() {
         </Card>
         </FadeInItem>
 
-        <FadeInItem><TasksSection /></FadeInItem>
-
-        <FadeInItem>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="lg:col-span-2">
             <AccountsSection />
