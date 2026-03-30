@@ -18,8 +18,8 @@ interface HSAEnrollmentReviewProps {
   onAffirmationChange: (checked: boolean) => void;
   eligibilityUnderstanding: boolean;
   onEligibilityUnderstandingChange: (checked: boolean) => void;
-  documentReceipt: boolean;
-  onDocumentReceiptChange: (checked: boolean) => void;
+  enrollmentDocumentationAcknowledged: boolean;
+  onEnrollmentDocumentationAcknowledgedChange: (checked: boolean) => void;
   onEditStep: (stepId: EnrollmentStepId) => void;
 }
 
@@ -52,8 +52,8 @@ export default function HSAEnrollmentReview({
   onAffirmationChange,
   eligibilityUnderstanding,
   onEligibilityUnderstandingChange,
-  documentReceipt,
-  onDocumentReceiptChange,
+  enrollmentDocumentationAcknowledged,
+  onEnrollmentDocumentationAcknowledgedChange,
   onEditStep,
 }: HSAEnrollmentReviewProps) {
   const profileData: ProfileData = {
@@ -203,9 +203,9 @@ export default function HSAEnrollmentReview({
               </div>
 
               <div className="flex gap-1 items-start">
-                <Checkbox id="documents" checked={documentReceipt} onCheckedChange={(checked) => onDocumentReceiptChange(checked as boolean)} className="mt-0.5" required />
+                <Checkbox id="documents" checked={enrollmentDocumentationAcknowledged} onCheckedChange={(checked) => onEnrollmentDocumentationAcknowledgedChange(checked as boolean)} className="mt-0.5" required />
                 <Label htmlFor="documents" className="text-sm leading-6 tracking-[-0.084px] text-foreground cursor-pointer">
-                  <span className="text-red-600">* </span>I confirm receipt of enrollment documents, understand my right to revoke within 7 days, and acknowledge that I haven't received tax or legal advice from the Custodian/Representative. I will seek my own professional advice and hold the Custodian/Representative harmless for my actions.
+                  <span className="text-red-600">* </span>I confirm I have received the enrollment documentation, understand my right to revoke within 7 days, and acknowledge that I haven&apos;t received tax or legal advice from the Custodian/Representative. I will seek my own professional advice and hold the Custodian/Representative harmless for my actions.
                 </Label>
               </div>
             </div>

@@ -63,12 +63,14 @@ export default function HSAEnrollmentWorkspace({ open, onOpenChange }: HSAEnroll
 
   const [affirmation, setAffirmation] = React.useState(false);
   const [eligibilityUnderstanding, setEligibilityUnderstanding] = React.useState(false);
-  const [documentReceipt, setDocumentReceipt] = React.useState(false);
+  const [enrollmentDocumentationAcknowledged, setEnrollmentDocumentationAcknowledged] =
+    React.useState(false);
 
   const currentStepIndex = stepOrder.indexOf(currentStepId);
   const stepperCurrentId = currentStepId === "success" ? "review" : currentStepId;
   const canProceedFromEligibility = certificationChecked && coverageLevel !== "";
-  const canSubmitReview = affirmation && eligibilityUnderstanding && documentReceipt;
+  const canSubmitReview =
+    affirmation && eligibilityUnderstanding && enrollmentDocumentationAcknowledged;
 
   const resetState = React.useCallback(() => {
     setCurrentStepId("profile");
@@ -76,7 +78,7 @@ export default function HSAEnrollmentWorkspace({ open, onOpenChange }: HSAEnroll
     setCoverageLevel("");
     setAffirmation(false);
     setEligibilityUnderstanding(false);
-    setDocumentReceipt(false);
+    setEnrollmentDocumentationAcknowledged(false);
   }, []);
 
   React.useEffect(() => {
@@ -222,8 +224,8 @@ export default function HSAEnrollmentWorkspace({ open, onOpenChange }: HSAEnroll
             onAffirmationChange={setAffirmation}
             eligibilityUnderstanding={eligibilityUnderstanding}
             onEligibilityUnderstandingChange={setEligibilityUnderstanding}
-            documentReceipt={documentReceipt}
-            onDocumentReceiptChange={setDocumentReceipt}
+            enrollmentDocumentationAcknowledged={enrollmentDocumentationAcknowledged}
+            onEnrollmentDocumentationAcknowledgedChange={setEnrollmentDocumentationAcknowledged}
             onEditStep={handleEditStep}
           />
         );

@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import {
   Button,
 } from "@wexinc-healthbenefits/ben-ui-kit";
-import { Send, Mic, Receipt } from "lucide-react";
+import { Send, Mic, FileText } from "lucide-react";
 import SiriOrb from "@/components/ui/siri-orb";
 import { quickActions } from "@/data/mockData";
 
@@ -38,7 +38,7 @@ export function AIChatSection() {
                 Good morning, Crystal. 
               </span>
               <span className="text-sm text-muted-foreground line-clamp-1">
-                You have <strong className="text-foreground">49 days</strong> left to use your $250 FSA balance. Upload a receipt?
+                You have <strong className="text-foreground">49 days</strong> left to use your $250 FSA balance. Upload documentation?
               </span>
             </div>
             <Button 
@@ -47,8 +47,8 @@ export function AIChatSection() {
               className="rounded-full shrink-0 shadow-md shadow-primary/20 hidden sm:flex"
               onClick={() => navigate("/reimburse")}
             >
-              <Receipt className="h-4 w-4 mr-1.5" />
-              Upload Receipt
+              <FileText className="h-4 w-4 mr-1.5" />
+              Upload documentation
             </Button>
           </div>
 

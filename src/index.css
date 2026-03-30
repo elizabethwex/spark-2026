@@ -1,6 +1,9 @@
 /* Semantic colors: packages/design-tokens (imported after this file in main.tsx). Kit: structure + components. */
 @import '@wexinc-healthbenefits/ben-ui-kit/styles.css';
 
+/* iOS app mode tokens — must come after kit so --wex-* vars are defined */
+@import './styles/app-tokens.css';
+
 @import "tailwindcss";
 @config "../tailwind.config.ts";
 

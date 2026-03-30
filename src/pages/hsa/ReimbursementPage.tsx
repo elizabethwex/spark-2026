@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Building, Receipt, CreditCard, Info, Copy } from "lucide-react";
+import { Building, FileText, CreditCard, Info, Copy } from "lucide-react";
 import {
   FloatLabel,
   Label,
@@ -66,7 +66,7 @@ export default function HSAReimbursementPage() {
       id: "check",
       title: "Check",
       description: "Your reimbursement check will be sent to your home within 3-5 business days from the date we receive substantiation of your claims.",
-      icon: <Receipt className="h-4 w-4 text-muted-foreground" />,
+      icon: <FileText className="h-4 w-4 text-muted-foreground" />,
       showLink: false,
     },
     {

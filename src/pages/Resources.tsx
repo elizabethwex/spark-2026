@@ -10,6 +10,7 @@ import {
 } from "@wexinc-healthbenefits/ben-ui-kit";
 import { ConsumerNavigation } from "@/components/layout/ConsumerNavigation";
 import { ConsumerFooter } from "@/components/layout/Footer";
+import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground";
 import {
   FileText,
   Download,
@@ -60,7 +61,7 @@ export default function Resources() {
   const [quickLinksOpen, setQuickLinksOpen] = useState(true);
 
   return (
-    <div className="min-h-screen bg-[#F1FAFE]">
+    <div className="min-h-screen" style={consumerPageBackgroundStyle}>
       <ConsumerNavigation />
 
       {/* Main Content */}
