@@ -142,7 +142,6 @@ export default function AppClaimsOverview() {
           ) : (
             filtered.map((claim, i) => {
               const sm = STATUS_META[claim.status];
-              const Icon = sm.icon;
               const isLast = i === filtered.length - 1;
               return (
                 <div
