@@ -84,11 +84,10 @@ interface TransactionRowProps {
   title: string;
   subtitle: string;
   amount: string;
-  last?: boolean;
   onClick?: () => void;
 }
 
-function TransactionRow({ title, subtitle, amount, last, onClick }: TransactionRowProps) {
+function TransactionRow({ title, subtitle, amount, onClick }: TransactionRowProps) {
   return (
     <div
       onClick={onClick}
@@ -944,13 +943,12 @@ export default function AppHome() {
               { title: "Pharmacy",      subtitle: "4/27/2026 · LPFSA", amount: "$42.50",  id: "c1" },
               { title: "Dr. Miller DDS",subtitle: "4/27/2026 · LPFSA", amount: "$340.00", id: "c3" },
               { title: "Investment Buy", subtitle: "4/27/2026 · HSA",   amount: "$500.00", id: "c2" },
-            ].map((tx, i, arr) => (
+            ].map((tx) => (
               <TransactionRow
                 key={tx.id}
                 title={tx.title}
                 subtitle={tx.subtitle}
                 amount={tx.amount}
-                last={i === arr.length - 1}
                 onClick={() => navigate(`/app/claims/${tx.id}`)}
               />
             ))}

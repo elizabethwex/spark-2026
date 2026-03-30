@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import { FadeInItem } from "@/components/layout/PageFadeIn";
 import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
@@ -1056,6 +1057,7 @@ export default function MessageCenter() {
       <ConsumerNavigation />
 
       {/* Main Content */}
+      <FadeInItem>
       <div className="mx-auto max-w-[1440px] px-4 py-6 sm:px-6 md:px-8 md:py-8">
         <div className="mx-auto max-w-[1376px]">
           {/* Page Header */}
@@ -1831,6 +1833,7 @@ export default function MessageCenter() {
           </SidebarProvider>
         </div>
       </div>
+      </FadeInItem>
 
       <ConsumerFooter />
 

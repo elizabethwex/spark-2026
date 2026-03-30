@@ -11,6 +11,7 @@ import {
 import { ConsumerNavigation } from "@/components/layout/ConsumerNavigation";
 import { ConsumerFooter } from "@/components/layout/Footer";
 import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground";
+import { FadeInItem } from "@/components/layout/PageFadeIn";
 import {
   FileText,
   Download,
@@ -65,6 +66,7 @@ export default function Resources() {
       <ConsumerNavigation />
 
       {/* Main Content */}
+      <FadeInItem>
       <div className="mx-auto max-w-[1440px] px-8 py-8">
         <div className="mx-auto max-w-[1376px]">
           {/* Page Header */}
@@ -303,6 +305,7 @@ export default function Resources() {
           </div>
         </div>
       </div>
+      </FadeInItem>
 
       <ConsumerFooter />
     </div>

@@ -10,7 +10,6 @@ import {
   Globe,
   Phone,
   Mail,
-  ChevronRight,
   LogOut,
 } from "lucide-react";
 import { AppNavBar } from "@/components/app-shell/AppNavBar";
