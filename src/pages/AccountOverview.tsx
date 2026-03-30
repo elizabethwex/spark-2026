@@ -1,6 +1,7 @@
 import { ConsumerNavigation } from "@/components/layout/ConsumerNavigation";
 import { ConsumerFooter } from "@/components/layout/Footer";
 import { UnderConstruction } from "@/components/UnderConstruction";
+import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground";
 // Original imports preserved for future restoration:
 // import { TitleBar } from "./account-overview/TitleBar";
 // import { AccountSummaryCards } from "./account-overview/AccountSummaryCards";
@@ -23,7 +24,7 @@ import { UnderConstruction } from "@/components/UnderConstruction";
  */
 export default function AccountOverviewPage() {
   return (
-    <div className="min-h-screen bg-[#F1FAFE]">
+    <div className="min-h-screen" style={consumerPageBackgroundStyle}>
       {/* Navigation Header */}
       <ConsumerNavigation />
 

@@ -52,6 +52,7 @@ import {
 } from "@wexinc-healthbenefits/ben-ui-kit";
 import { ConsumerNavigation } from "@/components/layout/ConsumerNavigation";
 import { ConsumerFooter } from "@/components/layout/Footer";
+import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground";
 import { cn } from "@/lib/utils";
 import emptyStateIllustration from "@/assets/empty-state-illustration.svg";
 import {
@@ -834,8 +835,8 @@ const ATTENTION_NEEDED_MESSAGE_TYPES: string[] = [
   "Denial Letter With Repayment",
   "Medicare Advantage Denial Letter",
   "Claim Applied to Repayment Alert",
-  "Receipt Reminder",
-  "Receipt Needed for Debit Card Transaction",
+  "Documentation Reminder",
+  "Documentation Needed for Debit Card Transaction",
   "Request for More Information (RMI)",
   "HSA Excess Distribution Notification",
   "HSA Cash Balance Warning",
@@ -1050,7 +1051,7 @@ export default function MessageCenter() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F1FAFE]">
+    <div className="min-h-screen" style={consumerPageBackgroundStyle}>
       {/* Navigation Bar */}
       <ConsumerNavigation />
 
