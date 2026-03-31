@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from "react"
+import type { CSSProperties } from "react"
 import { Button, Card, CardContent, FloatLabel, toast } from "@wexinc-healthbenefits/ben-ui-kit"
 import {
   Eye,
@@ -103,27 +104,32 @@ export default function Login({ onLoginSuccess }: LoginProps) {
     prevStepRef.current = step
   }, [step])
 
-  /** Account linking (steps 6–8, 10): reset scroll from prior step so the view starts at the top. */
+  /** Reset scroll on every step so the fixed background matches across main login and account/linking flows. */
   useEffect(() => {
-    if (step !== 6 && step !== 7 && step !== 8 && step !== 10 && step !== 11)
-      return
     window.scrollTo({ top: 0, left: 0, behavior: "auto" })
   }, [step])
 
   /** Move focus to the primary field for the current step after the step UI mounts. */
   useEffect(() => {
     const id = requestAnimationFrame(() => {
-      if (step === 1) usernameInputRef.current?.focus()
-      else if (step === 2) passwordInputRef.current?.focus()
-      else if (step === 3) mfaCodeInputRef.current?.focus()
-      else if (step === 4) methodEmailButtonRef.current?.focus()
-      else if (step === 5) accountContinueRef.current?.focus()
+      if (step === 1)
+        usernameInputRef.current?.focus({ preventScroll: true })
+      else if (step === 2)
+        passwordInputRef.current?.focus({ preventScroll: true })
+      else if (step === 3)
+        mfaCodeInputRef.current?.focus({ preventScroll: true })
+      else if (step === 4)
+        methodEmailButtonRef.current?.focus({ preventScroll: true })
+      else if (step === 5)
+        accountContinueRef.current?.focus({ preventScroll: true })
       else if (step === 6)
         accountLinkingContinueRef.current?.focus({ preventScroll: true })
       else if (step === 7)
         verifyLinkUsernameRef.current?.focus({ preventScroll: true })
-      else if (step === 8) linkMfaCodeInputRef.current?.focus()
-      else if (step === 9) linkMethodEmailButtonRef.current?.focus()
+      else if (step === 8)
+        linkMfaCodeInputRef.current?.focus({ preventScroll: true })
+      else if (step === 9)
+        linkMethodEmailButtonRef.current?.focus({ preventScroll: true })
       else if (step === 10)
         selectPrimaryRef.current?.focus({ preventScroll: true })
     })
@@ -291,8 +297,9 @@ export default function Login({ onLoginSuccess }: LoginProps) {
     const usernameLower = trimmedUsername.toLowerCase()
     const isValidUsername =
       usernameLower === "ux@wex.com" || usernameLower === "ux-nicole"
+    const passwordLower = password.trim().toLowerCase()
     const passwordOk =
-      password.trim().toLowerCase() === "uxprototype123!"
+      passwordLower === "uxprototype123!" || passwordLower === "spark"
     const isValidCredentials = isValidUsername && passwordOk
     
     if (!isValidCredentials) {
@@ -507,22 +514,27 @@ export default function Login({ onLoginSuccess }: LoginProps) {
     return 'XXXXXX8789'
   }
 
+  const loginBgStyle: CSSProperties = {
+    backgroundImage: `url(${loginBgUrl})`,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+    backgroundColor: "#f0f4f8",
+  }
+
   return (
-    <div 
-      className="min-h-screen w-full relative overflow-hidden"
-      style={{ 
-        backgroundImage: `url(${loginBgUrl})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        backgroundColor: '#f0f4f8'
-      }}
-    >
+    <div className="relative min-h-screen w-full">
+      {/* Fixed viewport background — does not stretch or move when content scrolls */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 z-0 min-h-[100dvh] w-full"
+        style={loginBgStyle}
+      />
 
       {/* Main Content */}
-      <div className="relative z-10 min-h-screen flex flex-col">
-        {/* Login Card */}
-        <div className="flex-1 flex items-center justify-center px-4 py-8">
+      <div className="relative z-10 flex min-h-screen min-h-[100dvh] flex-col">
+        {/* Login Card — same top alignment + padding as account selector / linking so fixed bg matches */}
+        <div className="flex flex-1 flex-col items-center justify-start px-4 py-8">
           {/* variant="elevated" = large shadow (shadow-lg, hover:shadow-xl) per ben-ui-kit; inline radius overrides kit token */}
           <Card
             variant="elevated"
