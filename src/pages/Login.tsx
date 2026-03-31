@@ -550,13 +550,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
               <div className="flex flex-col gap-6">
                 {/* Logo + Title + Subtext */}
                 <div className="flex flex-col gap-6 items-center">
-                  <div
-                    className={
-                      step === 5 || step === 6 || step === 7 || step === 8 || step === 10 || step === 11
-                        ? "h-8 w-24"
-                        : "w-[150px] h-[50px]"
-                    }
-                  >
+                  <div className="h-8 w-24">
                     <img src={wexLogoUrl} alt="WEX" className="w-full h-full object-contain" />
                   </div>
                   <div
