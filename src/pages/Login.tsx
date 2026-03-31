@@ -1,17 +1,66 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef, useMemo } from "react"
 import { Button, Card, CardContent, FloatLabel, toast } from "@wexinc-healthbenefits/ben-ui-kit"
-import { Eye, EyeOff, AlertCircle, Mail, MessageSquare, ChevronRight, UserLock } from "lucide-react"
+import {
+  Eye,
+  EyeOff,
+  AlertCircle,
+  Mail,
+  MessageSquare,
+  ChevronRight,
+  UserLock,
+} from "lucide-react"
 import { useAuth } from "@/context/AuthContext"
+import { cn } from "@/lib/utils"
+import { AccountLinkingIntro } from "@/components/login/AccountLinkingIntro"
+import { AccountLinkingVerifyAccess } from "@/components/login/AccountLinkingVerifyAccess"
+import {
+  LinkingAccountSummary,
+  MATCHED_ACCOUNT_ROWS,
+} from "@/components/login/accountLinkingShared"
+import { SelectPrimaryAccount } from "@/components/login/SelectPrimaryAccount"
+import { ConfirmAccountLinking } from "@/components/login/ConfirmAccountLinking"
+import type { PrimaryOptionId } from "@/components/login/accountLinkingPrimary"
 
 interface LoginProps {
   onLoginSuccess: () => void
 }
 
+/** Prototype email for MFA when the code is sent via email; shown masked in the read-only Email field. */
+const MFA_EMAIL_DISPLAY_SOURCE = "ux-nicole@dundermifflin.com"
+
+/** Prototype destination for account-linking MFA (step 8); masked like primary MFA. */
+const LINK_MFA_EMAIL_DISPLAY_SOURCE = "nicole.jackson@gmail.com"
+
+type LoginStep = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11
+
+const ACCOUNT_GROUPS: {
+  employerName: string
+  accounts: { id: string; label: string; icon: "building" | "landmark" }[]
+}[] = [
+  {
+    employerName: "Dunder Mifflin Paper Co.",
+    accounts: [
+      { id: "dm-reimb", label: "Reimbursement Account(s)", icon: "building" },
+      { id: "dm-mbe", label: "My Benefit Express", icon: "building" },
+    ],
+  },
+  {
+    employerName: "ACME Company",
+    accounts: [{ id: "acme-hsa", label: "Health Savings Account", icon: "landmark" }],
+  },
+]
+
+/** Prototype: only Reimbursement Account(s) may continue; other selections keep Continue disabled. */
+const ACCOUNT_SELECTION_ALLOWED_ID = "dm-reimb"
+
 export default function Login({ onLoginSuccess }: LoginProps) {
   const { login } = useAuth()
   const wexLogoUrl = `${import.meta.env.BASE_URL}WEX_Logo_Red_Vector.svg`
   const loginBgUrl = `${import.meta.env.BASE_URL}wexbrand_loginbg.svg`
-  const [step, setStep] = useState<1 | 2 | 3 | 4>(1)
+  const dunderMifflinLogoUrl = `${import.meta.env.BASE_URL}dundermifflin.png`
+  const acmeLogoUrl = `${import.meta.env.BASE_URL}acme.png`
+  const [step, setStep] = useState<LoginStep>(1)
+  const [selectedAccountId, setSelectedAccountId] = useState(ACCOUNT_SELECTION_ALLOWED_ID)
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -21,6 +70,65 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   const [generatedCode, setGeneratedCode] = useState("")
   const [codeError, setCodeError] = useState(false)
   const [selectedMfaMethod, setSelectedMfaMethod] = useState<'email' | 'sms'>('email')
+  const [linkMfaCode, setLinkMfaCode] = useState("")
+  const [linkGeneratedCode, setLinkGeneratedCode] = useState("")
+  const [linkCodeError, setLinkCodeError] = useState(false)
+  const [linkResendTimer, setLinkResendTimer] = useState(13)
+  const [linkMfaMethod, setLinkMfaMethod] = useState<"email" | "sms">("email")
+
+  const usernameInputRef = useRef<HTMLInputElement>(null)
+  const passwordInputRef = useRef<HTMLInputElement>(null)
+  const mfaCodeInputRef = useRef<HTMLInputElement>(null)
+  const methodEmailButtonRef = useRef<HTMLButtonElement>(null)
+  const accountContinueRef = useRef<HTMLButtonElement>(null)
+  const accountLinkingContinueRef = useRef<HTMLButtonElement>(null)
+  const verifyLinkUsernameRef = useRef<HTMLInputElement>(null)
+  const linkMfaCodeInputRef = useRef<HTMLInputElement>(null)
+  const linkMethodEmailButtonRef = useRef<HTMLButtonElement>(null)
+  const selectPrimaryRef = useRef<HTMLButtonElement>(null)
+  const confirmAccountLinkingRef = useRef<HTMLButtonElement>(null)
+  const [selectedPrimaryAccountId, setSelectedPrimaryAccountId] =
+    useState<PrimaryOptionId>("ux-nicole")
+  /** Matched account row ids successfully linked in this session — shown on account selector (step 5). */
+  const [linkedAccountIdsForSelector, setLinkedAccountIdsForSelector] = useState<string[]>([])
+  const [pendingLinkAccountIds, setPendingLinkAccountIds] = useState<string[]>([])
+  const prevStepRef = useRef<LoginStep>(step)
+
+  /** Dismiss prototype MFA code toasts (Sonner) when leaving an MFA entry step. */
+  useEffect(() => {
+    const prev = prevStepRef.current
+    if ((prev === 3 || prev === 8) && step !== 3 && step !== 8) {
+      toast.dismiss()
+    }
+    prevStepRef.current = step
+  }, [step])
+
+  /** Account linking (steps 6–8, 10): reset scroll from prior step so the view starts at the top. */
+  useEffect(() => {
+    if (step !== 6 && step !== 7 && step !== 8 && step !== 10 && step !== 11)
+      return
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" })
+  }, [step])
+
+  /** Move focus to the primary field for the current step after the step UI mounts. */
+  useEffect(() => {
+    const id = requestAnimationFrame(() => {
+      if (step === 1) usernameInputRef.current?.focus()
+      else if (step === 2) passwordInputRef.current?.focus()
+      else if (step === 3) mfaCodeInputRef.current?.focus()
+      else if (step === 4) methodEmailButtonRef.current?.focus()
+      else if (step === 5) accountContinueRef.current?.focus()
+      else if (step === 6)
+        accountLinkingContinueRef.current?.focus({ preventScroll: true })
+      else if (step === 7)
+        verifyLinkUsernameRef.current?.focus({ preventScroll: true })
+      else if (step === 8) linkMfaCodeInputRef.current?.focus()
+      else if (step === 9) linkMethodEmailButtonRef.current?.focus()
+      else if (step === 10)
+        selectPrimaryRef.current?.focus({ preventScroll: true })
+    })
+    return () => cancelAnimationFrame(id)
+  }, [step])
 
   // Debug instrumentation (Debug Mode)
   useEffect(() => {
@@ -146,6 +254,28 @@ export default function Login({ onLoginSuccess }: LoginProps) {
     }
   }, [step, resendTimer])
 
+  // Generate code when entering account-linking MFA (step 8)
+  useEffect(() => {
+    if (step !== 8) return
+    const code = Math.floor(10000 + Math.random() * 90000).toString()
+    setLinkGeneratedCode(code)
+    setLinkCodeError(false)
+    setLinkMfaCode("")
+    setLinkResendTimer(13)
+    toast(`Your MFA code is: ${code}`, {
+      duration: 30000,
+      position: "top-right",
+    })
+  }, [step])
+
+  // Countdown for account-linking MFA resend (step 8)
+  useEffect(() => {
+    if (step === 8 && linkResendTimer > 0) {
+      const timer = setTimeout(() => setLinkResendTimer(linkResendTimer - 1), 1000)
+      return () => clearTimeout(timer)
+    }
+  }, [step, linkResendTimer])
+
   const handleUsernameSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (username.trim()) {
@@ -179,12 +309,8 @@ export default function Login({ onLoginSuccess }: LoginProps) {
     e.preventDefault()
     
     if (mfaCode.trim() === generatedCode) {
-      // Code matches - success
       setCodeError(false)
-      // Set authenticated state
-      login()
-      // Call success callback to redirect
-      onLoginSuccess()
+      setStep(5)
     } else {
       // Code doesn't match - show error
       setCodeError(true)
@@ -214,6 +340,133 @@ export default function Login({ onLoginSuccess }: LoginProps) {
 
   const handleTryAnotherMethod = () => {
     setStep(4)
+  }
+
+  const handleAccountSelectionContinue = () => {
+    const canProceed =
+      selectedAccountId === ACCOUNT_SELECTION_ALLOWED_ID ||
+      selectedAccountId.startsWith("linked-")
+    if (!canProceed) return
+    login()
+    onLoginSuccess()
+  }
+
+  const canContinueAccountSelection =
+    selectedAccountId === ACCOUNT_SELECTION_ALLOWED_ID ||
+    selectedAccountId.startsWith("linked-")
+
+  const accountGroupsForDisplay = useMemo(() => {
+    if (linkedAccountIdsForSelector.length === 0) return ACCOUNT_GROUPS
+    const groups = ACCOUNT_GROUPS.map((g) => ({
+      ...g,
+      accounts: [...g.accounts],
+    }))
+    const dmIdx = groups.findIndex(
+      (g) => g.employerName === "Dunder Mifflin Paper Co."
+    )
+    if (dmIdx === -1) return groups
+    for (const linkId of linkedAccountIdsForSelector) {
+      const row = MATCHED_ACCOUNT_ROWS.find((r) => r.id === linkId)
+      if (!row) continue
+      const selectorId = `linked-${linkId}`
+      if (groups[dmIdx].accounts.some((a) => a.id === selectorId)) continue
+      groups[dmIdx].accounts.push({
+        id: selectorId,
+        label: row.productLabel,
+        icon: "building" as const,
+      })
+    }
+    return groups
+  }, [linkedAccountIdsForSelector])
+
+  const handleAccountSelectionCancel = () => {
+    setStep(3)
+  }
+
+  const handleAccountLinkingContinue = (selectedIds: string[]) => {
+    if (selectedIds.length === 0) return
+    setPendingLinkAccountIds(selectedIds)
+    setStep(7)
+  }
+
+  const handleVerifyAccessContinue = () => {
+    setStep(8)
+  }
+
+  const handleLinkMfaSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (linkMfaCode.trim() === linkGeneratedCode) {
+      setLinkCodeError(false)
+      setLinkedAccountIdsForSelector((prev) => [
+        ...new Set([...prev, ...pendingLinkAccountIds]),
+      ])
+      setPendingLinkAccountIds([])
+      setStep(10)
+    } else {
+      setLinkCodeError(true)
+    }
+  }
+
+  const handleLinkResendCode = () => {
+    if (linkResendTimer === 0) {
+      const code = Math.floor(10000 + Math.random() * 90000).toString()
+      setLinkGeneratedCode(code)
+      setLinkCodeError(false)
+      setLinkMfaCode("")
+      setLinkResendTimer(13)
+      toast(`Your new MFA code is: ${code}`, {
+        duration: 30000,
+        position: "top-right",
+      })
+    }
+  }
+
+  const handleLinkTryAnotherMethod = () => {
+    setStep(9)
+  }
+
+  const handleLinkMethodSelect = (method: "email" | "sms") => {
+    setLinkMfaMethod(method)
+    const code = Math.floor(10000 + Math.random() * 90000).toString()
+    setLinkGeneratedCode(code)
+    setLinkCodeError(false)
+    setLinkMfaCode("")
+    setLinkResendTimer(13)
+    toast(`Your MFA code is: ${code}`, {
+      duration: 30000,
+      position: "top-right",
+    })
+    setStep(8)
+  }
+
+  const handleVerifyAccessSkip = () => {
+    setPendingLinkAccountIds([])
+    setStep(5)
+  }
+
+  const handleAccountLinkingNotNow = () => {
+    setStep(5)
+  }
+
+  const handleSelectPrimaryMakePrimary = (selectedId: PrimaryOptionId) => {
+    setSelectedPrimaryAccountId(selectedId)
+    setStep(11)
+  }
+
+  const handleSelectPrimaryCancel = () => {
+    setStep(5)
+  }
+
+  const handleConfirmAccountLinking = () => {
+    const firstLinked = linkedAccountIdsForSelector[0]
+    if (firstLinked) {
+      setSelectedAccountId(`linked-${firstLinked}`)
+    }
+    setStep(5)
+  }
+
+  const handleConfirmAccountLinkingCancel = () => {
+    setStep(10)
   }
 
   const handleMethodSelect = (method: 'email' | 'sms') => {
@@ -273,29 +526,92 @@ export default function Login({ onLoginSuccess }: LoginProps) {
           {/* variant="elevated" = large shadow (shadow-lg, hover:shadow-xl) per ben-ui-kit; inline radius overrides kit token */}
           <Card
             variant="elevated"
-            className="w-full max-w-[402px] overflow-hidden border-0"
+            className={cn(
+              "w-full overflow-hidden border-0",
+              step === 5 || step === 6 || step === 7 || step === 8 || step === 10 || step === 11
+                ? "max-w-[464px]"
+                : "max-w-[402px]"
+            )}
             style={{ borderRadius: "16px" }}
           >
             <CardContent className="p-8" style={{ borderRadius: "16px" }}>
               <div className="flex flex-col gap-6">
                 {/* Logo + Title + Subtext */}
                 <div className="flex flex-col gap-6 items-center">
-                  <div className="w-[150px] h-[50px]">
+                  <div
+                    className={
+                      step === 5 || step === 6 || step === 7 || step === 8 || step === 10 || step === 11
+                        ? "h-8 w-24"
+                        : "w-[150px] h-[50px]"
+                    }
+                  >
                     <img src={wexLogoUrl} alt="WEX" className="w-full h-full object-contain" />
                   </div>
-                  <div className="flex flex-col gap-2 items-center text-center">
-                    <h1 className="text-[18px] font-semibold leading-6 tracking-[-0.252px] text-foreground">
-                      {step === 1 ? "Welcome" : step === 2 ? "Enter your password" : step === 3 ? "Verify your identity" : "Keep your account safe"}
-                    </h1>
-                    <p className="text-[16px] font-normal leading-6 tracking-[-0.176px] text-foreground max-w-[328px]">
-                      {step === 1 
-                        ? "Please enter your username to log into WEX Health & Benefits"
+                  <div
+                    className={cn(
+                      "flex flex-col items-center text-center",
+                      step === 5 || step === 6 || step === 7 || step === 8 || step === 10 || step === 11
+                        ? "gap-[14px]"
+                        : "gap-2"
+                    )}
+                  >
+                    <h3 className="text-xl font-display font-semibold text-foreground tracking-tight">
+                      {step === 1
+                        ? "Welcome"
                         : step === 2
-                        ? "Please enter your password to log into WEX Health & Benefits"
-                        : step === 3
-                        ? (selectedMfaMethod === 'sms' ? "We've sent a text message to" : "We've sent an email with your code to")
-                        : "Select an authentication method"}
+                          ? "Enter Your Password"
+                          : step === 3 || step === 8
+                            ? "Verify Your Identity"
+                            : step === 4 || step === 9
+                              ? "Keep Your Account Safe"
+                              : step === 5
+                                ? "Select an Account"
+                                : step === 6
+                                  ? "Unlinked Accounts"
+                                  : step === 7
+                                    ? "Verify Your Access"
+                                    : step === 10
+                                      ? "Select Primary Account"
+                                      : step === 11
+                                        ? "Confirm Account Linking"
+                                        : ""}
+                    </h3>
+                    {step !== 11 && (
+                    <p
+                      className={cn(
+                        "text-[16px] font-normal leading-6 tracking-[-0.176px] text-foreground",
+                        step === 6 || step === 7
+                          ? "w-full max-w-none"
+                          : "max-w-[328px]"
+                      )}
+                    >
+                      {step === 1
+                        ? "Please enter your username to login"
+                        : step === 2
+                          ? "Please enter your password to login"
+                          : step === 3
+                            ? selectedMfaMethod === "sms"
+                              ? "We've sent a text message to"
+                              : "We've sent an email with your code to the email address you have on file."
+                            : step === 4
+                              ? "Select an authentication method"
+                              : step === 5
+                                ? "Please select which account you'd like to access."
+                                : step === 6
+                                  ? "We found other benefits accounts that may belong to you. Link them to access and manage everything in one place."
+                                  : step === 7
+                                    ? "To link this account, please verify your access by entering your account credentials."
+                                    : step === 8
+                                      ? linkMfaMethod === "sms"
+                                        ? "We've sent a text message to"
+                                        : "We've sent an email with your code to the email address you have on file."
+                                      : step === 9
+                                        ? "Select an authentication method"
+                                        : step === 10
+                                          ? "You'll use the credentials from this selected account to login to all accounts moving forward."
+                                          : ""}
                     </p>
+                    )}
                   </div>
                 </div>
 
@@ -305,6 +621,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                     <form onSubmit={handleUsernameSubmit} className="flex flex-col gap-6">
                       {/* Input Field with Floating Label */}
                       <FloatLabel
+                        ref={usernameInputRef}
                         label="Username"
                         type="text"
                         value={username}
@@ -391,6 +708,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                     <div className="flex flex-col gap-[30px]">
                       <div className="flex flex-col gap-1">
                         <FloatLabel
+                          ref={passwordInputRef}
                           label="Password"
                           type={showPassword ? "text" : "password"}
                           value={password}
@@ -450,7 +768,11 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                     <FloatLabel
                       label={selectedMfaMethod === 'sms' ? "Mobile number" : "Email"}
                       type="text"
-                      value={selectedMfaMethod === 'sms' ? maskPhoneForSms() : maskUsername(username)}
+                      value={
+                        selectedMfaMethod === "sms"
+                          ? maskPhoneForSms()
+                          : maskUsername(MFA_EMAIL_DISPLAY_SOURCE)
+                      }
                       readOnly
                       size="lg"
                       className="text-[16px] leading-6 tracking-[-0.176px] cursor-default"
@@ -459,6 +781,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                 {/* Code Input Field */}
                 <div className="flex flex-col gap-1">
                   <FloatLabel
+                    ref={mfaCodeInputRef}
                     label="Enter the code"
                     type="text"
                     value={mfaCode}
@@ -520,6 +843,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                   <div className="flex flex-col gap-4">
                       {/* Email Option */}
                       <button
+                        ref={methodEmailButtonRef}
                         type="button"
                         onClick={() => handleMethodSelect('email')}
                         className="w-full"
@@ -552,6 +876,265 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                         </div>
                       </button>
                   </div>
+                )}
+
+                {/* Step 5: Account selection (after MFA) — Consumer-Experience Redesign / Login Account Selector */}
+                {step === 5 && (
+                  <div className="flex w-full flex-col gap-6">
+                    <div className="flex flex-col gap-6">
+                      {accountGroupsForDisplay.map((group) => (
+                        <div key={group.employerName} className="flex flex-col gap-4">
+                          <p className="w-full text-left text-base font-bold leading-6 tracking-[-0.176px] text-foreground">
+                            {group.employerName}
+                          </p>
+                          <div className="flex flex-col gap-4">
+                            {group.accounts.map((account) => {
+                              const selected = selectedAccountId === account.id
+                              return (
+                                <button
+                                  key={account.id}
+                                  type="button"
+                                  aria-pressed={selected}
+                                  onClick={() => setSelectedAccountId(account.id)}
+                                  className={cn(
+                                    "flex w-full items-center gap-4 rounded-lg border px-4 py-2 text-left transition-colors",
+                                    selected
+                                      ? "border-[hsl(var(--wex-primary))] bg-[hsl(var(--wex-primary)/0.08)]"
+                                      : "border-border bg-card hover:bg-accent/50"
+                                  )}
+                                >
+                                  <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded border border-border bg-background">
+                                    {account.icon === "building" ? (
+                                      <img
+                                        src={dunderMifflinLogoUrl}
+                                        alt=""
+                                        className="h-full w-full object-cover"
+                                      />
+                                    ) : (
+                                      <img
+                                        src={acmeLogoUrl}
+                                        alt=""
+                                        className="h-full w-full object-cover"
+                                      />
+                                    )}
+                                  </div>
+                                  <span className="text-[14px] font-normal leading-6 tracking-[-0.084px] text-foreground">
+                                    {account.label}
+                                  </span>
+                                </button>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setStep(6)}
+                      className="w-full text-left text-[14px] font-normal leading-6 tracking-[-0.084px] text-[hsl(var(--wex-primary))] hover:underline"
+                    >
+                      Link Another Account
+                    </button>
+
+                    <div className="flex flex-col gap-[17px]">
+                      <Button
+                        ref={accountContinueRef}
+                        type="button"
+                        disabled={!canContinueAccountSelection}
+                        onClick={handleAccountSelectionContinue}
+                        className="h-10 w-full rounded-lg text-[14px] font-medium leading-6 tracking-[-0.084px]"
+                      >
+                        Continue
+                      </Button>
+                      <Button
+                        type="button"
+                        intent="primary"
+                        variant="outline"
+                        onClick={handleAccountSelectionCancel}
+                        className="h-10 w-full rounded-lg text-[14px] font-medium leading-6 tracking-[-0.084px] border-[hsl(var(--wex-primary))] text-[hsl(var(--wex-primary))] hover:bg-muted/50"
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 6: Account linking — Unlinked Accounts (Figma 27732:25237) */}
+                {step === 6 && (
+                  <AccountLinkingIntro
+                    primaryUsername={username.trim() || "ux-nicole"}
+                    onContinue={handleAccountLinkingContinue}
+                    onNotNow={handleAccountLinkingNotNow}
+                    onAddAnotherAccount={() =>
+                      toast("Add another account", { position: "top-right" })
+                    }
+                    continueRef={accountLinkingContinueRef}
+                  />
+                )}
+
+                {step === 7 && (
+                  <AccountLinkingVerifyAccess
+                    row={
+                      MATCHED_ACCOUNT_ROWS.find(
+                        (r) => r.id === pendingLinkAccountIds[0]
+                      ) ?? MATCHED_ACCOUNT_ROWS[1]
+                    }
+                    onContinue={handleVerifyAccessContinue}
+                    onSkip={handleVerifyAccessSkip}
+                    usernameInputRef={verifyLinkUsernameRef}
+                  />
+                )}
+
+                {/* Step 8: Verify identity for the account being linked (mirrors step 3) */}
+                {step === 8 && (
+                  <div className="flex w-full flex-col gap-8">
+                    <LinkingAccountSummary
+                      row={
+                        MATCHED_ACCOUNT_ROWS.find(
+                          (r) => r.id === pendingLinkAccountIds[0]
+                        ) ?? MATCHED_ACCOUNT_ROWS[1]
+                      }
+                    />
+                    <form
+                      onSubmit={handleLinkMfaSubmit}
+                      className="flex flex-col gap-[21px]"
+                    >
+                    <FloatLabel
+                      label={linkMfaMethod === "sms" ? "Mobile number" : "Email"}
+                      type="text"
+                      value={
+                        linkMfaMethod === "sms"
+                          ? maskPhoneForSms()
+                          : maskUsername(LINK_MFA_EMAIL_DISPLAY_SOURCE)
+                      }
+                      readOnly
+                      size="lg"
+                      className="text-[16px] leading-6 tracking-[-0.176px] cursor-default"
+                    />
+
+                    <div className="flex flex-col gap-1">
+                      <FloatLabel
+                        ref={linkMfaCodeInputRef}
+                        label="Enter the code"
+                        type="text"
+                        value={linkMfaCode}
+                        onChange={(e) => {
+                          setLinkMfaCode(e.target.value)
+                          setLinkCodeError(false)
+                        }}
+                        size="lg"
+                        invalid={linkCodeError}
+                        className="text-[16px] leading-6 tracking-[-0.176px]"
+                      />
+                      {linkCodeError && (
+                        <p className="text-[12px] text-[hsl(var(--wex-destructive))] px-3 flex items-center gap-1">
+                          <AlertCircle className="h-3 w-3" />
+                          The code you entered is invalid
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="flex flex-col gap-[17px]">
+                    <Button
+                      type="submit"
+                      className="w-full h-10 rounded-lg text-[14px] font-medium leading-6 tracking-[-0.084px]"
+                    >
+                      Continue
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={handleVerifyAccessSkip}
+                      className="h-10 w-full rounded-lg text-[14px] font-medium leading-6 tracking-[-0.084px] text-[hsl(var(--wex-primary))] hover:bg-transparent hover:text-[hsl(var(--wex-primary))]"
+                    >
+                      Skip
+                    </Button>
+                    </div>
+
+                    <p className="text-[16px] leading-6 tracking-[-0.176px] text-foreground">
+                      Didn&apos;t receive an email?{" "}
+                      {linkResendTimer > 0 ? (
+                        <span className="font-semibold">
+                          Send again in 00:{linkResendTimer.toString().padStart(2, "0")}
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={handleLinkResendCode}
+                          className="font-semibold text-[hsl(var(--wex-primary))] hover:underline"
+                        >
+                          Send again
+                        </button>
+                      )}
+                    </p>
+
+                    <button
+                      type="button"
+                      onClick={handleLinkTryAnotherMethod}
+                      className="text-[16px] font-semibold leading-6 tracking-[-0.176px] text-[hsl(var(--wex-primary))] hover:underline text-left"
+                    >
+                      Try another method
+                    </button>
+                    </form>
+                  </div>
+                )}
+
+                {/* Step 9: Authentication method for linked-account MFA (mirrors step 4) */}
+                {step === 9 && (
+                  <div className="flex flex-col gap-4">
+                    <button
+                      ref={linkMethodEmailButtonRef}
+                      type="button"
+                      onClick={() => handleLinkMethodSelect("email")}
+                      className="w-full"
+                    >
+                      <div className="flex items-center justify-between p-4 border border-border rounded-lg hover:border-[hsl(var(--wex-primary))] hover:bg-accent transition-colors cursor-pointer">
+                        <div className="flex items-center gap-3">
+                          <Mail className="h-5 w-5 text-foreground" />
+                          <span className="text-[16px] font-normal leading-6 tracking-[-0.176px] text-foreground">
+                            Email Address
+                          </span>
+                        </div>
+                        <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleLinkMethodSelect("sms")}
+                      className="w-full"
+                    >
+                      <div className="flex items-center justify-between p-4 border border-border rounded-lg hover:border-[hsl(var(--wex-primary))] hover:bg-accent transition-colors cursor-pointer">
+                        <div className="flex items-center gap-3">
+                          <MessageSquare className="h-5 w-5 text-foreground" />
+                          <span className="text-[16px] font-normal leading-6 tracking-[-0.176px] text-foreground">
+                            SMS
+                          </span>
+                        </div>
+                        <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                    </button>
+                  </div>
+                )}
+
+                {step === 10 && (
+                  <SelectPrimaryAccount
+                    sessionUsername={username.trim() || "ux-nicole"}
+                    onMakePrimary={handleSelectPrimaryMakePrimary}
+                    onCancel={handleSelectPrimaryCancel}
+                    makePrimaryRef={selectPrimaryRef}
+                  />
+                )}
+
+                {step === 11 && (
+                  <ConfirmAccountLinking
+                    sessionUsername={username.trim() || "ux-nicole"}
+                    selectedPrimary={selectedPrimaryAccountId}
+                    onConfirm={handleConfirmAccountLinking}
+                    onCancel={handleConfirmAccountLinkingCancel}
+                    confirmRef={confirmAccountLinkingRef}
+                  />
                 )}
               </div>
             </CardContent>
