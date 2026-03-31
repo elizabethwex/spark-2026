@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { FadeInItem } from "@/components/layout/PageFadeIn";
 import { useSearchParams, useLocation } from "react-router-dom";
 import {
   Button, Alert, AlertDescription, AlertDialog, AlertDialogAction,
@@ -19,6 +20,7 @@ import {
 } from "@wexinc-healthbenefits/ben-ui-kit";
 import { ConsumerFooter } from "@/components/layout/Footer";
 import { ConsumerNavigation } from "@/components/layout/ConsumerNavigation";
+import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground";
 import { Pencil, Info, Plus, Calendar, X, Trash2, MoreVertical, Eye, RefreshCw, AlertCircle, User, Users, HeartPlus, ShieldCheck, Landmark, CreditCard, Bell, UserLock, Lock, SquareArrowRight } from "lucide-react";
 
 type SubPage = "my-profile" | "dependents" | "beneficiaries" | "authorized-signers" | "banking" | "debit-card" | "login-security" | "communication" | "report-lost-stolen" | "order-replacement-card";
@@ -3695,7 +3697,7 @@ export default function MyProfile() {
                             WEX Benefit Card follow up notice has been sent
                           </h4>
                           <p className="text-sm font-normal leading-6 tracking-[-0.084px] text-foreground">
-                            Automatically alert when a debit card follow up notice has been sent about on of your purchases. Helps to quickly know when a receipt needs to be supplied.
+                            Automatically alert when a debit card follow up notice has been sent about on of your purchases. Helps to quickly know when documentation needs to be supplied.
                           </p>
                         </div>
                         <div className="flex items-center" style={{ gap: "153px" }}>
@@ -3893,10 +3895,11 @@ export default function MyProfile() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F1FAFE]">
+    <div className="min-h-screen" style={consumerPageBackgroundStyle}>
       <ConsumerNavigation />
 
       {/* Main Content */}
+      <FadeInItem>
       <div className="mx-auto max-w-[1440px] px-4 py-8 sm:px-6 md:px-8">
         <div className="mx-auto max-w-[1376px]">
           {/* Page Header */}
@@ -3995,6 +3998,7 @@ export default function MyProfile() {
           </SidebarProvider>
         </div>
       </div>
+      </FadeInItem>
 
       <ConsumerFooter />
 

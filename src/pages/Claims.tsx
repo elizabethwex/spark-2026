@@ -1,6 +1,8 @@
 import { ConsumerFooter } from "@/components/layout/Footer";
 import { ConsumerNavigation } from "@/components/layout/ConsumerNavigation";
+import { FadeInItem } from "@/components/layout/PageFadeIn";
 import { UnderConstruction } from "@/components/UnderConstruction";
+import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground";
 // Original imports preserved for future restoration:
 // import { useState } from "react";
 // import { useNavigate } from "react-router-dom";
@@ -10,7 +12,7 @@ import { UnderConstruction } from "@/components/UnderConstruction";
 // import {
 //   DollarSign,
 //   Inbox,
-//   Receipt,
+//   FileText,
 //   RefreshCw,
 //   ArrowUpDown,
 //   CreditCard,
@@ -82,7 +84,7 @@ import { UnderConstruction } from "@/components/UnderConstruction";
 //       address: "123 elmo st.\nsesame home, ID, 11111",
 //     },
 //     categoryType: "Medical - Office visit",
-//     statusMessage: "Receipt is missing date of service (DOS). Please provide documentation with the required information.",
+//     statusMessage: "Documentation is missing date of service (DOS). Please provide documentation with the required information.",
 //     statusDate: "6/24/2025",
 //     isRecurring: false,
 //     hasDocuments: true,
@@ -130,7 +132,7 @@ import { UnderConstruction } from "@/components/UnderConstruction";
 //       address: "123 elmo st.\nsesame home, ID, 11111",
 //     },
 //     categoryType: "Medical - Prescription",
-//     statusMessage: "Please upload receipt for this claim.",
+//     statusMessage: "Please upload documentation for this claim.",
 //     statusDate: "5/8/2025",
 //     isRecurring: true,
 //     hasDocuments: false,
@@ -154,7 +156,7 @@ import { UnderConstruction } from "@/components/UnderConstruction";
 //     statusDate: "5/20/2025",
 //     isRecurring: false,
 //     hasDocuments: true,
-//     documents: [{ name: "receipt.pdf" }],
+//     documents: [{ name: "document.pdf" }],
 //   },
 //   {
 //     id: "4",
@@ -199,7 +201,7 @@ import { UnderConstruction } from "@/components/UnderConstruction";
 //     statusDate: "4/30/2025",
 //     isRecurring: false,
 //     hasDocuments: true,
-//     documents: [{ name: "receipt.pdf" }],
+//     documents: [{ name: "document.pdf" }],
 //   },
 //   {
 //     id: "6",
@@ -262,7 +264,7 @@ import { UnderConstruction } from "@/components/UnderConstruction";
 //     statusDate: "3/22/2025",
 //     isRecurring: false,
 //     hasDocuments: true,
-//     documents: [{ name: "receipt.pdf" }],
+//     documents: [{ name: "document.pdf" }],
 //   },
 //   {
 //     id: "9",
@@ -304,7 +306,7 @@ import { UnderConstruction } from "@/components/UnderConstruction";
 //     statusDate: "2/15/2025",
 //     isRecurring: false,
 //     hasDocuments: true,
-//     documents: [{ name: "receipt.pdf" }, { name: "invoice.pdf" }],
+//     documents: [{ name: "document.pdf" }, { name: "invoice.pdf" }],
 //   },
 //   {
 //     id: "11",
@@ -402,13 +404,15 @@ export default function Claims() {
   // };
 
   return (
-    <div className="min-h-screen bg-[#F1FAFE]">
+    <div className="min-h-screen" style={consumerPageBackgroundStyle}>
       <ConsumerNavigation />
 
       {/* Main Content */}
-      <div className="mx-auto max-w-[1440px] px-8 py-8">
-        <UnderConstruction />
-      </div>
+      <FadeInItem>
+        <div className="mx-auto max-w-[1440px] px-8 py-8">
+          <UnderConstruction />
+        </div>
+      </FadeInItem>
 
       <ConsumerFooter />
 
@@ -436,7 +440,7 @@ export default function Claims() {
  * Original return statement structure:
  * 
  * return (
- *   <div className="min-h-screen bg-[#F1FAFE]">
+ *   <div className="min-h-screen"> // homepage gradient via consumerPageBackgroundStyle
  *     <ConsumerNavigation />
  * 
  *     <div className="mx-auto max-w-[1440px] px-8 py-8">

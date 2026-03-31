@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import { FadeInItem } from "@/components/layout/PageFadeIn";
 import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
@@ -52,6 +53,7 @@ import {
 } from "@wexinc-healthbenefits/ben-ui-kit";
 import { ConsumerNavigation } from "@/components/layout/ConsumerNavigation";
 import { ConsumerFooter } from "@/components/layout/Footer";
+import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground";
 import { cn } from "@/lib/utils";
 import emptyStateIllustration from "@/assets/empty-state-illustration.svg";
 import {
@@ -834,8 +836,8 @@ const ATTENTION_NEEDED_MESSAGE_TYPES: string[] = [
   "Denial Letter With Repayment",
   "Medicare Advantage Denial Letter",
   "Claim Applied to Repayment Alert",
-  "Receipt Reminder",
-  "Receipt Needed for Debit Card Transaction",
+  "Documentation Reminder",
+  "Documentation Needed for Debit Card Transaction",
   "Request for More Information (RMI)",
   "HSA Excess Distribution Notification",
   "HSA Cash Balance Warning",
@@ -1050,11 +1052,12 @@ export default function MessageCenter() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F1FAFE]">
+    <div className="min-h-screen" style={consumerPageBackgroundStyle}>
       {/* Navigation Bar */}
       <ConsumerNavigation />
 
       {/* Main Content */}
+      <FadeInItem>
       <div className="mx-auto max-w-[1440px] px-4 py-6 sm:px-6 md:px-8 md:py-8">
         <div className="mx-auto max-w-[1376px]">
           {/* Page Header */}
@@ -1830,6 +1833,7 @@ export default function MessageCenter() {
           </SidebarProvider>
         </div>
       </div>
+      </FadeInItem>
 
       <ConsumerFooter />
 

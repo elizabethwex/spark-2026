@@ -1,0 +1,74 @@
+/**
+ * iOS App Mode Design Tokens
+ *
+ * Maps WEX brand tokens to iOS-semantic roles.
+ * These vars are only used by /app/* screens (no ben-ui-kit dependency).
+ *
+ * Font stack renders as SF Pro on Apple devices via the system font API.
+ */
+
+:root {
+  /* Tint / brand */
+  --app-tint:            hsl(var(--wex-primary));
+  --app-tint-hover:      hsl(var(--wex-primary-hover));
+  --app-tint-contrast:   hsl(var(--wex-primary-contrast));
+
+  /* Backgrounds */
+  --app-bg:              hsl(var(--wex-surface-subtle));
+  --app-surface:         hsl(var(--wex-content-bg));
+  --app-surface-raised:  hsl(0 0% 100%);
+
+  /* Borders */
+  --app-border:          hsl(var(--wex-content-border));
+  --app-separator:       hsl(var(--wex-content-border) / 0.6);
+
+  /* Text */
+  --app-text:            hsl(var(--wex-text));
+  --app-text-secondary:  hsl(var(--wex-text-muted));
+  --app-text-tertiary:   hsl(210 12% 65%);
+  --app-text-on-tint:    hsl(var(--wex-primary-contrast));
+
+  /* Semantic */
+  --app-destructive:     hsl(var(--wex-destructive));
+  --app-success:         hsl(var(--wex-success));
+  --app-warning:         hsl(var(--wex-warning));
+  --app-info:            hsl(var(--wex-info));
+
+  /* Liquid glass chrome */
+  --app-glass-bg:        rgba(255, 255, 255, 0.72);
+  --app-glass-border:    rgba(255, 255, 255, 0.5);
+  --app-glass-blur:      blur(20px) saturate(180%);
+
+  /* Dark glass (for tinted surfaces) */
+  --app-glass-dark-bg:   rgba(20, 24, 44, 0.55);
+  --app-glass-dark-border: rgba(255, 255, 255, 0.12);
+
+  /* Card glass */
+  --app-card-bg:         rgba(255, 255, 255, 0.85);
+  --app-card-shadow:     0 2px 16px rgba(0, 0, 0, 0.07), 0 0 0 0.5px rgba(0, 0, 0, 0.05);
+
+  /* Tab bar (pill nav: 12px top padding + 71px pill + 12px bottom = 95px before safe area) */
+  --app-tabbar-height:   95px;
+  --app-navbar-height:   52px;
+
+  /* Typography scale (iOS HIG) */
+  --app-font:            -apple-system, "SF Pro Text", "SF Pro Display", system-ui, sans-serif;
+  --app-font-large-title: 700 34px/41px var(--app-font);
+  --app-font-title1:     700 28px/34px var(--app-font);
+  --app-font-title2:     700 22px/28px var(--app-font);
+  --app-font-title3:     600 20px/25px var(--app-font);
+  --app-font-headline:   600 17px/22px var(--app-font);
+  --app-font-body:       400 17px/22px var(--app-font);
+  --app-font-callout:    400 16px/21px var(--app-font);
+  --app-font-subhead:    400 15px/20px var(--app-font);
+  --app-font-footnote:   400 13px/18px var(--app-font);
+  --app-font-caption1:   400 12px/16px var(--app-font);
+  --app-font-caption2:   400 11px/13px var(--app-font);
+
+  /* Radius */
+  --app-radius-sm:       8px;
+  --app-radius-md:       12px;
+  --app-radius-lg:       16px;
+  --app-radius-xl:       20px;
+  --app-radius-pill:     999px;
+}

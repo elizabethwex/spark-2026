@@ -254,7 +254,7 @@ export const infoCardsData: InfoCard[] = [
   },
   {
     title: "App like change and stabilization process",
-    description: "When using the tools in your Health and benefit account to pay for eligible health care expenses. It's where it is calculated, it handles all receipts and transaction. A fee legit tax.",
+    description: "When using the tools in your Health and benefit account to pay for eligible health care expenses. It's where it is calculated, it handles all documents and transaction. A fee legit tax.",
     buttonText: "Learn More",
     imageAlt: "Account tools",
   },
@@ -323,17 +323,6 @@ export const navigationItems = [
       { label: "Lifestyle Spending Account", href: "/account-overview?account=lifestyle" },
     ],
   },
-  { label: "Claims", href: "/claims", icon: "receipt", hasDropdown: false },
-  {
-    label: "Resources",
-    href: "#",
-    icon: "file-text",
-    hasDropdown: true,
-    subItems: [
-      { label: "Resources", href: "/resources" },
-      { label: "Forms & Documents", href: "/resources?section=forms" },
-      { label: "Videos & Guides", href: "/resources?section=videos" },
-      { label: "FAQs", href: "/resources?section=faqs" },
-    ],
-  },
+  { label: "Claims & Payments", href: "/claims", icon: "document", hasDropdown: false },
+  { label: "Messages", href: "/message-center", icon: "mail", hasDropdown: false },
 ];
