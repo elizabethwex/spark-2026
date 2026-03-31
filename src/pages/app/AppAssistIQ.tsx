@@ -15,6 +15,7 @@ import {
   Camera,
   Image as ImageIcon,
   Sparkles,
+  SquarePen,
 } from "lucide-react";
 import { AppNavBar, AppNavAction } from "@/components/app-shell/AppNavBar";
 import {
@@ -1578,11 +1579,20 @@ export default function AppAssistIQ() {
       <AppNavBar
         title={inWelcome ? "" : "Assist IQ"}
         rightActions={
-          <AppNavAction
-            icon={<X size={18} strokeWidth={2} />}
-            label="Close Assist IQ"
-            onClick={() => navigate(-1)}
-          />
+          <>
+            {!inWelcome && (
+              <AppNavAction
+                icon={<SquarePen size={18} strokeWidth={2} />}
+                label="New chat"
+                onClick={clear}
+              />
+            )}
+            <AppNavAction
+              icon={<X size={18} strokeWidth={2} />}
+              label="Close Assist IQ"
+              onClick={() => navigate(-1)}
+            />
+          </>
         }
       />
 
