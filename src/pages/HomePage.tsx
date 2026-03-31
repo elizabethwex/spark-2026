@@ -6,6 +6,8 @@ import { ConsumerFooter } from "@/components/layout/Footer";
 import { SparkAiForwardHero } from "@/components/spark/SparkAiForwardHero";
 import { SparkAccountsSection } from "@/components/spark/SparkAccountsSection";
 import { SparkRecentActivity } from "@/components/spark/SparkRecentActivity";
+import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground";
+import { PageFadeIn, FadeInItem } from "@/components/layout/PageFadeIn";
 
 export default function HomePage() {
   const { homepageMode } = usePrototype();
@@ -19,16 +21,15 @@ export default function HomePage() {
 
 function HomePageAiForward() {
   return (
-    <div 
-      className="min-h-screen font-['Inter']"
-      style={{ backgroundImage: "linear-gradient(18.88754079365124deg, rgb(255, 255, 255) 17.854%, var(--primary\\/50,rgb(238, 242, 255)) 86.811%, var(--primary\\/200,rgb(199, 210, 254)) 103.68%)" }}
-    >
+    <div className="min-h-screen font-['Inter']" style={consumerPageBackgroundStyle}>
       <ConsumerNavigation hidePrototypeFloating />
 
-      <main className="mx-auto w-full max-w-[1200px] space-y-10 px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
-        <SparkAiForwardHero />
-        <SparkAccountsSection />
-        <SparkRecentActivity />
+      <main className="mx-auto w-full max-w-[1200px] px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+        <PageFadeIn className="space-y-10">
+          <FadeInItem><SparkAiForwardHero /></FadeInItem>
+          <FadeInItem><SparkAccountsSection /></FadeInItem>
+          <FadeInItem><SparkRecentActivity /></FadeInItem>
+        </PageFadeIn>
       </main>
 
       <PrototypeFloatingControls />

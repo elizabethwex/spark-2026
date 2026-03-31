@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@wexinc-healthbenefits/ben-ui-kit";
 import { ConsumerNavigation } from "@/components/layout/ConsumerNavigation";
 import { usePrototype } from "@/context/PrototypeContext";
+import { PageFadeIn, FadeInItem } from "@/components/layout/PageFadeIn";
 import { AccountsSection } from "@/components/sections/AccountsSection";
 import { MessageCenterWidget } from "@/components/sections/MessageCenterWidget";
 import { QuickLinksSection } from "@/components/sections/QuickLinksSection";
@@ -11,6 +12,7 @@ import { PromoBanner } from "@/components/sections/PromoBanner";
 import { TasksSection } from "@/components/sections/TasksSection";
 import { ConsumerFooter } from "@/components/layout/Footer";
 import { HSAPlannerCard } from "@/components/HSAPlannerCard";
+import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground";
 
 /**
  * Partner-safe homepage: traditional dashboard without the prominent AI chat bar.
@@ -19,10 +21,12 @@ export default function HomePagePartnerSafe() {
   const { homeLayoutMode: layoutMode } = usePrototype();
 
   return (
-    <div className="min-h-screen bg-slate-50/50 font-['Inter']">
+    <div className="min-h-screen font-['Inter']" style={consumerPageBackgroundStyle}>
       <ConsumerNavigation />
 
-      <main className="w-full max-w-[1280px] mx-auto px-6 sm:px-8 py-8 space-y-8">
+      <main className="w-full max-w-[1280px] mx-auto px-6 sm:px-8 py-8">
+        <PageFadeIn className="space-y-8">
+        <FadeInItem>
         <Card className="border-border shadow-sm">
           <CardContent className="pt-6">
             <h1 className="text-2xl font-display font-semibold text-foreground tracking-tight">
@@ -33,9 +37,11 @@ export default function HomePagePartnerSafe() {
             </p>
           </CardContent>
         </Card>
+        </FadeInItem>
 
-        <TasksSection />
+        <FadeInItem><TasksSection /></FadeInItem>
 
+        <FadeInItem>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="lg:col-span-2">
             <AccountsSection />
@@ -83,6 +89,8 @@ export default function HomePagePartnerSafe() {
             <PromoBanner />
           </div>
         </div>
+        </FadeInItem>
+        </PageFadeIn>
       </main>
 
       <ConsumerFooter />

@@ -7,6 +7,7 @@ import { ThemingEngineHighlightProvider } from "./theming-engine/ThemingEngineHi
 import { ThemingEngineTopBar } from "./theming-engine/ThemingEngineTopBar";
 import { ThemingEngineConfigPane } from "./theming-engine/ThemingEngineConfigPane";
 import { ThemingEnginePreviewPane } from "./theming-engine/ThemingEnginePreviewPane";
+import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground";
 import { cn } from "@/lib/utils";
 
 export default function ThemingEnginePage() {
@@ -19,7 +20,7 @@ export default function ThemingEnginePage() {
   return (
     <FormProvider {...form}>
       <ThemingEngineHighlightProvider>
-      <div className={cn("min-h-screen bg-background flex flex-col")}>
+      <div className={cn("min-h-screen flex flex-col")} style={consumerPageBackgroundStyle}>
         <ConsumerNavigation hideNav />
         <ThemingEngineTopBar />
         <div className="flex flex-1 min-h-0">

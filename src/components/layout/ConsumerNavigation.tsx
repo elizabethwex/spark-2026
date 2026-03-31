@@ -10,6 +10,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
   Sheet,
   SheetClose,
@@ -17,12 +20,11 @@ import {
   SheetTrigger
 } from "@wexinc-healthbenefits/ben-ui-kit";
 import {
-  Bell,
   User,
   House,
   Wallet,
-  Receipt,
   FileText,
+  Mail,
   ChevronDown,
   Languages,
   LogOut,
@@ -38,8 +40,9 @@ import { PrototypeFloatingControls } from "@/components/PrototypeFloatingControl
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   "home": House,
   "wallet": Wallet,
-  "receipt": Receipt,
+  "document": FileText,
   "file-text": FileText,
+  "mail": Mail,
 };
 
 const languageOptions = [
@@ -213,6 +216,7 @@ export function ConsumerNavigation({
                     );
                   }
                   
+                  const isMessagesItem = item.href === "/message-center";
                   return (
                     <SheetClose asChild key={item.label}>
                       <Button
@@ -225,6 +229,13 @@ export function ConsumerNavigation({
                         <Link to={item.href} className="flex items-center gap-2">
                           {Icon && <Icon className="h-[15.75px] w-[15.75px]" />}
                           <span className="truncate">{item.label}</span>
+                          {isMessagesItem && unreadCount > 0 && (
+                            <div className="flex h-[18px] min-w-[18px] items-center justify-center rounded-[6px] bg-[#d24159] px-[3px]">
+                              <span className="text-[11px] font-bold leading-none text-white">
+                                {unreadCount}
+                              </span>
+                            </div>
+                          )}
                         </Link>
                       </Button>
                     </SheetClose>
@@ -318,6 +329,7 @@ export function ConsumerNavigation({
                 );
               }
               
+              const isMessages = item.href === "/message-center";
               return (
                 <Link
                   key={item.label}
@@ -325,7 +337,19 @@ export function ConsumerNavigation({
                   className="relative flex h-[44px] flex-col items-center justify-center rounded-[6px] px-[17px] transition-colors hover:bg-black/5"
                 >
                   <div className="flex items-center gap-[6px]">
-                    {Icon && <Icon className={`h-4 w-4 ${active ? "text-[#3958c3]" : "text-[#14182c]"}`} />}
+                    {/* Icon wrapper — badge sits on top of icon for Messages */}
+                    {Icon && (
+                      <div className="relative">
+                        <Icon className={`h-4 w-4 ${active ? "text-[#3958c3]" : "text-[#14182c]"}`} />
+                        {isMessages && unreadCount > 0 && (
+                          <div className="absolute -top-[8px] -right-[8px] flex h-[16px] min-w-[16px] items-center justify-center rounded-full bg-[#d24159] px-[3px] shadow-[0_1px_3px_rgba(0,0,0,0.2)]">
+                            <span className="text-[10px] font-bold leading-none text-white">
+                              {unreadCount}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    )}
                     <span className={`text-[14px] leading-[24px] tracking-[-0.084px] ${active ? "font-semibold text-[#3958c3]" : "font-normal text-[#14182c]"}`}>
                       {item.label}
                     </span>
@@ -364,26 +388,6 @@ export function ConsumerNavigation({
           </DropdownMenu>
 
           <div className="hidden lg:block h-[24px] w-px bg-[#5f6a94]" />
-
-          {/* Notifications with Badge */}
-          <div className="relative flex items-center justify-center">
-            <Link
-              to="/message-center"
-              className="flex h-[44px] w-[44px] items-center justify-center rounded-[6px] hover:bg-black/5 transition-colors"
-              aria-label="Notifications"
-            >
-              <Bell className="h-4 w-4 text-[#14182c]" />
-            </Link>
-            {unreadCount > 0 && (
-              <div className="absolute -right-1 -top-1 flex h-[20px] w-[20px] items-center justify-center rounded-[6px] bg-[#d24159] shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
-                <span className="text-[12px] font-bold leading-[16px] text-white">
-                  {unreadCount}
-                </span>
-              </div>
-            )}
-          </div>
-
-          <div className="h-[24px] w-px bg-[#5f6a94]" />
 
           {/* Profile Dropdown Menu */}
           <DropdownMenu>
@@ -424,19 +428,19 @@ export function ConsumerNavigation({
                   { label: "My Profile", subPage: "my-profile" },
                   { label: "Dependents", subPage: "dependents" },
                   { label: "Beneficiaries", subPage: "beneficiaries" },
-                  { label: "Authorized Signers", subPage: "authorized-signers" },
                   { label: "Banking", subPage: "banking" },
+                  { label: "Reimbursement Method", subPage: "reimbursement-method" },
                   { label: "Debit Card", subPage: "debit-card" },
                   { label: "Login and Security", subPage: "login-security" },
                   { label: "Communication Preferences", subPage: "communication" },
                 ].map((item) => {
-                  const isActive = isOnMyProfile && currentSubPage === item.subPage;
+                  const isItemActive = isOnMyProfile && currentSubPage === item.subPage;
                   return (
                     <DropdownMenuItem
                       key={item.subPage}
                       onClick={() => handleProfileNavigation(item.subPage)}
                       className={`flex items-center gap-[8px] pl-[12px] pr-0 py-[8px] text-sm tracking-[-0.084px] ${
-                        isActive
+                        isItemActive
                           ? "bg-[#f1fafe] text-primary"
                           : "text-foreground hover:bg-gray-50"
                       }`}
@@ -445,6 +449,36 @@ export function ConsumerNavigation({
                     </DropdownMenuItem>
                   );
                 })}
+
+                {/* Resources submenu */}
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger className="flex items-center gap-[8px] pl-[12px] pr-[12px] py-[8px] text-sm tracking-[-0.084px] text-foreground hover:bg-gray-50 cursor-pointer">
+                    Resources
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent className="w-[180px]">
+                    {[
+                      { label: "Resources", href: "/resources" },
+                      { label: "Forms & Documents", href: "/resources?section=forms" },
+                      { label: "Videos & Guides", href: "/resources?section=videos" },
+                      { label: "FAQs", href: "/resources?section=faqs" },
+                    ].map((res) => (
+                      <DropdownMenuItem key={res.href} asChild>
+                        <Link to={res.href} className="flex items-center text-sm">
+                          {res.label}
+                        </Link>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+              </div>
+
+              <DropdownMenuSeparator />
+
+              {/* Last login */}
+              <div className="px-[12px] py-[6px]">
+                <p className="text-[12px] text-muted-foreground tracking-[-0.03px]">
+                  Last login: 12/11/2025
+                </p>
               </div>
 
               <DropdownMenuSeparator />
