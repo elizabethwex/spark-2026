@@ -2,6 +2,8 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@wexinc-healthbenefits/ben-ui-kit";
 import { CalendarCheck2, PiggyBank, TrendingUp, CircleDollarSign, Info, Lightbulb, ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 import {
   sparkHsaSummary,
   sparkLpfsaSummary,
@@ -37,7 +39,7 @@ function useInView(options?: IntersectionObserverInit) {
 /**
  * SPARK-2026 “Your accounts” two-card row (HSA + LPFSA).
  */
-export function SparkAccountsSection() {
+export function SparkAccountsSection({ variant = "modern" }: { variant?: "modern" | "partner-safe" }) {
   const navigate = useNavigate();
   const h = sparkHsaSummary;
   const l = sparkLpfsaSummary;
@@ -46,22 +48,38 @@ export function SparkAccountsSection() {
 
   return (
     <section className="space-y-4" aria-labelledby="spark-accounts-heading">
-      <div className="flex items-center justify-between w-full">
-        <h2 id="spark-accounts-heading" className="text-[12px] font-black uppercase tracking-[3px] text-[#5f6a94] leading-[16px]">
-          Your Accounts
-        </h2>
-        <button 
-          type="button" 
-          className="text-[12px] font-bold uppercase tracking-[1.2px] text-[#1c6eff] leading-[16px] hover:underline"
-          onClick={() => navigate("/plans")}
-        >
-          View All Plans
-        </button>
-      </div>
+      {variant === "partner-safe" ? (
+        <SectionHeader
+          title="Your Accounts"
+          actionLabel="View All Plans"
+          actionHref="/plans"
+        />
+      ) : (
+        <div className="flex items-center justify-between w-full">
+          <h2 id="spark-accounts-heading" className="text-[12px] font-black uppercase tracking-[3px] text-[#5f6a94] leading-[16px]">
+            Your Accounts
+          </h2>
+          <button 
+            type="button" 
+            className="text-[12px] font-bold uppercase tracking-[1.2px] text-[#1c6eff] leading-[16px] hover:underline"
+            onClick={() => navigate("/plans")}
+          >
+            View All Plans
+          </button>
+        </div>
+      )}
 
       <div ref={ref} className="grid grid-cols-1 gap-x-6 gap-y-10 lg:grid-cols-2">
         {/* HSA Card */}
-        <div className="group/card flex h-full w-full flex-col overflow-hidden rounded-[24px] border border-white/60 bg-white shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1),0_2px_4px_-2px_rgba(0,0,0,0.1)] transition-shadow hover:shadow-md">
+        <div 
+          className={cn(
+            "group/card flex h-full w-full flex-col overflow-hidden rounded-[24px] transition-shadow hover:shadow-md",
+            variant === "partner-safe"
+              ? "bg-card border border-border shadow-sm text-card-foreground"
+              : "border border-white/60 bg-white shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1),0_2px_4px_-2px_rgba(0,0,0,0.1)]"
+          )}
+          style={{ borderRadius: '24px' }}
+        >
           {/* Header */}
           <div className="flex items-start px-6 pt-6">
             <div className="flex items-center gap-3">
@@ -170,7 +188,15 @@ export function SparkAccountsSection() {
         </div>
 
         {/* LPFSA Card */}
-        <div className="group/card flex h-full w-full flex-col rounded-[24px] border border-white/60 bg-white shadow-[0_3px_9px_rgba(43,49,78,0.04),0_6px_18px_rgba(43,49,78,0.06)] transition-shadow hover:shadow-md">
+        <div 
+          className={cn(
+            "group/card flex h-full w-full flex-col overflow-hidden rounded-[24px] transition-shadow hover:shadow-md",
+            variant === "partner-safe"
+              ? "bg-card border border-border shadow-sm text-card-foreground"
+              : "border border-white/60 bg-white shadow-[0_3px_9px_rgba(43,49,78,0.04),0_6px_18px_rgba(43,49,78,0.06)]"
+          )}
+          style={{ borderRadius: '24px' }}
+        >
           {/* Header */}
           <div className="flex items-start px-6 pt-6">
             <div className="flex items-center gap-3">
@@ -199,10 +225,19 @@ export function SparkAccountsSection() {
                 <p className="text-[40px] font-bold leading-[36px] tracking-[-0.9px] text-[#14182c]">
                   {l.balance}
                 </p>
-                <p className="mt-1 text-[12px] text-[#5f6a94]">
-                  <span className="font-normal leading-[16px]">Max rollover: </span>
-                  <span className="font-bold leading-[16px]">$500</span>
-                </p>
+                <div className="mt-1 flex flex-col items-start gap-2">
+                  <p className="text-[12px] text-[#5f6a94]">
+                    <span className="font-normal leading-[16px]">Max rollover: </span>
+                    <span className="font-bold leading-[16px]">$500</span>
+                  </p>
+                  {l.spendByTag && (
+                    <div className="flex items-center rounded-full border border-[#fff9e6] bg-[#fffbeb] px-[7px] py-[3px]">
+                      <span className="text-[10px] font-bold leading-[15px] text-[#bf8a00]">
+                        {l.spendByTag}
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Spend Ring */}
@@ -239,15 +274,6 @@ export function SparkAccountsSection() {
                     days<br />to spend
                   </span>
                 </div>
-                {l.spendByTag && (
-                  <div className="pointer-events-none absolute left-[-72px] top-[10px] opacity-0 transition-opacity group-hover:opacity-100 shadow-[0_1.5px_4.5px_rgba(43,49,78,0.04)]">
-                    <div className="flex items-center rounded-full border border-[#fff9e6] bg-[#fffbeb] px-[7px] py-[3px]">
-                      <span className="text-[10px] font-bold leading-[15px] text-[#bf8a00]">
-                        {l.spendByTag}
-                      </span>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
 
@@ -278,14 +304,7 @@ export function SparkAccountsSection() {
 
           {/* Footer */}
           <div className="px-6 pb-6 mt-auto">
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full rounded-xl border-[#3958c3] py-[9.75px] text-[15.75px] font-medium text-[#3958c3] hover:bg-[#3958c3]/5"
-              onClick={() => navigate("/reimburse")}
-            >
-              Reimburse Myself
-            </Button>
+            {/* Reimburse button removed per request */}
           </div>
         </div>
       </div>

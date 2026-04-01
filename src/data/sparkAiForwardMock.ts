@@ -40,6 +40,12 @@ export interface SparkActivityRow {
   amount: string;
   status: SparkActivityStatus;
   statusLabel: string;
+  timeline?: {
+    label: string;
+    date?: string;
+    completed: boolean;
+    active: boolean;
+  }[];
 }
 
 export const sparkRecentActivity: SparkActivityRow[] = [
@@ -49,6 +55,11 @@ export const sparkRecentActivity: SparkActivityRow[] = [
     amount: "$42.50",
     status: "approved",
     statusLabel: "APPROVED",
+    timeline: [
+      { label: "Submitted", date: "Apr 27", completed: true, active: false },
+      { label: "Processing", date: "Apr 28", completed: true, active: false },
+      { label: "Complete", date: "Apr 29", completed: true, active: true },
+    ],
   },
   {
     merchant: "Dr. Miller DDS",
@@ -56,6 +67,11 @@ export const sparkRecentActivity: SparkActivityRow[] = [
     amount: "$340.00",
     status: "needs_attention",
     statusLabel: "NEEDS ATTENTION",
+    timeline: [
+      { label: "Submitted", date: "Apr 27", completed: true, active: false },
+      { label: "Action Required", date: "Apr 28", completed: false, active: true },
+      { label: "Complete", completed: false, active: false },
+    ],
   },
   {
     merchant: "Vanguard Invest",
@@ -63,5 +79,10 @@ export const sparkRecentActivity: SparkActivityRow[] = [
     amount: "$500.00",
     status: "completed",
     statusLabel: "COMPLETED",
+    timeline: [
+      { label: "Submitted", date: "Dec 14", completed: true, active: false },
+      { label: "Processing", date: "Dec 15", completed: true, active: false },
+      { label: "Complete", date: "Dec 16", completed: true, active: true },
+    ],
   },
 ];

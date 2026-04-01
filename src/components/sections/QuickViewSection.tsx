@@ -82,7 +82,7 @@ export function QuickViewSection() {
   const pieData   = paidClaimsCategoryData.map((d) => ({ name: d.category, value: d.amount }));
 
   return (
-    <GlassCard hoverable>
+    <GlassCard>
       <CardContent className="p-6">
         <div className="space-y-5">
 
