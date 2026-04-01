@@ -18,6 +18,9 @@ const TABS: Tab[] = [
 export function AppTabBar() {
   const location = useLocation();
 
+  // Assist IQ takes over the full screen — hide the tab bar
+  if (location.pathname === "/app/assist-iq") return null;
+
   const isActive = (tab: Tab) => {
     if (tab.exact) return location.pathname === "/app" || location.pathname === "/app/";
     return location.pathname.startsWith(tab.to);
