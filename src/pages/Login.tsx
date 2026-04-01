@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef, useMemo } from "react"
+import { useState, useEffect, useLayoutEffect, useRef, useMemo } from "react"
 import type { CSSProperties } from "react"
+import { useLocation, useNavigate } from "react-router-dom"
 import { Button, Card, CardContent, FloatLabel, toast } from "@wexinc-healthbenefits/ben-ui-kit"
 import {
   Eye,
@@ -21,6 +22,20 @@ import {
 import { SelectPrimaryAccount } from "@/components/login/SelectPrimaryAccount"
 import { ConfirmAccountLinking } from "@/components/login/ConfirmAccountLinking"
 import type { PrimaryOptionId } from "@/components/login/accountLinkingPrimary"
+import {
+  ACCOUNT_SELECTION_ALLOWED_ID,
+  LINKED_ACCOUNT_IDS_SESSION_KEY,
+  buildAccountGroupsForDisplay,
+} from "@/components/login/accountSelectorConfig"
+import { SelectAccountScreen } from "@/components/login/SelectAccountScreen"
+import { loginMfaMethodCardClass } from "@/components/login/loginFlowCardStyles"
+import {
+  loginFlowFooterBgClass,
+  loginFlowLinkTextClass,
+  loginFlowPrimaryButtonClass,
+  loginFlowTertiaryGhostButtonClass,
+} from "@/components/login/loginFlowTheme"
+import type { LoginStep, LoginRouteState } from "@/components/login/loginFlowTypes"
 
 interface LoginProps {
   onLoginSuccess: () => void
@@ -32,30 +47,10 @@ const MFA_EMAIL_DISPLAY_SOURCE = "ux-nicole@dundermifflin.com"
 /** Prototype destination for account-linking MFA (step 8); masked like primary MFA. */
 const LINK_MFA_EMAIL_DISPLAY_SOURCE = "nicole.jackson@gmail.com"
 
-type LoginStep = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11
-
-const ACCOUNT_GROUPS: {
-  employerName: string
-  accounts: { id: string; label: string; icon: "building" | "landmark" }[]
-}[] = [
-  {
-    employerName: "Dunder Mifflin Paper Co.",
-    accounts: [
-      { id: "dm-reimb", label: "Reimbursement Account(s)", icon: "building" },
-      { id: "dm-mbe", label: "My Benefit Express", icon: "building" },
-    ],
-  },
-  {
-    employerName: "ACME Company",
-    accounts: [{ id: "acme-hsa", label: "Health Savings Account", icon: "landmark" }],
-  },
-]
-
-/** Prototype: only Reimbursement Account(s) may continue; other selections keep Continue disabled. */
-const ACCOUNT_SELECTION_ALLOWED_ID = "dm-reimb"
-
 export default function Login({ onLoginSuccess }: LoginProps) {
   const { login } = useAuth()
+  const navigate = useNavigate()
+  const location = useLocation()
   const wexLogoUrl = `${import.meta.env.BASE_URL}WEX_Logo_Red_Vector.svg`
   const loginBgUrl = `${import.meta.env.BASE_URL}wexbrand_loginbg.svg`
   const dunderMifflinLogoUrl = `${import.meta.env.BASE_URL}dundermifflin.png`
@@ -94,6 +89,27 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   const [linkedAccountIdsForSelector, setLinkedAccountIdsForSelector] = useState<string[]>([])
   const [pendingLinkAccountIds, setPendingLinkAccountIds] = useState<string[]>([])
   const prevStepRef = useRef<LoginStep>(step)
+
+  /** Open the wizard at a step when navigated from `/select-profile` (e.g. account linking). */
+  useLayoutEffect(() => {
+    const s = location.state as LoginRouteState | null
+    if (s?.initialStep != null) {
+      setStep(s.initialStep)
+      navigate(location.pathname, { replace: true, state: {} })
+    }
+  }, [location.state, location.pathname, navigate])
+
+  /** Keep `/select-profile` in sync with linked rows for the prototype. */
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(
+        LINKED_ACCOUNT_IDS_SESSION_KEY,
+        JSON.stringify(linkedAccountIdsForSelector)
+      )
+    } catch {
+      /* ignore */
+    }
+  }, [linkedAccountIdsForSelector])
 
   /** Dismiss prototype MFA code toasts (Sonner) when leaving an MFA entry step. */
   useEffect(() => {
@@ -362,29 +378,10 @@ export default function Login({ onLoginSuccess }: LoginProps) {
     selectedAccountId === ACCOUNT_SELECTION_ALLOWED_ID ||
     selectedAccountId.startsWith("linked-")
 
-  const accountGroupsForDisplay = useMemo(() => {
-    if (linkedAccountIdsForSelector.length === 0) return ACCOUNT_GROUPS
-    const groups = ACCOUNT_GROUPS.map((g) => ({
-      ...g,
-      accounts: [...g.accounts],
-    }))
-    const dmIdx = groups.findIndex(
-      (g) => g.employerName === "Dunder Mifflin Paper Co."
-    )
-    if (dmIdx === -1) return groups
-    for (const linkId of linkedAccountIdsForSelector) {
-      const row = MATCHED_ACCOUNT_ROWS.find((r) => r.id === linkId)
-      if (!row) continue
-      const selectorId = `linked-${linkId}`
-      if (groups[dmIdx].accounts.some((a) => a.id === selectorId)) continue
-      groups[dmIdx].accounts.push({
-        id: selectorId,
-        label: row.productLabel,
-        icon: "building" as const,
-      })
-    }
-    return groups
-  }, [linkedAccountIdsForSelector])
+  const accountGroupsForDisplay = useMemo(
+    () => buildAccountGroupsForDisplay(linkedAccountIdsForSelector),
+    [linkedAccountIdsForSelector]
+  )
 
   const handleAccountSelectionCancel = () => {
     setStep(3)
@@ -582,7 +579,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                                         ? "Confirm Account Linking"
                                         : ""}
                     </h3>
-                    {step !== 11 && (
+                    {step !== 11 && step !== 10 && (
                     <p
                       className={cn(
                         "text-[16px] font-normal leading-6 tracking-[-0.176px] text-foreground",
@@ -613,9 +610,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                                         : "We've sent an email with your code to the email address you have on file."
                                       : step === 9
                                         ? "Select an authentication method"
-                                        : step === 10
-                                          ? "You'll use the credentials from this selected account to login to all accounts moving forward."
-                                          : ""}
+                                        : ""}
                     </p>
                     )}
                   </div>
@@ -639,7 +634,10 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                       <div className="w-full text-left">
                         <button
                           type="button"
-                          className="text-[14px] font-normal leading-6 tracking-[-0.084px] text-[hsl(var(--wex-primary))] hover:underline"
+                          className={cn(
+                            "text-[14px] font-normal leading-6 tracking-[-0.084px]",
+                            loginFlowLinkTextClass
+                          )}
                         >
                           Forgot Username
                         </button>
@@ -648,7 +646,10 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                       {/* Continue Button */}
                       <Button
                         type="submit"
-                        className="w-full h-10 rounded-lg text-[14px] font-medium leading-6 tracking-[-0.084px]"
+                        className={cn(
+                          "w-full h-10 rounded-lg text-[14px] font-medium leading-6 tracking-[-0.084px]",
+                          loginFlowPrimaryButtonClass
+                        )}
                       >
                         Continue
                       </Button>
@@ -680,7 +681,10 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                       <p className="text-muted-foreground">Don't have an account?</p>
                       <button
                         type="button"
-                        className="text-[hsl(var(--wex-primary))] hover:underline cursor-pointer font-normal"
+                        className={cn(
+                          "cursor-pointer font-normal leading-6 tracking-[-0.176px]",
+                          loginFlowLinkTextClass
+                        )}
                       >
                         Register
                       </button>
@@ -704,7 +708,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                       <button
                         type="button"
                         onClick={handleEditUsername}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[14px] text-[hsl(var(--wex-primary))] hover:underline"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[14px] text-[#3958C3] hover:underline"
                       >
                         Edit
                       </button>
@@ -751,7 +755,10 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                       {/* Forgot Password Link */}
                       <button
                         type="button"
-                        className="text-left text-[14px] font-normal leading-6 tracking-[-0.084px] text-[hsl(var(--wex-primary))] hover:underline"
+                        className={cn(
+                          "text-left text-[14px] font-normal leading-6 tracking-[-0.084px]",
+                          loginFlowLinkTextClass
+                        )}
                       >
                         Forgot password
                       </button>
@@ -760,7 +767,10 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                     {/* Continue Button */}
                     <Button
                       type="submit"
-                      className="w-full h-10 rounded-lg text-[14px] font-medium leading-6 tracking-[-0.084px]"
+                      className={cn(
+                        "w-full h-10 rounded-lg text-[14px] font-medium leading-6 tracking-[-0.084px]",
+                        loginFlowPrimaryButtonClass
+                      )}
                     >
                       Continue
                     </Button>
@@ -810,7 +820,10 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                     {/* Continue Button */}
                     <Button
                       type="submit"
-                      className="w-full h-10 rounded-lg text-[14px] font-medium leading-6 tracking-[-0.084px]"
+                      className={cn(
+                        "w-full h-10 rounded-lg text-[14px] font-medium leading-6 tracking-[-0.084px]",
+                        loginFlowPrimaryButtonClass
+                      )}
                     >
                       Continue
                     </Button>
@@ -826,7 +839,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                         <button
                           type="button"
                           onClick={handleResendCode}
-                          className="font-semibold text-[hsl(var(--wex-primary))] hover:underline"
+                          className={cn("font-semibold", loginFlowLinkTextClass)}
                         >
                           Send again
                         </button>
@@ -837,7 +850,10 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                     <button
                       type="button"
                       onClick={handleTryAnotherMethod}
-                      className="text-[16px] font-semibold leading-6 tracking-[-0.176px] text-[hsl(var(--wex-primary))] hover:underline text-left"
+                      className={cn(
+                        "text-left text-[16px] font-semibold leading-6 tracking-[-0.176px]",
+                        loginFlowLinkTextClass
+                      )}
                     >
                       Try another method
                     </button>
@@ -854,7 +870,12 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                         onClick={() => handleMethodSelect('email')}
                         className="w-full"
                       >
-                        <div className="flex items-center justify-between p-4 border border-border rounded-lg hover:border-[hsl(var(--wex-primary))] hover:bg-accent transition-colors cursor-pointer">
+                        <div
+                          className={cn(
+                            "flex items-center justify-between p-4",
+                            loginMfaMethodCardClass
+                          )}
+                        >
                           <div className="flex items-center gap-3">
                             <Mail className="h-5 w-5 text-foreground" />
                             <span className="text-[16px] font-normal leading-6 tracking-[-0.176px] text-foreground">
@@ -871,7 +892,12 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                         onClick={() => handleMethodSelect('sms')}
                         className="w-full"
                       >
-                        <div className="flex items-center justify-between p-4 border border-border rounded-lg hover:border-[hsl(var(--wex-primary))] hover:bg-accent transition-colors cursor-pointer">
+                        <div
+                          className={cn(
+                            "flex items-center justify-between p-4",
+                            loginMfaMethodCardClass
+                          )}
+                        >
                           <div className="flex items-center gap-3">
                             <MessageSquare className="h-5 w-5 text-foreground" />
                             <span className="text-[16px] font-normal leading-6 tracking-[-0.176px] text-foreground">
@@ -886,84 +912,18 @@ export default function Login({ onLoginSuccess }: LoginProps) {
 
                 {/* Step 5: Account selection (after MFA) — Consumer-Experience Redesign / Login Account Selector */}
                 {step === 5 && (
-                  <div className="flex w-full flex-col gap-6">
-                    <div className="flex flex-col gap-6">
-                      {accountGroupsForDisplay.map((group) => (
-                        <div key={group.employerName} className="flex flex-col gap-4">
-                          <p className="w-full text-left text-base font-bold leading-6 tracking-[-0.176px] text-foreground">
-                            {group.employerName}
-                          </p>
-                          <div className="flex flex-col gap-4">
-                            {group.accounts.map((account) => {
-                              const selected = selectedAccountId === account.id
-                              return (
-                                <button
-                                  key={account.id}
-                                  type="button"
-                                  aria-pressed={selected}
-                                  onClick={() => setSelectedAccountId(account.id)}
-                                  className={cn(
-                                    "flex w-full items-center gap-4 rounded-lg border px-4 py-2 text-left transition-colors",
-                                    selected
-                                      ? "border-[hsl(var(--wex-primary))] bg-[hsl(var(--wex-primary)/0.08)]"
-                                      : "border-border bg-card hover:bg-accent/50"
-                                  )}
-                                >
-                                  <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded border border-border bg-background">
-                                    {account.icon === "building" ? (
-                                      <img
-                                        src={dunderMifflinLogoUrl}
-                                        alt=""
-                                        className="h-full w-full object-cover"
-                                      />
-                                    ) : (
-                                      <img
-                                        src={acmeLogoUrl}
-                                        alt=""
-                                        className="h-full w-full object-cover"
-                                      />
-                                    )}
-                                  </div>
-                                  <span className="text-[14px] font-normal leading-6 tracking-[-0.084px] text-foreground">
-                                    {account.label}
-                                  </span>
-                                </button>
-                              )
-                            })}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => setStep(6)}
-                      className="w-full text-left text-[14px] font-normal leading-6 tracking-[-0.084px] text-[hsl(var(--wex-primary))] hover:underline"
-                    >
-                      Link Another Account
-                    </button>
-
-                    <div className="flex flex-col gap-[17px]">
-                      <Button
-                        ref={accountContinueRef}
-                        type="button"
-                        disabled={!canContinueAccountSelection}
-                        onClick={handleAccountSelectionContinue}
-                        className="h-10 w-full rounded-lg text-[14px] font-medium leading-6 tracking-[-0.084px]"
-                      >
-                        Continue
-                      </Button>
-                      <Button
-                        type="button"
-                        intent="primary"
-                        variant="outline"
-                        onClick={handleAccountSelectionCancel}
-                        className="h-10 w-full rounded-lg text-[14px] font-medium leading-6 tracking-[-0.084px] border-[hsl(var(--wex-primary))] text-[hsl(var(--wex-primary))] hover:bg-muted/50"
-                      >
-                        Cancel
-                      </Button>
-                    </div>
-                  </div>
+                  <SelectAccountScreen
+                    groups={accountGroupsForDisplay}
+                    selectedAccountId={selectedAccountId}
+                    onSelectAccount={setSelectedAccountId}
+                    onLinkAnotherAccount={() => setStep(6)}
+                    onContinue={handleAccountSelectionContinue}
+                    onCancel={handleAccountSelectionCancel}
+                    accountContinueRef={accountContinueRef}
+                    canContinue={canContinueAccountSelection}
+                    dunderMifflinLogoUrl={dunderMifflinLogoUrl}
+                    acmeLogoUrl={acmeLogoUrl}
+                  />
                 )}
 
                 {/* Step 6: Account linking — Unlinked Accounts (Figma 27732:25237) */}
@@ -1044,7 +1004,10 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                     <div className="flex flex-col gap-[17px]">
                     <Button
                       type="submit"
-                      className="w-full h-10 rounded-lg text-[14px] font-medium leading-6 tracking-[-0.084px]"
+                      className={cn(
+                        "w-full h-10 rounded-lg text-[14px] font-medium leading-6 tracking-[-0.084px]",
+                        loginFlowPrimaryButtonClass
+                      )}
                     >
                       Continue
                     </Button>
@@ -1052,7 +1015,10 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                       type="button"
                       variant="ghost"
                       onClick={handleVerifyAccessSkip}
-                      className="h-10 w-full rounded-lg text-[14px] font-medium leading-6 tracking-[-0.084px] text-[hsl(var(--wex-primary))] hover:bg-transparent hover:text-[hsl(var(--wex-primary))]"
+                      className={cn(
+                        "h-10 w-full rounded-lg text-[14px] font-medium leading-6 tracking-[-0.084px]",
+                        loginFlowTertiaryGhostButtonClass
+                      )}
                     >
                       Skip
                     </Button>
@@ -1068,7 +1034,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                         <button
                           type="button"
                           onClick={handleLinkResendCode}
-                          className="font-semibold text-[hsl(var(--wex-primary))] hover:underline"
+                          className={cn("font-semibold", loginFlowLinkTextClass)}
                         >
                           Send again
                         </button>
@@ -1078,7 +1044,10 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                     <button
                       type="button"
                       onClick={handleLinkTryAnotherMethod}
-                      className="text-[16px] font-semibold leading-6 tracking-[-0.176px] text-[hsl(var(--wex-primary))] hover:underline text-left"
+                      className={cn(
+                        "text-left text-[16px] font-semibold leading-6 tracking-[-0.176px]",
+                        loginFlowLinkTextClass
+                      )}
                     >
                       Try another method
                     </button>
@@ -1095,7 +1064,12 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                       onClick={() => handleLinkMethodSelect("email")}
                       className="w-full"
                     >
-                      <div className="flex items-center justify-between p-4 border border-border rounded-lg hover:border-[hsl(var(--wex-primary))] hover:bg-accent transition-colors cursor-pointer">
+                      <div
+                        className={cn(
+                          "flex items-center justify-between p-4",
+                          loginMfaMethodCardClass
+                        )}
+                      >
                         <div className="flex items-center gap-3">
                           <Mail className="h-5 w-5 text-foreground" />
                           <span className="text-[16px] font-normal leading-6 tracking-[-0.176px] text-foreground">
@@ -1111,7 +1085,12 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                       onClick={() => handleLinkMethodSelect("sms")}
                       className="w-full"
                     >
-                      <div className="flex items-center justify-between p-4 border border-border rounded-lg hover:border-[hsl(var(--wex-primary))] hover:bg-accent transition-colors cursor-pointer">
+                      <div
+                        className={cn(
+                          "flex items-center justify-between p-4",
+                          loginMfaMethodCardClass
+                        )}
+                      >
                         <div className="flex items-center gap-3">
                           <MessageSquare className="h-5 w-5 text-foreground" />
                           <span className="text-[16px] font-normal leading-6 tracking-[-0.176px] text-foreground">
@@ -1148,7 +1127,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
         </div>
 
         {/* Footer */}
-        <footer className="bg-[hsl(var(--wex-primary-hover))] w-full py-[13px] px-[131px]">
+        <footer className={cn("w-full py-[13px] px-[131px]", loginFlowFooterBgClass)}>
           <div className="flex flex-col gap-[14px] items-center">
             {/* Footer Links */}
             <div className="flex gap-8 items-start text-[11px] font-semibold leading-4 tracking-[0.055px] text-white">
