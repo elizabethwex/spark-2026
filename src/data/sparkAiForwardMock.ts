@@ -20,13 +20,13 @@ export const sparkHsaSummary = {
   ytdReturnPct: "+12.5%",
   cashBalance: "$3,200.00",
   contributionPctUsed: 74,
-  planYear: "2025",
+  planYear: "2026",
   remainingLimit: "$1,100.00",
 };
 
 export const sparkLpfsaSummary = {
   balance: "$850.00",
-  planRange: "01/01/2025 – 12/31/2025",
+  planRange: "01/01/2026 – 12/31/2026",
   daysToSpend: 28,
   spendByTag: "Spend $350 by 12/31",
   eligibleLabel: "Vision & Dental",
@@ -62,9 +62,9 @@ export const sparkRecentActivity: SparkActivityRow[] = [
     ],
   },
   {
-    merchant: "Dr. Miller DDS",
+    merchant: "Bigtown Dentistry",
     meta: "4/27/26 • LPFSA Account",
-    amount: "$340.00",
+    amount: "$210.00",
     status: "needs_attention",
     statusLabel: "NEEDS ATTENTION",
     timeline: [
@@ -75,7 +75,7 @@ export const sparkRecentActivity: SparkActivityRow[] = [
   },
   {
     merchant: "Vanguard Invest",
-    meta: "Dec 14 • HSA Account",
+    meta: "12/14/25 • HSA Account",
     amount: "$500.00",
     status: "completed",
     statusLabel: "COMPLETED",

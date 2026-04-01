@@ -308,7 +308,7 @@ export function SparkAiForwardHero() {
                     Missing Documentation Required
                   </h2>
                   <p className="text-[16px] leading-[24.75px] text-[#5f6a94]">
-                    Upload your documentation for Dr. Miller in under a minute.
+                    Upload your documentation for Bigtown Dentistry in under a minute.
                   </p>
                 </motion.div>
               )}
@@ -326,7 +326,7 @@ export function SparkAiForwardHero() {
                   className="flex flex-col"
                 >
                   <p className="text-[16px] leading-[24.75px] text-[#5f6a94]">
-                    Upload your documentation for Dr. Miller in under a minute.
+                    Upload your documentation for Bigtown Dentistry in under a minute.
                   </p>
                 </motion.div>
               )}
@@ -380,7 +380,7 @@ export function SparkAiForwardHero() {
               </div>
               <div className="flex flex-col">
                 <p className="text-[14px] font-bold leading-[24px] text-[#14182c]">
-                  Dr. Miller (Dental)
+                  Bigtown Dentistry
                 </p>
                 <p className="text-[12px] font-medium leading-[20px] text-[#5f6a94]">
                   Yesterday • FSA Account
@@ -389,7 +389,7 @@ export function SparkAiForwardHero() {
             </div>
             <div className="flex flex-col items-end">
               <p className="text-[16px] font-extrabold leading-[28px] tracking-[-0.5px] text-[#14182c]">
-                $340.00
+                  $210.00
               </p>
             </div>
           </div>

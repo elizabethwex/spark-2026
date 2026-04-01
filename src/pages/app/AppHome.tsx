@@ -941,7 +941,7 @@ export default function AppHome() {
             {/* Transaction rows */}
             {[
               { title: "Pharmacy",      subtitle: "4/27/2026 · LPFSA", amount: "$42.50",  id: "c1" },
-              { title: "Dr. Miller DDS",subtitle: "4/27/2026 · LPFSA", amount: "$340.00", id: "c3" },
+              { title: "Bigtown Dentistry",subtitle: "4/27/2026 · LPFSA", amount: "$210.00", id: "c3" },
               { title: "Investment Buy", subtitle: "4/27/2026 · HSA",   amount: "$500.00", id: "c2" },
             ].map((tx) => (
               <TransactionRow

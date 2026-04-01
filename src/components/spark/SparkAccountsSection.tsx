@@ -258,7 +258,7 @@ export function SparkAccountsSection({ variant = "modern" }: { variant?: "modern
                     cy="56"
                     r="48"
                     fill="none"
-                    stroke="#3958c3"
+                    stroke={l.daysToSpend <= 30 ? "#bf8a00" : "#3958c3"}
                     strokeWidth="10"
                     strokeLinecap="round"
                     strokeDasharray={`${2 * Math.PI * 48}`}
@@ -304,7 +304,16 @@ export function SparkAccountsSection({ variant = "modern" }: { variant?: "modern
 
           {/* Footer */}
           <div className="px-6 pb-6 mt-auto">
-            {/* Reimburse button removed per request */}
+            {variant === "modern" && (
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full rounded-xl border-[#3958c3] py-[9.75px] text-[15.75px] font-medium text-[#3958c3] hover:bg-[#3958c3]/5"
+                onClick={() => navigate("/reimburse")}
+              >
+                Reimburse Myself
+              </Button>
+            )}
           </div>
         </div>
       </div>
