@@ -411,11 +411,15 @@ export function SparkAiForwardHero() {
                 >
                   <Button
                     type="button"
-                    className="w-full gap-[7px] rounded-[12px] bg-[#3958c3] px-[13.25px] py-[9.75px] text-[15.75px] font-medium text-white hover:bg-[#3958c3]/90"
+                    className="w-full gap-[7px] rounded-[12px] border-0 px-[13.25px] py-[9.75px] text-[15.75px] font-medium text-white hover:opacity-90 transition-opacity"
+                    style={{
+                      backgroundImage:
+                        "linear-gradient(172.91deg, rgb(37, 20, 111) 2.4625%, rgb(200, 16, 46) 100%)",
+                    }}
                     onClick={() => setUploadPhase("options")}
                   >
                     <Camera className="h-[15.75px] w-[15.75px]" />
-                    Upload document & file
+                    Upload Document
                   </Button>
                   <button
                     type="button"
