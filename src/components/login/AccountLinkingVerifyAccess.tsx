@@ -5,6 +5,8 @@ import {
   LinkingAccountSummary,
   type MatchedAccountRow,
 } from "@/components/login/accountLinkingShared"
+import { cn } from "@/lib/utils"
+import { loginFlowPrimaryButtonClass, loginFlowTertiaryGhostButtonClass } from "@/components/login/loginFlowTheme"
 
 const LINK_VERIFY_ACCEPTED_USERNAME = "n.jackson"
 
@@ -101,7 +103,10 @@ export function AccountLinkingVerifyAccess({
           <Button
             type="submit"
             disabled={!canContinue}
-            className="h-10 w-full rounded-lg text-[14px] font-medium leading-6 tracking-[-0.084px]"
+            className={cn(
+              "h-10 w-full rounded-lg text-[14px] font-medium leading-6 tracking-[-0.084px]",
+              loginFlowPrimaryButtonClass
+            )}
           >
             Continue
           </Button>
@@ -109,7 +114,10 @@ export function AccountLinkingVerifyAccess({
             type="button"
             variant="ghost"
             onClick={onSkip}
-            className="h-10 w-full rounded-lg text-[14px] font-medium leading-6 tracking-[-0.084px] text-[hsl(var(--wex-primary))] hover:bg-transparent hover:text-[hsl(var(--wex-primary))]"
+            className={cn(
+              "h-10 w-full rounded-lg text-[14px] font-medium leading-6 tracking-[-0.084px]",
+              loginFlowTertiaryGhostButtonClass
+            )}
           >
             Skip
           </Button>

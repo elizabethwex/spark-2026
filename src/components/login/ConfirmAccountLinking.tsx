@@ -2,6 +2,8 @@ import { useState, type RefObject } from "react"
 import { Button, Checkbox } from "@wexinc-healthbenefits/ben-ui-kit"
 import { Lock } from "lucide-react"
 import { ProductTag } from "@/components/login/accountLinkingShared"
+import { cn } from "@/lib/utils"
+import { loginFlowPrimaryButtonClass, loginFlowTertiaryGhostButtonClass } from "@/components/login/loginFlowTheme"
 import {
   getPrimaryCredentialsDisplay,
   type PrimaryOptionId,
@@ -43,13 +45,13 @@ export function ConfirmAccountLinking({
 
   return (
     <div className="flex w-full flex-col gap-[21px]">
-      <div className="flex flex-col gap-2 rounded-xl border border-border bg-[#eff6ff] p-4 text-center text-base font-bold leading-6 tracking-[-0.176px] text-foreground">
+      <div className="flex flex-col gap-2 rounded-xl border border-[#E3E7F4] bg-[#eff6ff] p-4 text-center text-base font-bold leading-6 tracking-[-0.176px] text-foreground">
         <p>Username: {username}</p>
         <p>Password: {passwordMasked}</p>
       </div>
 
       <div className="flex flex-col gap-4">
-        <div className="rounded-xl border border-border bg-card p-4">
+        <div className="rounded-xl border border-[#E3E7F4] bg-card p-4">
           <div className="flex flex-col items-start gap-1">
             <ProductTag label="Spending Account(s)" variant="info" />
             <p className="text-[14px] font-normal leading-6 tracking-[-0.084px] text-foreground">
@@ -62,7 +64,7 @@ export function ConfirmAccountLinking({
           </div>
         </div>
 
-        <div className="rounded-xl border border-border bg-card p-4">
+        <div className="rounded-xl border border-[#E3E7F4] bg-card p-4">
           <div className="flex flex-col items-start gap-1">
             <ProductTag label="COBRA & Direct Bill" variant="purple" />
             <p className="text-[14px] font-normal leading-6 tracking-[-0.084px] text-foreground">
@@ -72,7 +74,7 @@ export function ConfirmAccountLinking({
         </div>
       </div>
 
-      <div className="flex flex-col gap-3 rounded-xl border border-border bg-[#eff6ff] p-4">
+      <div className="flex flex-col gap-3 rounded-xl border border-[#E3E7F4] bg-[#eff6ff] p-4">
         <p className="text-base font-bold leading-6 tracking-[-0.176px] text-foreground">
           Confirm Account Linking
         </p>
@@ -114,7 +116,10 @@ export function ConfirmAccountLinking({
           type="button"
           disabled={!canConfirm}
           onClick={onConfirm}
-          className="h-10 w-full rounded-lg text-[14px] font-medium leading-6 tracking-[-0.084px]"
+          className={cn(
+            "h-10 w-full rounded-lg text-[14px] font-medium leading-6 tracking-[-0.084px]",
+            loginFlowPrimaryButtonClass
+          )}
         >
           Confirm & Link Accounts
         </Button>
@@ -122,7 +127,10 @@ export function ConfirmAccountLinking({
           type="button"
           variant="ghost"
           onClick={onCancel}
-          className="h-10 w-full rounded-lg text-[14px] font-medium leading-6 tracking-[-0.084px] text-[hsl(var(--wex-primary))] hover:bg-transparent hover:text-[hsl(var(--wex-primary))]"
+          className={cn(
+            "h-10 w-full rounded-lg text-[14px] font-medium leading-6 tracking-[-0.084px]",
+            loginFlowTertiaryGhostButtonClass
+          )}
         >
           Cancel
         </Button>

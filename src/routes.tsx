@@ -59,6 +59,9 @@ const ThemingEnginePage = React.lazy(() => import("@/pages/ThemingEnginePage"));
 // Modern documentation preview
 const ModernDocumentPage = React.lazy(() => import("@/pages/ModernDocument"));
 
+// Select an Account (authenticated; same UI as login step 5)
+const SelectProfilePage = React.lazy(() => import("@/pages/SelectProfilePage"));
+
 
 /**
  * Loading fallback for lazy-loaded pages
@@ -127,6 +130,9 @@ export function AppRoutes() {
 
         {/* Account Documents */}
         <Route path="account-documents" element={withConsumerLight(<AccountDocumentsPage />)} />
+
+        {/* Select an Account (authenticated; login wizard step 5 remains on /login) */}
+        <Route path="select-profile" element={withConsumerLight(<SelectProfilePage />)} />
 
         {/* Reimbursement flow routes */}
         <Route

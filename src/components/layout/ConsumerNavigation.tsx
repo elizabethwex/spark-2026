@@ -26,6 +26,7 @@ import {
   FileText,
   Mail,
   ChevronDown,
+  ChevronRight,
   Languages,
   LogOut,
   Menu,
@@ -405,20 +406,27 @@ export function ConsumerNavigation({
               align="end"
               className="w-[240px] rounded-[8px] border border-border bg-white px-0 py-[8px] shadow-[0px_4px_10px_0px_rgba(2,13,36,0.15),0px_0px_1px_0px_rgba(2,13,36,0.3)]"
             >
-              {/* Header Section */}
-              <div className="flex gap-[8px] items-center pl-[12px] pr-0 py-[8px]">
-                <div className="flex items-center justify-center shrink-0 size-[16px]">
-                  <User className="h-4 w-4 text-foreground" />
-                </div>
-                <div className="flex flex-col items-start justify-center flex-1 min-w-0">
-                  <p className="font-semibold text-sm text-foreground tracking-[-0.084px] leading-[24px]">
-                    WEX, Inc.
-                  </p>
-                  <p className="font-normal text-[13px] text-muted-foreground tracking-[-0.0325px] leading-[24px]">
-                    Switch Account
-                  </p>
-                </div>
-              </div>
+              {/* Header Section — navigate to account selection */}
+              <DropdownMenuItem asChild className="h-auto cursor-default p-0">
+                <Link
+                  to="/select-profile"
+                  className="flex w-full items-center gap-[8px] rounded-sm py-[8px] pl-[12px] pr-[12px] outline-none hover:bg-gray-50 focus-visible:bg-gray-50"
+                  aria-label="Switch account — select profile"
+                >
+                  <div className="flex size-[16px] shrink-0 items-center justify-center">
+                    <User className="h-4 w-4 text-foreground" />
+                  </div>
+                  <div className="flex min-w-0 flex-1 flex-col items-start justify-center">
+                    <p className="text-sm font-semibold leading-[24px] tracking-[-0.084px] text-foreground">
+                      WEX, Inc.
+                    </p>
+                    <p className="text-[13px] font-normal leading-[24px] tracking-[-0.0325px] text-muted-foreground">
+                      Switch Account
+                    </p>
+                  </div>
+                  <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+                </Link>
+              </DropdownMenuItem>
 
               <DropdownMenuSeparator />
 
