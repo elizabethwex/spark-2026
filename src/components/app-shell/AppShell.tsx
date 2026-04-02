@@ -1,8 +1,10 @@
-import { Outlet } from "react-router-dom";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Outlet, useLocation } from "react-router-dom";
 import { AppTabBar } from "./AppTabBar";
 import { IPhoneMockup, SCREEN_HEIGHT } from "./IPhoneMockup";
 import { AppStatusBar, STATUS_BAR_HEIGHT } from "./AppStatusBar";
 import { useDeviceMockup } from "@/hooks/useDeviceMockup";
+import { AppChromeProvider } from "@/context/AppChromeContext";
 
 // Height available to route-level screens below the status bar
 const CONTENT_HEIGHT = SCREEN_HEIGHT - STATUS_BAR_HEIGHT; // 790px
@@ -24,6 +26,43 @@ const CONTENT_HEIGHT = SCREEN_HEIGHT - STATUS_BAR_HEIGHT; // 790px
  */
 export function AppShell() {
   const { deviceOn, toggleDevice, isMobileDevice } = useDeviceMockup();
+  const location = useLocation();
+  const [scrollPort, setScrollPort] = useState<HTMLDivElement | null>(null);
+  const [topChromeHidden, setTopChromeHidden] = useState(false);
+  const lastScrollY = useRef(0);
+
+  const scrollRefCallback = useCallback((node: HTMLDivElement | null) => {
+    setScrollPort(node);
+  }, []);
+
+  useEffect(() => {
+    lastScrollY.current = 0;
+    setTopChromeHidden(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    const threshold = 8;
+    const minY = 24;
+
+    const onScroll = () => {
+      const y = scrollPort?.scrollTop ?? 0;
+      const dy = y - lastScrollY.current;
+      lastScrollY.current = y;
+
+      if (y < minY) {
+        setTopChromeHidden(false);
+        return;
+      }
+      if (dy > threshold) setTopChromeHidden(true);
+      else if (dy < -threshold) setTopChromeHidden(false);
+    };
+
+    if (!scrollPort) return undefined;
+    scrollPort.addEventListener("scroll", onScroll, { passive: true });
+    return () => scrollPort.removeEventListener("scroll", onScroll);
+  }, [scrollPort]);
+
+  const chromeValue = { topChromeHidden };
 
   // ── Device ON ────────────────────────────────────────────────────────────────
   if (deviceOn) {
@@ -52,44 +91,50 @@ export function AppShell() {
            *   - --app-screen-height tells child screens how tall they can be
            *     (screen minus the status bar we render above the Outlet)
            */}
-          <div
-            style={{
-              height: SCREEN_HEIGHT,
-              display: "flex",
-              flexDirection: "column",
-              overflow: "hidden",
-              transform: "translateZ(0)",
-              position: "relative",
-              background: "var(--app-bg)",
-              // @ts-expect-error custom CSS property
-              "--app-screen-height": `${CONTENT_HEIGHT}px`,
-            }}
-          >
-            {/* iOS status bar — time + signal/wifi/battery */}
-            <AppStatusBar />
-
-            {/* Route content */}
+          <AppChromeProvider value={chromeValue}>
             <div
+              data-app-mobile-scroll
               style={{
-                flex: 1,
-                minHeight: 0,
+                height: SCREEN_HEIGHT,
                 display: "flex",
                 flexDirection: "column",
-                overflowY: "auto",
+                overflow: "hidden",
+                transform: "translateZ(0)",
+                position: "relative",
+                background: "var(--app-bg)",
+                // @ts-expect-error custom CSS property
+                "--app-screen-height": `${CONTENT_HEIGHT}px`,
               }}
             >
-              <Outlet />
-            </div>
+              {/* iOS status bar — time + signal/wifi/battery (liquid glass, hides on scroll down) */}
+              <AppStatusBar />
 
-            {/*
-             * AppTabBar is position:fixed, so it escapes the normal flex flow.
-             * With transform:translateZ(0) on the screen container above, it
-             * ends up anchored to the bottom of the phone screen — not the
-             * viewport. No extra positioning is needed here; just include it
-             * in the React tree so it renders.
-             */}
-            <AppTabBar />
-          </div>
+              {/* Route content */}
+              <div
+                ref={scrollRefCallback}
+                style={{
+                  flex: 1,
+                  minHeight: 0,
+                  display: "flex",
+                  flexDirection: "column",
+                  overflowY: "auto",
+                  paddingTop:
+                    location.pathname === "/app/lock-screen" ? 0 : STATUS_BAR_HEIGHT,
+                }}
+              >
+                <Outlet />
+              </div>
+
+              {/*
+               * AppTabBar is position:fixed, so it escapes the normal flex flow.
+               * With transform:translateZ(0) on the screen container above, it
+               * ends up anchored to the bottom of the phone screen — not the
+               * viewport. No extra positioning is needed here; just include it
+               * in the React tree so it renders.
+               */}
+              <AppTabBar />
+            </div>
+          </AppChromeProvider>
         </IPhoneMockup>
 
         {/* Toggle hint */}
@@ -140,25 +185,31 @@ export function AppShell() {
         justifyContent: "center",
       }}
     >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: 430,
-          minHeight: "100dvh",
-          position: "relative",
-          background: "var(--app-bg)",
-          overflowX: "hidden",
-        }}
-      >
+      <AppChromeProvider value={chromeValue}>
         <div
+          ref={scrollRefCallback}
+          data-app-mobile-scroll
           style={{
-            paddingBottom: "calc(var(--app-tabbar-height) + env(safe-area-inset-bottom, 0px))",
+            width: "100%",
+            maxWidth: 430,
+            height: "100dvh",
+            maxHeight: "100dvh",
+            position: "relative",
+            background: "var(--app-bg)",
+            overflowX: "hidden",
+            overflowY: "auto",
           }}
         >
-          <Outlet />
+          <div
+            style={{
+              paddingBottom: "calc(var(--app-tabbar-height) + env(safe-area-inset-bottom, 0px))",
+            }}
+          >
+            <Outlet />
+          </div>
+          <AppTabBar />
         </div>
-        <AppTabBar />
-      </div>
+      </AppChromeProvider>
 
       {/* Show hint badge on desktop only */}
       {!isMobileDevice && (

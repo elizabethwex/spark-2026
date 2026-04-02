@@ -19,6 +19,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { AppNavBar } from "@/components/app-shell/AppNavBar";
+import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
 import { AppCard } from "@/components/app-shell/primitives/AppCard";
 import { getPrototypeInboxEntries, type MessageTag } from "./messageCatalog";
 
@@ -591,7 +592,8 @@ export default function AppMessageCenter() {
 
   return (
     <div style={PAGE_ROOT}>
-      <AppNavBar mode="large-title" title="Messages" />
+      <AppTopSpacer variant="home" />
+      <AppNavBar variant="title" title="Messages" />
 
       <div
         data-name="Page filters"

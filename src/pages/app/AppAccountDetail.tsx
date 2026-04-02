@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { Wallet, ArrowUpRight, ArrowDownLeft, Check, Clock, X } from "lucide-react";
 import { AppNavBar } from "@/components/app-shell/AppNavBar";
+import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
 import { AppCard } from "@/components/app-shell/primitives/AppCard";
 import { AppBadge } from "@/components/app-shell/primitives/AppBadge";
 
@@ -48,7 +49,13 @@ export default function AppAccountDetail() {
         fontFamily: "var(--app-font)",
       }}
     >
-      <AppNavBar title={meta.name} backTo="/app/account" backLabel="Accounts" />
+      <AppTopSpacer variant="home" />
+      <AppNavBar
+        variant="sub-page"
+        title={meta.name}
+        backTo="/app/account"
+        backLabel="Accounts"
+      />
 
       <div style={{ padding: "0 0 24px" }}>
         {/* Balance hero */}

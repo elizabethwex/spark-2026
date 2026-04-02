@@ -18,6 +18,7 @@ import {
   SquarePen,
 } from "lucide-react";
 import { AppNavBar, AppNavAction } from "@/components/app-shell/AppNavBar";
+import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
 import {
   AppPromptChip,
   AssistIQAvatar,
@@ -1575,24 +1576,20 @@ export default function AppAssistIQ() {
         overflow: "hidden",
       }}
     >
+      <AppTopSpacer variant="home" />
       {/* Nav bar */}
       <AppNavBar
+        variant="full-page"
         title={inWelcome ? "" : "Assist IQ"}
+        onClose={() => navigate(-1)}
         rightActions={
-          <>
-            {!inWelcome && (
-              <AppNavAction
-                icon={<SquarePen size={18} strokeWidth={2} />}
-                label="New chat"
-                onClick={clear}
-              />
-            )}
+          !inWelcome ? (
             <AppNavAction
-              icon={<X size={18} strokeWidth={2} />}
-              label="Close Assist IQ"
-              onClick={() => navigate(-1)}
+              icon={<SquarePen size={18} strokeWidth={2} />}
+              label="New chat"
+              onClick={clear}
             />
-          </>
+          ) : undefined
         }
       />
 
