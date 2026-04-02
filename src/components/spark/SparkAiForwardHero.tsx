@@ -28,17 +28,24 @@ export function SparkAiForwardHero() {
   const navigate = useNavigate();
   const prefersReducedMotion = useReducedMotion();
   const [uploadPhase, setUploadPhase] = useState<UploadPhase>("default");
+  const [isTaskVisible, setIsTaskVisible] = useState(true);
+  const [isHeroExpanded, setIsHeroExpanded] = useState(false);
 
   useEffect(() => {
     if (uploadPhase === "uploading") {
       const timer = setTimeout(() => setUploadPhase("success"), 2500);
       return () => clearTimeout(timer);
     }
-    if (uploadPhase === "success") {
-      const timer = setTimeout(() => setUploadPhase("default"), 2000);
+  }, [uploadPhase]);
+
+  useEffect(() => {
+    if (!isTaskVisible && !isHeroExpanded) {
+      const timer = setTimeout(() => {
+        setIsHeroExpanded(true);
+      }, 1500);
       return () => clearTimeout(timer);
     }
-  }, [uploadPhase]);
+  }, [isTaskVisible, isHeroExpanded]);
 
   // Check session storage synchronously so the first render has the correct state
   const [isFirstVisit] = useState(() => {
@@ -180,17 +187,18 @@ export function SparkAiForwardHero() {
 
   return (
     <motion.div
+      layout
       initial={shouldAnimate ? "hidden" : "instant"}
       animate={animateState}
       variants={containerVariants}
-      className="spark-hero-root relative flex flex-col lg:flex-row w-full items-center lg:items-stretch justify-center gap-6 lg:gap-[32px] rounded-[24px] lg:rounded-[32px] border border-[#e3e7f4] p-6 sm:p-8 lg:p-[41px] shadow-[0_1.5px_4.5px_rgba(43,49,78,0.04)]"
+      className="spark-hero-root relative flex flex-col lg:flex-row w-full items-center lg:items-stretch justify-center gap-6 lg:gap-[32px] rounded-[24px] lg:rounded-[32px] border border-[#e3e7f4] p-6 sm:p-8 lg:p-[41px] shadow-[0_1.5px_4.5px_rgba(43,49,78,0.04)] overflow-hidden"
       style={{
         backgroundImage:
           "url('data:image/svg+xml;utf8,<svg viewBox=\\'0 0 1200 523.5\\' xmlns=\\'http://www.w3.org/2000/svg\\' preserveAspectRatio=\\'none\\'><rect x=\\'0\\' y=\\'0\\' height=\\'100%\\' width=\\'100%\\' fill=\\'url(%23grad)\\' opacity=\\'1\\'/><defs><radialGradient id=\\'grad\\' gradientUnits=\\'userSpaceOnUse\\' cx=\\'0\\' cy=\\'0\\' r=\\'10\\' gradientTransform=\\'matrix(176.49 0 0 51.824 -48 157.05)\\'><stop stop-color=\\'rgba(23,45,161,0.09)\\' offset=\\'0\\'/><stop stop-color=\\'rgba(23,45,161,0)\\' offset=\\'0.5\\'/></radialGradient></defs></svg>'), url('data:image/svg+xml;utf8,<svg viewBox=\\'0 0 1200 523.5\\' xmlns=\\'http://www.w3.org/2000/svg\\' preserveAspectRatio=\\'none\\'><rect x=\\'0\\' y=\\'0\\' height=\\'100%\\' width=\\'100%\\' fill=\\'url(%23grad)\\' opacity=\\'1\\'/><defs><radialGradient id=\\'grad\\' gradientUnits=\\'userSpaceOnUse\\' cx=\\'0\\' cy=\\'0\\' r=\\'10\\' gradientTransform=\\'matrix(176.49 0 0 55.526 1248 392.62)\\'><stop stop-color=\\'rgba(200,16,46,0.07)\\' offset=\\'0\\'/><stop stop-color=\\'rgba(200,16,46,0)\\' offset=\\'0.45\\'/></radialGradient></defs></svg>'), url('data:image/svg+xml;utf8,<svg viewBox=\\'0 0 1200 523.5\\' xmlns=\\'http://www.w3.org/2000/svg\\' preserveAspectRatio=\\'none\\'><rect x=\\'0\\' y=\\'0\\' height=\\'100%\\' width=\\'100%\\' fill=\\'url(%23grad)\\' opacity=\\'1\\'/><defs><radialGradient id=\\'grad\\' gradientUnits=\\'userSpaceOnUse\\' cx=\\'0\\' cy=\\'0\\' r=\\'10\\' gradientTransform=\\'matrix(93.338 0 0 103.65 660 732.9)\\'><stop stop-color=\\'rgba(23,45,161,0.04)\\' offset=\\'0\\'/><stop stop-color=\\'rgba(23,45,161,0)\\' offset=\\'0.4\\'/></radialGradient></defs></svg>'), linear-gradient(90deg, rgba(255, 255, 255, 0.93) 0%, rgba(255, 255, 255, 0.93) 100%)",
       }}
     >
       {/* Left Column: AI Assist */}
-      <div className="flex w-full lg:flex-1 flex-col gap-[24px]">
+      <motion.div layout className="flex w-full lg:flex-1 flex-col gap-[24px]">
         <motion.div
           variants={greetingVariants}
           className="flex flex-col gap-[16px]"
@@ -249,23 +257,31 @@ export function SparkAiForwardHero() {
             })}
           </motion.div>
         </motion.div>
-      </div>
+      </motion.div>
 
-      {/* Divider */}
-      <motion.div
-        variants={dividerDesktopVariants}
-        style={{ originY: 0 }}
-        className="hidden lg:block w-[1.5px] self-stretch shrink-0 bg-[#e3e7f4]"
-      />
-      <motion.div
-        variants={dividerMobileVariants}
-        style={{ originX: 0 }}
-        className="block lg:hidden w-full h-[1.5px] shrink-0 bg-[#e3e7f4]"
-      />
+      <AnimatePresence>
+        {!isHeroExpanded && (
+          <motion.div
+            layout
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0, width: 0, height: 0, margin: 0, padding: 0, overflow: "hidden", transition: { duration: 0.5, ease: softEaseOut } }}
+            className="flex flex-col lg:flex-row gap-6 lg:gap-[32px] items-center lg:items-stretch"
+          >
+            {/* Divider */}
+            <motion.div
+              variants={dividerDesktopVariants}
+              style={{ originY: 0 }}
+              className="hidden lg:block w-[1.5px] self-stretch shrink-0 bg-[#e3e7f4]"
+            />
+            <motion.div
+              variants={dividerMobileVariants}
+              style={{ originX: 0 }}
+              className="block lg:hidden w-full h-[1.5px] shrink-0 bg-[#e3e7f4]"
+            />
 
-      {/* Right Column: Next Steps */}
-      <div className="flex w-full lg:w-[376px] shrink-0 flex-col gap-[8px]">
-        <motion.div
+            {/* Right Column: Next Steps */}
+            <div className="flex w-full lg:w-[376px] shrink-0 flex-col gap-[8px]">
+              <motion.div
           variants={ctaHeaderVariants}
           className="flex items-center gap-[8px]"
         >
@@ -275,16 +291,22 @@ export function SparkAiForwardHero() {
           </h3>
           <div className="rounded-[6px] bg-[#e1e8ff] px-[8px] py-[2px]">
             <span className="text-[12px] font-bold leading-[16px] text-[#7a87b2]">
-              1 Task
+              {isTaskVisible ? "1 Task" : "0 Tasks"}
             </span>
           </div>
         </motion.div>
 
-        <motion.div
-          variants={ctaCardVariants}
-          className="flex flex-col gap-[24px] rounded-[32px] border border-[#e2e8f0] bg-white p-[25px]"
-        >
-          {/* ── Header area: contextual copy per phase ── */}
+        <AnimatePresence mode="wait">
+          {isTaskVisible ? (
+            <motion.div
+              key="task-card"
+              variants={ctaCardVariants}
+              initial={shouldAnimate ? "hidden" : "instant"}
+              animate={animateState}
+              exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
+              className="flex flex-col gap-[24px] rounded-[32px] border border-[#e2e8f0] bg-white p-[25px]"
+            >
+              {/* ── Header area: contextual copy per phase ── */}
           <div className="relative">
             <AnimatePresence mode="popLayout">
               {uploadPhase === "default" && (
@@ -430,7 +452,7 @@ export function SparkAiForwardHero() {
                     duration: 0.4,
                     ease: [0.2, 0, 0, 1],
                   }}
-                  className="flex flex-col items-center justify-center gap-[16px] min-h-[160px]"
+                  className="flex flex-col items-center gap-[16px]"
                 >
                   <Button
                     type="button"
@@ -629,6 +651,13 @@ export function SparkAiForwardHero() {
                       We've added it to this claim.
                     </p>
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsTaskVisible(false)}
+                    className="mt-[8px] rounded-[12px] bg-[#f8f9fe] border border-[#e3e7f4] px-[16px] py-[8px] text-[14px] font-medium text-[#5f6a94] hover:bg-[#eef2ff] hover:text-[#3958c3] transition-colors"
+                  >
+                    Close
+                  </button>
                   <style>{`
                     @keyframes checkDraw {
                       to { stroke-dashoffset: 0; }
@@ -639,9 +668,31 @@ export function SparkAiForwardHero() {
             </AnimatePresence>
           </div>
         </motion.div>
+          ) : (
+            <motion.div
+              key="empty-state"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3 }}
+              className="flex flex-col items-center justify-center gap-[16px] rounded-[32px] border border-[#e2e8f0] bg-white p-[32px] text-center min-h-[200px]"
+            >
+              <div className="flex h-[48px] w-[48px] items-center justify-center rounded-full bg-[#eef2ff]">
+                <CheckCircle2 className="h-[24px] w-[24px] text-[#3958c3]" />
+              </div>
+              <div className="flex flex-col gap-[4px]">
+                <p className="text-[16px] font-semibold text-[#14182c]">
+                  You're all caught up!
+                </p>
+                <p className="text-[14px] text-[#5f6a94]">
+                  No pending tasks at the moment.
+                </p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <AnimatePresence>
-          {uploadPhase === "default" && (
+          {uploadPhase === "default" && isTaskVisible && (
             <motion.div
               key="caught-up-message"
               variants={ctaHeaderVariants}
@@ -656,6 +707,9 @@ export function SparkAiForwardHero() {
           )}
         </AnimatePresence>
       </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
