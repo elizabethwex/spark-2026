@@ -682,18 +682,12 @@ export default function AppHome() {
         </div>
 
         {/* ── Quick Actions ── */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            padding: "0 16px",
-          }}
-        >
+        <div style={{ padding: "0 16px" }}>
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "172px 172px",
-              gap: 12,
+              gridTemplateColumns: "1fr 1fr",
+              gap: 16,
             }}
           >
             {/* Reimburse Myself */}
