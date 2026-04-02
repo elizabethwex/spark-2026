@@ -30,6 +30,7 @@ export function SparkAiForwardHero() {
   const [uploadPhase, setUploadPhase] = useState<UploadPhase>("default");
   const [isTaskVisible, setIsTaskVisible] = useState(true);
   const [isHeroExpanded, setIsHeroExpanded] = useState(false);
+  const [selectedUploadMethod, setSelectedUploadMethod] = useState<"qr" | null>(null);
 
   useEffect(() => {
     if (uploadPhase === "uploading") {
@@ -62,12 +63,46 @@ export function SparkAiForwardHero() {
     }
   }, [isFirstVisit]);
 
+  useEffect(() => {
+    if (uploadPhase === "options" && selectedUploadMethod === "qr") {
+      const timer = setTimeout(() => {
+        setUploadPhase("uploading");
+      }, prefersReducedMotion ? 0 : 240);
+      return () => clearTimeout(timer);
+    }
+  }, [uploadPhase, selectedUploadMethod, prefersReducedMotion]);
+
+  useEffect(() => {
+    if (uploadPhase !== "options" && selectedUploadMethod !== null) {
+      setSelectedUploadMethod(null);
+    }
+  }, [uploadPhase, selectedUploadMethod]);
+
   const shouldAnimate = isFirstVisit && !prefersReducedMotion;
 
   const restrainedSpring = {
     type: "spring" as const,
     stiffness: 200,
     damping: 20,
+  };
+
+  const layoutSpring = {
+    type: "spring" as const,
+    stiffness: 220,
+    damping: 24,
+    mass: 0.9,
+  };
+
+  const phaseTransition = {
+    duration: 0.32,
+    ease: softEaseOut,
+  };
+
+  const phasePresenceMotion = {
+    initial: { opacity: 0, y: 8 },
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -6 },
+    transition: phaseTransition,
   };
 
   const containerVariants = {
@@ -184,10 +219,12 @@ export function SparkAiForwardHero() {
   };
 
   const animateState = shouldAnimate ? "visible" : "instant";
+  const isQrSelected = uploadPhase === "options" && selectedUploadMethod === "qr";
 
   return (
     <motion.div
       layout
+      transition={{ layout: layoutSpring }}
       initial={shouldAnimate ? "hidden" : "instant"}
       animate={animateState}
       variants={containerVariants}
@@ -198,7 +235,11 @@ export function SparkAiForwardHero() {
       }}
     >
       {/* Left Column: AI Assist */}
-      <motion.div layout className="flex w-full lg:flex-1 flex-col gap-[24px]">
+      <motion.div
+        layout
+        transition={{ layout: layoutSpring }}
+        className="flex w-full lg:flex-1 flex-col gap-[24px]"
+      >
         <motion.div
           variants={greetingVariants}
           className="flex flex-col gap-[16px]"
@@ -263,8 +304,17 @@ export function SparkAiForwardHero() {
         {!isHeroExpanded && (
           <motion.div
             layout
+            transition={{ layout: layoutSpring }}
             initial={{ opacity: 1 }}
-            exit={{ opacity: 0, width: 0, height: 0, margin: 0, padding: 0, overflow: "hidden", transition: { duration: 0.5, ease: softEaseOut } }}
+            exit={{
+              opacity: 0,
+              width: 0,
+              height: 0,
+              margin: 0,
+              padding: 0,
+              overflow: "hidden",
+              transition: { duration: 0.42, ease: softEaseOut },
+            }}
             className="flex flex-col lg:flex-row gap-6 lg:gap-[32px] items-center lg:items-stretch"
           >
             {/* Divider */}
@@ -280,45 +330,47 @@ export function SparkAiForwardHero() {
             />
 
             {/* Right Column: Next Steps */}
-            <div className="flex w-full lg:w-[376px] shrink-0 flex-col gap-[8px]">
-              <motion.div
-          variants={ctaHeaderVariants}
-          className="flex items-center gap-[8px]"
-        >
-          <Bell className="h-[18px] w-[18px] text-[#5f6a94]" />
-          <h3 className="text-[12px] font-black uppercase leading-[16px] tracking-[2.4px] text-[#5f6a94]">
-            Your next steps
-          </h3>
-          <div className="rounded-[6px] bg-[#e1e8ff] px-[8px] py-[2px]">
-            <span className="text-[12px] font-bold leading-[16px] text-[#7a87b2]">
-              {isTaskVisible ? "1 Task" : "0 Tasks"}
-            </span>
-          </div>
-        </motion.div>
-
-        <AnimatePresence mode="wait">
-          {isTaskVisible ? (
             <motion.div
-              key="task-card"
-              variants={ctaCardVariants}
-              initial={shouldAnimate ? "hidden" : "instant"}
-              animate={animateState}
-              exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
-              className="flex flex-col gap-[24px] rounded-[32px] border border-[#e2e8f0] bg-white p-[25px]"
+              layout
+              transition={{ layout: layoutSpring }}
+              className="flex w-full lg:w-[376px] shrink-0 flex-col gap-[8px]"
             >
+              <motion.div
+                layout="position"
+                variants={ctaHeaderVariants}
+                className="flex items-center gap-[8px]"
+              >
+                <Bell className="h-[18px] w-[18px] text-[#5f6a94]" />
+                <h3 className="text-[12px] font-black uppercase leading-[16px] tracking-[2.4px] text-[#5f6a94]">
+                  Your next steps
+                </h3>
+                <div className="rounded-[6px] bg-[#e1e8ff] px-[8px] py-[2px]">
+                  <span className="text-[12px] font-bold leading-[16px] text-[#7a87b2]">
+                    {isTaskVisible ? "1 Task" : "0 Tasks"}
+                  </span>
+                </div>
+              </motion.div>
+
+              <AnimatePresence mode="wait">
+                {isTaskVisible ? (
+                  <motion.div
+                    key="task-card"
+                    layout
+                    transition={{ layout: layoutSpring }}
+                    variants={ctaCardVariants}
+                    initial={shouldAnimate ? "hidden" : "instant"}
+                    animate={animateState}
+                    exit={{ opacity: 0, y: -8, transition: phaseTransition }}
+                    className="flex flex-col gap-[24px] rounded-[32px] border border-[#e2e8f0] bg-white p-[25px]"
+                  >
               {/* ── Header area: contextual copy per phase ── */}
-          <div className="relative">
-            <AnimatePresence mode="popLayout">
+          <motion.div layout className="relative">
+            <AnimatePresence mode="wait">
               {uploadPhase === "default" && (
                 <motion.div
                   key="card-header-default"
-                  initial={{ opacity: 0, scale: 0.97 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.97 }}
-                  transition={{
-                    duration: 0.4,
-                    ease: [0.2, 0, 0, 1],
-                  }}
+                  layout
+                  {...phasePresenceMotion}
                   className="flex flex-col gap-[12px]"
                 >
                   <div className="self-start rounded-[6px] bg-[#ffbf00] px-[12px] py-[4px]">
@@ -338,13 +390,8 @@ export function SparkAiForwardHero() {
               {uploadPhase === "options" && (
                 <motion.div
                   key="card-header-options"
-                  initial={{ opacity: 0, scale: 0.97 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.97 }}
-                  transition={{
-                    duration: 0.4,
-                    ease: [0.2, 0, 0, 1],
-                  }}
+                  layout
+                  {...phasePresenceMotion}
                   className="flex flex-col gap-[16px]"
                 >
                   <p className="text-[16px] leading-[24.75px] text-[#5f6a94]">
@@ -377,13 +424,8 @@ export function SparkAiForwardHero() {
               {uploadPhase === "uploading" && (
                 <motion.div
                   key="card-header-uploading"
-                  initial={{ opacity: 0, scale: 0.97 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.97 }}
-                  transition={{
-                    duration: 0.4,
-                    ease: [0.2, 0, 0, 1],
-                  }}
+                  layout
+                  {...phasePresenceMotion}
                   className="flex flex-col"
                 >
                   <p className="text-[16px] leading-[24.75px] text-[#5f6a94]">
@@ -395,13 +437,8 @@ export function SparkAiForwardHero() {
               {uploadPhase === "success" && (
                 <motion.div
                   key="card-header-success"
-                  initial={{ opacity: 0, scale: 0.97 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.97 }}
-                  transition={{
-                    duration: 0.4,
-                    ease: [0.2, 0, 0, 1],
-                  }}
+                  layout
+                  {...phasePresenceMotion}
                   className="flex flex-col gap-[4px]"
                 >
                   <p className="text-[16px] font-semibold leading-[24.75px] text-[#16a34a]">
@@ -413,45 +450,47 @@ export function SparkAiForwardHero() {
                 </motion.div>
               )}
             </AnimatePresence>
-          </div>
+          </motion.div>
 
           {/* ── Claim summary (hidden during options phase) ── */}
-          {uploadPhase !== "options" && (
-            <div className="flex items-center justify-between rounded-[24px] bg-[#f8f9fe] border border-[#f8f9fe] p-[17px]">
-              <div className="flex items-center gap-[16px]">
-                <div className="flex h-[48px] w-[48px] shrink-0 items-center justify-center rounded-[12px] border border-[#e2e8f0] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
-                  <FileText className="h-[18px] w-[18px] text-[#3958c3]" />
+          <AnimatePresence mode="wait">
+            {uploadPhase !== "options" && (
+              <motion.div
+                key="claim-summary"
+                layout
+                {...phasePresenceMotion}
+                className="flex items-center justify-between rounded-[24px] bg-[#f8f9fe] border border-[#f8f9fe] p-[17px]"
+              >
+                <div className="flex items-center gap-[16px]">
+                  <div className="flex h-[48px] w-[48px] shrink-0 items-center justify-center rounded-[12px] border border-[#e2e8f0] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
+                    <FileText className="h-[18px] w-[18px] text-[#3958c3]" />
+                  </div>
+                  <div className="flex flex-col">
+                    <p className="text-[14px] font-bold leading-[24px] text-[#14182c]">
+                      Bigtown Dentistry
+                    </p>
+                    <p className="text-[12px] font-medium leading-[20px] text-[#5f6a94]">
+                      Yesterday • FSA Account
+                    </p>
+                  </div>
                 </div>
-                <div className="flex flex-col">
-                  <p className="text-[14px] font-bold leading-[24px] text-[#14182c]">
-                    Bigtown Dentistry
-                  </p>
-                  <p className="text-[12px] font-medium leading-[20px] text-[#5f6a94]">
-                    Yesterday • FSA Account
+                <div className="flex flex-col items-end">
+                  <p className="text-[16px] font-extrabold leading-[28px] tracking-[-0.5px] text-[#14182c]">
+                      $210.00
                   </p>
                 </div>
-              </div>
-              <div className="flex flex-col items-end">
-                <p className="text-[16px] font-extrabold leading-[28px] tracking-[-0.5px] text-[#14182c]">
-                    $210.00
-                </p>
-              </div>
-            </div>
-          )}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* ── Action area: 4 phases ── */}
-          <div className="relative">
-            <AnimatePresence mode="popLayout">
+          <motion.div layout className="relative">
+            <AnimatePresence mode="wait">
               {uploadPhase === "default" && (
                 <motion.div
                   key="action-default"
-                  initial={{ opacity: 0, scale: 0.97 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.97 }}
-                  transition={{
-                    duration: 0.4,
-                    ease: [0.2, 0, 0, 1],
-                  }}
+                  layout
+                  {...phasePresenceMotion}
                   className="flex flex-col items-center gap-[16px]"
                 >
                   <Button
@@ -478,44 +517,87 @@ export function SparkAiForwardHero() {
               {uploadPhase === "options" && (
                 <motion.div
                   key="action-options"
-                  initial={{ opacity: 0, scale: 0.97 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.97 }}
-                  transition={{
-                    duration: 0.4,
-                    ease: [0.2, 0, 0, 1],
-                  }}
+                  layout
+                  {...phasePresenceMotion}
                   className="flex flex-col items-center gap-[12px] w-full min-h-[160px]"
                 >
-                  <div className="flex w-full items-center gap-[16px]">
-                    <div className="flex flex-1 flex-col items-center gap-[8px]">
+                    <div className="flex w-full items-center gap-[16px]">
+                    <motion.div
+                      className="flex flex-1 flex-col items-center gap-[8px]"
+                      animate={
+                        isQrSelected
+                          ? { scale: 1.02, y: -2 }
+                          : { scale: 1, y: 0 }
+                      }
+                      transition={{ duration: 0.22, ease: softEaseOut }}
+                    >
                       <motion.button
                         type="button"
-                        onClick={() => setUploadPhase("uploading")}
+                        onClick={() => setSelectedUploadMethod("qr")}
                         whileTap={{ scale: 0.96 }}
-                        className="p-[8px] bg-white rounded-[12px] shadow-[0_1px_2px_rgba(0,0,0,0.05)] border border-[#e2e8f0] cursor-pointer transition-opacity hover:opacity-80"
+                        animate={
+                          isQrSelected
+                            ? {
+                                boxShadow:
+                                  "0 0 0 3px rgba(57,88,195,0.14), 0 10px 24px rgba(57,88,195,0.12)",
+                                borderColor: "#3958c3",
+                                backgroundColor: "#f8faff",
+                              }
+                            : {
+                                boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+                                borderColor: "#e2e8f0",
+                                backgroundColor: "#ffffff",
+                              }
+                        }
+                        transition={{ duration: 0.2, ease: softEaseOut }}
+                        className="rounded-[12px] border p-[8px] cursor-pointer"
                       >
-                        <QRCode
-                          value="https://wexinc.com/upload/claim/123"
-                          size={80}
-                        />
+                        <motion.div
+                          animate={isQrSelected ? { scale: [1, 0.97, 1] } : { scale: 1 }}
+                          transition={{ duration: 0.28, ease: softEaseOut }}
+                        >
+                          <QRCode
+                            value="https://wexinc.com/upload/claim/123"
+                            size={80}
+                          />
+                        </motion.div>
                       </motion.button>
-                      <p className="text-[11px] font-bold leading-tight text-[#14182c] text-center">
+                      <motion.p
+                        animate={
+                          isQrSelected
+                            ? { color: "#3958c3", opacity: 1 }
+                            : { color: "#14182c", opacity: 1 }
+                        }
+                        transition={{ duration: 0.2, ease: softEaseOut }}
+                        className="text-[11px] font-bold leading-tight text-center"
+                      >
                         Scan with
                         <br />
                         phone
-                      </p>
-                    </div>
+                      </motion.p>
+                    </motion.div>
 
-                    <div className="flex flex-col items-center gap-[6px] shrink-0">
+                    <motion.div
+                      className="flex flex-col items-center gap-[6px] shrink-0"
+                      animate={isQrSelected ? { opacity: 0.55 } : { opacity: 1 }}
+                      transition={{ duration: 0.2, ease: softEaseOut }}
+                    >
                       <div className="w-[1px] h-[24px] bg-[#e3e7f4]" />
                       <span className="text-[10px] font-semibold uppercase tracking-[0.5px] text-[#b7c0da]">
                         or
                       </span>
                       <div className="w-[1px] h-[24px] bg-[#e3e7f4]" />
-                    </div>
+                    </motion.div>
 
-                    <div className="flex flex-1 flex-col items-center gap-[8px]">
+                    <motion.div
+                      className="flex flex-1 flex-col items-center gap-[8px]"
+                      animate={
+                        isQrSelected
+                          ? { opacity: 0.48, scale: 0.98, y: 2 }
+                          : { opacity: 1, scale: 1, y: 0 }
+                      }
+                      transition={{ duration: 0.2, ease: softEaseOut }}
+                    >
                       <motion.button
                         type="button"
                         onClick={() => navigate("/reimburse")}
@@ -535,7 +617,7 @@ export function SparkAiForwardHero() {
                         <br />
                         or upload
                       </p>
-                    </div>
+                    </motion.div>
                   </div>
 
                   <button
@@ -551,47 +633,75 @@ export function SparkAiForwardHero() {
               {uploadPhase === "uploading" && (
                 <motion.div
                   key="action-uploading"
-                  initial={{ opacity: 0, scale: 0.97 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.97 }}
-                  transition={{
-                    duration: 0.4,
-                    ease: [0.2, 0, 0, 1],
-                  }}
+                  layout
+                  {...phasePresenceMotion}
                   className="flex flex-col items-center justify-center gap-[16px] min-h-[160px]"
                 >
-                  <svg
-                    width="56"
-                    height="56"
-                    viewBox="0 0 56 56"
-                    fill="none"
-                    className="animate-[spin_1.2s_linear_infinite]"
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    transition={{ duration: 0.3, ease: softEaseOut }}
                   >
-                    <circle
-                      cx="28"
-                      cy="28"
-                      r="24"
-                      stroke="#e3e7f4"
-                      strokeWidth="3"
-                      fill="none"
-                    />
-                    <circle
-                      cx="28"
-                      cy="28"
-                      r="24"
-                      stroke="#3958c3"
-                      strokeWidth="3"
-                      fill="none"
-                      strokeLinecap="round"
-                      strokeDasharray="80 200"
-                      style={{
-                        animation: "uploadSweep 1.2s ease-in-out infinite",
-                      }}
-                    />
-                  </svg>
-                  <p className="text-[14px] font-medium text-[#5f6a94]">
-                    Reviewing your documentation…
-                  </p>
+                    <motion.div
+                      animate={{ scale: [1, 1.03, 1] }}
+                      transition={{ duration: 1.4, ease: softEaseOut, repeat: Infinity }}
+                    >
+                      <svg
+                        width="56"
+                        height="56"
+                        viewBox="0 0 56 56"
+                        fill="none"
+                        className="animate-[spin_1.35s_linear_infinite]"
+                      >
+                        <circle
+                          cx="28"
+                          cy="28"
+                          r="24"
+                          stroke="#e3e7f4"
+                          strokeWidth="3"
+                          fill="none"
+                        />
+                        <circle
+                          cx="28"
+                          cy="28"
+                          r="24"
+                          stroke="#3958c3"
+                          strokeWidth="3"
+                          fill="none"
+                          strokeLinecap="round"
+                          strokeDasharray="80 200"
+                          style={{
+                            animation: "uploadSweep 1.35s ease-in-out infinite",
+                          }}
+                        />
+                      </svg>
+                    </motion.div>
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.28, delay: 0.08, ease: softEaseOut }}
+                    className="flex flex-col items-center gap-[8px]"
+                  >
+                    <p className="text-[14px] font-medium text-[#5f6a94]">
+                      Reviewing your documentation…
+                    </p>
+                    <div className="flex items-center gap-[6px] rounded-full bg-[#f8f9fe] px-[12px] py-[6px]">
+                      {[0, 1, 2].map((dot) => (
+                        <motion.span
+                          key={dot}
+                          className="h-[6px] w-[6px] rounded-full bg-[#9ca7c7]"
+                          animate={{ opacity: [0.35, 1, 0.35], scale: [0.9, 1.1, 0.9] }}
+                          transition={{
+                            duration: 1,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                            delay: dot * 0.14,
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </motion.div>
                   <style>{`
                     @keyframes uploadSweep {
                       0% { stroke-dashoffset: 0; }
@@ -605,59 +715,67 @@ export function SparkAiForwardHero() {
               {uploadPhase === "success" && (
                 <motion.div
                   key="action-success"
-                  initial={{ opacity: 0, scale: 0.97 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.97 }}
-                  transition={{
-                    duration: 0.4,
-                    ease: [0.2, 0, 0, 1],
-                  }}
+                  layout
+                  {...phasePresenceMotion}
                   className="flex flex-col items-center justify-center gap-[16px] min-h-[160px]"
                 >
                   <motion.div
-                    initial={{ scale: 1 }}
-                    animate={{ scale: [1, 1.08, 1] }}
-                    transition={{ duration: 0.6, delay: 0.4, ease: [0.2, 0, 0, 1] }}
+                    initial={{ opacity: 0, scale: 0.88, y: 10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    transition={{ duration: 0.34, ease: softEaseOut }}
                   >
-                    <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
-                      <circle
-                        cx="28"
-                        cy="28"
-                        r="24"
-                        fill="rgba(22,163,74,0.08)"
-                        stroke="#16a34a"
-                        strokeWidth="3"
-                      />
-                      <path
-                        d="M18 28.5L24.5 35L38 21.5"
-                        stroke="#16a34a"
-                        strokeWidth="3"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        fill="none"
-                        style={{
-                          strokeDasharray: 30,
-                          strokeDashoffset: 30,
-                          animation: "checkDraw 0.4s ease-out 0.15s forwards",
-                        }}
-                      />
-                    </svg>
+                    <motion.div
+                      animate={{ scale: [1, 1.08, 1] }}
+                      transition={{ duration: 0.6, delay: 0.16, ease: [0.2, 0, 0, 1] }}
+                    >
+                      <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+                        <circle
+                          cx="28"
+                          cy="28"
+                          r="24"
+                          fill="rgba(22,163,74,0.08)"
+                          stroke="#16a34a"
+                          strokeWidth="3"
+                        />
+                        <path
+                          d="M18 28.5L24.5 35L38 21.5"
+                          stroke="#16a34a"
+                          strokeWidth="3"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          fill="none"
+                          style={{
+                            strokeDasharray: 30,
+                            strokeDashoffset: 30,
+                            animation: "checkDraw 0.42s ease-out 0.12s forwards",
+                          }}
+                        />
+                      </svg>
+                    </motion.div>
                   </motion.div>
-                  <div className="flex flex-col items-center gap-[4px]">
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.28, delay: 0.14, ease: softEaseOut }}
+                    className="flex flex-col items-center gap-[4px]"
+                  >
                     <p className="text-[14px] font-semibold text-[#16a34a]">
                       Documentation uploaded
                     </p>
                     <p className="text-[12px] text-[#5f6a94]">
                       We've added it to this claim.
                     </p>
-                  </div>
-                  <button
+                  </motion.div>
+                  <motion.button
                     type="button"
                     onClick={() => setIsTaskVisible(false)}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.24, delay: 0.24, ease: softEaseOut }}
                     className="mt-[8px] rounded-[12px] bg-[#f8f9fe] border border-[#e3e7f4] px-[16px] py-[8px] text-[14px] font-medium text-[#5f6a94] hover:bg-[#eef2ff] hover:text-[#3958c3] transition-colors"
                   >
                     Close
-                  </button>
+                  </motion.button>
                   <style>{`
                     @keyframes checkDraw {
                       to { stroke-dashoffset: 0; }
@@ -666,14 +784,15 @@ export function SparkAiForwardHero() {
                 </motion.div>
               )}
             </AnimatePresence>
-          </div>
+          </motion.div>
         </motion.div>
           ) : (
             <motion.div
               key="empty-state"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3 }}
+              layout
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={phaseTransition}
               className="flex flex-col items-center justify-center gap-[16px] rounded-[32px] border border-[#e2e8f0] bg-white p-[32px] text-center min-h-[200px]"
             >
               <div className="flex h-[48px] w-[48px] items-center justify-center rounded-full bg-[#eef2ff]">
@@ -706,7 +825,7 @@ export function SparkAiForwardHero() {
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
+      </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

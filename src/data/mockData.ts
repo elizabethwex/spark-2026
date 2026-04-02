@@ -249,18 +249,6 @@ export const infoCardsData: InfoCard[] = [
     imageAlt: "Beneficiary designation",
     imageUrl: "https://images.unsplash.com/photo-1609220136736-443140cffec6?q=80&w=600&auto=format&fit=crop",
   },
-  {
-    title: "Get reimbursed faster",
-    description: "If you've paid for qualified health care expenses with your own money, you can access your benefit account checks instead to use the eligible health care expenses using our tool.",
-    buttonText: "Learn More",
-    imageAlt: "Reimbursement process",
-  },
-  {
-    title: "App like change and stabilization process",
-    description: "When using the tools in your Health and benefit account to pay for eligible health care expenses. It's where it is calculated, it handles all documents and transaction. A fee legit tax.",
-    buttonText: "Learn More",
-    imageAlt: "Account tools",
-  },
 ];
 
 export const hsaContributionsData: ChartData[] = [

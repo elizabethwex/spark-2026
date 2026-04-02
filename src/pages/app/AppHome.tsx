@@ -13,8 +13,7 @@ import { AppNavBar } from "@/components/app-shell/AppNavBar";
 // Figma asset URLs (valid for 7 days from design export)
 const FSA_STORE_LOGO =
   "https://www.figma.com/api/mcp/asset/8abcb600-66e0-4370-a379-d031216d1324";
-const ILLUSTRATION_BG =
-  "https://www.figma.com/api/mcp/asset/cbcfec8c-be4d-42ac-896b-9280bfda8ae6";
+const ILLUSTRATION_BG = "/FSA-Store.svg";
 const ILLUSTRATION_CHAR =
   "https://www.figma.com/api/mcp/asset/bf87285a-d9ef-4ebe-b7de-95e14ef41e1e";
 const ILLUSTRATION_SCREEN =
@@ -877,36 +876,6 @@ export default function AppHome() {
                   inset: "0 -9.74% 7.11% -9.03%",
                   width: "118.77%",
                   height: "92.89%",
-                  objectFit: "cover",
-                }}
-              />
-              <img
-                src={ILLUSTRATION_SCREEN}
-                alt=""
-                aria-hidden="true"
-                style={{
-                  position: "absolute",
-                  top: "3.38%",
-                  left: "18.38%",
-                  right: "47.87%",
-                  bottom: "17.24%",
-                  width: "33.75%",
-                  height: "79.38%",
-                  objectFit: "cover",
-                }}
-              />
-              <img
-                src={ILLUSTRATION_CHAR}
-                alt=""
-                aria-hidden="true"
-                style={{
-                  position: "absolute",
-                  top: "25.62%",
-                  left: "43.28%",
-                  right: "25.93%",
-                  bottom: "2.69%",
-                  width: "30.79%",
-                  height: "71.69%",
                   objectFit: "cover",
                 }}
               />
