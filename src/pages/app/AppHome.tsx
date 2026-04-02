@@ -240,7 +240,7 @@ export default function AppHome() {
       }}
     >
       <AppTopSpacer variant="home" />
-      <AppNavBar mode="home" />
+      <AppNavBar variant="main" />
 
       {/* Scrollable content */}
       <div

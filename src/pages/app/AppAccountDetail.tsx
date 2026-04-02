@@ -49,8 +49,13 @@ export default function AppAccountDetail() {
         fontFamily: "var(--app-font)",
       }}
     >
-      <AppTopSpacer variant="page" />
-      <AppNavBar title={meta.name} backTo="/app/account" backLabel="Accounts" />
+      <AppTopSpacer variant="home" />
+      <AppNavBar
+        variant="sub-page"
+        title={meta.name}
+        backTo="/app/account"
+        backLabel="Accounts"
+      />
 
       <div style={{ padding: "0 0 24px" }}>
         {/* Balance hero */}

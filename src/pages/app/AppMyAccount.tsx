@@ -64,8 +64,8 @@ export default function AppMyAccount() {
         fontFamily: "var(--app-font)",
       }}
     >
-      <AppTopSpacer variant="page" />
-      <AppNavBar title="Profile" />
+      <AppTopSpacer variant="home" />
+      <AppNavBar variant="title" title="Profile" />
 
       <div style={{ padding: "16px 0 32px" }}>
         {/* Avatar + name hero */}

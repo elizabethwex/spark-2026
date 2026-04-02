@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, FileText, Trash2, ChevronDown, Camera, Image as ImageIcon, Paperclip, CheckCircle2 } from "lucide-react";
-import { AppNavBar, AppNavAction } from "@/components/app-shell/AppNavBar";
+import { FileText, Trash2, ChevronDown, Camera, Image as ImageIcon, Paperclip, CheckCircle2 } from "lucide-react";
+import { AppNavBar } from "@/components/app-shell/AppNavBar";
 import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
@@ -344,8 +344,31 @@ function StepCamera({ onCapture, onClose }: { onCapture: () => void; onClose: ()
           alignItems: "center",
           justifyContent: "center",
           flexShrink: 0,
+          position: "relative",
         }}
       >
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close camera"
+          style={{
+            position: "absolute",
+            left: 16,
+            top: "50%",
+            transform: "translateY(-50%)",
+            border: "none",
+            background: "rgba(255,255,255,0.12)",
+            color: "#fff",
+            fontSize: 15,
+            fontWeight: 600,
+            fontFamily: "var(--app-font)",
+            padding: "8px 12px",
+            borderRadius: 12,
+            cursor: "pointer",
+          }}
+        >
+          Cancel
+        </button>
         <p style={{ margin: 0, fontSize: 16, color: "#fff", textAlign: "center", lineHeight: "24px", fontFamily: "var(--app-font)" }}>
           Hold your camera steady and make sure all the information is visible
         </p>
@@ -833,17 +856,8 @@ export default function AppPennyFlow() {
       {/* Nav bar — hidden on camera step */}
       {step !== 2 && (
         <>
-        <AppTopSpacer variant="page" />
-        <AppNavBar
-          title={navTitle}
-          rightActions={
-            <AppNavAction
-              icon={<X size={18} strokeWidth={2} />}
-              label="Close"
-              onClick={handleClose}
-            />
-          }
-        />
+        <AppTopSpacer variant="home" />
+        <AppNavBar variant="full-page" title={navTitle} onClose={handleClose} />
         </>
       )}
 

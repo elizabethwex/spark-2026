@@ -56,8 +56,8 @@ export default function AppClaimsOverview() {
         fontFamily: "var(--app-font)",
       }}
     >
-      <AppTopSpacer variant="page" />
-      <AppNavBar title="Claims" />
+      <AppTopSpacer variant="home" />
+      <AppNavBar variant="title" title="Claims" />
 
       <div style={{ padding: "16px 16px 24px" }}>
         {/* Stats row */}

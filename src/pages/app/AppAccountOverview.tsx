@@ -72,8 +72,8 @@ export default function AppAccountOverview() {
         fontFamily: "var(--app-font)",
       }}
     >
-      <AppTopSpacer variant="page" />
-      <AppNavBar title="Accounts" backTo="/app" backLabel="Home" />
+      <AppTopSpacer variant="home" />
+      <AppNavBar variant="title" title="Accounts" />
 
       <div
         style={{

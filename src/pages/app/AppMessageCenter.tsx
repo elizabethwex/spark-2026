@@ -593,7 +593,7 @@ export default function AppMessageCenter() {
   return (
     <div style={PAGE_ROOT}>
       <AppTopSpacer variant="home" />
-      <AppNavBar mode="large-title" title="Messages" />
+      <AppNavBar variant="title" title="Messages" />
 
       <div
         data-name="Page filters"

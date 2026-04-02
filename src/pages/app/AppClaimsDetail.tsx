@@ -152,8 +152,13 @@ export default function AppClaimsDetail() {
         fontFamily: "var(--app-font)",
       }}
     >
-      <AppTopSpacer variant="page" />
-      <AppNavBar title="Claim Detail" backTo="/app/claims" backLabel="Claims" />
+      <AppTopSpacer variant="home" />
+      <AppNavBar
+        variant="sub-page"
+        title="Claim Detail"
+        backTo="/app/claims"
+        backLabel="Claims"
+      />
 
       <div style={{ padding: "16px 16px 32px", display: "flex", flexDirection: "column", gap: 20 }}>
         {/* Header card */}

@@ -45,9 +45,7 @@ export function AppShell() {
     const minY = 24;
 
     const onScroll = () => {
-      const y = deviceOn
-        ? scrollPort?.scrollTop ?? 0
-        : window.scrollY || document.documentElement.scrollTop;
+      const y = scrollPort?.scrollTop ?? 0;
       const dy = y - lastScrollY.current;
       lastScrollY.current = y;
 
@@ -59,15 +57,10 @@ export function AppShell() {
       else if (dy < -threshold) setTopChromeHidden(false);
     };
 
-    if (deviceOn) {
-      if (!scrollPort) return undefined;
-      scrollPort.addEventListener("scroll", onScroll, { passive: true });
-      return () => scrollPort.removeEventListener("scroll", onScroll);
-    }
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [deviceOn, scrollPort]);
+    if (!scrollPort) return undefined;
+    scrollPort.addEventListener("scroll", onScroll, { passive: true });
+    return () => scrollPort.removeEventListener("scroll", onScroll);
+  }, [scrollPort]);
 
   const chromeValue = { topChromeHidden };
 
@@ -100,6 +93,7 @@ export function AppShell() {
            */}
           <AppChromeProvider value={chromeValue}>
             <div
+              data-app-mobile-scroll
               style={{
                 height: SCREEN_HEIGHT,
                 display: "flex",
@@ -193,13 +187,17 @@ export function AppShell() {
     >
       <AppChromeProvider value={chromeValue}>
         <div
+          ref={scrollRefCallback}
+          data-app-mobile-scroll
           style={{
             width: "100%",
             maxWidth: 430,
-            minHeight: "100dvh",
+            height: "100dvh",
+            maxHeight: "100dvh",
             position: "relative",
             background: "var(--app-bg)",
             overflowX: "hidden",
+            overflowY: "auto",
           }}
         >
           <div
