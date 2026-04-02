@@ -1,8 +1,6 @@
 import { useLocation } from "react-router-dom";
 import { Button } from "@wexinc-healthbenefits/ben-ui-kit";
-import { Smartphone } from "lucide-react";
 import { usePrototype, HOME_LAYOUT_LABELS } from "@/context/PrototypeContext";
-import { MOBILE_APP_PROTOTYPE_URL } from "@/config/prototype";
 
 /**
  * Conference prototype: floating controls for home layout, homepage variant, and mobile app link.

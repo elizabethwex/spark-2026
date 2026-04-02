@@ -1,4 +1,3 @@
-import { Card, CardContent } from "@wexinc-healthbenefits/ben-ui-kit";
 import { ConsumerNavigation } from "@/components/layout/ConsumerNavigation";
 import { usePrototype } from "@/context/PrototypeContext";
 import { PageFadeIn, FadeInItem } from "@/components/layout/PageFadeIn";
@@ -8,7 +7,6 @@ import { QuickLinksSection } from "@/components/sections/QuickLinksSection";
 import { TransactionsAndLinks } from "@/components/sections/TransactionsAndLinks";
 import { InfoCardsSection } from "@/components/sections/InfoCardsSection";
 import { QuickViewSection } from "@/components/sections/QuickViewSection";
-import { PromoBanner } from "@/components/sections/PromoBanner";
 import { MobileAppBanner } from "@/components/sections/MobileAppBanner";
 import { QuickActionsSection } from "@/components/sections/QuickActionsSection";
 import { ConsumerFooter } from "@/components/layout/Footer";
