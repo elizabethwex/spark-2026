@@ -26,7 +26,17 @@ interface AppNavBarHomeProps {
   solid?: never;
 }
 
-type AppNavBarProps = AppNavBarPageProps | AppNavBarHomeProps;
+/** Large left-aligned title + profile / Assist IQ (Consumer Mobile — Messages, etc.) */
+interface AppNavBarLargeTitleProps {
+  mode: "large-title";
+  title: string;
+  backTo?: never;
+  backLabel?: never;
+  rightActions?: never;
+  solid?: never;
+}
+
+type AppNavBarProps = AppNavBarPageProps | AppNavBarHomeProps | AppNavBarLargeTitleProps;
 
 const CHROME_TRANSITION = { type: "tween" as const, duration: 0.28, ease: [0.22, 1, 0.36, 1] as const };
 
@@ -35,7 +45,10 @@ export function AppNavBar(props: AppNavBarProps) {
   const { deviceOn } = useDeviceMockup();
   const { topChromeHidden } = useAppChrome();
 
-  const navInnerH = props.mode === "home" ? APP_NAV_HOME_INNER_H : APP_NAV_PAGE_INNER_H;
+  const navInnerH =
+    props.mode === "home" || props.mode === "large-title"
+      ? APP_NAV_HOME_INNER_H
+      : APP_NAV_PAGE_INNER_H;
   const hideY = deviceOn ? -(STATUS_BAR_HEIGHT + navInnerH) : "-100%";
 
   const fixedChrome: React.CSSProperties = {
@@ -51,6 +64,85 @@ export function AppNavBar(props: AppNavBarProps) {
     top: deviceOn ? STATUS_BAR_HEIGHT : 0,
     ...APP_TOP_LIQUID_GLASS,
   };
+
+  if (props.mode === "large-title") {
+    const { title } = props;
+    return (
+      <motion.header
+        initial={false}
+        animate={{ y: topChromeHidden ? hideY : 0 }}
+        transition={CHROME_TRANSITION}
+        style={{
+          ...fixedChrome,
+          borderBottom: "none",
+        }}
+      >
+        <div
+          style={{
+            minHeight: 56,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 12,
+            padding: "0 16px 8px",
+          }}
+        >
+          <h1
+            style={{
+              margin: 0,
+              font: "var(--app-font-large-title)",
+              letterSpacing: 0.4,
+              color: "#1a1a1a",
+              flex: 1,
+              minWidth: 0,
+            }}
+          >
+            {title}
+          </h1>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+            <button
+              aria-label="Profile"
+              onClick={() => navigate("/app/my-account")}
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: "50%",
+                backdropFilter: "blur(20px) saturate(180%)",
+                WebkitBackdropFilter: "blur(20px) saturate(180%)",
+                background: "rgba(255, 255, 255, 0.65)",
+                border: "none",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxShadow: "0 8px 40px rgba(0,0,0,0.12), inset 0 0 0 0.5px rgba(255,255,255,0.4)",
+              }}
+            >
+              <User size={22} strokeWidth={1.75} style={{ color: "#14182c" }} />
+            </button>
+            <button
+              aria-label="Assist IQ"
+              onClick={() => navigate("/app/assist-iq")}
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: "50%",
+                background: "linear-gradient(133.5deg, #25146F 2.46%, #C8102E 100%)",
+                border: "none",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxShadow: "0 4px 16px rgba(37,20,111,0.35)",
+              }}
+            >
+              <Sparkles size={20} strokeWidth={1.75} style={{ color: "#fff" }} />
+            </button>
+          </div>
+        </div>
+      </motion.header>
+    );
+  }
 
   if (props.mode === "home") {
     return (

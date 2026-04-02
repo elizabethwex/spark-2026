@@ -65,7 +65,7 @@ npm install
 # Start the development server
 npm run dev
 
-# The application will be available at http://localhost:5174
+# The application will be available at http://localhost:5175 (configured in vite.config.ts; another port if 5175 is in use)
 ```
 
 ### Build
