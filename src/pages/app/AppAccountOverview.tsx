@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Wallet, TrendingUp, ArrowRight, ChevronRight } from "lucide-react";
 import { AppNavBar } from "@/components/app-shell/AppNavBar";
+import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
 import { AppCard } from "@/components/app-shell/primitives/AppCard";
 import { AppBadge } from "@/components/app-shell/primitives/AppBadge";
 
@@ -71,6 +72,7 @@ export default function AppAccountOverview() {
         fontFamily: "var(--app-font)",
       }}
     >
+      <AppTopSpacer variant="page" />
       <AppNavBar title="Accounts" backTo="/app" backLabel="Home" />
 
       <div

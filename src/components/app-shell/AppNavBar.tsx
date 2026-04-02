@@ -1,6 +1,12 @@
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { ChevronLeft, User, Sparkles } from "lucide-react";
 import type { ReactNode } from "react";
+import { useDeviceMockup } from "@/hooks/useDeviceMockup";
+import { useAppChrome } from "@/context/AppChromeContext";
+import { STATUS_BAR_HEIGHT } from "./AppStatusBar";
+import { APP_NAV_HOME_INNER_H, APP_NAV_PAGE_INNER_H } from "./appChromeLayout";
+import { APP_TOP_LIQUID_GLASS } from "./appChromeStyles";
 
 interface AppNavBarPageProps {
   mode?: "page";
@@ -22,28 +28,41 @@ interface AppNavBarHomeProps {
 
 type AppNavBarProps = AppNavBarPageProps | AppNavBarHomeProps;
 
-const GLASS_BASE: React.CSSProperties = {
-  position: "sticky",
-  top: 0,
-  left: 0,
-  right: 0,
-  zIndex: 40,
-  backdropFilter: "blur(20px) saturate(180%)",
-  WebkitBackdropFilter: "blur(20px) saturate(180%)",
-  background: "var(--app-glass-bg)",
-  borderBottom: "0.5px solid var(--app-glass-border)",
-  paddingTop: "env(safe-area-inset-top, 0px)",
-  fontFamily: "var(--app-font)",
-};
+const CHROME_TRANSITION = { type: "tween" as const, duration: 0.28, ease: [0.22, 1, 0.36, 1] as const };
 
 export function AppNavBar(props: AppNavBarProps) {
   const navigate = useNavigate();
+  const { deviceOn } = useDeviceMockup();
+  const { topChromeHidden } = useAppChrome();
+
+  const navInnerH = props.mode === "home" ? APP_NAV_HOME_INNER_H : APP_NAV_PAGE_INNER_H;
+  const hideY = deviceOn ? -(STATUS_BAR_HEIGHT + navInnerH) : "-100%";
+
+  const fixedChrome: React.CSSProperties = {
+    position: "fixed",
+    left: 0,
+    right: 0,
+    maxWidth: 430,
+    margin: "0 auto",
+    width: "100%",
+    zIndex: 49,
+    fontFamily: "var(--app-font)",
+    paddingTop: deviceOn ? 0 : "env(safe-area-inset-top, 0px)",
+    top: deviceOn ? STATUS_BAR_HEIGHT : 0,
+    ...APP_TOP_LIQUID_GLASS,
+  };
 
   if (props.mode === "home") {
     return (
-      <header style={{ ...GLASS_BASE, background: "transparent", borderBottom: "none", backdropFilter: "none", WebkitBackdropFilter: "none" }}>
-        {/* iOS status bar spacer */}
-        <div style={{ height: "env(safe-area-inset-top, 0px)" }} />
+      <motion.header
+        initial={false}
+        animate={{ y: topChromeHidden ? hideY : 0 }}
+        transition={CHROME_TRANSITION}
+        style={{
+          ...fixedChrome,
+          borderBottom: "none",
+        }}
+      >
         <div
           style={{
             height: 56,
@@ -53,16 +72,13 @@ export function AppNavBar(props: AppNavBarProps) {
             padding: "0 16px 8px",
           }}
         >
-          {/* WEX Logo */}
           <img
             src={`${import.meta.env.BASE_URL}WEX_Logo_Red_Vector.svg`}
             alt="WEX"
             style={{ height: 28, width: "auto", objectFit: "contain" }}
           />
 
-          {/* Trailing action buttons */}
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            {/* Assist IQ gradient button */}
             <button
               aria-label="Assist IQ"
               onClick={() => navigate("/app/assist-iq")}
@@ -83,7 +99,6 @@ export function AppNavBar(props: AppNavBarProps) {
               <Sparkles size={20} strokeWidth={1.75} style={{ color: "#fff" }} />
             </button>
 
-            {/* Profile liquid glass button */}
             <button
               aria-label="Profile"
               onClick={() => navigate("/app/my-account")}
@@ -107,24 +122,28 @@ export function AppNavBar(props: AppNavBarProps) {
             </button>
           </div>
         </div>
-      </header>
+      </motion.header>
     );
   }
 
   const { title, backTo, backLabel = "Back", rightActions, solid = false } = props;
 
   return (
-    <header
+    <motion.header
+      initial={false}
+      animate={{ y: topChromeHidden ? hideY : 0 }}
+      transition={CHROME_TRANSITION}
       style={{
-        ...GLASS_BASE,
-        backdropFilter: solid ? "none" : GLASS_BASE.backdropFilter,
-        WebkitBackdropFilter: solid ? "none" : GLASS_BASE.WebkitBackdropFilter,
-        background: solid ? "var(--app-surface)" : GLASS_BASE.background,
+        ...fixedChrome,
+        backdropFilter: solid ? "none" : fixedChrome.backdropFilter,
+        WebkitBackdropFilter: solid ? "none" : fixedChrome.WebkitBackdropFilter,
+        background: solid ? "var(--app-surface)" : fixedChrome.background,
+        borderBottom: solid ? "0.5px solid var(--app-glass-border)" : "none",
       }}
     >
       <div
         style={{
-          height: 52,
+          height: APP_NAV_PAGE_INNER_H,
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
@@ -133,7 +152,6 @@ export function AppNavBar(props: AppNavBarProps) {
           position: "relative",
         }}
       >
-        {/* Left: back button */}
         <div style={{ width: 80, display: "flex", alignItems: "center" }}>
           {backTo && (
             <button
@@ -159,7 +177,6 @@ export function AppNavBar(props: AppNavBarProps) {
           )}
         </div>
 
-        {/* Center: title */}
         <span
           style={{
             position: "absolute",
@@ -175,7 +192,6 @@ export function AppNavBar(props: AppNavBarProps) {
           {title}
         </span>
 
-        {/* Right: actions */}
         <div
           style={{
             width: 80,
@@ -188,7 +204,7 @@ export function AppNavBar(props: AppNavBarProps) {
           {rightActions}
         </div>
       </div>
-    </header>
+    </motion.header>
   );
 }
 

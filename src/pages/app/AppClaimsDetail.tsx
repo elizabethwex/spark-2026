@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { Check, Clock, X, AlertCircle, FileText, Upload, Phone } from "lucide-react";
 import { AppNavBar } from "@/components/app-shell/AppNavBar";
+import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
 import { AppCard } from "@/components/app-shell/primitives/AppCard";
 import { AppBadge } from "@/components/app-shell/primitives/AppBadge";
 import { AppButton } from "@/components/app-shell/primitives/AppButton";
@@ -151,6 +152,7 @@ export default function AppClaimsDetail() {
         fontFamily: "var(--app-font)",
       }}
     >
+      <AppTopSpacer variant="page" />
       <AppNavBar title="Claim Detail" backTo="/app/claims" backLabel="Claims" />
 
       <div style={{ padding: "16px 16px 32px", display: "flex", flexDirection: "column", gap: 20 }}>

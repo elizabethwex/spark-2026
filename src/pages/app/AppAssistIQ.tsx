@@ -18,6 +18,7 @@ import {
   SquarePen,
 } from "lucide-react";
 import { AppNavBar, AppNavAction } from "@/components/app-shell/AppNavBar";
+import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
 import {
   AppPromptChip,
   AssistIQAvatar,
@@ -1575,6 +1576,7 @@ export default function AppAssistIQ() {
         overflow: "hidden",
       }}
     >
+      <AppTopSpacer variant="page" />
       {/* Nav bar */}
       <AppNavBar
         title={inWelcome ? "" : "Assist IQ"}

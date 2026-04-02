@@ -9,6 +9,8 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { AppNavBar } from "@/components/app-shell/AppNavBar";
+import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
+import { useDeviceMockup } from "@/hooks/useDeviceMockup";
 
 // Figma asset URLs (valid for 7 days from design export)
 const FSA_STORE_LOGO =
@@ -221,6 +223,12 @@ function TransactionRow({ title, subtitle, amount, onClick }: TransactionRowProp
 
 export default function AppHome() {
   const navigate = useNavigate();
+  const { deviceOn } = useDeviceMockup();
+
+  /** Device frame: tab bar is fixed over the scroll area — clear it. Mobile web: shell already reserves tab bar + safe area; add a small inner gap. */
+  const contentPaddingBottom = deviceOn
+    ? "calc(28px + var(--app-tabbar-height) + env(safe-area-inset-bottom, 0px))"
+    : 56;
 
   return (
     <div
@@ -231,6 +239,7 @@ export default function AppHome() {
         fontFamily: "var(--app-font)",
       }}
     >
+      <AppTopSpacer variant="home" />
       <AppNavBar mode="home" />
 
       {/* Scrollable content */}
@@ -240,11 +249,11 @@ export default function AppHome() {
           flexDirection: "column",
           gap: 24,
           paddingTop: 24,
-          paddingBottom: 40,
+          paddingBottom: contentPaddingBottom,
           background: TINT_50,
         }}
       >
-        {/* ── Alert Notification Card ── */}
+        {/* ── Missing document (debit card / Bigtown Dentistry) ── */}
         <div style={{ padding: "0 16px" }}>
           <div
             style={{
@@ -279,7 +288,7 @@ export default function AppHome() {
                   lineHeight: "20px",
                 }}
               >
-                Upload your document to complete this claim for Dr. Miller.
+                Upload your document to complete this claim for Bigtown Dentistry.
               </div>
             </div>
 
@@ -338,7 +347,7 @@ export default function AppHome() {
                       lineHeight: "22px",
                     }}
                   >
-                    Dr. Miller (Dental)
+                    Bigtown Dentistry
                   </div>
                   <div
                     style={{
@@ -365,7 +374,7 @@ export default function AppHome() {
                   flexShrink: 0,
                 }}
               >
-                $340.00
+                $210.00
               </div>
             </div>
 

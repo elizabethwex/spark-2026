@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Bell, ChevronRight, AlertCircle, Info, Check } from "lucide-react";
 import { AppNavBar } from "@/components/app-shell/AppNavBar";
+import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
 import { AppCard } from "@/components/app-shell/primitives/AppCard";
 
 type MessageType = "alert" | "info" | "confirmation";
@@ -99,6 +100,7 @@ export default function AppMessageCenter() {
         fontFamily: "var(--app-font)",
       }}
     >
+      <AppTopSpacer variant="page" />
       <AppNavBar
         title="Messages"
         rightActions={
