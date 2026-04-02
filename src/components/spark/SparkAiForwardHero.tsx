@@ -286,18 +286,18 @@ export function SparkAiForwardHero() {
         >
           {/* ── Header area: contextual copy per phase ── */}
           <div className="relative">
-            <AnimatePresence mode="wait">
+            <AnimatePresence mode="popLayout">
               {uploadPhase === "default" && (
                 <motion.div
                   key="card-header-default"
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
+                  initial={{ opacity: 0, scale: 0.97 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.97 }}
                   transition={{
                     duration: 0.4,
                     ease: [0.2, 0, 0, 1],
                   }}
-                  className="flex flex-col gap-[12px] overflow-hidden"
+                  className="flex flex-col gap-[12px]"
                 >
                   <div className="self-start rounded-[6px] bg-[#ffbf00] px-[12px] py-[4px]">
                     <span className="text-[11px] font-extrabold uppercase leading-[16.5px] tracking-[0.275px] text-black">
@@ -316,27 +316,48 @@ export function SparkAiForwardHero() {
               {uploadPhase === "options" && (
                 <motion.div
                   key="card-header-options"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
+                  initial={{ opacity: 0, scale: 0.97 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.97 }}
                   transition={{
                     duration: 0.4,
                     ease: [0.2, 0, 0, 1],
                   }}
-                  className="flex flex-col"
+                  className="flex flex-col gap-[16px]"
                 >
                   <p className="text-[16px] leading-[24.75px] text-[#5f6a94]">
                     Upload your documentation for Bigtown Dentistry in under a minute.
                   </p>
+
+                  <div className="flex flex-col gap-[12px] rounded-[24px] bg-[#f8f9fe] border border-[#e3e7f4] p-[17px]">
+                    <p className="text-[13px] font-bold text-[#14182c]">
+                      Make sure your document includes:
+                    </p>
+                    <ul className="flex flex-col gap-[8px]">
+                      {[
+                        "Provider’s or merchant’s name",
+                        "Date of service",
+                        "Dollar amount",
+                        "Category & type of service",
+                      ].map((item, i) => (
+                        <li key={i} className="flex items-start gap-[8px]">
+                          <CheckCircle2 className="h-[16px] w-[16px] text-[#16a34a] shrink-0 mt-[2px]" />
+                          <span className="text-[14px] tracking-tight leading-[20px] text-[#5f6a94]">
+                            {item}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </motion.div>
               )}
 
               {uploadPhase === "uploading" && (
                 <motion.div
                   key="card-header-uploading"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
+                  initial={{ opacity: 0, scale: 0.97 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.97 }}
                   transition={{
                     duration: 0.4,
                     ease: [0.2, 0, 0, 1],
@@ -352,9 +373,9 @@ export function SparkAiForwardHero() {
               {uploadPhase === "success" && (
                 <motion.div
                   key="card-header-success"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
+                  initial={{ opacity: 0, scale: 0.97 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.97 }}
                   transition={{
                     duration: 0.4,
                     ease: [0.2, 0, 0, 1],
@@ -372,42 +393,44 @@ export function SparkAiForwardHero() {
             </AnimatePresence>
           </div>
 
-          {/* ── Claim summary (stable anchor) ── */}
-          <div className="flex items-center justify-between rounded-[24px] bg-[#f8f9fe] border border-[#f8f9fe] p-[17px]">
-            <div className="flex items-center gap-[16px]">
-              <div className="flex h-[48px] w-[48px] shrink-0 items-center justify-center rounded-[12px] border border-[#e2e8f0] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
-                <FileText className="h-[18px] w-[18px] text-[#3958c3]" />
+          {/* ── Claim summary (hidden during options phase) ── */}
+          {uploadPhase !== "options" && (
+            <div className="flex items-center justify-between rounded-[24px] bg-[#f8f9fe] border border-[#f8f9fe] p-[17px]">
+              <div className="flex items-center gap-[16px]">
+                <div className="flex h-[48px] w-[48px] shrink-0 items-center justify-center rounded-[12px] border border-[#e2e8f0] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
+                  <FileText className="h-[18px] w-[18px] text-[#3958c3]" />
+                </div>
+                <div className="flex flex-col">
+                  <p className="text-[14px] font-bold leading-[24px] text-[#14182c]">
+                    Bigtown Dentistry
+                  </p>
+                  <p className="text-[12px] font-medium leading-[20px] text-[#5f6a94]">
+                    Yesterday • FSA Account
+                  </p>
+                </div>
               </div>
-              <div className="flex flex-col">
-                <p className="text-[14px] font-bold leading-[24px] text-[#14182c]">
-                  Bigtown Dentistry
-                </p>
-                <p className="text-[12px] font-medium leading-[20px] text-[#5f6a94]">
-                  Yesterday • FSA Account
+              <div className="flex flex-col items-end">
+                <p className="text-[16px] font-extrabold leading-[28px] tracking-[-0.5px] text-[#14182c]">
+                    $210.00
                 </p>
               </div>
             </div>
-            <div className="flex flex-col items-end">
-              <p className="text-[16px] font-extrabold leading-[28px] tracking-[-0.5px] text-[#14182c]">
-                  $210.00
-              </p>
-            </div>
-          </div>
+          )}
 
           {/* ── Action area: 4 phases ── */}
           <div className="relative">
-            <AnimatePresence mode="wait">
+            <AnimatePresence mode="popLayout">
               {uploadPhase === "default" && (
                 <motion.div
                   key="action-default"
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
+                  initial={{ opacity: 0, scale: 0.97 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.97 }}
                   transition={{
                     duration: 0.4,
                     ease: [0.2, 0, 0, 1],
                   }}
-                  className="flex flex-col items-center justify-center gap-[16px] overflow-hidden"
+                  className="flex flex-col items-center justify-center gap-[16px] min-h-[160px]"
                 >
                   <Button
                     type="button"
@@ -444,16 +467,17 @@ export function SparkAiForwardHero() {
                 >
                   <div className="flex w-full items-center gap-[16px]">
                     <div className="flex flex-1 flex-col items-center gap-[8px]">
-                      <button
+                      <motion.button
                         type="button"
                         onClick={() => setUploadPhase("uploading")}
+                        whileTap={{ scale: 0.96 }}
                         className="p-[8px] bg-white rounded-[12px] shadow-[0_1px_2px_rgba(0,0,0,0.05)] border border-[#e2e8f0] cursor-pointer transition-opacity hover:opacity-80"
                       >
                         <QRCode
                           value="https://wexinc.com/upload/claim/123"
                           size={80}
                         />
-                      </button>
+                      </motion.button>
                       <p className="text-[11px] font-bold leading-tight text-[#14182c] text-center">
                         Scan with
                         <br />
@@ -470,11 +494,12 @@ export function SparkAiForwardHero() {
                     </div>
 
                     <div className="flex flex-1 flex-col items-center gap-[8px]">
-                      <button
+                      <motion.button
                         type="button"
                         onClick={() => navigate("/reimburse")}
                         aria-label="Take photo or upload"
                         title="Take photo or upload"
+                        whileTap={{ scale: 0.96 }}
                         className="flex h-[96px] w-[96px] shrink-0 items-center justify-center rounded-[14px] border-2 border-[#b7c0da] bg-white text-[#5f6a94] shadow-[0_1px_2px_rgba(0,0,0,0.05)] transition-colors hover:border-[#5f6a94] hover:bg-[#eef2ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3958c3] focus-visible:ring-offset-2"
                       >
                         <Upload
@@ -482,7 +507,7 @@ export function SparkAiForwardHero() {
                           strokeWidth={1.75}
                           aria-hidden
                         />
-                      </button>
+                      </motion.button>
                       <p className="text-[11px] font-bold leading-tight text-[#14182c] text-center">
                         Take photo
                         <br />
@@ -615,15 +640,21 @@ export function SparkAiForwardHero() {
           </div>
         </motion.div>
 
-        <motion.div
-          variants={ctaHeaderVariants}
-          className="flex items-center justify-center gap-[8px] pt-2"
-        >
-          <CheckCircle2 className="h-[18px] w-[18px] text-[#9ca7c7]" />
-          <p className="text-[14px] leading-[24px] tracking-[-0.084px] text-[#9ca7c7]">
-            You're all caught up on other tasks
-          </p>
-        </motion.div>
+        <AnimatePresence>
+          {uploadPhase === "default" && (
+            <motion.div
+              key="caught-up-message"
+              variants={ctaHeaderVariants}
+              exit={{ opacity: 0, height: 0, paddingTop: 0, transition: { duration: 0.3 } }}
+              className="flex items-center justify-center gap-[8px] pt-2 overflow-hidden"
+            >
+              <CheckCircle2 className="h-[18px] w-[18px] text-[#9ca7c7]" />
+              <p className="text-[14px] leading-[24px] tracking-[-0.084px] text-[#9ca7c7]">
+                You're all caught up on other tasks
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </motion.div>
   );
