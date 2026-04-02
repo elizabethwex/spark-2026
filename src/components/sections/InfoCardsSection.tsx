@@ -32,7 +32,11 @@ export function InfoCardsSection() {
             </div>
             <div className="shrink-0 w-[160px] h-[264px]">
               <div className="w-full h-full rounded-xl overflow-hidden flex items-center justify-center bg-gradient-to-br from-primary/10 to-info/10">
-                <span className="text-sm text-muted-foreground">{card.imageAlt}</span>
+                {card.imageUrl ? (
+                  <img src={card.imageUrl} alt={card.imageAlt} className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-sm text-muted-foreground">{card.imageAlt}</span>
+                )}
               </div>
             </div>
           </CardContent>

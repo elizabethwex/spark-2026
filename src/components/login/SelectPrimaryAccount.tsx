@@ -1,11 +1,13 @@
 import { useState, type RefObject } from "react"
-import { Button } from "@wexinc-healthbenefits/ben-ui-kit"
+import { Button, RadioGroup, RadioGroupItem } from "@wexinc-healthbenefits/ben-ui-kit"
 import { cn } from "@/lib/utils"
 import { ProductTag } from "@/components/login/accountLinkingShared"
 import {
   getPrimaryCredentialsDisplay,
   type PrimaryOptionId,
 } from "@/components/login/accountLinkingPrimary"
+import { loginSelectableSelected, loginSelectableUnselected } from "@/components/login/loginFlowCardStyles"
+import { loginFlowPrimaryButtonClass, loginFlowTertiaryGhostButtonClass } from "@/components/login/loginFlowTheme"
 
 const OPTIONS: {
   id: PrimaryOptionId
@@ -51,39 +53,61 @@ export function SelectPrimaryAccount({
 
   return (
     <div className="flex w-full flex-col gap-[21px]">
-      <div className="flex flex-col gap-2 rounded-xl border border-border bg-[#eff6ff] p-4 text-left text-base font-bold leading-6 tracking-[-0.176px] text-foreground">
-        <p>Username: {displayUsername}</p>
-        <p>Password: {displayPasswordMasked}</p>
-      </div>
-
-      <div className="flex flex-col gap-4">
+      <RadioGroup
+        value={selected}
+        onValueChange={(v) => setSelected(v as PrimaryOptionId)}
+        className="flex flex-col gap-4"
+      >
         {OPTIONS.map((opt) => {
           const isOn = selected === opt.id
           return (
-            <button
+            <div
               key={opt.id}
-              type="button"
-              aria-pressed={isOn}
-              onClick={() => setSelected(opt.id)}
               className={cn(
-                "w-full rounded-xl border p-4 text-left transition-colors",
-                isOn
-                  ? "border-[hsl(var(--wex-primary))] bg-[hsl(var(--wex-primary)/0.08)]"
-                  : "border-border bg-card"
+                "flex w-full cursor-pointer select-none items-start gap-4 rounded-xl p-4 text-left transition-colors",
+                isOn ? loginSelectableSelected : loginSelectableUnselected
               )}
+              onClick={() => setSelected(opt.id)}
             >
-              <p className="text-base font-bold leading-6 tracking-[-0.176px] text-foreground">
-                {opt.username}
-              </p>
-              <div className="mt-1 flex flex-wrap items-start gap-2">
-                <ProductTag label={opt.productLabel} variant={opt.tagVariant} />
+              <div
+                className="mt-0.5 shrink-0"
+                onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => e.stopPropagation()}
+              >
+                <RadioGroupItem
+                  value={opt.id}
+                  id={`primary-account-${opt.id}`}
+                  className="shrink-0"
+                  aria-label={`Select ${opt.username} as primary`}
+                />
               </div>
-              <p className="mt-1 text-[14px] font-normal leading-6 tracking-[-0.084px] text-foreground">
-                Dunder Mifflin Paper Co.
-              </p>
-            </button>
+              <div className="flex min-w-0 flex-1 flex-col gap-1">
+                <p className="text-base font-bold leading-6 tracking-[-0.176px] text-foreground">
+                  {opt.username}
+                </p>
+                <div className="flex flex-wrap items-start gap-2">
+                  <ProductTag label={opt.productLabel} variant={opt.tagVariant} />
+                </div>
+                <p className="text-[14px] font-normal leading-6 tracking-[-0.084px] text-foreground">
+                  Dunder Mifflin Paper Co.
+                </p>
+              </div>
+            </div>
           )
         })}
+      </RadioGroup>
+
+      <div className="flex flex-col gap-3 rounded-xl border border-[#E3E7F4] bg-[#eff6ff] p-4 text-left text-foreground">
+        <p className="text-base font-bold leading-6 tracking-[-0.176px]">
+          Username: {displayUsername}
+        </p>
+        <p className="text-base font-bold leading-6 tracking-[-0.176px]">
+          Password: {displayPasswordMasked}
+        </p>
+        <p className="border-t border-[#E3E7F4] pt-3 text-[16px] font-normal leading-6 tracking-[-0.176px]">
+          You&apos;ll use the credentials from this selected account to login to all accounts moving
+          forward.
+        </p>
       </div>
 
       <div className="flex flex-col gap-[17px]">
@@ -91,7 +115,10 @@ export function SelectPrimaryAccount({
           ref={makePrimaryRef}
           type="button"
           onClick={() => onMakePrimary(selected)}
-          className="h-10 w-full rounded-lg text-[14px] font-medium leading-6 tracking-[-0.084px]"
+          className={cn(
+            "h-10 w-full rounded-lg text-[14px] font-medium leading-6 tracking-[-0.084px]",
+            loginFlowPrimaryButtonClass
+          )}
         >
           Make Primary
         </Button>
@@ -99,7 +126,10 @@ export function SelectPrimaryAccount({
           type="button"
           variant="ghost"
           onClick={onCancel}
-          className="h-10 w-full rounded-lg text-[14px] font-medium leading-6 tracking-[-0.084px] text-[hsl(var(--wex-primary))] hover:bg-transparent hover:text-[hsl(var(--wex-primary))]"
+          className={cn(
+            "h-10 w-full rounded-lg text-[14px] font-medium leading-6 tracking-[-0.084px]",
+            loginFlowTertiaryGhostButtonClass
+          )}
         >
           Cancel
         </Button>

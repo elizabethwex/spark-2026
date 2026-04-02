@@ -5,12 +5,11 @@ const HOME_LAYOUT_STORAGE_KEY = "portal-prototype-home-layout";
 
 export type HomepageMode = "partner-safe" | "ai-forward";
 
-export type HomeLayoutMode = "half" | "full" | "planner";
+export type HomeLayoutMode = "full" | "planner";
 
-const HOME_LAYOUT_ORDER: HomeLayoutMode[] = ["half", "full", "planner"];
+const HOME_LAYOUT_ORDER: HomeLayoutMode[] = ["full", "planner"];
 
 export const HOME_LAYOUT_LABELS: Record<HomeLayoutMode, string> = {
-  half: "Half Width",
   full: "Full Width",
   planner: "HSA Planner",
 };
@@ -37,11 +36,11 @@ function readStoredHomepageMode(): HomepageMode {
 function readStoredHomeLayout(): HomeLayoutMode {
   try {
     const v = window.localStorage.getItem(HOME_LAYOUT_STORAGE_KEY);
-    if (v === "half" || v === "full" || v === "planner") return v;
+    if (v === "full" || v === "planner") return v;
   } catch {
     /* ignore */
   }
-  return "half";
+  return "full";
 }
 
 export function PrototypeProvider({ children }: { children: React.ReactNode }) {
@@ -50,7 +49,7 @@ export function PrototypeProvider({ children }: { children: React.ReactNode }) {
   );
 
   const [homeLayoutMode, setHomeLayoutModeState] = React.useState<HomeLayoutMode>(() =>
-    typeof window !== "undefined" ? readStoredHomeLayout() : "half"
+    typeof window !== "undefined" ? readStoredHomeLayout() : "full"
   );
 
   React.useEffect(() => {

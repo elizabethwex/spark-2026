@@ -82,14 +82,12 @@ export function QuickViewSection() {
   const pieData   = paidClaimsCategoryData.map((d) => ({ name: d.category, value: d.amount }));
 
   return (
-    <GlassCard hoverable>
+    <GlassCard>
       <CardContent className="p-6">
         <div className="space-y-5">
 
           <SectionHeader
             title="Quick View"
-            actionLabel="View All Accounts"
-            actionHref="/account-overview"
           />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:divide-x lg:divide-slate-200">
@@ -176,7 +174,7 @@ export function QuickViewSection() {
             <div className="space-y-4 lg:pl-6">
               <div className="flex items-center justify-between">
                 <h3 className="text-base font-semibold text-foreground">Paid Claims by Category</h3>
-                <span className="text-sm text-muted-foreground">01/01/2025 – 12/31/2025</span>
+                <span className="text-sm text-muted-foreground">01/01/2026 – 12/31/2026</span>
               </div>
 
               <div className="flex items-center gap-6">
