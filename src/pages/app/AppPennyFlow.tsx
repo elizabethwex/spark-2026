@@ -16,12 +16,11 @@ const SUCCESS_BG = "#dcfae6";
 const TEXT_PRIMARY = "#111322";
 const TEXT_SECONDARY = "rgba(60,60,67,0.6)";
 
-// Bigtown Dentistry receipt photo (from Figma assets)
-const RECEIPT_IMG =
-  "https://www.figma.com/api/mcp/asset/10a206f8-ecc2-4bee-a1e1-061b7ac51f9e";
-// Document folder illustration (from Figma assets)
-const DOC_ILLUSTRATION =
-  "https://www.figma.com/api/mcp/asset/1d7ed4b7-f166-4701-ae72-1e7cc50bb7bc";
+/** Static assets under `public/app-ui/` (Figma MCP URLs expire and do not ship in git). */
+const pennyAsset = (file: string) => `${import.meta.env.BASE_URL}app-ui/${file}`;
+
+const RECEIPT_IMG = pennyAsset("penny-receipt.svg");
+const DOC_ILLUSTRATION = pennyAsset("penny-doc-illustration.svg");
 
 // ─── Shared sub-components ────────────────────────────────────────────────────
 
