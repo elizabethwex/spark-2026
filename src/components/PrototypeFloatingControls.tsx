@@ -44,7 +44,7 @@ export function PrototypeFloatingControls() {
           className="h-auto min-h-8 px-1 py-1.5 text-[10px] font-semibold leading-tight"
           onClick={() => setHomepageMode("ai-forward")}
         >
-          AI forward
+          Modern
         </Button>
         <Button
           type="button"
@@ -57,18 +57,6 @@ export function PrototypeFloatingControls() {
           Partner safe
         </Button>
       </div>
-
-      <Button variant="outline" size="sm" className="h-8 w-full gap-1.5 text-[11px] font-semibold" asChild>
-        <a
-          href={MOBILE_APP_PROTOTYPE_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Open mobile app prototype in a new tab"
-        >
-          <Smartphone className="h-3.5 w-3.5 shrink-0" />
-          Mobile app
-        </a>
-      </Button>
     </div>
   );
 }

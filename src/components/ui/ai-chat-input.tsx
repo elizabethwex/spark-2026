@@ -7,7 +7,7 @@ const PLACEHOLDER_PREFIX = "Ask me… ";
 const QUERIES = [
   "Can I use my FSA for dental?",
   "why my claim needs attention",
-  "what documentation I need to upload",
+  "what document I need to upload",
   "how to get reimbursed",
   "what I can use my FSA for",
   "how much I have left to spend",
