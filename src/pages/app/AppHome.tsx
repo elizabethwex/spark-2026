@@ -16,10 +16,6 @@ import { useDeviceMockup } from "@/hooks/useDeviceMockup";
 const FSA_STORE_LOGO =
   "https://www.figma.com/api/mcp/asset/8abcb600-66e0-4370-a379-d031216d1324";
 const ILLUSTRATION_BG = "/FSA-Store.svg";
-const ILLUSTRATION_CHAR =
-  "https://www.figma.com/api/mcp/asset/bf87285a-d9ef-4ebe-b7de-95e14ef41e1e";
-const ILLUSTRATION_SCREEN =
-  "https://www.figma.com/api/mcp/asset/450c126d-77a0-4cd0-ace9-e8ac61142593";
 
 const CARD_SHADOW =
   "0px 3px 9px rgba(43,49,78,0.04), 0px 6px 18px rgba(43,49,78,0.06)";
