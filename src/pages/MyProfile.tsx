@@ -2331,13 +2331,13 @@ export default function MyProfile() {
                               •••• {card.cardNumber}
                             </span>
                             {card.status === "ready-to-activate" && (
-                              <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-md bg-[#dcfce7] text-[#008375] text-[12.25px] font-bold leading-none whitespace-nowrap">
+                              <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-[12px] bg-[#dcfce7] text-[#008375] text-[11px] font-semibold leading-none whitespace-nowrap">
                                 Ready to Activate
                               </span>
                             )}
                             {card.status === "deactivated" && (
                               <>
-                                <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-md bg-[#ffecc7] text-[#b37a2b] text-[12.25px] font-bold leading-none whitespace-nowrap">
+                                <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-[12px] bg-[#ffecc7] text-[#b37a2b] text-[11px] font-semibold leading-none whitespace-nowrap">
                                   Deactivated
                                 </span>
                                 <Tooltip>
@@ -2353,17 +2353,17 @@ export default function MyProfile() {
                               </>
                             )}
                             {card.status === "active" && (
-                              <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-md bg-[#dbeafe] text-[#1d4ed8] text-[12.25px] font-bold leading-none whitespace-nowrap">
+                              <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-[12px] bg-[#dbeafe] text-[#1d4ed8] text-[11px] font-semibold leading-none whitespace-nowrap">
                                 Active
                               </span>
                             )}
                             {card.status === "suspended" && (
-                              <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-md bg-[#ffe4e6] text-[#e11d48] text-[12.25px] font-bold leading-none whitespace-nowrap">
+                              <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-[12px] bg-[#ffe4e6] text-[#e11d48] text-[11px] font-semibold leading-none whitespace-nowrap">
                                 Suspended
                               </span>
                             )}
                             {card.status === "replacement-ordered" && (
-                              <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-md bg-[#e0e7ff] text-[#3730a3] text-[12.25px] font-bold leading-none whitespace-nowrap">
+                              <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-[12px] bg-[#e0e7ff] text-[#3730a3] text-[11px] font-semibold leading-none whitespace-nowrap">
                                 Replacement Ordered
                               </span>
                             )}
@@ -2473,17 +2473,17 @@ export default function MyProfile() {
                             Card Status:
                           </span>
                           {selectedCardForDetails.status === "ready-to-activate" && (
-                            <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-md bg-[#dcfce7] text-[#008375] text-[12.25px] font-bold leading-none whitespace-nowrap">
+                            <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-[12px] bg-[#dcfce7] text-[#008375] text-[11px] font-semibold leading-none whitespace-nowrap">
                               Ready to Activate
                             </span>
                           )}
                           {selectedCardForDetails.status === "deactivated" && (
-                            <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-md bg-[#ffecc7] text-[#b37a2b] text-[12.25px] font-bold leading-none whitespace-nowrap">
+                            <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-[12px] bg-[#ffecc7] text-[#b37a2b] text-[11px] font-semibold leading-none whitespace-nowrap">
                               Deactivated
                             </span>
                           )}
                           {selectedCardForDetails.status === "active" && (
-                            <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-md bg-[#dbeafe] text-[#1d4ed8] text-[12.25px] font-bold leading-none whitespace-nowrap">
+                            <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-[12px] bg-[#dbeafe] text-[#1d4ed8] text-[11px] font-semibold leading-none whitespace-nowrap">
                               Active
                             </span>
                           )}
@@ -5810,22 +5810,22 @@ export default function MyProfile() {
                         •••• {cardBeingReported?.cardNumber}
                       </span>
                       {cardBeingReported?.status === "active" && (
-                        <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-md bg-[#dbeafe] text-[#1d4ed8] text-[12.25px] font-bold leading-none">
+                        <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-[12px] bg-[#dbeafe] text-[#1d4ed8] text-[11px] font-semibold leading-none">
                           Active
                         </span>
                       )}
                       {cardBeingReported?.status === "ready-to-activate" && (
-                        <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-md bg-[#dcfce7] text-[#008375] text-[12.25px] font-bold leading-none">
+                        <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-[12px] bg-[#dcfce7] text-[#008375] text-[11px] font-semibold leading-none">
                           Ready to Activate
                         </span>
                       )}
                       {cardBeingReported?.status === "deactivated" && (
-                        <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-md bg-[#ffecc7] text-[#b37a2b] text-[12.25px] font-bold leading-none">
+                        <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-[12px] bg-[#ffecc7] text-[#b37a2b] text-[11px] font-semibold leading-none">
                           Deactivated
                         </span>
                       )}
                       {cardBeingReported?.status === "suspended" && (
-                        <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-md bg-[#ffe4e6] text-[#e11d48] text-[12.25px] font-bold leading-none">
+                        <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-[12px] bg-[#ffe4e6] text-[#e11d48] text-[11px] font-semibold leading-none">
                           Suspended
                         </span>
                       )}
@@ -6059,27 +6059,27 @@ export default function MyProfile() {
                         •••• {cardBeingReplaced?.cardNumber}
                       </span>
                       {cardBeingReplaced?.status === "active" && (
-                        <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-md bg-[#dbeafe] text-[#1d4ed8] text-[12.25px] font-bold leading-none">
+                        <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-[12px] bg-[#dbeafe] text-[#1d4ed8] text-[11px] font-semibold leading-none">
                           Active
                         </span>
                       )}
                       {cardBeingReplaced?.status === "ready-to-activate" && (
-                        <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-md bg-[#dcfce7] text-[#008375] text-[12.25px] font-bold leading-none">
+                        <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-[12px] bg-[#dcfce7] text-[#008375] text-[11px] font-semibold leading-none">
                           Ready to Activate
                         </span>
                       )}
                       {cardBeingReplaced?.status === "deactivated" && (
-                        <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-md bg-[#ffecc7] text-[#b37a2b] text-[12.25px] font-bold leading-none">
+                        <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-[12px] bg-[#ffecc7] text-[#b37a2b] text-[11px] font-semibold leading-none">
                           Deactivated
                         </span>
                       )}
                       {cardBeingReplaced?.status === "suspended" && (
-                        <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-md bg-[#ffe4e6] text-[#e11d48] text-[12.25px] font-bold leading-none">
+                        <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-[12px] bg-[#ffe4e6] text-[#e11d48] text-[11px] font-semibold leading-none">
                           Suspended
                         </span>
                       )}
                       {cardBeingReplaced?.status === "replacement-ordered" && (
-                        <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-md bg-[#e0e7ff] text-[#3730a3] text-[12.25px] font-bold leading-none">
+                        <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-[12px] bg-[#e0e7ff] text-[#3730a3] text-[11px] font-semibold leading-none">
                           Replacement Ordered
                         </span>
                       )}

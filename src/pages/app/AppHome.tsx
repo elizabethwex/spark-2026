@@ -13,6 +13,7 @@ import { AppNavBar } from "@/components/app-shell/AppNavBar";
 import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
 import { useDeviceMockup } from "@/hooks/useDeviceMockup";
 import { FsaStoreBrowser } from "@/components/app-shell/FsaStoreBrowser";
+import { useReimburseWorkspace } from "@/context/ReimburseWorkspaceContext";
 
 const FSA_STORE_LOGO = "/app-ui/fsastore-logo.svg";
 const FSA_STORE_IMAGE = "/app-ui/fsa-store-image.svg";
@@ -220,6 +221,7 @@ export default function AppHome() {
   const navigate = useNavigate();
   const { deviceOn } = useDeviceMockup();
   const [showFsaStore, setShowFsaStore] = useState(false);
+  const { openReimburseWorkspace } = useReimburseWorkspace();
 
   /** Device frame: tab bar is fixed over the scroll area — clear it. Mobile web: shell already reserves tab bar + safe area; add a small inner gap. */
   const contentPaddingBottom = deviceOn
@@ -687,23 +689,17 @@ export default function AppHome() {
         </div>
 
         {/* ── Quick Actions ── */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            padding: "0 16px",
-          }}
-        >
+        <div style={{ padding: "0 16px" }}>
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "172px 172px",
-              gap: 12,
+              gridTemplateColumns: "1fr 1fr",
+              gap: 16,
             }}
           >
             {/* Reimburse Myself */}
             <button
-              onClick={() => navigate("/reimburse")}
+              onClick={() => openReimburseWorkspace()}
               style={{
                 background: "#fff",
                 borderRadius: 24,

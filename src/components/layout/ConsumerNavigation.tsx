@@ -149,7 +149,7 @@ export function ConsumerNavigation({
 
   return (
     <>
-    <header className="sticky top-0 z-50 w-full border-b border-[#e3e7f4] bg-[rgba(255,255,255,0.41)] shadow-[0_2px_16px_rgba(0,0,0,0.08)] backdrop-blur-md">
+    <header className="sticky top-0 z-50 w-full border-b border-[#e3e7f4] bg-[rgba(255,255,255,0.41)] shadow-[0_2px_16px_rgba(0,0,0,0.08)] backdrop-blur-md will-change-transform">
       <div className="flex h-[80px] items-center px-[32px] gap-[24px]">
         {/* Hamburger (mobile <= lg) — hidden when nav items are suppressed */}
         {!hideNav && (
