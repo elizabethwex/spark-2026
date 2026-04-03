@@ -9,8 +9,8 @@ export function MobileAppBanner() {
       <img
         alt=""
         aria-hidden="true"
-        className="absolute inset-0 h-full w-full object-cover pointer-events-none"
-        src="/mobile-app-banner-bg.png"
+        className="absolute inset-0 h-full w-full object-cover pointer-events-none scale-105"
+        src="/ps-banner.png"
       />
 
       <div className="relative flex items-center px-[60px] py-8">

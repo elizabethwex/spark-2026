@@ -280,14 +280,7 @@ export function AccountsSection() {
 
           {/* Footer */}
           <div className="px-6 pb-6 mt-auto">
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full rounded-xl border-[#3958c3] py-[9.75px] text-[15.75px] font-medium text-[#3958c3] hover:bg-[#3958c3]/5"
-              onClick={() => navigate("/reimburse")}
-            >
-              Reimburse Myself
-            </Button>
+            <div className="h-[44px]" />
           </div>
         </div>
       </div>

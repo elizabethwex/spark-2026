@@ -11,6 +11,7 @@ import { AlertCircle } from "lucide-react";
 import { hsaContributionBars, paidClaimsCategoryData } from "@/data/mockData";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import { cn } from "@/lib/utils";
 
 const WEX_BLUE       = "hsl(208, 100%, 32%)";
 const WEX_BLUE_MUTED = "hsl(208, 60%, 88%)";
@@ -77,7 +78,7 @@ const claimsChartConfig = {
   Vision:  { label: "Vision",  color: CLAIMS_COLORS[2] },
 } satisfies ChartConfig;
 
-export function QuickViewSection() {
+export function QuickViewSection({ activeView = 1 }: { activeView?: 1 | 2 | 3 }) {
   const totalPaid = paidClaimsCategoryData.reduce((sum, d) => sum + d.amount, 0);
   const pieData   = paidClaimsCategoryData.map((d) => ({ name: d.category, value: d.amount }));
 
@@ -90,88 +91,93 @@ export function QuickViewSection() {
             title="Quick View"
           />
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:divide-x lg:divide-slate-200">
+          <div className={cn(
+            "grid grid-cols-1 gap-6",
+            activeView !== 2 && "lg:grid-cols-2 lg:divide-x lg:divide-slate-200"
+          )}>
 
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <h3 className="text-base font-semibold text-foreground">
-                  HSA Contributions by Tax Year
-                </h3>
-                <AlertCircle className="h-4 w-4 text-muted-foreground" />
-              </div>
-
-              <div className="h-[320px]">
-                <ResponsiveBar
-                  data={hsaContributionBars as unknown as BarDatum[]}
-                  keys={["irsMax"]}
-                  indexBy="year"
-                  colors={[WEX_BLUE_MUTED]}
-                  borderRadius={6}
-                  padding={0.4}
-                  valueScale={{ type: "linear", max: 10000 }}
-                  margin={{ top: 10, right: 10, bottom: 40, left: 50 }}
-                  enableLabel={false}
-                  enableGridX={false}
-                  gridYValues={Y_TICKS}
-                  axisLeft={{
-                    tickValues: Y_TICKS,
-                    tickSize: 0,
-                    tickPadding: 12,
-                    format: (v) => `$${(v as number) / 1000}K`,
-                  }}
-                  axisBottom={{
-                    tickSize: 0,
-                    tickPadding: 12,
-                  }}
-                  theme={nivoTheme}
-                  animate
-                  motionConfig="gentle"
-                  layers={["grid", "axes", "bars", ContributedOverlay, "markers", "legends", "annotations"]}
-                  tooltip={({ indexValue }) => {
-                    const d = hsaContributionBars.find((b) => b.year === indexValue);
-                    if (!d) return null;
-                    return (
-                      <div className="bg-white rounded-xl shadow-lg px-3 py-2 text-sm border border-slate-100">
-                        <div className="font-semibold text-foreground mb-1">{indexValue} Tax Year</div>
-                        <div className="flex items-center gap-2">
-                          <span
-                            className="w-2.5 h-2.5 rounded-sm inline-block flex-shrink-0"
-                            style={{ background: WEX_BLUE }}
-                          />
-                          <span className="text-muted-foreground">Your contributions:</span>
-                          <span className="font-medium text-foreground">${d.contributed.toLocaleString()}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span
-                            className="w-2.5 h-2.5 rounded-sm inline-block flex-shrink-0"
-                            style={{ background: WEX_BLUE_MUTED }}
-                          />
-                          <span className="text-muted-foreground">Remaining to max:</span>
-                          <span className="font-medium text-foreground">${d.remaining.toLocaleString()}</span>
-                        </div>
-                        <div className="border-t border-slate-100 mt-1.5 pt-1.5 flex items-center justify-between">
-                          <span className="text-muted-foreground">IRS Max:</span>
-                          <span className="font-semibold text-foreground">${d.irsMax.toLocaleString()}</span>
-                        </div>
-                      </div>
-                    );
-                  }}
-                />
-              </div>
-
-              <div className="flex items-center justify-center gap-6 text-sm">
+            {activeView !== 2 && (
+              <div className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: WEX_BLUE }} />
-                  <span className="text-muted-foreground">Your Contributions</span>
+                  <h3 className="text-base font-semibold text-foreground">
+                    HSA Contributions by Tax Year
+                  </h3>
+                  <AlertCircle className="h-4 w-4 text-muted-foreground" />
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-sm border border-slate-200" style={{ backgroundColor: WEX_BLUE_MUTED }} />
-                  <span className="text-muted-foreground">Remaining to IRS Max</span>
+
+                <div className="h-[320px]">
+                  <ResponsiveBar
+                    data={hsaContributionBars as unknown as BarDatum[]}
+                    keys={["irsMax"]}
+                    indexBy="year"
+                    colors={[WEX_BLUE_MUTED]}
+                    borderRadius={6}
+                    padding={0.4}
+                    valueScale={{ type: "linear", max: 10000 }}
+                    margin={{ top: 10, right: 10, bottom: 40, left: 50 }}
+                    enableLabel={false}
+                    enableGridX={false}
+                    gridYValues={Y_TICKS}
+                    axisLeft={{
+                      tickValues: Y_TICKS,
+                      tickSize: 0,
+                      tickPadding: 12,
+                      format: (v) => `$${(v as number) / 1000}K`,
+                    }}
+                    axisBottom={{
+                      tickSize: 0,
+                      tickPadding: 12,
+                    }}
+                    theme={nivoTheme}
+                    animate
+                    motionConfig="gentle"
+                    layers={["grid", "axes", "bars", ContributedOverlay, "markers", "legends", "annotations"]}
+                    tooltip={({ indexValue }) => {
+                      const d = hsaContributionBars.find((b) => b.year === indexValue);
+                      if (!d) return null;
+                      return (
+                        <div className="bg-white rounded-xl shadow-lg px-3 py-2 text-sm border border-slate-100">
+                          <div className="font-semibold text-foreground mb-1">{indexValue} Tax Year</div>
+                          <div className="flex items-center gap-2">
+                            <span
+                              className="w-2.5 h-2.5 rounded-sm inline-block flex-shrink-0"
+                              style={{ background: WEX_BLUE }}
+                            />
+                            <span className="text-muted-foreground">Your contributions:</span>
+                            <span className="font-medium text-foreground">${d.contributed.toLocaleString()}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span
+                              className="w-2.5 h-2.5 rounded-sm inline-block flex-shrink-0"
+                              style={{ background: WEX_BLUE_MUTED }}
+                            />
+                            <span className="text-muted-foreground">Remaining to max:</span>
+                            <span className="font-medium text-foreground">${d.remaining.toLocaleString()}</span>
+                          </div>
+                          <div className="border-t border-slate-100 mt-1.5 pt-1.5 flex items-center justify-between">
+                            <span className="text-muted-foreground">IRS Max:</span>
+                            <span className="font-semibold text-foreground">${d.irsMax.toLocaleString()}</span>
+                          </div>
+                        </div>
+                      );
+                    }}
+                  />
+                </div>
+
+                <div className="flex items-center justify-center gap-6 text-sm">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: WEX_BLUE }} />
+                    <span className="text-muted-foreground">Your Contributions</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-sm border border-slate-200" style={{ backgroundColor: WEX_BLUE_MUTED }} />
+                    <span className="text-muted-foreground">Remaining to IRS Max</span>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
-            <div className="space-y-4 lg:pl-6">
+            <div className={cn("space-y-4", activeView !== 2 ? "lg:pl-6" : "max-w-2xl mx-auto w-full")}>
               <div className="flex items-center justify-between">
                 <h3 className="text-base font-semibold text-foreground">Paid Claims by Category</h3>
                 <span className="text-sm text-muted-foreground">01/01/2026 – 12/31/2026</span>
