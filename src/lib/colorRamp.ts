@@ -8,7 +8,6 @@
  * Library: culori (tree-shakeable via culori/fn).
  */
 
-// @ts-ignore
 import {
   useMode,
   modeOklch,
