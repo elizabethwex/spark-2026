@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { ConsumerNavigation } from "@/components/layout/ConsumerNavigation";
 import { usePrototype } from "@/context/PrototypeContext";
 import { PageFadeIn, FadeInItem } from "@/components/layout/PageFadeIn";
@@ -18,6 +19,23 @@ import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground"
  */
 export default function HomePagePartnerSafe() {
   const { homeLayoutMode: layoutMode } = usePrototype();
+  const [activeView, setActiveView] = useState<1 | 2 | 3>(1);
+
+  const effectiveLayoutMode = activeView === 2 ? "standard" : layoutMode;
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore keypresses if the user is typing in an input
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      
+      if (e.key === '1') setActiveView(1);
+      if (e.key === '2') setActiveView(2);
+      if (e.key === '3') setActiveView(3);
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   return (
     <div className="min-h-screen font-['Inter']" style={consumerPageBackgroundStyle}>
@@ -32,14 +50,14 @@ export default function HomePagePartnerSafe() {
         <FadeInItem>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="lg:col-span-2">
-            <QuickActionsSection />
+            <QuickActionsSection activeView={activeView} />
           </div>
 
           <div className="lg:col-span-2">
-            <SparkAccountsSection variant="partner-safe" />
+            <SparkAccountsSection variant="partner-safe" activeView={activeView} />
           </div>
 
-          {layoutMode === "planner" ? (
+          {effectiveLayoutMode === "planner" ? (
             <>
               <div className="h-full">
                 <MessageCenterWidget />
@@ -54,7 +72,7 @@ export default function HomePagePartnerSafe() {
                 <MessageCenterWidget />
               </div>
               <div className="lg:col-span-2">
-                <TransactionsAndLinks />
+                <TransactionsAndLinks activeView={activeView} />
               </div>
               <div className="lg:col-span-2">
                 <QuickLinksSection />
@@ -62,10 +80,10 @@ export default function HomePagePartnerSafe() {
             </>
           )}
 
-          {layoutMode === "planner" && (
+          {effectiveLayoutMode === "planner" && (
             <>
               <div className="lg:col-span-2">
-                <TransactionsAndLinks />
+                <TransactionsAndLinks activeView={activeView} />
               </div>
               <div className="lg:col-span-2">
                 <QuickLinksSection />

@@ -32,6 +32,24 @@ export const sparkLpfsaSummary = {
   eligibleLabel: "Vision & Dental",
 };
 
+export const sparkFsaSummary = {
+  balance: "$850.00",
+  planRange: "01/01/2026 - 4/15/2026",
+  daysToSpend: 28,
+  spendByTag: "Spend $350 by 12/31",
+  eligibleLabel: "Health FSA",
+  eligibleDesc: "Medical, Dental, Vision, RX, OTC meds.",
+};
+
+export const sparkDcfsaSummary = {
+  balance: "$620.00",
+  planRange: "01/01/2025 - 12/31/2025",
+  daysToSpend: 28,
+  spendByTag: "Spend $120 by 12/31",
+  eligibleLabel: "Using DCFSA funds",
+  eligibleDesc: "Daycare, Preschool, Day Camps, Adult Care.",
+};
+
 export type SparkActivityStatus = "approved" | "needs_attention" | "completed";
 
 export interface SparkActivityRow {

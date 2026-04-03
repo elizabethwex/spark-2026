@@ -100,8 +100,28 @@ function TimelineTracker({ steps }: { steps: NonNullable<SparkActivityRow["timel
   );
 }
 
-export function TransactionsAndLinks() {
+export function TransactionsAndLinks({ activeView = 1 }: { activeView?: 1 | 2 | 3 }) {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+
+  const displayActivity = sparkRecentActivity.map((row) => {
+    if (activeView === 2) {
+      if (row.meta.includes("LPFSA")) {
+        return { ...row, meta: row.meta.replace("LPFSA", "FSA") };
+      }
+      if (row.merchant === "Vanguard Invest") {
+        return {
+          ...row,
+          merchant: "Bright Horizons Daycare",
+          meta: "12/14/25 • DCFSA Account",
+        };
+      }
+    } else if (activeView === 3) {
+      if (row.meta.includes("LPFSA")) {
+        return { ...row, meta: row.meta.replace("LPFSA", "HSA") };
+      }
+    }
+    return row;
+  });
 
   return (
     <GlassCard>
@@ -114,7 +134,7 @@ export function TransactionsAndLinks() {
           />
 
           <div className="flex flex-col gap-[12px]">
-            {sparkRecentActivity.map((row, index) => {
+            {displayActivity.map((row, index) => {
               const isExpanded = expandedIndex === index;
               const hasTimeline = row.timeline && row.timeline.length > 0;
 

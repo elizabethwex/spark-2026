@@ -25,13 +25,25 @@ const softEaseOut: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 /**
  * SPARK-2026 AI-forward hero: Assist IQ + "Your next steps" task insight (Figma).
  */
-export function SparkAiForwardHero() {
+export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 }) {
   const navigate = useNavigate();
   const prefersReducedMotion = useReducedMotion();
   const [uploadPhase, setUploadPhase] = useState<UploadPhase>("default");
   const [isTaskVisible, setIsTaskVisible] = useState(true);
   const [isHeroExpanded, setIsHeroExpanded] = useState(false);
   const [selectedUploadMethod, setSelectedUploadMethod] = useState<"qr" | null>(null);
+
+  const claimAccountText = 
+    activeView === 1 ? "LPFSA Account" : 
+    activeView === 2 ? "FSA Account" : 
+    "HSA Account";
+
+  const quickActions = sparkAccountQuickActions.map(action => {
+    if (activeView === 2 && action.label === "HSA Store") {
+      return { ...action, label: "FSA Store" };
+    }
+    return action;
+  });
 
   useEffect(() => {
     if (uploadPhase === "uploading") {
@@ -229,15 +241,15 @@ export function SparkAiForwardHero() {
       initial={shouldAnimate ? "hidden" : "instant"}
       animate={animateState}
       variants={containerVariants}
-      className="spark-hero-root relative flex flex-col lg:flex-row w-full items-center lg:items-stretch justify-center gap-6 lg:gap-[32px] rounded-[24px] lg:rounded-[32px] border border-[#e3e7f4] p-6 sm:p-8 lg:p-[41px] shadow-[0_1.5px_4.5px_rgba(43,49,78,0.04)] bg-white"
+      className="spark-hero-root relative isolate flex flex-col lg:flex-row w-full items-center lg:items-stretch justify-center gap-6 lg:gap-[32px] rounded-[24px] lg:rounded-[32px] border border-[#e3e7f4] p-6 sm:p-8 lg:p-[41px] shadow-[0_1.5px_4.5px_rgba(43,49,78,0.04)] bg-white [filter:drop-shadow(0_0_0_transparent)]"
       style={{
         backgroundImage:
           "url('data:image/svg+xml;utf8,<svg viewBox=\\'0 0 1200 523.5\\' xmlns=\\'http://www.w3.org/2000/svg\\' preserveAspectRatio=\\'none\\'><rect x=\\'0\\' y=\\'0\\' height=\\'100%\\' width=\\'100%\\' fill=\\'url(%23grad)\\' opacity=\\'1\\'/><defs><radialGradient id=\\'grad\\' gradientUnits=\\'userSpaceOnUse\\' cx=\\'0\\' cy=\\'0\\' r=\\'10\\' gradientTransform=\\'matrix(176.49 0 0 51.824 -48 157.05)\\'><stop stop-color=\\'rgba(23,45,161,0.09)\\' offset=\\'0\\'/><stop stop-color=\\'rgba(23,45,161,0)\\' offset=\\'0.5\\'/></radialGradient></defs></svg>'), url('data:image/svg+xml;utf8,<svg viewBox=\\'0 0 1200 523.5\\' xmlns=\\'http://www.w3.org/2000/svg\\' preserveAspectRatio=\\'none\\'><rect x=\\'0\\' y=\\'0\\' height=\\'100%\\' width=\\'100%\\' fill=\\'url(%23grad)\\' opacity=\\'1\\'/><defs><radialGradient id=\\'grad\\' gradientUnits=\\'userSpaceOnUse\\' cx=\\'0\\' cy=\\'0\\' r=\\'10\\' gradientTransform=\\'matrix(176.49 0 0 55.526 1248 392.62)\\'><stop stop-color=\\'rgba(200,16,46,0.07)\\' offset=\\'0\\'/><stop stop-color=\\'rgba(200,16,46,0)\\' offset=\\'0.45\\'/></radialGradient></defs></svg>'), url('data:image/svg+xml;utf8,<svg viewBox=\\'0 0 1200 523.5\\' xmlns=\\'http://www.w3.org/2000/svg\\' preserveAspectRatio=\\'none\\'><rect x=\\'0\\' y=\\'0\\' height=\\'100%\\' width=\\'100%\\' fill=\\'url(%23grad)\\' opacity=\\'1\\'/><defs><radialGradient id=\\'grad\\' gradientUnits=\\'userSpaceOnUse\\' cx=\\'0\\' cy=\\'0\\' r=\\'10\\' gradientTransform=\\'matrix(93.338 0 0 103.65 660 732.9)\\'><stop stop-color=\\'rgba(23,45,161,0.04)\\' offset=\\'0\\'/><stop stop-color=\\'rgba(23,45,161,0)\\' offset=\\'0.4\\'/></radialGradient></defs></svg>'), linear-gradient(90deg, rgba(255, 255, 255, 0.93) 0%, rgba(255, 255, 255, 0.93) 100%)",
       }}
     >
       <ShineBorder
-        borderWidth={3}
-        duration={10}
+        borderWidth={1.5}
+        duration={18}
         color={["#25146f", "#c8102e", "#25146f"]}
         className="absolute inset-0 pointer-events-none p-0 border-none bg-transparent dark:bg-transparent shadow-none z-50 rounded-[24px] lg:rounded-[32px]"
       >
@@ -288,7 +300,7 @@ export function SparkAiForwardHero() {
             variants={pillsWrapperVariants}
             className="flex flex-wrap gap-[16px]"
           >
-            {sparkAccountQuickActions.map((action) => {
+            {quickActions.map((action) => {
               const Icon = action.icon;
               return (
                 <motion.button
@@ -479,7 +491,7 @@ export function SparkAiForwardHero() {
                       Bigtown Dentistry
                     </p>
                     <p className="text-[12px] font-medium leading-[20px] text-[#5f6a94]">
-                      Yesterday • FSA Account
+                      Yesterday • {claimAccountText}
                     </p>
                   </div>
                 </div>

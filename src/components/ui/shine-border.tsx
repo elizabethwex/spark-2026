@@ -45,6 +45,7 @@ export function ShineBorder({
         className,
       )}
     >
+      {children}
       <div
         style={
           {
@@ -54,9 +55,8 @@ export function ShineBorder({
             "--background-radial-gradient": `radial-gradient(circle, transparent 20%, ${color instanceof Array ? color.join(",") : color}, transparent 80%)`,
           } as React.CSSProperties
         }
-        className={`absolute inset-0 rounded-[inherit] before:absolute before:inset-0 before:rounded-[inherit] before:p-[length:var(--border-width)] before:will-change-[background-position] before:content-[""] before:![-webkit-mask-composite:xor] before:[-webkit-mask:var(--mask-linear-gradient)] before:[background-image:var(--background-radial-gradient)] before:[background-size:300%_300%] before:![mask-composite:exclude] before:[mask:var(--mask-linear-gradient)] motion-safe:before:animate-[shine-pulse_var(--shine-pulse-duration)_infinite_linear] before:pointer-events-none after:absolute after:-inset-[2.5px] after:rounded-[inherit] after:p-[length:var(--border-width)] after:will-change-[background-position] after:content-[""] after:![-webkit-mask-composite:xor] after:[-webkit-mask:var(--mask-linear-gradient)] after:[background-image:var(--background-radial-gradient)] after:[background-size:300%_300%] after:![mask-composite:exclude] after:[mask:var(--mask-linear-gradient)] motion-safe:after:animate-[shine-pulse_var(--shine-pulse-duration)_infinite_linear] after:pointer-events-none after:blur-[2.5px] after:opacity-60`}
+        className={`absolute inset-0 -z-10 pointer-events-none rounded-[inherit] before:absolute before:inset-0 before:rounded-[inherit] before:p-[length:var(--border-width)] before:content-[""] before:![-webkit-mask-composite:xor] before:[-webkit-mask:var(--mask-linear-gradient)] before:[background-image:var(--background-radial-gradient)] before:[background-size:300%_300%] before:![mask-composite:exclude] before:[mask:var(--mask-linear-gradient)] motion-safe:before:animate-[shine-pulse_var(--shine-pulse-duration)_infinite_linear] before:pointer-events-none before:opacity-70 before:blur-[0.5px] after:absolute after:-inset-[1px] after:rounded-[inherit] after:p-[length:var(--border-width)] after:content-[""] after:![-webkit-mask-composite:xor] after:[-webkit-mask:var(--mask-linear-gradient)] after:[background-image:var(--background-radial-gradient)] after:[background-size:300%_300%] after:![mask-composite:exclude] after:[mask:var(--mask-linear-gradient)] motion-safe:after:animate-[shine-pulse_var(--shine-pulse-duration)_infinite_linear] after:pointer-events-none after:blur-[2px] after:opacity-30`}
       ></div>
-      {children}
     </div>
   );
 }
