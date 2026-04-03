@@ -31,7 +31,6 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
   const [uploadPhase, setUploadPhase] = useState<UploadPhase>("default");
   const [isTaskVisible, setIsTaskVisible] = useState(true);
   const [isHeroExpanded, setIsHeroExpanded] = useState(false);
-  const [selectedUploadMethod, setSelectedUploadMethod] = useState<"qr" | null>(null);
 
   const claimAccountText = 
     activeView === 1 ? "LPFSA Account" : 
@@ -75,21 +74,6 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
       sessionStorage.setItem("sparkHeroVisited", "true");
     }
   }, [isFirstVisit]);
-
-  useEffect(() => {
-    if (uploadPhase === "options" && selectedUploadMethod === "qr") {
-      const timer = setTimeout(() => {
-        setUploadPhase("uploading");
-      }, prefersReducedMotion ? 0 : 240);
-      return () => clearTimeout(timer);
-    }
-  }, [uploadPhase, selectedUploadMethod, prefersReducedMotion]);
-
-  useEffect(() => {
-    if (uploadPhase !== "options" && selectedUploadMethod !== null) {
-      setSelectedUploadMethod(null);
-    }
-  }, [uploadPhase, selectedUploadMethod]);
 
   const shouldAnimate = isFirstVisit && !prefersReducedMotion;
 
@@ -232,7 +216,6 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
   };
 
   const animateState = shouldAnimate ? "visible" : "instant";
-  const isQrSelected = uploadPhase === "options" && selectedUploadMethod === "qr";
 
   return (
     <motion.div
@@ -473,9 +456,9 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
             </AnimatePresence>
           </motion.div>
 
-          {/* ── Claim summary (hidden during options phase) ── */}
+          {/* ── Claim summary (hidden during options and uploading phases) ── */}
           <AnimatePresence mode="wait">
-            {uploadPhase !== "options" && (
+            {(uploadPhase === "default" || uploadPhase === "success") && (
               <motion.div
                 key="claim-summary"
                 layout
@@ -491,7 +474,7 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
                       Bigtown Dentistry
                     </p>
                     <p className="text-[12px] font-medium leading-[20px] text-[#5f6a94]">
-                      Yesterday • {claimAccountText}
+                      4/27/26 • {claimAccountText}
                     </p>
                   </div>
                 </div>
@@ -545,36 +528,23 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
                     <div className="flex w-full items-center gap-[16px]">
                     <motion.div
                       className="flex flex-1 flex-col items-center gap-[8px]"
-                      animate={
-                        isQrSelected
-                          ? { scale: 1.02, y: -2 }
-                          : { scale: 1, y: 0 }
-                      }
+                      animate={{ scale: 1, y: 0 }}
                       transition={{ duration: 0.22, ease: softEaseOut }}
                     >
                       <motion.button
                         type="button"
-                        onClick={() => setSelectedUploadMethod("qr")}
+                        onClick={() => setUploadPhase("uploading")}
                         whileTap={{ scale: 0.96 }}
-                        animate={
-                          isQrSelected
-                            ? {
-                                boxShadow:
-                                  "0 0 0 3px rgba(57,88,195,0.14), 0 10px 24px rgba(57,88,195,0.12)",
-                                borderColor: "#3958c3",
-                                backgroundColor: "#f8faff",
-                              }
-                            : {
-                                boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
-                                borderColor: "#e2e8f0",
-                                backgroundColor: "#ffffff",
-                              }
-                        }
+                        animate={{
+                          boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+                          borderColor: "#e2e8f0",
+                          backgroundColor: "#ffffff",
+                        }}
                         transition={{ duration: 0.2, ease: softEaseOut }}
                         className="rounded-[12px] border p-[8px] cursor-pointer"
                       >
                         <motion.div
-                          animate={isQrSelected ? { scale: [1, 0.97, 1] } : { scale: 1 }}
+                          animate={{ scale: 1 }}
                           transition={{ duration: 0.28, ease: softEaseOut }}
                         >
                           <QRCode
@@ -584,11 +554,7 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
                         </motion.div>
                       </motion.button>
                       <motion.p
-                        animate={
-                          isQrSelected
-                            ? { color: "#3958c3", opacity: 1 }
-                            : { color: "#14182c", opacity: 1 }
-                        }
+                        animate={{ color: "#14182c", opacity: 1 }}
                         transition={{ duration: 0.2, ease: softEaseOut }}
                         className="text-[11px] font-bold leading-tight text-center"
                       >
@@ -600,7 +566,7 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
 
                     <motion.div
                       className="flex flex-col items-center gap-[6px] shrink-0"
-                      animate={isQrSelected ? { opacity: 0.55 } : { opacity: 1 }}
+                      animate={{ opacity: 1 }}
                       transition={{ duration: 0.2, ease: softEaseOut }}
                     >
                       <div className="w-[1px] h-[24px] bg-[#e3e7f4]" />
@@ -612,11 +578,7 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
 
                     <motion.div
                       className="flex flex-1 flex-col items-center gap-[8px]"
-                      animate={
-                        isQrSelected
-                          ? { opacity: 0.48, scale: 0.98, y: 2 }
-                          : { opacity: 1, scale: 1, y: 0 }
-                      }
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
                       transition={{ duration: 0.2, ease: softEaseOut }}
                     >
                       <motion.button
