@@ -1,0 +1,1 @@
+const a="linear-gradient(184deg, var(--app-primary-50) 50%, var(--app-primary-300) 140%)",s="var(--app-border)",r="var(--app-success-surface)",p="var(--app-success-text)",S="var(--app-separator)",_="var(--app-info)";export{a as C,s as a,p as b,r as c,S as d,_ as e};
