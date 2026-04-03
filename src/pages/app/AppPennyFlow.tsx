@@ -6,15 +6,15 @@ import { AppNavBar } from "@/components/app-shell/AppNavBar";
 import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
-const PRIMARY = "#3958c3";
-const PRIMARY_DARK = "#172da0";
-const BG_TINT = "#eef2ff";
-const CARD_BG = "#fff";
-const YELLOW_BG = "#fff8cc";
-const SUCCESS_GREEN = "#007a55";
-const SUCCESS_BG = "#dcfae6";
-const TEXT_PRIMARY = "#111322";
-const TEXT_SECONDARY = "rgba(60,60,67,0.6)";
+const PRIMARY = "var(--app-primary)";
+const PRIMARY_DARK = "var(--app-primary-700)";
+const BG_TINT = "var(--app-primary-50)";
+const CARD_BG = "var(--app-neutral-00)";
+const YELLOW_BG = "var(--app-warning-surface)";
+const SUCCESS_GREEN = "var(--app-success)";
+const SUCCESS_BG = "var(--app-success-surface)";
+const TEXT_PRIMARY = "var(--app-text)";
+const TEXT_SECONDARY = "var(--app-text-secondary)";
 
 /** Static assets under `public/app-ui/` (Figma MCP URLs expire and do not ship in git). */
 const pennyAsset = (file: string) => `${import.meta.env.BASE_URL}app-ui/${file}`;
@@ -31,7 +31,7 @@ function ProgressBar({ progress }: { progress: number }) {
       style={{
         width: "100%",
         height: 4,
-        background: "#edf1ff",
+        background: "var(--app-primary-50)",
         borderRadius: 9999,
         overflow: "hidden",
         flexShrink: 0,
@@ -70,7 +70,7 @@ function PillButton({
         fontWeight: 510,
         fontFamily: "var(--app-font)",
         letterSpacing: -0.4,
-        background: variant === "primary" ? PRIMARY : "#edf1ff",
+        background: variant === "primary" ? PRIMARY : "var(--app-primary-50)",
         color: variant === "primary" ? "#fff" : PRIMARY_DARK,
         flexShrink: 0,
       }}
@@ -123,7 +123,7 @@ function StepTransaction({ onNext }: { onNext: () => void }) {
               borderRadius: 9999,
               border: "none",
               cursor: "pointer",
-              background: "#172da0",
+              background: PRIMARY_DARK,
               color: "#fff",
               fontSize: 16,
               fontWeight: 500,
@@ -157,7 +157,7 @@ function StepTransaction({ onNext }: { onNext: () => void }) {
           style={{
             background: CARD_BG,
             borderRadius: 12,
-            border: "1px solid #dcdfea",
+            border: "1px solid var(--app-border)",
             overflow: "hidden",
           }}
         >
@@ -171,7 +171,7 @@ function StepTransaction({ onNext }: { onNext: () => void }) {
               key={label}
               style={{
                 padding: "14px 16px",
-                borderTop: i > 0 ? "1px solid #e6e6e6" : "none",
+                borderTop: i > 0 ? "1px solid var(--app-separator)" : "none",
                 display: "flex",
                 flexDirection: "column",
                 gap: 2,
@@ -276,7 +276,7 @@ function StepUploadMethod({ onSelect }: { onSelect: (method: string) => void }) 
                 borderRadius: 100,
                 border: "none",
                 cursor: "pointer",
-                background: "#edf1ff",
+                background: "var(--app-primary-50)",
                 color: PRIMARY_DARK,
                 fontSize: 17,
                 fontWeight: 510,
@@ -295,7 +295,7 @@ function StepUploadMethod({ onSelect }: { onSelect: (method: string) => void }) 
         <div
           style={{
             background: "#f9f9fb",
-            border: "1px solid #d0d6ea",
+            border: "1px solid var(--app-border)",
             borderRadius: 12,
             padding: 16,
           }}
@@ -303,8 +303,8 @@ function StepUploadMethod({ onSelect }: { onSelect: (method: string) => void }) 
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
             <div style={{ width: 24, height: 24, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <circle cx="10" cy="10" r="9" stroke="#5f6a94" strokeWidth="1.5" />
-                <path d="M10 9v5M10 7v1" stroke="#5f6a94" strokeWidth="1.5" strokeLinecap="round" />
+                <circle cx="10" cy="10" r="9" stroke="var(--app-text-secondary)" strokeWidth="1.5" />
+                <path d="M10 9v5M10 7v1" stroke="var(--app-text-secondary)" strokeWidth="1.5" strokeLinecap="round" />
               </svg>
             </div>
             <span style={{ fontSize: 16, fontWeight: 700, color: TEXT_PRIMARY, fontFamily: "var(--app-font)" }}>
@@ -470,15 +470,15 @@ function StepDocPreview({ onContinue, onAddAnother }: { onContinue: () => void; 
               alignItems: "center",
               gap: 8,
               padding: "12px 16px",
-              borderBottom: "1px solid #eee",
+              borderBottom: "1px solid var(--app-separator)",
             }}
           >
-            <FileText size={20} color="#5f6a94" style={{ flexShrink: 0 }} />
+            <FileText size={20} color="var(--app-text-secondary)" style={{ flexShrink: 0 }} />
             <span style={{ flex: 1, fontSize: 16, fontWeight: 700, color: TEXT_PRIMARY, fontFamily: "var(--app-font)" }}>
               IMG_21017.jpg
             </span>
             <button style={{ background: "none", border: "none", cursor: "pointer", padding: 4, display: "flex" }}>
-              <Trash2 size={20} color="#5f6a94" />
+              <Trash2 size={20} color="var(--app-text-secondary)" />
             </button>
           </div>
 
@@ -615,7 +615,7 @@ function StepReview({ onSubmit }: { onSubmit: () => void }) {
               BigtownDentistry.jpg
             </span>
             <button style={{ background: "none", border: "none", cursor: "pointer", padding: 4, display: "flex" }}>
-              <Trash2 size={20} color="#5f6a94" />
+              <Trash2 size={20} color="var(--app-text-secondary)" />
             </button>
           </div>
         </div>
@@ -628,14 +628,14 @@ function StepReview({ onSubmit }: { onSubmit: () => void }) {
               Edit
             </button>
           </div>
-          <div style={{ background: CARD_BG, borderRadius: 12, overflow: "hidden", border: "1px solid #eee" }}>
+          <div style={{ background: CARD_BG, borderRadius: 12, overflow: "hidden", border: "1px solid var(--app-border)" }}>
             {[
               ["Date", "November 24, 2026"],
               ["Amount", "$210.00"],
               ["Merchant", "Bigtown Dentistry"],
               ["Category", "Dental"],
             ].map(([label, value], i) => (
-              <div key={label} style={{ display: "flex", padding: "14px 16px", borderTop: i > 0 ? "1px solid #eee" : "none" }}>
+              <div key={label} style={{ display: "flex", padding: "14px 16px", borderTop: i > 0 ? "1px solid var(--app-separator)" : "none" }}>
                 <span style={{ width: 100, fontSize: 16, color: TEXT_SECONDARY, fontFamily: "var(--app-font)", flexShrink: 0 }}>{label}</span>
                 <span style={{ fontSize: 16, color: TEXT_PRIMARY, fontFamily: "var(--app-font)" }}>{value}</span>
               </div>
@@ -652,7 +652,7 @@ function StepReview({ onSubmit }: { onSubmit: () => void }) {
             style={{
               background: CARD_BG,
               borderRadius: 12,
-              border: "1px solid #eee",
+              border: "1px solid var(--app-border)",
               padding: "14px 16px",
               display: "flex",
               alignItems: "center",
@@ -660,12 +660,12 @@ function StepReview({ onSubmit }: { onSubmit: () => void }) {
             }}
           >
             <span style={{ fontSize: 16, color: TEXT_PRIMARY, fontFamily: "var(--app-font)" }}>Self</span>
-            <ChevronDown size={18} color="#5f6a94" />
+            <ChevronDown size={18} color="var(--app-text-secondary)" />
           </div>
         </div>
 
         {/* Items info box */}
-        <div style={{ background: CARD_BG, borderRadius: 12, padding: 16, border: "1px solid #eee" }}>
+        <div style={{ background: CARD_BG, borderRadius: 12, padding: 16, border: "1px solid var(--app-border)" }}>
           <p style={{ margin: "0 0 4px", fontSize: 16, fontWeight: 700, color: TEXT_PRIMARY, fontFamily: "var(--app-font)" }}>
             Items found on your documentation
           </p>
@@ -683,7 +683,7 @@ function StepReview({ onSubmit }: { onSubmit: () => void }) {
               <span style={{ fontSize: 14, fontWeight: 600, color: TEXT_PRIMARY, fontFamily: "var(--app-font)" }}>{amount}</span>
             </div>
           ))}
-          <div style={{ borderTop: "1px solid #eee", marginTop: 10, paddingTop: 10, display: "flex", justifyContent: "space-between" }}>
+          <div style={{ borderTop: "1px solid var(--app-separator)", marginTop: 10, paddingTop: 10, display: "flex", justifyContent: "space-between" }}>
             <span style={{ fontSize: 15, fontWeight: 700, color: TEXT_PRIMARY, fontFamily: "var(--app-font)" }}>Total</span>
             <span style={{ fontSize: 15, fontWeight: 700, color: TEXT_PRIMARY, fontFamily: "var(--app-font)" }}>$210.00</span>
           </div>
@@ -750,7 +750,7 @@ function StepApproved({ onGoHome }: { onGoHome: () => void }) {
           transition={{ delay: 0.2 }}
           style={{ textAlign: "center", width: "100%" }}
         >
-          <h2 style={{ margin: "0 0 8px", fontSize: 22, fontWeight: 600, color: "#1a1a1a", letterSpacing: -0.44, fontFamily: "var(--app-font)" }}>
+          <h2 style={{ margin: "0 0 8px", fontSize: 22, fontWeight: 600, color: "var(--app-text)", letterSpacing: -0.44, fontFamily: "var(--app-font)" }}>
             Claim approved!
           </h2>
           <p style={{ margin: 0, fontSize: 16, color: TEXT_SECONDARY, lineHeight: "24px", fontFamily: "var(--app-font)" }}>
@@ -786,7 +786,7 @@ function StepApproved({ onGoHome }: { onGoHome: () => void }) {
             style={{
               background: CARD_BG,
               borderRadius: 12,
-              border: "1px solid #e3e7f4",
+              border: "1px solid var(--app-border)",
               padding: "16px",
               display: "flex",
               justifyContent: "space-between",
@@ -794,7 +794,7 @@ function StepApproved({ onGoHome }: { onGoHome: () => void }) {
             }}
           >
             <div>
-              <p style={{ margin: 0, fontSize: 16, fontWeight: 600, color: "#000", fontFamily: "var(--app-font)" }}>Current balance</p>
+              <p style={{ margin: 0, fontSize: 16, fontWeight: 600, color: "var(--app-text)", fontFamily: "var(--app-font)" }}>Current balance</p>
               <p style={{ margin: 0, fontSize: 16, color: TEXT_SECONDARY, fontFamily: "var(--app-font)" }}>Limited Purpose FSA 2026</p>
             </div>
             <span style={{ fontSize: 16, fontWeight: 600, color: TEXT_PRIMARY, fontFamily: "var(--app-font)" }}>$849.00</span>

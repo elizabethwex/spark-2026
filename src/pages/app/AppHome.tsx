@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowRight,
@@ -11,20 +12,19 @@ import {
 import { AppNavBar } from "@/components/app-shell/AppNavBar";
 import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
 import { useDeviceMockup } from "@/hooks/useDeviceMockup";
+import { FsaStoreBrowser } from "@/components/app-shell/FsaStoreBrowser";
 import { useReimburseWorkspace } from "@/context/ReimburseWorkspaceContext";
 
-// Figma asset URLs (valid for 7 days from design export)
-const FSA_STORE_LOGO =
-  "https://www.figma.com/api/mcp/asset/8abcb600-66e0-4370-a379-d031216d1324";
-const ILLUSTRATION_BG = "/FSA-Store.svg";
+const FSA_STORE_LOGO = "/app-ui/fsastore-logo.svg";
+const FSA_STORE_IMAGE = "/app-ui/fsa-store-image.svg";
 
 const CARD_SHADOW =
   "0px 3px 9px rgba(43,49,78,0.04), 0px 6px 18px rgba(43,49,78,0.06)";
 
-const TEXT_PRIMARY = "#14182c";
-const TEXT_SECONDARY = "#5f6a94";
-const TINT = "hsl(208 100% 38%)";
-const TINT_50 = "#eef2ff";
+const TEXT_PRIMARY = "var(--app-text)";
+const TEXT_SECONDARY = "var(--app-text-secondary)";
+const TINT = "var(--app-primary)";
+const TINT_50 = "var(--app-primary-50)";
 
 interface SectionHeaderProps {
   title: string;
@@ -128,7 +128,7 @@ function TransactionRow({ title, subtitle, amount, onClick }: TransactionRowProp
         <div
           style={{
             height: 1,
-            background: "#e6e6e6",
+            background: "var(--app-separator)",
             flexShrink: 0,
           }}
         />
@@ -158,7 +158,7 @@ function TransactionRow({ title, subtitle, amount, onClick }: TransactionRowProp
               style={{
                 fontSize: 17,
                 fontWeight: 600,
-                color: "#000",
+                color: "var(--app-text)",
                 letterSpacing: -0.43,
                 lineHeight: "22px",
                 overflow: "hidden",
@@ -206,9 +206,9 @@ function TransactionRow({ title, subtitle, amount, onClick }: TransactionRowProp
               {amount}
             </span>
             <ChevronRight
-              size={14}
+              size={17}
               strokeWidth={2.5}
-              style={{ color: TEXT_SECONDARY, width: 8 }}
+              style={{ color: TEXT_SECONDARY }}
             />
           </div>
         </div>
@@ -220,6 +220,7 @@ function TransactionRow({ title, subtitle, amount, onClick }: TransactionRowProp
 export default function AppHome() {
   const navigate = useNavigate();
   const { deviceOn } = useDeviceMockup();
+  const [showFsaStore, setShowFsaStore] = useState(false);
   const { openReimburseWorkspace } = useReimburseWorkspace();
 
   /** Device frame: tab bar is fixed over the scroll area — clear it. Mobile web: shell already reserves tab bar + safe area; add a small inner gap. */
@@ -231,7 +232,7 @@ export default function AppHome() {
     <div
       style={{
         minHeight: "auto",
-        background: "linear-gradient(189.07deg, #eef2ff 50%, #a5b4fc 140%)",
+        background: "linear-gradient(189.07deg, var(--app-primary-50) 50%, var(--app-primary-300) 140%)",
         fontFamily: "var(--app-font)",
         paddingBottom:
           "calc(var(--app-tabbar-height, 95px) + env(safe-area-inset-bottom, 0px))",
@@ -293,8 +294,8 @@ export default function AppHome() {
             {/* Claim row */}
             <div
               style={{
-                background: "#f8f9fe",
-                border: "1px solid #f8f9fe",
+                background: "var(--app-primary-50)",
+                border: "1px solid var(--app-primary-50)",
                 borderRadius: 24,
                 padding: 17,
                 display: "flex",
@@ -310,7 +311,7 @@ export default function AppHome() {
                     height: 48,
                     borderRadius: 12,
                     background: "#fff",
-                    border: "1px solid #e3e7f4",
+                    border: "1px solid var(--app-border)",
                     boxShadow: "0px 1px 2px rgba(0,0,0,0.05)",
                     display: "flex",
                     alignItems: "center",
@@ -329,7 +330,7 @@ export default function AppHome() {
                   >
                     <path
                       d="M9 2C6.8 2 5 3.8 5 6c0 .8.2 1.5.6 2.1-.4 2.6-.8 5.2-1.2 6.8-.1.5.2 1.1.8 1.1.4 0 .8-.3.9-.7L7 12h4l1.9 3.3c.1.4.5.7.9.7.6 0 .9-.6.8-1.1-.4-1.6-.8-4.2-1.2-6.8.4-.6.6-1.3.6-2.1C14 3.8 12.2 2 10 2H9z"
-                      fill="#5f6a94"
+                      fill="var(--app-text-secondary)"
                     />
                   </svg>
                 </div>
@@ -548,7 +549,7 @@ export default function AppHome() {
                     flexShrink: 0,
                   }}
                 >
-                  <ChevronRight size={14} strokeWidth={2.5} style={{ color: TEXT_SECONDARY, width: 8 }} />
+                  <ChevronRight size={17} strokeWidth={2.5} style={{ color: TEXT_SECONDARY }} />
                 </div>
               </div>
             </div>
@@ -651,12 +652,11 @@ export default function AppHome() {
                         display: "inline-flex",
                         alignItems: "center",
                         gap: 4,
-                        background: "#e6a800",
+                        background: "var(--app-warning)",
                         borderRadius: 6,
-                        padding: "2px 8px 2px 4px",
+                        padding: "2px 8px",
                       }}
                     >
-                      <span style={{ fontSize: 12, color: "#4a3500", lineHeight: "16px" }}>⏰</span>
                       <span
                         style={{
                           fontSize: 12,
@@ -681,7 +681,7 @@ export default function AppHome() {
                     flexShrink: 0,
                   }}
                 >
-                  <ChevronRight size={14} strokeWidth={2.5} style={{ color: TEXT_SECONDARY, width: 8 }} />
+                  <ChevronRight size={17} strokeWidth={2.5} style={{ color: TEXT_SECONDARY }} />
                 </div>
               </div>
             </div>
@@ -789,6 +789,7 @@ export default function AppHome() {
         {/* ── FSA Store promo card ── */}
         <div style={{ padding: "0 16px" }}>
           <div
+            onClick={() => setShowFsaStore(true)}
             style={{
               background: "#fff",
               borderRadius: 24,
@@ -799,6 +800,7 @@ export default function AppHome() {
               gap: 13,
               overflow: "hidden",
               minHeight: 196,
+              cursor: "pointer",
             }}
           >
             {/* Left: text content */}
@@ -872,19 +874,18 @@ export default function AppHome() {
                 height: 128,
                 flexShrink: 0,
                 position: "relative",
-                overflow: "hidden",
               }}
             >
               <img
-                src={ILLUSTRATION_BG}
+                src={FSA_STORE_IMAGE}
                 alt=""
                 aria-hidden="true"
                 style={{
                   position: "absolute",
-                  inset: "0 -9.74% 7.11% -9.03%",
-                  width: "118.77%",
-                  height: "92.89%",
-                  objectFit: "cover",
+                  inset: "-20px -24px",
+                  width: "calc(100% + 48px)",
+                  height: "calc(100% + 40px)",
+                  objectFit: "contain",
                 }}
               />
             </div>
@@ -926,6 +927,12 @@ export default function AppHome() {
           </div>
         </div>
       </div>
+
+      {showFsaStore && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 60 }}>
+          <FsaStoreBrowser onClose={() => setShowFsaStore(false)} />
+        </div>
+      )}
     </div>
   );
 }

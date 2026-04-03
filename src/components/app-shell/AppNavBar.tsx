@@ -83,7 +83,7 @@ const BACK_PILL_BTN: React.CSSProperties = {
   fontSize: 17,
   fontWeight: 500,
   letterSpacing: -0.2,
-  color: "#14182c",
+  color: "var(--app-text)",
   boxShadow: "0 8px 40px rgba(0,0,0,0.12)",
   backdropFilter: "blur(20px) saturate(180%)",
   WebkitBackdropFilter: "blur(20px) saturate(180%)",
@@ -93,7 +93,7 @@ const BACK_PILL_BTN: React.CSSProperties = {
 function ProfileButton({ onClick }: { onClick: () => void }) {
   return (
     <button type="button" aria-label="Profile" onClick={onClick} style={LIQUID_SYMBOL_BTN}>
-      <User size={22} strokeWidth={1.75} style={{ color: "#14182c" }} />
+      <User size={22} strokeWidth={1.75} style={{ color: "var(--app-text)" }} />
     </button>
   );
 }
@@ -109,7 +109,7 @@ function AssistIqButton({ onClick }: { onClick: () => void }) {
 function BackPill({ label, onClick }: { label: string; onClick: () => void }) {
   return (
     <button type="button" onClick={onClick} style={BACK_PILL_BTN}>
-      <ChevronLeft size={22} strokeWidth={2} style={{ color: "#14182c", marginLeft: -2 }} />
+      <ChevronLeft size={22} strokeWidth={2} style={{ color: "var(--app-text)", marginLeft: -2 }} />
       <span>{label}</span>
     </button>
   );
@@ -193,7 +193,7 @@ export function AppNavBar(props: AppNavBarProps) {
               margin: 0,
               font: "var(--app-font-large-title)",
               letterSpacing: 0.4,
-              color: "#1a1a1a",
+              color: "var(--app-text)",
               flex: 1,
               minWidth: 0,
             }}
@@ -228,7 +228,7 @@ export function AppNavBar(props: AppNavBarProps) {
               fontSize: 14,
               fontWeight: 600,
               letterSpacing: -0.084,
-              color: "#14182c",
+              color: "var(--app-text)",
               whiteSpace: "nowrap",
               maxWidth: "42%",
               overflow: "hidden",
@@ -266,7 +266,7 @@ export function AppNavBar(props: AppNavBarProps) {
               fontSize: 17,
               fontWeight: 600,
               letterSpacing: -0.43,
-              color: "#1a1a1a",
+              color: "var(--app-text)",
               whiteSpace: "nowrap",
               maxWidth: "46%",
               overflow: "hidden",
@@ -280,7 +280,7 @@ export function AppNavBar(props: AppNavBarProps) {
         <div style={{ flex: "0 0 auto", display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 8 }}>
           {rightActions}
           <button type="button" aria-label="Close" onClick={onClose} style={LIQUID_SYMBOL_BTN}>
-            <X size={22} strokeWidth={2} style={{ color: "#14182c" }} />
+            <X size={22} strokeWidth={2} style={{ color: "var(--app-text)" }} />
           </button>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import { hexToLuminance } from "@/lib/accessibility";
+import { generateColorRamp, rampToRecord, type RampStep } from "@/lib/colorRamp";
 import type { ChartPaletteOption, ThemingEngineFormValues } from "./schema";
 import { CHART_PALETTE_HEX } from "./chartPalettes";
 
@@ -62,19 +63,19 @@ const CARD_SHADOW_CSS: Record<"subtle" | "medium" | "elevated", string> = {
 
 const UXT_CARD_BORDER_HEX = "#E3E7F4";
 
-// System locks — see src/requirements/theming-variables.md Section 3
-const LOCK_CARD_LIGHT       = "#FFFFFF";
+// System locks — aligned to UXT guide N1–N10. See src/requirements/theming-variables.md §3.
+const LOCK_CARD_LIGHT       = "#FFFFFF";   // N4  Neutral 00
 const LOCK_CARD_DARK        = "#1E293B";
-const LOCK_BORDER           = "#E2E8F0";
-const LOCK_TEXT_PRIMARY     = "#0F172A";
+const LOCK_BORDER           = "#E3E7F4";   // N5  Neutral 200
+const LOCK_TEXT_PRIMARY     = "#14182C";   // N1  Neutral 900
 const LOCK_TEXT_PRIMARY_DARK = "#F5F5F5";
-const LOCK_MUTED_LIGHT      = "#515F6B";
+const LOCK_MUTED_LIGHT      = "#5F6A94";   // N2  Neutral 700
 const LOCK_MUTED_DARK       = "#94A3B8";
-const LOCK_DISABLED_BG      = "#E2E8F0";
-const LOCK_ERROR            = "#EF4444";
-const LOCK_SUCCESS          = "#22C55E";
-const LOCK_LINK             = "#0073C2";   // WEX System Blue; header links use --theme-header-text
-const LOCK_FOCUS_RING_LIGHT = "#0F172A";   // high-contrast on light backgrounds
+const LOCK_DISABLED_BG      = "#E3E7F4";   // N5  Neutral 200
+const LOCK_ERROR            = "#DC2626";   // N10 Critical 600
+const LOCK_SUCCESS          = "#009966";   // N7  Success 600
+const LOCK_LINK             = "#1C6EFF";   // N6  Info 600; header links use --theme-header-text
+const LOCK_FOCUS_RING_LIGHT = "#14182C";   // N1  high-contrast on light backgrounds
 const LOCK_FOCUS_RING_DARK  = "#FFFFFF";   // white on dark backgrounds
 
 const PRIMARY_FG_LUMINANCE_THRESHOLD = 0.4;
@@ -85,11 +86,37 @@ function getPrimaryForegroundHex(primaryHex: string): string {
 
 // ─── User-input → CSS var mapping ─────────────────────────────────────────────
 
-function buildUserVars(brandColors: ThemingEngineFormValues["brandColors"]): Record<string, string> {
-  const { primary, secondary, pageBg, headerBg, headerText, illustration } = brandColors;
+/** Auto-compute nav text: white on dark backgrounds, N1 on light. */
+function getHeaderTextHex(headerBgHex: string): string {
+  return hexToLuminance(headerBgHex) < 0.4 ? "#FFFFFF" : LOCK_TEXT_PRIMARY;
+}
+
+/**
+ * Build CSS vars for an OKLCH color ramp.
+ * Emits `--{prefix}-{step}: #hex` for each of the 11 steps.
+ */
+function buildRampVars(hex: string, prefix: string): Record<string, string> {
+  const ramp = rampToRecord(generateColorRamp(hex));
+  const vars: Record<string, string> = {};
+  for (const step of Object.keys(ramp) as unknown as RampStep[]) {
+    vars[`--${prefix}-${step}`] = ramp[step];
+  }
+  return vars;
+}
+
+function buildUserVars(brandColors: ThemingEngineFormValues["brandColors"], aiAgent: ThemingEngineFormValues["aiAgent"]): Record<string, string> {
+  const { primary, secondary, pageBg, headerBg, illustration } = brandColors;
   const [pr, pg, pb] = hexToRgb(primary);
+  const headerText = getHeaderTextHex(headerBg);
+
+  const primaryRamp = buildRampVars(primary, "theme-primary-ramp");
+  const secondaryRamp = buildRampVars(secondary, "theme-secondary-ramp");
 
   return {
+    // OKLCH color ramps (11 steps each, 50–950)
+    ...primaryRamp,
+    ...secondaryRamp,
+
     // Passthrough semantic vars (used by consuming components that read --theme-*)
     "--theme-primary":      primary,
     "--theme-secondary":    secondary,
@@ -97,6 +124,7 @@ function buildUserVars(brandColors: ThemingEngineFormValues["brandColors"]): Rec
     "--theme-header-bg":    headerBg,
     "--theme-header-text":  headerText,
     "--theme-illustration": illustration,
+    "--theme-ai-color":     aiAgent.accentColor,
 
     // Auto-computed — Section 2 of requirements doc
     "--theme-primary-hover":   darkenHex(primary, 0.15),
@@ -104,6 +132,7 @@ function buildUserVars(brandColors: ThemingEngineFormValues["brandColors"]): Rec
 
     // Internal ben-ui-kit / Tailwind CSS vars driven by user inputs
     "--primary":                              hexToHsl(primary),
+    "--wex-primary":                          hexToHsl(primary),
     "--wex-component-button-primary-bg":      hexToHsl(primary),
     "--wex-component-button-primary-border":  hexToHsl(primary),
     "--wex-component-button-primary-hover-bg":hexToHsl(darkenHex(primary, 0.15)),
@@ -122,6 +151,10 @@ function buildUserVars(brandColors: ThemingEngineFormValues["brandColors"]): Rec
     "--background": hexToHsl(pageBg),
     "--wex-header-bg": hexToHsl(headerBg),
     "--wex-header-fg": hexToHsl(headerText),
+
+    // C6: AI agent color — cascades to --app-ai-color via app-tokens.css
+    "--wex-ai-color": aiAgent.accentColor,
+    "--wex-ai-color-hsl": hexToHsl(aiAgent.accentColor),
   };
 }
 
@@ -232,7 +265,7 @@ export function themeToCssVars(
   const inputR = cMode ? INPUT_RADIUS[cMode] : INPUT_RADIUS[inputRadius];
   const aiChipR = AI_CHIP_RADIUS[aiAgent.borderRadius];
 
-  const vars = buildUserVars(brandColors);
+  const vars = buildUserVars(brandColors, aiAgent);
 
   Object.assign(vars, getChartVars(chartPalette));
 

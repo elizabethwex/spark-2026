@@ -108,7 +108,7 @@ export function AppTabBar() {
                       style={{
                         position: "absolute",
                         inset: 0,
-                        background: "hsl(208 100% 97%)",
+                        background: "var(--app-primary-50)",
                         borderRadius: 9999,
                       }}
                     />
@@ -117,7 +117,7 @@ export function AppTabBar() {
                     size={22}
                     strokeWidth={active ? 2.25 : 1.75}
                     style={{
-                      color: active ? "hsl(208 100% 38%)" : "#14182c",
+                      color: active ? "var(--app-primary)" : "var(--app-text)",
                       position: "relative",
                       zIndex: 1,
                     }}
@@ -131,7 +131,7 @@ export function AppTabBar() {
                     fontWeight: active ? 600 : 500,
                     letterSpacing: 0,
                     lineHeight: "16px",
-                    color: active ? "hsl(208 100% 38%)" : "#14182c",
+                    color: active ? "var(--app-primary)" : "var(--app-text)",
                   }}
                 >
                   {tab.label}

@@ -17,16 +17,16 @@ import {
 
 const CARD_SHADOW =
   "0px 3.017px 9.051px rgba(43,49,78,0.04), 0px 6.034px 18.101px rgba(43,49,78,0.06)";
-const TEXT_PRIMARY = "#14182c";
-const TEXT_SECONDARY = "#5f6a94";
-const TINT = "#3958c3";
-const TINT_50 = "#eef2ff";
-const WARNING_BG = "#e6a800";
+const TEXT_PRIMARY = "var(--app-text)";
+const TEXT_SECONDARY = "var(--app-text-secondary)";
+const TINT = "var(--app-primary)";
+const TINT_50 = "var(--app-primary-50)";
+const WARNING_BG = "var(--app-warning)";
 const WARNING_TEXT = "#4a3500";
-const LINK_COLOR = "#1c6eff";
-const SEPARATOR = "#e6e6e6";
-const SUCCESS_SURFACE = "#ecfdf5";
-const SUCCESS_TEXT = "#002c22";
+const LINK_COLOR = "var(--app-info)";
+const SEPARATOR = "var(--app-separator)";
+const SUCCESS_SURFACE = "var(--app-success-surface)";
+const SUCCESS_TEXT = "var(--app-success-text)";
 const SHEET_BG = "rgba(255,255,255,0.96)";
 const GRABBER_COLOR = "#ccc";
 
@@ -253,7 +253,7 @@ export default function AppAccountOverview() {
       style={{
         minHeight: "auto",
         fontFamily: "var(--app-font)",
-        background: "linear-gradient(189.07deg, #eef2ff 50%, #a5b4fc 140%)",
+        background: "linear-gradient(189.07deg, var(--app-primary-50) 50%, var(--app-primary-300) 140%)",
         paddingBottom:
           "calc(var(--app-tabbar-height, 95px) + env(safe-area-inset-bottom, 0px) + 64px)",
       }}

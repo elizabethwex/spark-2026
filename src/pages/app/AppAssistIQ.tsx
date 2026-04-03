@@ -27,12 +27,12 @@ import {
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const ASSIST_IQ_GRADIENT =
   "linear-gradient(133.5deg, #25146f 2.5%, #c8102e 100%)";
-const USER_BUBBLE_BG = "#e3e7f4";
-const PRIMARY_BTN = "#3958c3";
+const USER_BUBBLE_BG = "var(--app-border)";
+const PRIMARY_BTN = "var(--app-primary)";
 const CARD_SHADOW =
   "0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04)";
-const TEXT_PRIMARY = "#14182c";
-const TEXT_SECONDARY = "#5f6a94";
+const TEXT_PRIMARY = "var(--app-text)";
+const TEXT_SECONDARY = "var(--app-text-secondary)";
 const WARNING_BG = "#fff7e0";
 const WARNING_TEXT = "#7a4a00";
 const SUCCESS_BG = "#e6f9f0";

@@ -11,16 +11,19 @@ const chartPaletteOptions = ["ocean", "vibrant", "warm"] as const;
 const aiIconPresetOptions = ["orb", "sparkle", "chat"] as const;
 
 /**
- * The 6 user-configurable brand color fields.
+ * The 6 user-configurable brand color fields (C1–C6).
  * These are the ONLY colors an admin can set. See src/requirements/theming-variables.md.
+ *
+ * Navigation text (formerly `headerText`) is now auto-computed from `headerBg`
+ * luminance — see `themeToCssVars.ts`.
  */
 export const brandColorsSchema = z.object({
-  primary:      z.string().regex(hexColorRegex).default("#0073C2"),
+  primary:      z.string().regex(hexColorRegex).default("#3958C3"),
   secondary:    z.string().regex(hexColorRegex).default("#E2E5EA"),
-  pageBg:       z.string().regex(hexColorRegex).default("#F7F7F7"),
-  headerBg:     z.string().regex(hexColorRegex).default("#253746"),
-  headerText:   z.string().regex(hexColorRegex).default("#FFFFFF"),
-  illustration: z.string().regex(hexColorRegex).default("#0EA5E9"),
+  pageBg:       z.string().regex(hexColorRegex).default("#F8F9FE"),
+  headerBg:     z.string().regex(hexColorRegex).default("#FFFFFF"),
+  illustration: z.string().regex(hexColorRegex).default("#1C6EFF"),
+  aiColor:      z.string().regex(hexColorRegex).default("#C8102E"),
 });
 
 export const aiAgentSchema = z.object({
@@ -90,11 +93,27 @@ export const themingEngineSchema = z
     path: ["secondaryLogoFile"],
   });
 
+/**
+ * Legacy-compatible brand colors for import: accepts old `headerText` (stripped)
+ * and new `aiColor` (falls back to default).
+ */
+const brandColorsImportSchema = z
+  .object({
+    primary:      z.string().regex(hexColorRegex).default("#3958C3"),
+    secondary:    z.string().regex(hexColorRegex).default("#E2E5EA"),
+    pageBg:       z.string().regex(hexColorRegex).default("#F8F9FE"),
+    headerBg:     z.string().regex(hexColorRegex).default("#FFFFFF"),
+    headerText:   z.string().regex(hexColorRegex).optional(),
+    illustration: z.string().regex(hexColorRegex).default("#1C6EFF"),
+    aiColor:      z.string().regex(hexColorRegex).default("#C8102E"),
+  })
+  .transform(({ headerText: _legacy, ...rest }) => rest);
+
 /** Raw import shape before normalization (allows legacy cardShadow). */
 const themingEngineImportRawSchema = z.object({
   headerLogoFile: z.union([z.null(), z.undefined()]).optional(),
   secondaryLogoFile: z.union([z.null(), z.undefined()]).optional(),
-  brandColors: brandColorsSchema,
+  brandColors: brandColorsImportSchema,
   chartPalette: z.enum(chartPaletteOptions).default("ocean"),
   iconSet: z.enum(iconSetOptions).default("outline"),
   globalCornerRadiusEnabled: z.boolean().default(true),
@@ -144,12 +163,12 @@ export type ChartPaletteOption = (typeof chartPaletteOptions)[number];
 export type AiIconPreset = (typeof aiIconPresetOptions)[number];
 
 const defaultBrandColors: BrandColors = {
-  primary:      "#0073C2",
+  primary:      "#3958C3",
   secondary:    "#E2E5EA",
-  pageBg:       "#F7F7F7",
-  headerBg:     "#253746",
-  headerText:   "#FFFFFF",
-  illustration: "#0EA5E9",
+  pageBg:       "#F8F9FE",
+  headerBg:     "#FFFFFF",
+  illustration: "#1C6EFF",
+  aiColor:      "#C8102E",
 };
 
 export const defaultThemingEngineValues: ThemingEngineFormValues = {

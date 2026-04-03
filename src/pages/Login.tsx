@@ -516,7 +516,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
     backgroundSize: "cover",
     backgroundPosition: "center",
     backgroundRepeat: "no-repeat",
-    backgroundColor: "#f0f4f8",
+    backgroundColor: "hsl(var(--background))",
   }
 
   return (
@@ -708,7 +708,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                       <button
                         type="button"
                         onClick={handleEditUsername}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[14px] text-[#3958C3] hover:underline"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[14px] text-primary hover:underline"
                       >
                         Edit
                       </button>
