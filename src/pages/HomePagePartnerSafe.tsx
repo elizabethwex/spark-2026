@@ -96,7 +96,7 @@ export default function HomePagePartnerSafe() {
           </div>
 
           <div className="lg:col-span-2">
-            <QuickViewSection />
+            <QuickViewSection activeView={activeView} />
           </div>
         </div>
         </FadeInItem>

@@ -9,7 +9,7 @@ export function MobileAppBanner() {
       <img
         alt=""
         aria-hidden="true"
-        className="absolute inset-0 h-full w-full object-cover pointer-events-none"
+        className="absolute inset-0 h-full w-full object-cover pointer-events-none scale-105"
         src="/ps-banner.png"
       />
 
