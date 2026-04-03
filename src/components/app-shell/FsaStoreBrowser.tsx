@@ -81,7 +81,7 @@ export function FsaStoreBrowser({ onClose }: FsaStoreBrowserProps) {
           <Progress
             value={progress}
             className="h-1 w-full rounded-none bg-muted/30"
-            indicatorClassName="bg-primary transition-all duration-75 ease-linear"
+            data-theme-token="primary"
           />
         )}
       </div>
