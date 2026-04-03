@@ -233,10 +233,11 @@ export default function AppHome() {
   return (
     <div
       style={{
-        minHeight: "100%",
-        background:
-          "linear-gradient(33deg, #ffffff 17.854%, #eef2ff 86.811%, #c7d2fe 120%)",
+        minHeight: "auto",
+        background: "linear-gradient(189.07deg, #eef2ff 50%, #a5b4fc 140%)",
         fontFamily: "var(--app-font)",
+        paddingBottom:
+          "calc(var(--app-tabbar-height, 95px) + env(safe-area-inset-bottom, 0px))",
       }}
     >
       <AppTopSpacer variant="home" />
@@ -557,7 +558,7 @@ export default function AppHome() {
 
             {/* LPFSA card */}
             <div
-              onClick={() => navigate("/app/account/fsa-health")}
+              onClick={() => navigate("/app/account/lpfsa")}
               style={{
                 background: "#fff",
                 borderRadius: 24,
