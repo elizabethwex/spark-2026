@@ -35,8 +35,8 @@ export function AppChatBubble({ role, children, timestamp, variant = "bubble" }:
           }
       : isUser
         ? {
-            background: "var(--app-tint)",
-            color: "var(--app-text-on-tint)",
+            background: "var(--app-primary)",
+            color: "var(--app-text-on-primary)",
             boxShadow: "0 2px 8px rgba(0,0,0,0.12)",
             padding: "10px 14px",
           }

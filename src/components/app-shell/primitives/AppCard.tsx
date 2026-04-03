@@ -35,7 +35,7 @@ export function AppCard({
       boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
     },
     tinted: {
-      background: "var(--app-tint)",
+      background: "var(--app-primary)",
       boxShadow: "0 4px 20px rgba(0,0,0,0.18)",
     },
   };

@@ -302,7 +302,7 @@ export function ConsumerNavigation({
                     <DropdownMenuTrigger asChild>
                       <button
                         className={`flex h-[44px] items-center justify-center gap-[6px] rounded-[6px] px-[17px] py-[9px] transition-colors hover:bg-black/5 ${
-                          active ? "text-[#3958c3] font-semibold" : "text-[#14182c] font-normal"
+                          active ? "text-primary font-semibold" : "text-foreground font-normal"
                         }`}
                       >
                         {Icon && <Icon className="h-4 w-4" />}
@@ -341,7 +341,7 @@ export function ConsumerNavigation({
                     {/* Icon wrapper — badge sits on top of icon for Messages */}
                     {Icon && (
                       <div className="relative">
-                        <Icon className={`h-4 w-4 ${active ? "text-[#3958c3]" : "text-[#14182c]"}`} />
+                        <Icon className={`h-4 w-4 ${active ? "text-primary" : "text-foreground"}`} />
                         {isMessages && unreadCount > 0 && (
                           <div className="absolute -top-[8px] -right-[8px] flex h-[16px] min-w-[16px] items-center justify-center rounded-full bg-[#d24159] px-[3px] shadow-[0_1px_3px_rgba(0,0,0,0.2)]">
                             <span className="text-[10px] font-bold leading-none text-white">
@@ -351,12 +351,12 @@ export function ConsumerNavigation({
                         )}
                       </div>
                     )}
-                    <span className={`text-[14px] leading-[24px] tracking-[-0.084px] ${active ? "font-semibold text-[#3958c3]" : "font-normal text-[#14182c]"}`}>
+                    <span className={`text-[14px] leading-[24px] tracking-[-0.084px] ${active ? "font-semibold text-primary" : "font-normal text-foreground"}`}>
                       {item.label}
                     </span>
                   </div>
                   {active && (
-                    <div className="absolute bottom-0 h-[2px] w-[83px] rounded-[4px] bg-[#3958c3]" />
+                    <div className="absolute bottom-0 h-[2px] w-[83px] rounded-[4px] bg-primary" />
                   )}
                 </Link>
               );
@@ -372,7 +372,7 @@ export function ConsumerNavigation({
                 className="hidden lg:flex h-[44px] w-[44px] items-center justify-center rounded-[6px] hover:bg-black/5 transition-colors"
                 aria-label="Language"
               >
-                <Languages className="h-4 w-4 text-[#14182c]" />
+                <Languages className="h-4 w-4 text-foreground" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
@@ -398,7 +398,7 @@ export function ConsumerNavigation({
                 aria-label="User profile"
               >
                 <div className="flex h-[40px] w-[40px] items-center justify-center rounded-full border border-[#d0d6ea] bg-[#e3e7f4]">
-                  <User className="h-4 w-4 text-[#14182c]" />
+                  <User className="h-4 w-4 text-foreground" />
                 </div>
               </button>
             </DropdownMenuTrigger>

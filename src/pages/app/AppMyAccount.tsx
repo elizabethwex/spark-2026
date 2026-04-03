@@ -114,7 +114,7 @@ export default function AppMyAccount() {
                 boxShadow: "var(--app-card-shadow)",
               }}
             >
-              <Phone size={14} strokeWidth={1.75} style={{ color: "var(--app-tint)" }} />
+              <Phone size={14} strokeWidth={1.75} style={{ color: "var(--app-primary)" }} />
               <span style={{ font: "var(--app-font-caption1)", color: "var(--app-text)" }}>
                 123-456-7890
               </span>
@@ -130,7 +130,7 @@ export default function AppMyAccount() {
                 boxShadow: "var(--app-card-shadow)",
               }}
             >
-              <Building2 size={14} strokeWidth={1.75} style={{ color: "var(--app-tint)" }} />
+              <Building2 size={14} strokeWidth={1.75} style={{ color: "var(--app-primary)" }} />
               <span style={{ font: "var(--app-font-caption1)", color: "var(--app-text)" }}>
                 WEX, Inc.
               </span>

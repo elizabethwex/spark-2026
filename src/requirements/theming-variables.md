@@ -32,16 +32,20 @@ User Input (6 vars)
 
 ## Section 1 — User-Configurable Variables (Admin Panel Inputs)
 
-These are the **only** 6 colors an admin can change. No other color fields should appear in the UI.
+These are the **only** 6 colors an admin can change (C1–C6). No other color fields should appear in the UI.
 
-| Variable | Role | Applied To |
-|---|---|---|
-| `--theme-primary` | The anchor brand color | Primary buttons, active states, key data visualizations |
-| `--theme-secondary` | The accent color | Secondary buttons, floating action buttons, active tab underlines |
-| `--theme-page-bg` | The wallpaper behind content | Main `<body>` or root container |
-| `--theme-header-bg` | Top navigation background | Navigation bar background |
-| `--theme-header-text` | Top navigation text and icons | Navigation bar text and icon fills |
-| `--theme-illustration` | Decorative accent color | Empty-state SVGs, hero graphics, decorative icons |
+| Key | Variable | Schema field | Role | Applied To |
+|-----|---|---|---|---|
+| C1 | `--theme-primary` | `brandColors.primary` | The anchor brand color | Primary buttons, active states, key data visualizations |
+| C2 | `--theme-secondary` | `brandColors.secondary` | The accent color | Secondary buttons, floating action buttons, active tab underlines |
+| C3 | `--theme-page-bg` | `brandColors.pageBg` | The wallpaper behind content | Main `<body>` or root container |
+| C4 | `--theme-header-bg` | `brandColors.headerBg` | Top navigation background | Navigation bar background |
+| C5 | `--theme-illustration` | `brandColors.illustration` | Decorative accent color | Empty-state SVGs, hero graphics, decorative icons |
+| C6 | `--theme-ai-color` | `brandColors.aiColor` | AI agent branding | AI assistant surfaces, chat bubbles, agent branding |
+
+> **Navigation text** (`--theme-header-text` / `--wex-header-fg`) is **auto-computed** from
+> `--theme-header-bg` luminance: white on dark backgrounds, `#14182C` on light. It is no longer
+> a user-configurable field.
 
 ### Default Values
 
@@ -51,14 +55,20 @@ These are the **only** 6 colors an admin can change. No other color fields shoul
 | `--theme-secondary` | `#E2E5EA` |
 | `--theme-page-bg` | `#F7F7F7` |
 | `--theme-header-bg` | `#253746` |
-| `--theme-header-text` | `#FFFFFF` |
 | `--theme-illustration` | `#0EA5E9` |
+| `--theme-ai-color` | `#C8102E` |
 
 ---
 
 ## Section 2 — Auto-Computed Derived Variables (Never Exposed in UI)
 
 Calculated from user inputs at runtime in JavaScript. Do **not** add these to the admin panel.
+
+### `--theme-header-text` / `--wex-header-fg`
+
+- **Calculation:** Derived from `--theme-header-bg` luminance. White (`#FFFFFF`) when luminance < 0.4; primary text (`#0F172A`) otherwise.
+- **JS implementation:** `getHeaderTextHex(headerBgHex)` in `themeToCssVars.ts`.
+- **Usage:** Navigation bar text and icon fills. Guaranteed WCAG 2.1 AA contrast against the header background.
 
 ### `--theme-primary-hover`
 
@@ -87,16 +97,17 @@ Calculated from user inputs at runtime in JavaScript. Do **not** add these to th
 
 These are applied **last** in `themeToCssVars.ts`, overwriting anything set by user inputs or computed vars.
 
-| Variable | Light Mode Value | Dark Mode Value | Notes |
-|---|---|---|---|
-| `--system-card-bg` / `--card` | `#FFFFFF` | `#1E293B` | Cards and modals. Prevents brand colors on data containers. |
-| `--system-border` / `--border` | `#E2E8F0` (WEX Slate/200) | `#E2E8F0` | Borders and dividers. Prevents neon table borders. |
-| `--system-text-primary` / `--foreground` | `#0F172A` (Slate/900) | `#F5F5F5` | Primary text. Maximum readability. |
-| `--system-disabled-bg` | `#E2E8F0` (System Gray) | `#E2E8F0` | Disabled state backgrounds. |
-| `--system-error` / `--destructive` | `#EF4444` (Alert Red) | `#EF4444` | Error and destructive states. |
-| `--system-success` / `--success` | `#22C55E` (Success Green) | `#22C55E` | Success states. |
-| `--system-link` | `#0073C2` (WEX System Blue) | `#0073C2` | Hyperlinks. Exception: links inside the header inherit `--theme-header-text`. |
-| `--theme-focus-ring` | `#0F172A` or WEX System Blue (light bg) | `#FFFFFF` (dark bg) | Computed from page-bg luminance, then locked. |
+| Variable | Light Mode Value | Dark Mode Value | UXT Ref | Notes |
+|---|---|---|---|---|
+| `--system-card-bg` / `--card` | `#FFFFFF` | `#1E293B` | N4 | Cards and modals. Prevents brand colors on data containers. |
+| `--system-border` / `--border` | `#E3E7F4` (Neutral 200) | `#E3E7F4` | N5 | Borders and dividers. Prevents neon table borders. |
+| `--system-text-primary` / `--foreground` | `#14182C` (Neutral 900) | `#F5F5F5` | N1 | Primary text. Maximum readability. |
+| `--muted-foreground` | `#5F6A94` (Neutral 700) | `#94A3B8` | N2 | Secondary / muted text. |
+| `--system-disabled-bg` | `#E3E7F4` (Neutral 200) | `#E3E7F4` | N5 | Disabled state backgrounds. |
+| `--system-error` / `--destructive` | `#DC2626` (Critical 600) | `#DC2626` | N10 | Error and destructive states. |
+| `--system-success` / `--success` | `#009966` (Success 600) | `#009966` | N7 | Success states. |
+| `--system-link` | `#1C6EFF` (Info 600) | `#1C6EFF` | N6 | Hyperlinks. Exception: links inside the header inherit `--theme-header-text`. |
+| `--theme-focus-ring` | `#14182C` (Neutral 900, light bg) | `#FFFFFF` (dark bg) | N1 | Computed from page-bg luminance, then locked. |
 
 ---
 
@@ -111,9 +122,11 @@ These are set in `themeToCssVars.ts` **before** system locks. They must **not** 
 | `--theme-preview-card-border-color` | Fixed `#E3E7F4` when border on; `transparent` when off. |
 | `--preview-card-radius`, `--preview-button-radius`, `--preview-input-radius` | UXT-aligned pixel radii per control. |
 | `--preview-ai-chip-radius` | AI assistant chip in preview. |
-| `--theme-ai-accent`, `--theme-ai-accent-hsl` | AI agent accent (preview chip); not a replacement for semantic `--primary`. |
+| `--theme-ai-accent`, `--theme-ai-accent-hsl` | AI agent accent (preview chip); driven by `aiAgent.accentColor`, not `brandColors.aiColor`. |
+| `--theme-ai-color` | C6 brand AI color. Cascades to `--wex-ai-color` and `--app-ai-color`. |
+| `--wex-ai-color`, `--wex-ai-color-hsl` | WEX-layer AI color; consumed by `app-tokens.css` → `--app-ai-color`. |
 
-**Theme JSON (export/import)** may also include: `cardShadow` (`subtle` \| `medium` \| `elevated`; legacy `flat`→`subtle`, `shadow`→`medium`), `cardBorder` (`withBorder` \| `withoutBorder`), `aiAgent` `{ name, iconPreset, accentColor, borderRadius }`, `secondaryLogoFile` omitted (always `null` in JSON).
+**Theme JSON (export/import)** may also include: `cardShadow` (`subtle` \| `medium` \| `elevated`; legacy `flat`→`subtle`, `shadow`→`medium`), `cardBorder` (`withBorder` \| `withoutBorder`), `aiAgent` `{ name, iconPreset, accentColor, borderRadius }`, `secondaryLogoFile` omitted (always `null` in JSON). Legacy exports with `brandColors.headerText` are accepted on import (the field is stripped; header text is now auto-computed).
 
 ---
 
@@ -131,3 +144,5 @@ When updating this doc, keep these files in sync:
 | `src/pages/theming-engine/LogoUploadsSection.tsx` | Primary / secondary logo uploads |
 | `src/pages/theming-engine/AiAgentCustomizationTab.tsx` | AI preview chip fields |
 | `src/pages/theming-engine/MemberDashboardPreview.tsx` | Preview layout + `data-theme-token` / `data-preview-card` |
+| `src/styles/app-tokens.css` | Mobile `--app-*` theming bridge tokens (C1–C6 cascade) |
+| `src/lib/accessibility.ts` | WCAG contrast checks for `BrandColorsForContrast` |

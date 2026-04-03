@@ -21,6 +21,7 @@
     "@wexinc-healthbenefits/ben-ui-kit": "0.3.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "culori": "^4.0.2",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.38.0",
     "lucide-react": "^0.562.0",

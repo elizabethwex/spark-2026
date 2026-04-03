@@ -2227,7 +2227,7 @@ export default function MyProfile() {
                 <Empty className="w-full">
                   <EmptyHeader className="max-w-xl">
                     <EmptyMedia variant="default">
-                      <div className="flex items-center justify-center rounded-lg bg-[#f7f7f7] p-4">
+                      <div className="flex items-center justify-center rounded-lg bg-muted p-4">
                         <CreditCard className="h-10 w-10 text-muted-foreground" />
                       </div>
                     </EmptyMedia>
@@ -2264,7 +2264,7 @@ export default function MyProfile() {
                       <div className="flex flex-col gap-2">
                         {/* Card Header */}
                         <div className="flex items-center justify-between">
-                          <h3 className="text-base font-semibold text-[#1d2c38] tracking-[-0.176px] leading-6 whitespace-nowrap">
+                          <h3 className="text-base font-semibold text-foreground tracking-[-0.176px] leading-6 whitespace-nowrap">
                             {card.cardholderName}
                           </h3>
                           <DropdownMenu
@@ -2327,7 +2327,7 @@ export default function MyProfile() {
                         <div className="flex flex-col gap-1">
                           {/* Card Number + Status Tag */}
                           <div className="flex items-center gap-1.5">
-                            <span className="text-[14px] text-[#1d2c38] tracking-[-0.084px] leading-6 whitespace-nowrap">
+                            <span className="text-[14px] text-foreground tracking-[-0.084px] leading-6 whitespace-nowrap">
                               •••• {card.cardNumber}
                             </span>
                             {card.status === "ready-to-activate" && (
@@ -2371,20 +2371,20 @@ export default function MyProfile() {
 
                           {/* Expiration Date */}
                           <div className="flex items-center gap-1.5">
-                            <span className="text-[14px] text-[#515f6b] tracking-[-0.084px] leading-6 whitespace-nowrap">
+                            <span className="text-[14px] text-muted-foreground tracking-[-0.084px] leading-6 whitespace-nowrap">
                               Expires:
                             </span>
-                            <span className="text-[14px] text-[#1d2c38] tracking-[-0.084px] leading-6 whitespace-nowrap">
+                            <span className="text-[14px] text-foreground tracking-[-0.084px] leading-6 whitespace-nowrap">
                               {card.expirationDate}
                             </span>
                           </div>
 
                           {/* Effective Date */}
                           <div className="flex items-center gap-1.5">
-                            <span className="text-[14px] text-[#515f6b] tracking-[-0.084px] leading-6 whitespace-nowrap">
+                            <span className="text-[14px] text-muted-foreground tracking-[-0.084px] leading-6 whitespace-nowrap">
                               Effective:
                             </span>
-                            <span className="text-[14px] text-[#1d2c38] tracking-[-0.084px] leading-6 whitespace-nowrap">
+                            <span className="text-[14px] text-foreground tracking-[-0.084px] leading-6 whitespace-nowrap">
                               {card.effectiveDate}
                             </span>
                           </div>
@@ -2426,10 +2426,10 @@ export default function MyProfile() {
                 {/* Informational Alert — matches Figma message component */}
                 <Alert
                   intent="info"
-                  className="border border-[#bfdbfe] bg-[rgba(239,246,255,0.95)] rounded-md shadow-[0px_4px_8px_0px_rgba(2,5,10,0.04)]"
+                  className="border border-blue-200 bg-[rgba(239,246,255,0.95)] rounded-md shadow-[0px_4px_8px_0px_rgba(2,5,10,0.04)]"
                 >
-                  <AlertCircle className="h-[15.75px] w-[15.75px] text-[#0058a3]" />
-                  <AlertDescription className="text-base text-[#2563eb] leading-6 tracking-[-0.176px]">
+                  <AlertCircle className="h-[15.75px] w-[15.75px] text-[hsl(var(--wex-info))]" />
+                  <AlertDescription className="text-base text-[hsl(var(--wex-info))] leading-6 tracking-[-0.176px]">
                     <span className="font-normal">
                       Request New Personal Identification Number (PIN) Toll Free Number:{" "}
                     </span>
@@ -2445,7 +2445,7 @@ export default function MyProfile() {
               <DialogContent className="w-[448px] p-0 gap-0">
                 {/* Header */}
                 <div className="flex items-center justify-between p-[17.5px]">
-                  <DialogTitle className="text-[17.5px] font-semibold text-[#243746] leading-normal whitespace-nowrap">
+                  <DialogTitle className="text-[17.5px] font-semibold text-foreground leading-normal whitespace-nowrap">
                     Card Details
                   </DialogTitle>
                 </div>
@@ -2453,23 +2453,23 @@ export default function MyProfile() {
                 {selectedCardForDetails && (
                   <div className="flex flex-col gap-6 pb-6 px-[18px]">
                     {/* ── Card info bordered box ── */}
-                    <div className="border border-[#e4e6e9] rounded-[8px] py-4 flex flex-col gap-[9px]">
+                    <div className="border border-border rounded-[8px] py-4 flex flex-col gap-[9px]">
                       {/* Cardholder row */}
                       <div className="flex items-center gap-1.5 px-4">
-                        <CreditCard className="h-4 w-4 text-[#243746] shrink-0" />
-                        <span className="text-[16px] font-medium text-[#1d2c38] leading-6 tracking-[-0.176px]">
+                        <CreditCard className="h-4 w-4 text-foreground shrink-0" />
+                        <span className="text-[16px] font-medium text-foreground leading-6 tracking-[-0.176px]">
                           {selectedCardForDetails.cardholderName}
                         </span>
                       </div>
 
                       {/* Divider */}
-                      <div className="h-px bg-[#e4e6e9] w-full" />
+                      <div className="h-px bg-border w-full" />
 
                       {/* Key-value rows */}
                       <div className="flex flex-col gap-2 px-4">
                         {/* Card Status */}
                         <div className="flex items-center justify-between">
-                          <span className="text-[14px] text-[#515f6b] tracking-[-0.084px] leading-6 whitespace-nowrap">
+                          <span className="text-[14px] text-muted-foreground tracking-[-0.084px] leading-6 whitespace-nowrap">
                             Card Status:
                           </span>
                           {selectedCardForDetails.status === "ready-to-activate" && (
@@ -2491,30 +2491,30 @@ export default function MyProfile() {
 
                         {/* Card Number */}
                         <div className="flex items-center justify-between">
-                          <span className="text-[14px] text-[#515f6b] tracking-[-0.084px] leading-6 whitespace-nowrap">
+                          <span className="text-[14px] text-muted-foreground tracking-[-0.084px] leading-6 whitespace-nowrap">
                             Card Number:
                           </span>
-                          <span className="text-[14px] text-[#1d2c38] tracking-[-0.084px] leading-6 whitespace-nowrap">
+                          <span className="text-[14px] text-foreground tracking-[-0.084px] leading-6 whitespace-nowrap">
                             •••• {selectedCardForDetails.cardNumber}
                           </span>
                         </div>
 
                         {/* Expires */}
                         <div className="flex items-center justify-between">
-                          <span className="text-[14px] text-[#515f6b] tracking-[-0.084px] leading-6 whitespace-nowrap">
+                          <span className="text-[14px] text-muted-foreground tracking-[-0.084px] leading-6 whitespace-nowrap">
                             Expires:
                           </span>
-                          <span className="text-[14px] text-[#1d2c38] tracking-[-0.084px] leading-6 whitespace-nowrap">
+                          <span className="text-[14px] text-foreground tracking-[-0.084px] leading-6 whitespace-nowrap">
                             {selectedCardForDetails.expirationDate}
                           </span>
                         </div>
 
                         {/* Effective */}
                         <div className="flex items-center justify-between">
-                          <span className="text-[14px] text-[#515f6b] tracking-[-0.084px] leading-6 whitespace-nowrap">
+                          <span className="text-[14px] text-muted-foreground tracking-[-0.084px] leading-6 whitespace-nowrap">
                             Effective:
                           </span>
-                          <span className="text-[14px] text-[#1d2c38] tracking-[-0.084px] leading-6 whitespace-nowrap">
+                          <span className="text-[14px] text-foreground tracking-[-0.084px] leading-6 whitespace-nowrap">
                             {selectedCardForDetails.effectiveDate}
                           </span>
                         </div>
@@ -2524,22 +2524,22 @@ export default function MyProfile() {
                     {/* ── Purse Status section ── */}
                     {selectedCardForDetails.purseStatuses && selectedCardForDetails.purseStatuses.length > 0 && (
                       <div className="flex flex-col gap-4">
-                        <h3 className="text-[16px] font-semibold text-[#243746] leading-6 tracking-[-0.176px]">
+                        <h3 className="text-[16px] font-semibold text-foreground leading-6 tracking-[-0.176px]">
                           Purse Status
                         </h3>
                         <div className="flex flex-col">
                           {selectedCardForDetails.purseStatuses.map((purse, index) => (
                             <div key={index}>
                               <div className="flex items-center justify-between py-2">
-                                <span className="text-[14px] text-[#515f6b] tracking-[-0.084px] leading-6 whitespace-nowrap">
+                                <span className="text-[14px] text-muted-foreground tracking-[-0.084px] leading-6 whitespace-nowrap">
                                   {purse.accountName}:
                                 </span>
-                                <span className="text-[14px] text-[#1d2c38] tracking-[-0.084px] leading-6 whitespace-nowrap">
+                                <span className="text-[14px] text-foreground tracking-[-0.084px] leading-6 whitespace-nowrap">
                                   {purse.status}
                                 </span>
                               </div>
                               {index < selectedCardForDetails.purseStatuses!.length - 1 && (
-                                <div className="h-px bg-[#e4e6e9]" />
+                                <div className="h-px bg-border" />
                               )}
                             </div>
                           ))}
@@ -2600,13 +2600,13 @@ export default function MyProfile() {
                       onValueChange={(value) => setActivationVerificationMethod(value as "text" | "email")}
                       className="flex flex-col gap-4"
                     >
-                      <div className="flex items-center gap-2 p-4 border border-border rounded-[11px] hover:bg-[#f8f9fa]">
+                      <div className="flex items-center gap-2 p-4 border border-border rounded-[11px] hover:bg-muted">
                         <RadioGroupItem value="text" id="verify-text-activation" />
                         <Label htmlFor="verify-text-activation" className="cursor-pointer flex-1 text-sm text-foreground">
                           <span className="font-semibold">Text Message</span> at (***) ***-1111
                         </Label>
                       </div>
-                      <div className="flex items-center gap-2 p-4 border border-border rounded-[11px] hover:bg-[#f8f9fa]">
+                      <div className="flex items-center gap-2 p-4 border border-border rounded-[11px] hover:bg-muted">
                         <RadioGroupItem value="email" id="verify-email-activation" />
                         <Label htmlFor="verify-email-activation" className="cursor-pointer flex-1 text-sm text-foreground">
                           <span className="font-semibold">Email</span> at my***m**@******.com
@@ -3965,7 +3965,7 @@ export default function MyProfile() {
                                       <SidebarMenuButton
                                         isActive={isActive}
                                         onClick={() => handleSubPageChange(item.key)}
-                                        className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-[#E4F5FD] data-[active=true]:text-[#00437c] data-[active=false]:text-[#1d2c38] hover:bg-[#f7f7f7]"
+                                        className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-accent data-[active=true]:text-[hsl(var(--wex-info))] data-[active=false]:text-foreground hover:bg-muted"
                                       >
                                         <div className="flex items-center gap-2 w-full">
                                           <Icon className={`h-[14px] w-[14px] shrink-0 ${isActive ? 'text-primary' : 'text-foreground'}`} />
@@ -4819,7 +4819,7 @@ export default function MyProfile() {
         <DialogContent className="w-[800px] p-0 [&>div:last-child]:hidden">
           <div className="flex">
             {/* Left Sidebar - Progress Indicator */}
-            <div className="w-[240px] border-r border-border bg-[#f8f9fa] p-6">
+            <div className="w-[240px] border-r border-border bg-muted p-6">
               <Stepper
                 steps={[
                   { id: "step1", label: "Authentication" },
@@ -4869,13 +4869,13 @@ export default function MyProfile() {
                           onValueChange={(value) => handleBankAccountFormChange("verificationMethod", value)}
                           className="space-y-3"
                         >
-                          <div className="flex items-center space-x-3 p-4 border border-border rounded-md hover:bg-[#f8f9fa]">
+                          <div className="flex items-center space-x-3 p-4 border border-border rounded-md hover:bg-muted">
                             <RadioGroupItem value="text" id="verify-text" />
                             <Label htmlFor="verify-text" className="cursor-pointer flex-1">
                               <span className="text-sm text-foreground">Text Message at (***) ***-1111</span>
                             </Label>
                           </div>
-                          <div className="flex items-center space-x-3 p-4 border border-border rounded-md hover:bg-[#f8f9fa]">
+                          <div className="flex items-center space-x-3 p-4 border border-border rounded-md hover:bg-muted">
                             <RadioGroupItem value="email" id="verify-email" />
                             <Label htmlFor="verify-email" className="cursor-pointer flex-1">
                               <span className="text-sm text-foreground">Email at my***m**@******.com</span>
@@ -5013,7 +5013,7 @@ export default function MyProfile() {
                     
                     {/* Direct Deposit Options */}
                     <div className="space-y-3">
-                      <div className="flex items-start space-x-3 p-4 border border-border rounded-md hover:bg-[#f8f9fa]">
+                      <div className="flex items-start space-x-3 p-4 border border-border rounded-md hover:bg-muted">
                         <Checkbox
                           id="direct-deposit-hsa"
                           checked={(bankAccountFormData.selectedDirectDepositOptions || []).includes("hsa")}
@@ -5038,7 +5038,7 @@ export default function MyProfile() {
                         </label>
                       </div>
                       
-                      <div className="flex items-start space-x-3 p-4 border border-border rounded-md hover:bg-[#f8f9fa]">
+                      <div className="flex items-start space-x-3 p-4 border border-border rounded-md hover:bg-muted">
                         <Checkbox
                           id="direct-deposit-plan-year"
                           checked={(bankAccountFormData.selectedDirectDepositOptions || []).includes("2025")}
@@ -5796,17 +5796,17 @@ export default function MyProfile() {
 
               {/* Card Information */}
               <div className="flex flex-col gap-4">
-                <h3 className="text-[20px] font-medium text-[#1d2c38] leading-8 tracking-[-0.34px]">
+                <h3 className="text-[20px] font-medium text-foreground leading-8 tracking-[-0.34px]">
                   Card Information
                 </h3>
-                <div className="border border-[#e4e6e9] rounded-[8px] px-4 py-3 flex items-center gap-3">
+                <div className="border border-border rounded-[8px] px-4 py-3 flex items-center gap-3">
                   <CreditCard className="h-5 w-5 text-primary shrink-0" />
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-[14px] font-medium text-[#1d2c38] leading-6">
+                    <span className="text-[14px] font-medium text-foreground leading-6">
                       {cardBeingReported?.cardholderName}
                     </span>
                     <div className="flex items-center gap-2">
-                      <span className="text-[14px] text-[#515f6b] leading-6">
+                      <span className="text-[14px] text-muted-foreground leading-6">
                         •••• {cardBeingReported?.cardNumber}
                       </span>
                       {cardBeingReported?.status === "active" && (
@@ -5837,7 +5837,7 @@ export default function MyProfile() {
               {/* Mailing Address */}
               <div className="flex flex-col gap-3">
                 <div className="flex items-center gap-3">
-                  <h3 className="text-[20px] font-medium text-[#1d2c38] leading-8 tracking-[-0.34px]">
+                  <h3 className="text-[20px] font-medium text-foreground leading-8 tracking-[-0.34px]">
                     Mailing Address
                   </h3>
                   <Button
@@ -5860,26 +5860,26 @@ export default function MyProfile() {
                     <span className="text-sm font-medium text-primary">Edit</span>
                   </Button>
                 </div>
-                <div className="flex flex-col text-[14px] text-[#1d2c38] leading-6">
+                <div className="flex flex-col text-[14px] text-foreground leading-6">
                   <span>{mailingAddress.street}</span>
                   {mailingAddress.addressLine2 && <span>{mailingAddress.addressLine2}</span>}
                   <span>{mailingAddress.city}, {mailingAddress.state} {mailingAddress.zip}</span>
                   <span>{mailingAddress.country}</span>
                 </div>
-                <div className="h-px bg-[#e4e6e9] mt-1" />
+                <div className="h-px bg-border mt-1" />
               </div>
 
               {/* Update Card Status */}
               <div className="flex flex-col gap-4">
-                <h3 className="text-[20px] font-medium text-[#1d2c38] leading-8 tracking-[-0.34px]">
+                <h3 className="text-[20px] font-medium text-foreground leading-8 tracking-[-0.34px]">
                   Update Card Status
                 </h3>
                 <div className="flex items-start gap-6">
-                  <span className="text-[14px] text-[#515f6b] leading-6 w-[180px] shrink-0">New Status:</span>
-                  <span className="text-[14px] text-[#1d2c38] leading-6">Lost/Stolen</span>
+                  <span className="text-[14px] text-muted-foreground leading-6 w-[180px] shrink-0">New Status:</span>
+                  <span className="text-[14px] text-foreground leading-6">Lost/Stolen</span>
                 </div>
                 <div className="flex items-start gap-6">
-                  <span className="text-[14px] text-[#515f6b] leading-6 w-[180px] shrink-0">
+                  <span className="text-[14px] text-muted-foreground leading-6 w-[180px] shrink-0">
                     Can you confirm this card has been lost/stolen?
                   </span>
                   <RadioGroup
@@ -5889,24 +5889,24 @@ export default function MyProfile() {
                   >
                     <div className="flex items-center gap-2">
                       <RadioGroupItem value="yes" id="rls-confirm-yes" />
-                      <Label htmlFor="rls-confirm-yes" className="cursor-pointer text-[14px] text-[#1d2c38]">Yes</Label>
+                      <Label htmlFor="rls-confirm-yes" className="cursor-pointer text-[14px] text-foreground">Yes</Label>
                     </div>
                     <div className="flex items-center gap-2">
                       <RadioGroupItem value="no" id="rls-confirm-no" />
-                      <Label htmlFor="rls-confirm-no" className="cursor-pointer text-[14px] text-[#1d2c38]">No</Label>
+                      <Label htmlFor="rls-confirm-no" className="cursor-pointer text-[14px] text-foreground">No</Label>
                     </div>
                   </RadioGroup>
                 </div>
                 <div className="flex items-start gap-6">
-                  <span className="text-[14px] text-[#515f6b] leading-6 w-[180px] shrink-0">Replacement Fee:</span>
-                  <span className="text-[14px] text-[#1d2c38] leading-6">$3.00</span>
+                  <span className="text-[14px] text-muted-foreground leading-6 w-[180px] shrink-0">Replacement Fee:</span>
+                  <span className="text-[14px] text-foreground leading-6">$3.00</span>
                 </div>
-                <div className="h-px bg-[#e4e6e9] mt-1" />
+                <div className="h-px bg-border mt-1" />
               </div>
 
               {/* What Happens Next */}
               <div className="flex flex-col gap-4">
-                <h3 className="text-[20px] font-medium text-[#1d2c38] leading-8 tracking-[-0.34px]">
+                <h3 className="text-[20px] font-medium text-foreground leading-8 tracking-[-0.34px]">
                   What Happens Next
                 </h3>
                 <div className="flex flex-col gap-3">
@@ -5917,19 +5917,19 @@ export default function MyProfile() {
                   ].map((item, i) => (
                     <div key={i} className="flex items-start gap-3">
                       <SquareArrowRight className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                      <span className="text-[14px] text-[#1d2c38] leading-6">{item}</span>
+                      <span className="text-[14px] text-foreground leading-6">{item}</span>
                     </div>
                   ))}
                 </div>
-                <div className="h-px bg-[#e4e6e9]" />
-                <p className="text-[13px] text-[#515f6b] leading-6">
+                <div className="h-px bg-border" />
+                <p className="text-[13px] text-muted-foreground leading-6">
                   * A United States mailing address is required to receive a replacement card.
                 </p>
                 <Alert
                   intent="info"
-                  className="border border-[#bfdbfe] bg-[rgba(239,246,255,0.95)] rounded-md shadow-[0px_4px_8px_0px_rgba(2,5,10,0.04)]"
+                  className="border border-blue-200 bg-[rgba(239,246,255,0.95)] rounded-md shadow-[0px_4px_8px_0px_rgba(2,5,10,0.04)]"
                 >
-                  <AlertCircle className="h-4 w-4 text-[#0058a3] shrink-0" />
+                  <AlertCircle className="h-4 w-4 text-[hsl(var(--wex-info))] shrink-0" />
                   <AlertDescription className="text-[14px] text-primary leading-6">
                     <span className="font-normal">
                       A replacement card fee may apply. If you suspect fraud, please mark the card as Lost/Stolen and contact XX Bank HSA Customer Support at{" "}
@@ -6045,17 +6045,17 @@ export default function MyProfile() {
 
               {/* Card Information */}
               <div className="flex flex-col gap-4">
-                <h3 className="text-[20px] font-medium text-[#1d2c38] leading-8 tracking-[-0.34px]">
+                <h3 className="text-[20px] font-medium text-foreground leading-8 tracking-[-0.34px]">
                   Card Information
                 </h3>
-                <div className="border border-[#e4e6e9] rounded-[8px] px-4 py-3 flex items-center gap-3">
+                <div className="border border-border rounded-[8px] px-4 py-3 flex items-center gap-3">
                   <CreditCard className="h-5 w-5 text-primary shrink-0" />
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-[14px] font-medium text-[#1d2c38] leading-6">
+                    <span className="text-[14px] font-medium text-foreground leading-6">
                       {cardBeingReplaced?.cardholderName}
                     </span>
                     <div className="flex items-center gap-2">
-                      <span className="text-[14px] text-[#515f6b] leading-6">
+                      <span className="text-[14px] text-muted-foreground leading-6">
                         •••• {cardBeingReplaced?.cardNumber}
                       </span>
                       {cardBeingReplaced?.status === "active" && (
@@ -6091,7 +6091,7 @@ export default function MyProfile() {
               {/* Mailing Address */}
               <div className="flex flex-col gap-3">
                 <div className="flex items-center gap-3">
-                  <h3 className="text-[20px] font-medium text-[#1d2c38] leading-8 tracking-[-0.34px]">
+                  <h3 className="text-[20px] font-medium text-foreground leading-8 tracking-[-0.34px]">
                     Mailing Address
                   </h3>
                   <Button
@@ -6114,18 +6114,18 @@ export default function MyProfile() {
                     <span className="text-sm font-medium text-primary">Edit</span>
                   </Button>
                 </div>
-                <div className="flex flex-col text-[14px] text-[#1d2c38] leading-6">
+                <div className="flex flex-col text-[14px] text-foreground leading-6">
                   <span>{mailingAddress.street}</span>
                   {mailingAddress.addressLine2 && <span>{mailingAddress.addressLine2}</span>}
                   <span>{mailingAddress.city}, {mailingAddress.state} {mailingAddress.zip}</span>
                   <span>{mailingAddress.country}</span>
                 </div>
-                <div className="h-px bg-[#e4e6e9] mt-1" />
+                <div className="h-px bg-border mt-1" />
               </div>
 
               {/* What Happens Next */}
               <div className="flex flex-col gap-4">
-                <h3 className="text-[20px] font-medium text-[#1d2c38] leading-8 tracking-[-0.34px]">
+                <h3 className="text-[20px] font-medium text-foreground leading-8 tracking-[-0.34px]">
                   What Happens Next
                 </h3>
                 <div className="flex flex-col gap-3">
@@ -6136,19 +6136,19 @@ export default function MyProfile() {
                   ].map((item, i) => (
                     <div key={i} className="flex items-start gap-3">
                       <SquareArrowRight className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                      <span className="text-[14px] text-[#1d2c38] leading-6">{item}</span>
+                      <span className="text-[14px] text-foreground leading-6">{item}</span>
                     </div>
                   ))}
                 </div>
-                <div className="h-px bg-[#e4e6e9]" />
-                <p className="text-[13px] text-[#515f6b] leading-6">
+                <div className="h-px bg-border" />
+                <p className="text-[13px] text-muted-foreground leading-6">
                   * A United States mailing address is required to receive a replacement card.
                 </p>
                 <Alert
                   intent="info"
-                  className="border border-[#bfdbfe] bg-[rgba(239,246,255,0.95)] rounded-md shadow-[0px_4px_8px_0px_rgba(2,5,10,0.04)]"
+                  className="border border-blue-200 bg-[rgba(239,246,255,0.95)] rounded-md shadow-[0px_4px_8px_0px_rgba(2,5,10,0.04)]"
                 >
-                  <AlertCircle className="h-4 w-4 text-[#0058a3] shrink-0" />
+                  <AlertCircle className="h-4 w-4 text-[hsl(var(--wex-info))] shrink-0" />
                   <AlertDescription className="text-[14px] text-primary leading-6">
                     <span className="font-normal">
                       A replacement card fee may apply. If you suspect fraud, please mark the card as Lost/Stolen and contact XX Bank HSA Customer Support at{" "}

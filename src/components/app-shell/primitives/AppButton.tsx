@@ -12,8 +12,8 @@ interface AppButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const VARIANT_STYLES: Record<ButtonVariant, React.CSSProperties> = {
   primary: {
-    background: "var(--app-tint)",
-    color: "var(--app-text-on-tint)",
+    background: "var(--app-primary)",
+    color: "var(--app-text-on-primary)",
     border: "none",
     boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
   },
@@ -21,12 +21,12 @@ const VARIANT_STYLES: Record<ButtonVariant, React.CSSProperties> = {
     backdropFilter: "blur(20px) saturate(180%)",
     WebkitBackdropFilter: "blur(20px) saturate(180%)",
     background: "var(--app-glass-bg)",
-    color: "var(--app-tint)",
+    color: "var(--app-primary)",
     border: "0.5px solid var(--app-glass-border)",
   },
   ghost: {
     background: "transparent",
-    color: "var(--app-tint)",
+    color: "var(--app-primary)",
     border: "none",
   },
   destructive: {

@@ -19,18 +19,18 @@ import {
 const CARD_SHADOW = "0px 3.017px 9.051px rgba(43,49,78,0.04), 0px 6.034px 18.101px rgba(43,49,78,0.06)";
 const INVESTMENT_SHADOW =
   "0px 12px 16px -4px rgba(10,13,18,0.08), 0px 4px 6px -2px rgba(10,13,18,0.03), 0px 2px 2px -1px rgba(10,13,18,0.04)";
-const TEXT_PRIMARY = "#14182c";
-const TEXT_SECONDARY = "#5f6a94";
-const TINT = "#3958c3";
-const TINT_50 = "#eef2ff";
+const TEXT_PRIMARY = "var(--app-text)";
+const TEXT_SECONDARY = "var(--app-text-secondary)";
+const TINT = "var(--app-primary)";
+const TINT_50 = "var(--app-primary-50)";
 const LIGHT_BLUE = "#a0dcf8";
 const DARK_BLUE = "#0058a3";
-const SEPARATOR = "#e6e6e6";
+const SEPARATOR = "var(--app-separator)";
 const BG_TERTIARY = "rgba(118,118,128,0.12)";
-const SUCCESS_GREEN = "#34c759";
-const SUCCESS_BG = "#099";
-const LIGHT_BLUE_BORDER = "#e1e8ff";
-const LIGHT_BLUE_BG = "#edf1ff";
+const SUCCESS_GREEN = "var(--app-success)";
+const SUCCESS_BG = "var(--app-success)";
+const LIGHT_BLUE_BORDER = "var(--app-border)";
+const LIGHT_BLUE_BG = "var(--app-primary-50)";
 
 /** Degrees clockwise from 12 o'clock (Figma: first slice starts ~7 o'clock). */
 const DONUT_START_DEG = 210;
@@ -528,7 +528,7 @@ export default function AppAccountDetail() {
                     fontWeight: 400,
                     lineHeight: "22px",
                     letterSpacing: -0.43,
-                    color: tx.type === "credit" ? "#059669" : TEXT_PRIMARY,
+                    color: tx.type === "credit" ? "var(--app-success)" : TEXT_PRIMARY,
                     textAlign: "right",
                   }}
                 >
@@ -1015,7 +1015,7 @@ export default function AppAccountDetail() {
       style={{
         minHeight: "auto",
         fontFamily: "var(--app-font)",
-        background: "linear-gradient(186.833deg, #eef2ff 50%, #a5b4fc 140%)",
+        background: "linear-gradient(186.833deg, var(--app-primary-50) 50%, var(--app-primary-300) 140%)",
         paddingBottom: "calc(var(--app-tabbar-height, 95px) + env(safe-area-inset-bottom, 0px) + 64px)",
       }}
     >

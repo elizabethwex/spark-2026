@@ -12,18 +12,21 @@
 | **C3** | Page background | Page background | `#F8F9FE` | Maps to Neutral 50 in guide. |
 | **C4** | Navigation background | Top navigation background | `#FFFFFF` | Maps to Neutral 00. |
 | **C5** | Illustration accent | Illustration accents | `#1C6EFF` | Info 600 in guide. |
-| **C6** | AI color | Solid for customizations; gradient for WEX Direct only | Solid default `#C8102E`; gradient TL `#25146F` → BR `#C8102E` | Not yet fully wired in cxr-ux schema; document when adding AI theming. |
+| **C6** | AI color | Solid for customizations; gradient for WEX Direct only | Solid default `#C8102E`; gradient TL `#25146F` → BR `#C8102E` | Wired via `brandColors.aiColor` → `--theme-ai-color` → `--app-ai-color`. |
 
 ### Mapping to this codebase (`schema.ts` / `themeToCssVars.ts`)
 
-| UXT | Current field / token |
-|-----|------------------------|
-| C1 | `brandColors.primary` → `--theme-primary`, `--primary`, etc. |
-| C2 | `brandColors.secondary` |
-| C3 | `brandColors.pageBg` → `--theme-page-bg`, `--background` |
-| C4 | `brandColors.headerBg` → `--theme-header-bg`, `--wex-header-bg` |
-| C5 | `brandColors.illustration` → `--theme-illustration` |
-| C6 | *Future:* extend schema + `themeToCssVars` for AI surfaces |
+| UXT | Schema field | CSS vars | Mobile cascade |
+|-----|-------------|----------|----------------|
+| C1 | `brandColors.primary` | `--theme-primary`, `--primary`, `--wex-primary` | `--app-primary` |
+| C2 | `brandColors.secondary` | `--theme-secondary`, `--secondary` | `--app-secondary` |
+| C3 | `brandColors.pageBg` | `--theme-page-bg`, `--background` | `--app-page-bg` |
+| C4 | `brandColors.headerBg` | `--theme-header-bg`, `--wex-header-bg` | `--app-nav-bg` |
+| C5 | `brandColors.illustration` | `--theme-illustration` | `--app-illustration` |
+| C6 | `brandColors.aiColor` | `--theme-ai-color`, `--wex-ai-color` | `--app-ai-color` |
+
+> **Navigation text** (`--theme-header-text` / `--wex-header-fg`) is auto-computed from C4 luminance.
+> It is no longer a user-configurable field (formerly `brandColors.headerText`).
 
 Default hex values in code may differ from the guide until an explicit migration; when changing defaults, prefer the table above.
 
@@ -82,7 +85,7 @@ Applied globally by tier **Sharp / Soft / Round** (guide default for WEX Direct:
 - **Library:** **`culori`** (`culori/fn`) for conversion, `displayable`, `clampChroma`.
 - **Worked example** in the PDF for `#3958C3` lists each step’s L/C/H → hex.
 
-**Implementation status:** cxr-ux today uses simpler derivations (darken primary, hsl mapping). Migrating to full UXT ramps is a **separate epic**; do not rip out locks until product signs off.
+**Implementation status:** Fully implemented. `src/lib/colorRamp.ts` generates 11-step OKLCH ramps using `culori/fn`. Both primary and secondary ramps are generated in `themeToCssVars.ts` and emitted as `--theme-primary-ramp-{step}` / `--theme-secondary-ramp-{step}`. Mobile tokens in `app-tokens.css` consume these via `var(--theme-primary-ramp-{step}, <default>)`. Verified against the PDF worked example for `#3958C3` — all 11 steps match exactly.
 
 ## Quick reference (algorithm)
 
@@ -98,5 +101,7 @@ Applied globally by tier **Sharp / Soft / Round** (guide default for WEX Direct:
 |------|---------|
 | [theming-variables.md](./theming-variables.md) | Repo contract for admin vars + system locks |
 | `src/pages/theming-engine/schema.ts` | Form + export shape |
-| `src/pages/theming-engine/themeToCssVars.ts` | CSS var mapping |
+| `src/lib/colorRamp.ts` | OKLCH ramp generator (`generateColorRamp`) |
+| `src/pages/theming-engine/themeToCssVars.ts` | CSS var mapping + ramp emission |
+| `src/styles/app-tokens.css` | Mobile `--app-*` theming bridge tokens + ramp consumption |
 | `.cursor/rules/theming-engine-uxt-mapping.mdc` | AI agent guardrails when editing theming code |
