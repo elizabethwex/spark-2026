@@ -9,6 +9,8 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { AppNavBar } from "@/components/app-shell/AppNavBar";
+import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
+import { useDeviceMockup } from "@/hooks/useDeviceMockup";
 
 // Figma asset URLs (valid for 7 days from design export)
 const FSA_STORE_LOGO =
@@ -220,17 +222,25 @@ function TransactionRow({ title, subtitle, amount, onClick }: TransactionRowProp
 
 export default function AppHome() {
   const navigate = useNavigate();
+  const { deviceOn } = useDeviceMockup();
+
+  /** Device frame: tab bar is fixed over the scroll area — clear it. Mobile web: shell already reserves tab bar + safe area; add a small inner gap. */
+  const contentPaddingBottom = deviceOn
+    ? "calc(28px + var(--app-tabbar-height) + env(safe-area-inset-bottom, 0px))"
+    : 56;
 
   return (
     <div
       style={{
-        minHeight: "100%",
-        background:
-          "linear-gradient(33deg, #ffffff 17.854%, #eef2ff 86.811%, #c7d2fe 120%)",
+        minHeight: "auto",
+        background: "linear-gradient(189.07deg, #eef2ff 50%, #a5b4fc 140%)",
         fontFamily: "var(--app-font)",
+        paddingBottom:
+          "calc(var(--app-tabbar-height, 95px) + env(safe-area-inset-bottom, 0px))",
       }}
     >
-      <AppNavBar mode="home" />
+      <AppTopSpacer variant="home" />
+      <AppNavBar variant="main" />
 
       {/* Scrollable content */}
       <div
@@ -239,11 +249,11 @@ export default function AppHome() {
           flexDirection: "column",
           gap: 24,
           paddingTop: 24,
-          paddingBottom: 40,
+          paddingBottom: contentPaddingBottom,
           background: TINT_50,
         }}
       >
-        {/* ── Alert Notification Card ── */}
+        {/* ── Missing document (debit card / Bigtown Dentistry) ── */}
         <div style={{ padding: "0 16px" }}>
           <div
             style={{
@@ -278,7 +288,7 @@ export default function AppHome() {
                   lineHeight: "20px",
                 }}
               >
-                Upload your document to complete this claim for Dr. Miller.
+                Upload your document to complete this claim for Bigtown Dentistry.
               </div>
             </div>
 
@@ -337,7 +347,7 @@ export default function AppHome() {
                       lineHeight: "22px",
                     }}
                   >
-                    Dr. Miller (Dental)
+                    Bigtown Dentistry
                   </div>
                   <div
                     style={{
@@ -364,7 +374,7 @@ export default function AppHome() {
                   flexShrink: 0,
                 }}
               >
-                $340.00
+                $210.00
               </div>
             </div>
 
@@ -547,7 +557,7 @@ export default function AppHome() {
 
             {/* LPFSA card */}
             <div
-              onClick={() => navigate("/app/account/fsa-health")}
+              onClick={() => navigate("/app/account/lpfsa")}
               style={{
                 background: "#fff",
                 borderRadius: 24,

@@ -13,6 +13,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { AppNavBar } from "@/components/app-shell/AppNavBar";
+import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
 import { AppListRow, AppListSection } from "@/components/app-shell/primitives/AppListRow";
 
 interface SectionItem {
@@ -63,7 +64,8 @@ export default function AppMyAccount() {
         fontFamily: "var(--app-font)",
       }}
     >
-      <AppNavBar title="Profile" />
+      <AppTopSpacer variant="home" />
+      <AppNavBar variant="title" title="Profile" />
 
       <div style={{ padding: "16px 0 32px" }}>
         {/* Avatar + name hero */}

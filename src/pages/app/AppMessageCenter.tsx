@@ -1,327 +1,1170 @@
-import { useState } from "react";
-import { Bell, ChevronRight, AlertCircle, Info, Check } from "lucide-react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent as ReactPointerEvent,
+  type ReactNode,
+} from "react";
+import {
+  AlertTriangle,
+  ChevronRight,
+  Download,
+  FileText,
+  Mail,
+  Paperclip,
+  Star,
+  Trash2,
+} from "lucide-react";
 import { AppNavBar } from "@/components/app-shell/AppNavBar";
+import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
 import { AppCard } from "@/components/app-shell/primitives/AppCard";
+import { getPrototypeInboxEntries, type MessageTag } from "./messageCatalog";
 
-type MessageType = "alert" | "info" | "confirmation";
+type FilterId =
+  | "all"
+  | "attention"
+  | "unread"
+  | "starred"
+  | "archive"
+  | "account-security"
+  | "money-activity"
+  | "tax-statements";
 
-interface Message {
+interface MessageRow {
   id: string;
-  subject: string;
-  preview: string;
+  title: string;
   date: string;
-  type: MessageType;
   read: boolean;
+  attentionNeeded: boolean;
+  pdfAttached: boolean;
   body: string;
+  starred: boolean;
+  archived?: boolean;
+  tags?: MessageTag[];
 }
 
-const MESSAGES: Message[] = [
-  {
-    id: "m1",
-    subject: "Action Required: LSA Balance Expiring",
-    preview: "Your LSA balance will expire on March 31. Please use your remaining $49.00 before...",
-    date: "Today",
-    type: "alert",
-    read: false,
-    body: "Your Lifestyle Spending Account (LSA) balance of $49.00 will expire on March 31, 2025. Please use your remaining balance before the deadline. Eligible expenses include gym memberships, fitness equipment, and wellness programs.",
-  },
-  {
-    id: "m2",
-    subject: "Payroll Contribution Received",
-    preview: "A payroll contribution of $158.00 was deposited to your HSA on January 17...",
-    date: "Jan 17",
-    type: "confirmation",
-    read: false,
-    body: "A payroll contribution of $158.00 was successfully deposited to your HSA For Life® account on January 17, 2025. Your current HSA balance is $0.00.",
-  },
-  {
-    id: "m3",
-    subject: "Claim Approved – Dr. Lisa Monroe",
-    preview: "Your claim for $120.00 from Dr. Lisa Monroe has been approved and payment...",
-    date: "Jan 12",
-    type: "confirmation",
-    read: true,
-    body: "Your claim for $120.00 from Dr. Lisa Monroe – Primary Care has been approved. Payment has been processed to your Health FSA account. Claim #CLM-2025-C1.",
-  },
-  {
-    id: "m4",
-    subject: "Document Requested – Vision Works",
-    preview: "We need additional documentation to process your Vision Works claim of $215.00...",
-    date: "Dec 30",
-    type: "alert",
-    read: true,
-    body: "We need additional documentation to process your Vision Works claim of $215.00. Please upload an Explanation of Benefits (EOB) or itemized receipt. You can submit documents through the app or log in to the portal.",
-  },
-  {
-    id: "m5",
-    subject: "New Plan Year Starting January 1",
-    preview: "Your 2025 benefit accounts are now active. Review your new contribution amounts...",
-    date: "Jan 1",
-    type: "info",
-    read: true,
-    body: "Your 2025 benefit accounts are now active. Your Health FSA balance has been reset to $250.00 and your Dependent Care FSA is funded at $5,000.00 for the plan year. Review your contribution amounts and ensure your bank account is up to date.",
-  },
-  {
-    id: "m6",
-    subject: "Claim Denied – CVS Pharmacy",
-    preview: "Your claim for $18.50 from CVS Pharmacy has been denied. The item is not...",
-    date: "Dec 12",
-    type: "alert",
-    read: true,
-    body: "Your claim for $18.50 from CVS Pharmacy has been denied. The purchased item (cosmetic product) is not an eligible HSA expense under IRS guidelines. If you believe this is an error, you can file an appeal within 60 days.",
-  },
+/** Max inbox rows shown in the Messages prototype (product cap). */
+const MAX_MESSAGES = 20;
+
+const PAGE_SIZE = 8;
+
+/** Figma 520:9309 — Row with Swipe Actions (info / warning / critical). */
+const SWIPE_ACTION_SIZE = 52;
+const SWIPE_ACTION_GAP = 10;
+const SWIPE_ROW_PR = 16;
+const SWIPE_MAX_PX =
+  SWIPE_ROW_PR + SWIPE_ACTION_SIZE * 3 + SWIPE_ACTION_GAP * 2;
+const SWIPE_ACTION_BLUE = "#1c6eff";
+const SWIPE_ACTION_GOLD = "#e6a800";
+const SWIPE_ACTION_RED = "#dc2626";
+
+type SwipeGestureState =
+  | { kind: "idle" }
+  | { kind: "open"; id: string }
+  | {
+      kind: "drag";
+      id: string;
+      pointerId: number;
+      startX: number;
+      startOffset: number;
+      currentX: number;
+    };
+
+function swipeOffsetFromState(
+  state: SwipeGestureState,
+  id: string
+): number {
+  if (state.kind === "drag" && state.id === id) {
+    const dx = state.currentX - state.startX;
+    return Math.max(
+      -SWIPE_MAX_PX,
+      Math.min(0, state.startOffset + dx)
+    );
+  }
+  if (state.kind === "open" && state.id === id) return -SWIPE_MAX_PX;
+  return 0;
+}
+
+/**
+ * Seed inbox from the prototype catalog (20 max). Last row is archived for the Archive filter.
+ */
+function buildInboxRows(): MessageRow[] {
+  const entries = getPrototypeInboxEntries();
+  return entries.map((entry, i) => {
+    const archived = i === MAX_MESSAGES - 1;
+    const day = Math.max(1, 28 - (i % 20));
+    return {
+      id: `m${i + 1}`,
+      title: entry.title,
+      date: `April ${day}`,
+      read: i % 3 !== 0,
+      attentionNeeded: entry.attentionNeeded,
+      pdfAttached: entry.pdfAttached ?? false,
+      starred: i === 4,
+      archived,
+      tags: [entry.tag],
+      body:
+        entry.previewBody ??
+        `Open this message to review details for ${entry.title}.`,
+    };
+  });
+}
+
+const FILTERS: { id: FilterId; label: string }[] = [
+  { id: "all", label: "All Messages" },
+  { id: "attention", label: "Attention Needed" },
+  { id: "unread", label: "Unread" },
+  { id: "starred", label: "Starred" },
+  { id: "archive", label: "Archive" },
+  { id: "account-security", label: "Account & Security" },
+  { id: "money-activity", label: "Money Activity" },
+  { id: "tax-statements", label: "Tax & Statements" },
 ];
 
-const TYPE_ICON: Record<MessageType, { icon: React.ComponentType<{ size?: number; strokeWidth?: number; style?: React.CSSProperties }>; bg: string; color: string }> = {
-  alert:        { icon: AlertCircle, bg: "hsl(350 62% 94%)",  color: "hsl(350 62% 40%)" },
-  info:         { icon: Info,        bg: "hsl(208 100% 93%)", color: "hsl(208 100% 32%)" },
-  confirmation: { icon: Check,       bg: "hsl(142 76% 90%)",  color: "hsl(142 76% 30%)" },
+/** Fills viewport above tab bar (AppShell adds bottom padding for tab bar). */
+const PAGE_ROOT: CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  minHeight:
+    "calc(100dvh - var(--app-tabbar-height) - env(safe-area-inset-bottom, 0px))",
+  background: "linear-gradient(33deg, #ffffff 18%, #eef2ff 87%, #c7d2fe 104%)",
+  fontFamily: "var(--app-font)",
 };
 
-export default function AppMessageCenter() {
-  const [selected, setSelected] = useState<Message | null>(null);
-  const [messages, setMessages] = useState(MESSAGES);
+const PILL_SELECTED_BG = "#0c1a5c";
+const PILL_SELECTED_TEXT = "#ffffff";
+/** Figma labels/vibrant/controls primary */
+const PILL_IDLE_TEXT = "#1a1a1a";
+/** Figma 474:11927 — Fill + Shadow on idle liquid-glass button */
+const PILL_SHADOW = "0 8px 40px rgba(0, 0, 0, 0.12)";
+const CRITICAL = "#dc2626";
+const LABELS_SECONDARY = "rgba(60, 60, 67, 0.6)";
+const CHEVRON_MUTED = "#5f6a94";
+const INFO_SURFACE = "#eff6ff";
+const INFO_TEXT = "#172554";
 
-  const unreadCount = messages.filter((m) => !m.read).length;
+/** Figma View message / Modal — attachment filename from title */
+function pdfFileNameFromTitle(title: string): string {
+  const slug = title
+    .replace(/[^a-zA-Z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "")
+    .slice(0, 48);
+  return `${slug || "message"}.pdf`;
+}
 
-  const open = (msg: Message) => {
-    setMessages((prev) =>
-      prev.map((m) => (m.id === msg.id ? { ...m, read: true } : m))
+/** Detail sheet timestamp — Figma: 11/23/25 11:05AM style */
+function formatDetailTimestamp(dateLabel: string): string {
+  return `${dateLabel}, 2026 · 11:05 AM`;
+}
+
+function filterMessages(list: MessageRow[], filter: FilterId): MessageRow[] {
+  const base = (rows: MessageRow[]) => rows.filter((m) => {
+    if (filter === "archive") return m.archived === true;
+    return !m.archived;
+  });
+
+  switch (filter) {
+    case "all":
+      return base(list);
+    case "attention":
+      return base(list).filter((m) => m.attentionNeeded);
+    case "unread":
+      return base(list).filter((m) => !m.read);
+    case "starred":
+      return base(list).filter((m) => m.starred);
+    case "archive":
+      return list.filter((m) => m.archived === true);
+    case "account-security":
+      return base(list).filter((m) => m.tags?.includes("account-security"));
+    case "money-activity":
+      return base(list).filter((m) => m.tags?.includes("money-activity"));
+    case "tax-statements":
+      return base(list).filter((m) => m.tags?.includes("tax-statements"));
+    default:
+      return base(list);
+  }
+}
+
+/**
+ * Filter chip — Figma "Button - Liquid Glass - Text".
+ * Selected (474:10160): primary-900, white label, glass highlight.
+ * Idle (474:11927): frosted glass + 8px/40px shadow, dark label — matches app `--app-glass-*` tokens.
+ */
+function FilterPill({
+  label,
+  selected,
+  onClick,
+}: {
+  label: string;
+  selected: boolean;
+  onClick: () => void;
+}) {
+  const base: CSSProperties = {
+    position: "relative",
+    flexShrink: 0,
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    height: 48,
+    minHeight: 48,
+    padding: "13px 20px",
+    borderRadius: 1000,
+    border: "none",
+    cursor: "pointer",
+    fontFamily: "var(--app-font)",
+    fontSize: 17,
+    fontWeight: 600,
+    letterSpacing: -0.43,
+    lineHeight: "22px",
+    whiteSpace: "nowrap",
+    boxSizing: "border-box",
+    boxShadow: PILL_SHADOW,
+    WebkitTapHighlightColor: "transparent",
+  };
+
+  if (selected) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        aria-pressed="true"
+        style={{
+          ...base,
+          color: PILL_SELECTED_TEXT,
+          background: PILL_SELECTED_BG,
+          /* Subtle top edge like Figma glass stack */
+          boxShadow: `${PILL_SHADOW}, inset 0 1px 0 rgba(255, 255, 255, 0.18)`,
+        }}
+      >
+        {label}
+      </button>
     );
-    setSelected({ ...msg, read: true });
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed="false"
+      style={{
+        ...base,
+        color: PILL_IDLE_TEXT,
+        background: "var(--app-glass-bg)",
+        backdropFilter: "var(--app-glass-blur)",
+        WebkitBackdropFilter: "var(--app-glass-blur)",
+        border: "0.5px solid var(--app-glass-border)",
+        boxShadow: PILL_SHADOW,
+      }}
+    >
+      {label}
+    </button>
+  );
+}
+
+/** Figma 520:9309 — swipe left reveals circular actions; card slides over them. */
+function MessageSwipeRow({
+  translateX,
+  isDragging,
+  onForegroundPointerDown,
+  onForegroundPointerMove,
+  onForegroundPointerUp,
+  onForegroundPointerCancel,
+  onCardClick,
+  onMarkRead,
+  onToggleStar,
+  onDelete,
+  messageStarred,
+  children,
+}: {
+  translateX: number;
+  isDragging: boolean;
+  onForegroundPointerDown: (e: ReactPointerEvent<HTMLDivElement>) => void;
+  onForegroundPointerMove: (e: ReactPointerEvent<HTMLDivElement>) => void;
+  onForegroundPointerUp: (e: ReactPointerEvent<HTMLDivElement>) => void;
+  onForegroundPointerCancel: (e: ReactPointerEvent<HTMLDivElement>) => void;
+  onCardClick: () => void;
+  onMarkRead: () => void;
+  onToggleStar: () => void;
+  onDelete: () => void;
+  messageStarred: boolean;
+  children: ReactNode;
+}) {
+  const actionsInteractive = translateX < -8;
+  const actionBtn: CSSProperties = {
+    width: SWIPE_ACTION_SIZE,
+    height: SWIPE_ACTION_SIZE,
+    minWidth: SWIPE_ACTION_SIZE,
+    minHeight: SWIPE_ACTION_SIZE,
+    borderRadius: 100,
+    border: "none",
+    padding: 0,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    cursor: "pointer",
+    flexShrink: 0,
+    WebkitTapHighlightColor: "transparent",
   };
 
   return (
     <div
       style={{
-        minHeight: "100%",
-        background: "var(--app-bg)",
-        fontFamily: "var(--app-font)",
+        position: "relative",
+        height: 126,
+        borderRadius: "var(--app-radius-lg)",
+        overflow: "hidden",
+        flexShrink: 0,
       }}
     >
-      <AppNavBar
-        title="Messages"
-        rightActions={
-          unreadCount > 0 ? (
-            <div
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          inset: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "flex-end",
+          paddingRight: SWIPE_ROW_PR,
+          gap: SWIPE_ACTION_GAP,
+          pointerEvents: actionsInteractive ? "auto" : "none",
+        }}
+      >
+        <button
+          type="button"
+          aria-label="Mark as read or unread"
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+            onMarkRead();
+          }}
+          style={{ ...actionBtn, background: SWIPE_ACTION_BLUE }}
+        >
+          <Mail size={22} strokeWidth={2} color="#fff" aria-hidden />
+        </button>
+        <button
+          type="button"
+          aria-pressed={messageStarred}
+          aria-label={
+            messageStarred ? "Unstar message" : "Star message"
+          }
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleStar();
+          }}
+          style={{ ...actionBtn, background: SWIPE_ACTION_GOLD }}
+        >
+          <Star
+            size={22}
+            strokeWidth={2}
+            color="#fff"
+            fill={messageStarred ? "#fff" : "none"}
+            aria-hidden
+          />
+        </button>
+        <button
+          type="button"
+          aria-label="Delete message"
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete();
+          }}
+          style={{ ...actionBtn, background: SWIPE_ACTION_RED }}
+        >
+          <Trash2 size={22} strokeWidth={2} color="#fff" aria-hidden />
+        </button>
+      </div>
+
+      <div
+        role="presentation"
+        onClick={onCardClick}
+        onPointerDown={onForegroundPointerDown}
+        onPointerMove={onForegroundPointerMove}
+        onPointerUp={onForegroundPointerUp}
+        onPointerCancel={onForegroundPointerCancel}
+        style={{
+          position: "relative",
+          zIndex: 1,
+          height: "100%",
+          transform: `translate3d(${translateX}px, 0, 0)`,
+          transition: isDragging
+            ? "none"
+            : "transform 0.22s cubic-bezier(0.32, 0.72, 0, 1)",
+          touchAction: "pan-y",
+          background: "#fff",
+          borderRadius: "var(--app-radius-lg)",
+          boxShadow:
+            "0 2px 16px rgba(0, 0, 0, 0.07), 0 0 0 0.5px rgba(0, 0, 0, 0.05)",
+        }}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
+export default function AppMessageCenter() {
+  const [filter, setFilter] = useState<FilterId>("all");
+  const [rows, setRows] = useState<MessageRow[]>(() => buildInboxRows());
+  const [visibleLimit, setVisibleLimit] = useState(PAGE_SIZE);
+  const [selected, setSelected] = useState<MessageRow | null>(null);
+  const [swipe, setSwipe] = useState<SwipeGestureState>({ kind: "idle" });
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const loadMoreInFlight = useRef(false);
+  const loadMoreFnRef = useRef<() => void>(() => {});
+  const swipePointerStartRef = useRef({ x: 0, y: 0 });
+  const swipeAxisRef = useRef<"undecided" | "x" | "y">("undecided");
+  const swipeDidDragRef = useRef(false);
+
+  const unreadCount = useMemo(
+    () => rows.filter((m) => !m.read && !m.archived).length,
+    [rows]
+  );
+
+  const starredCount = useMemo(
+    () => rows.filter((m) => m.starred && !m.archived).length,
+    [rows]
+  );
+
+  const filtered = useMemo(() => filterMessages(rows, filter), [rows, filter]);
+
+  const displayed = useMemo(
+    () => filtered.slice(0, visibleLimit),
+    [filtered, visibleLimit]
+  );
+
+  const selectFilter = useCallback((next: FilterId) => {
+    setSwipe({ kind: "idle" });
+    setFilter(next);
+    setVisibleLimit(PAGE_SIZE);
+    queueMicrotask(() => scrollRef.current?.scrollTo({ top: 0 }));
+  }, []);
+
+  const loadMore = useCallback(() => {
+    if (loadMoreInFlight.current) return;
+
+    if (visibleLimit < filtered.length) {
+      loadMoreInFlight.current = true;
+      setVisibleLimit((n) => Math.min(n + PAGE_SIZE, filtered.length));
+      queueMicrotask(() => {
+        loadMoreInFlight.current = false;
+      });
+    }
+  }, [visibleLimit, filtered.length]);
+
+  useEffect(() => {
+    loadMoreFnRef.current = loadMore;
+  }, [loadMore]);
+
+  useEffect(() => {
+    const root = scrollRef.current;
+    const sentinel = sentinelRef.current;
+    if (!root || !sentinel) return;
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) loadMoreFnRef.current();
+      },
+      { root, rootMargin: "200px 0px", threshold: 0 }
+    );
+    io.observe(sentinel);
+    return () => io.disconnect();
+  }, [displayed.length, filtered.length, filter]);
+
+  const open = useCallback((msg: MessageRow) => {
+    setSwipe({ kind: "idle" });
+    setRows((prev) =>
+      prev.map((m) => (m.id === msg.id ? { ...m, read: true } : m))
+    );
+    setSelected({ ...msg, read: true });
+  }, []);
+
+  const beginRowPointer = useCallback(
+    (id: string, e: ReactPointerEvent<HTMLDivElement>) => {
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      swipeAxisRef.current = "undecided";
+      swipeDidDragRef.current = false;
+      swipePointerStartRef.current = { x: e.clientX, y: e.clientY };
+      try {
+        e.currentTarget.setPointerCapture(e.pointerId);
+      } catch {
+        /* ignore */
+      }
+      setSwipe((prev) => {
+        const startOffset = swipeOffsetFromState(prev, id);
+        return {
+          kind: "drag",
+          id,
+          pointerId: e.pointerId,
+          startX: e.clientX,
+          startOffset,
+          currentX: e.clientX,
+        };
+      });
+    },
+    []
+  );
+
+  const moveRowPointer = useCallback((id: string, e: ReactPointerEvent<HTMLDivElement>) => {
+    setSwipe((prev) => {
+      if (
+        prev.kind !== "drag" ||
+        prev.id !== id ||
+        e.pointerId !== prev.pointerId
+      ) {
+        return prev;
+      }
+
+      const dx = e.clientX - swipePointerStartRef.current.x;
+      const dy = e.clientY - swipePointerStartRef.current.y;
+
+      if (
+        swipeAxisRef.current === "undecided" &&
+        (Math.abs(dx) > 12 || Math.abs(dy) > 12)
+      ) {
+        swipeAxisRef.current =
+          Math.abs(dy) > Math.abs(dx) ? "y" : "x";
+      }
+
+      /* Vertical scroll: keep drag state until pointer up so capture releases cleanly. */
+      if (swipeAxisRef.current === "y") return prev;
+
+      if (Math.abs(dx) > 14) swipeDidDragRef.current = true;
+      e.preventDefault();
+      return { ...prev, currentX: e.clientX };
+    });
+  }, []);
+
+  const endRowPointer = useCallback(
+    (id: string, e: ReactPointerEvent<HTMLDivElement>) => {
+      try {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      } catch {
+        /* ignore */
+      }
+      setSwipe((prev) => {
+        if (
+          prev.kind !== "drag" ||
+          prev.id !== id ||
+          e.pointerId !== prev.pointerId
+        ) {
+          return prev;
+        }
+
+        if (swipeAxisRef.current === "y") {
+          const off = swipeOffsetFromState(prev, id);
+          return off < -SWIPE_MAX_PX * 0.35
+            ? { kind: "open", id }
+            : { kind: "idle" };
+        }
+
+        const off = swipeOffsetFromState(prev, id);
+        if (off < -SWIPE_MAX_PX * 0.35) return { kind: "open", id };
+        return { kind: "idle" };
+      });
+      swipeAxisRef.current = "undecided";
+    },
+    []
+  );
+
+  const handleCardActivate = useCallback(
+    (msg: MessageRow) => {
+      if (swipeDidDragRef.current) {
+        swipeDidDragRef.current = false;
+        return;
+      }
+      if (swipe.kind === "open" && swipe.id === msg.id) {
+        setSwipe({ kind: "idle" });
+        return;
+      }
+      open(msg);
+    },
+    [swipe, open]
+  );
+
+  const closeSheet = useCallback(() => setSelected(null), []);
+
+  return (
+    <div style={PAGE_ROOT}>
+      <AppTopSpacer variant="home" />
+      <AppNavBar variant="title" title="Messages" />
+
+      <div
+        data-name="Page filters"
+        style={{
+          flexShrink: 0,
+          background: "transparent",
+          /* Left inset matches message list; no right padding so pills reach the edge (scroll affordance). */
+          padding: "8px 0 8px 16px",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 16,
+            overflowX: "auto",
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+            background: "transparent",
+          }}
+          className="messages-filter-scroll"
+        >
+          {FILTERS.map((f) => {
+            const label =
+              f.id === "unread"
+                ? `Unread (${unreadCount})`
+                : f.id === "starred"
+                  ? `Starred (${starredCount})`
+                  : f.label;
+            return (
+              <FilterPill
+                key={f.id}
+                label={label}
+                selected={filter === f.id}
+                onClick={() => selectFilter(f.id)}
+              />
+            );
+          })}
+        </div>
+      </div>
+
+      <div
+        ref={scrollRef}
+        style={{
+          flex: 1,
+          minHeight: 0,
+          overflowY: "auto",
+          WebkitOverflowScrolling: "touch",
+          padding: "16px 16px 24px",
+          display: "flex",
+          flexDirection: "column",
+          gap: 8,
+        }}
+      >
+        {filtered.length === 0 && (
+          <p
+            style={{
+              font: "var(--app-font-body)",
+              color: "var(--app-text-secondary)",
+              textAlign: "center",
+              padding: "24px 8px",
+            }}
+          >
+            No messages in this view.
+          </p>
+        )}
+        {displayed.map((msg) => (
+          <MessageSwipeRow
+            key={msg.id}
+            translateX={swipeOffsetFromState(swipe, msg.id)}
+            isDragging={swipe.kind === "drag" && swipe.id === msg.id}
+            onForegroundPointerDown={(e) => beginRowPointer(msg.id, e)}
+            onForegroundPointerMove={(e) => moveRowPointer(msg.id, e)}
+            onForegroundPointerUp={(e) => endRowPointer(msg.id, e)}
+            onForegroundPointerCancel={(e) => endRowPointer(msg.id, e)}
+            onCardClick={() => handleCardActivate(msg)}
+            onMarkRead={() => {
+              setRows((prev) =>
+                prev.map((m) =>
+                  m.id === msg.id ? { ...m, read: !m.read } : m
+                )
+              );
+              setSwipe({ kind: "idle" });
+            }}
+            messageStarred={msg.starred}
+            onToggleStar={() => {
+              setRows((prev) =>
+                prev.map((m) =>
+                  m.id === msg.id
+                    ? { ...m, starred: !m.starred }
+                    : m
+                )
+              );
+              setSwipe({ kind: "idle" });
+            }}
+            onDelete={() => {
+              setRows((prev) => prev.filter((m) => m.id !== msg.id));
+              setSwipe({ kind: "idle" });
+            }}
+          >
+            <AppCard
+              variant="solid"
+              padding="14px 20px"
               style={{
-                minWidth: 20,
-                height: 20,
-                borderRadius: "var(--app-radius-pill)",
-                background: "var(--app-destructive)",
+                height: "100%",
+                boxSizing: "border-box",
                 display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: "0 6px",
+                flexDirection: "column",
+                overflow: "hidden",
+                borderRadius: "var(--app-radius-lg)",
+                background: "#fff",
+                boxShadow: "none",
               }}
             >
-              <span
-                style={{
-                  font: "var(--app-font-caption2)",
-                  fontWeight: 700,
-                  color: "#fff",
-                }}
-              >
-                {unreadCount}
-              </span>
-            </div>
-          ) : undefined
-        }
-      />
-
-      <div style={{ padding: "16px 16px 24px" }}>
-        {unreadCount > 0 && (
-          <div style={{ marginBottom: 16 }}>
-            <AppCard variant="glass" padding="12px 16px">
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <Bell size={18} strokeWidth={1.75} style={{ color: "var(--app-tint)" }} />
-                <span style={{ font: "var(--app-font-subhead)", color: "var(--app-text)" }}>
-                  {unreadCount} unread message{unreadCount > 1 ? "s" : ""}
-                </span>
-              </div>
-            </AppCard>
-          </div>
-        )}
-
-        <AppCard variant="solid" padding="0">
-          {messages.map((msg, i) => {
-            const tm = TYPE_ICON[msg.type];
-            const Icon = tm.icon;
-            const isLast = i === messages.length - 1;
-            return (
+            {msg.attentionNeeded && (
               <div
-                key={msg.id}
-                onClick={() => open(msg)}
                 style={{
-                  display: "flex",
-                  alignItems: "flex-start",
-                  padding: "13px 16px",
-                  gap: 12,
-                  cursor: "pointer",
-                  position: "relative",
-                  background: msg.read ? "transparent" : "hsl(208 100% 98%)",
+                  display: "grid",
+                  gridTemplateColumns: "auto 1fr auto",
+                  alignItems: "center",
+                  gap: 8,
+                  marginBottom: 6,
+                  flexShrink: 0,
                 }}
               >
-                {/* Unread dot */}
-                {!msg.read && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      left: 4,
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      width: 8,
-                      height: 8,
-                      borderRadius: "50%",
-                      background: "var(--app-tint)",
-                    }}
-                  />
-                )}
-
+                <AlertTriangle
+                  size={17}
+                  strokeWidth={2}
+                  style={{ color: CRITICAL, flexShrink: 0 }}
+                  aria-hidden
+                />
+                <span
+                  style={{
+                    font: "var(--app-font-subhead)",
+                    color: CRITICAL,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  Attention Needed
+                </span>
                 <div
                   style={{
-                    width: 38,
-                    height: 38,
-                    borderRadius: "50%",
-                    background: tm.bg,
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "center",
+                    gap: 4,
+                    flexShrink: 0,
+                    font: "var(--app-font-caption1)",
+                    color: LABELS_SECONDARY,
+                  }}
+                >
+                  {msg.starred && (
+                    <span
+                      aria-label="Starred"
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        lineHeight: 0,
+                      }}
+                    >
+                      <Star
+                        size={14}
+                        strokeWidth={2}
+                        color={SWIPE_ACTION_GOLD}
+                        fill={SWIPE_ACTION_GOLD}
+                        aria-hidden
+                      />
+                    </span>
+                  )}
+                  <span>{msg.date}</span>
+                  <ChevronRight
+                    size={14}
+                    strokeWidth={2.5}
+                    style={{ color: CHEVRON_MUTED }}
+                    aria-hidden
+                  />
+                </div>
+              </div>
+            )}
+
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 8,
+                flex: 1,
+                minHeight: 0,
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  width: "100%",
+                  flexShrink: 0,
+                }}
+              >
+                {!msg.read && (
+                  <span
+                    style={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: "50%",
+                      background: "var(--app-tint)",
+                      flexShrink: 0,
+                    }}
+                    aria-hidden
+                  />
+                )}
+                <div
+                  style={{
+                    display: "flex",
+                    flex: 1,
+                    alignItems: "center",
+                    gap: 8,
+                    minWidth: 0,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: 17,
+                      fontWeight: msg.read ? 400 : 600,
+                      letterSpacing: -0.43,
+                      lineHeight: "22px",
+                      color: "#000",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                      flex: 1,
+                      minWidth: 0,
+                    }}
+                  >
+                    {msg.title}
+                  </span>
+                  {!msg.attentionNeeded && (
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 4,
+                        flexShrink: 0,
+                        font: "var(--app-font-caption1)",
+                        color: LABELS_SECONDARY,
+                      }}
+                    >
+                      {msg.starred && (
+                        <span
+                          aria-label="Starred"
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            lineHeight: 0,
+                          }}
+                        >
+                          <Star
+                            size={14}
+                            strokeWidth={2}
+                            color={SWIPE_ACTION_GOLD}
+                            fill={SWIPE_ACTION_GOLD}
+                            aria-hidden
+                          />
+                        </span>
+                      )}
+                      <span>{msg.date}</span>
+                      <ChevronRight
+                        size={14}
+                        strokeWidth={2.5}
+                        style={{ color: CHEVRON_MUTED }}
+                        aria-hidden
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {msg.pdfAttached && (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
                     flexShrink: 0,
                   }}
                 >
-                  <Icon size={18} strokeWidth={1.75} style={{ color: tm.color }} />
-                </div>
-
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div
+                  <span
                     style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "baseline",
-                      gap: 8,
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 4,
+                      padding: "2px 8px 2px 4px",
+                      borderRadius: 6,
+                      background: INFO_SURFACE,
+                      fontSize: 12,
+                      fontWeight: 600,
+                      lineHeight: "20px",
+                      color: INFO_TEXT,
                     }}
                   >
-                    <div
-                      style={{
-                        font: "var(--app-font-subhead)",
-                        fontWeight: msg.read ? 400 : 600,
-                        color: "var(--app-text)",
-                        flex: 1,
-                        minWidth: 0,
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                      }}
-                    >
-                      {msg.subject}
-                    </div>
-                    <span
-                      style={{
-                        font: "var(--app-font-caption1)",
-                        color: "var(--app-text-secondary)",
-                        flexShrink: 0,
-                      }}
-                    >
-                      {msg.date}
-                    </span>
-                  </div>
-                  <div
-                    style={{
-                      font: "var(--app-font-caption1)",
-                      color: "var(--app-text-secondary)",
-                      marginTop: 3,
-                      overflow: "hidden",
-                      display: "-webkit-box",
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: "vertical" as unknown as React.CSSProperties["WebkitBoxOrient"],
-                    }}
-                  >
-                    {msg.preview}
-                  </div>
+                    <Paperclip size={12} strokeWidth={2} aria-hidden />
+                    PDF Attached
+                  </span>
                 </div>
+              )}
+            </div>
+          </AppCard>
+          </MessageSwipeRow>
+        ))}
 
-                <ChevronRight size={14} strokeWidth={2} style={{ color: "var(--app-text-tertiary)", flexShrink: 0, marginTop: 4 }} />
+        {filtered.length > 0 && (
+          <div
+            ref={sentinelRef}
+            style={{ height: 1, flexShrink: 0 }}
+            aria-hidden
+          />
+        )}
 
-                {!isLast && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      bottom: 0,
-                      left: 66,
-                      right: 0,
-                      height: "0.5px",
-                      background: "var(--app-separator)",
-                    }}
-                  />
-                )}
-              </div>
-            );
-          })}
-        </AppCard>
       </div>
 
-      {/* Message detail sheet */}
       {selected && (
         <div
+          role="presentation"
           style={{
             position: "fixed",
-            inset: 0,
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            width: "100%",
+            maxWidth: 430,
+            marginLeft: "auto",
+            marginRight: "auto",
             zIndex: 100,
             display: "flex",
             flexDirection: "column",
             justifyContent: "flex-end",
-            background: "rgba(0,0,0,0.4)",
           }}
-          onClick={() => setSelected(null)}
         >
-          <div
+          <button
+            type="button"
+            aria-label="Close message"
+            onClick={closeSheet}
             style={{
-              background: "var(--app-surface)",
-              borderRadius: "var(--app-radius-xl) var(--app-radius-xl) 0 0",
-              padding: "0 0 env(safe-area-inset-bottom, 24px)",
-              maxHeight: "85dvh",
+              position: "absolute",
+              inset: 0,
+              zIndex: 0,
+              margin: 0,
+              padding: 0,
+              border: "none",
+              background: "rgba(18, 24, 29, 0.3)",
+              cursor: "pointer",
+            }}
+          />
+          <div
+            className="message-detail-sheet-panel"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="message-detail-title"
+            style={{
+              position: "relative",
+              zIndex: 1,
+              display: "flex",
+              flexDirection: "column",
+              gap: 8,
+              width: "100%",
+              maxWidth: 430,
+              margin: "0 auto",
+              maxHeight: "min(85dvh, 520px)",
+              background: "#fff",
+              borderTop: "1px solid #edeff0",
+              borderLeft: "1px solid #edeff0",
+              borderRight: "1px solid #edeff0",
+              borderRadius: "16px 16px 0 0",
+              padding: "0 16px calc(24px + env(safe-area-inset-bottom, 0px))",
               overflow: "auto",
+              boxSizing: "border-box",
+              touchAction: "pan-y",
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div style={{ display: "flex", justifyContent: "center", paddingTop: 10 }}>
-              <div
+            <button
+              type="button"
+              aria-label="Close message"
+              onClick={closeSheet}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "flex-start",
+                paddingTop: 5,
+                minHeight: 44,
+                width: "100%",
+                margin: 0,
+                border: "none",
+                background: "transparent",
+                cursor: "pointer",
+                flexShrink: 0,
+              }}
+            >
+              <span
                 style={{
                   width: 36,
-                  height: 4,
-                  borderRadius: 2,
-                  background: "var(--app-border)",
+                  height: 5,
+                  borderRadius: 100,
+                  background: "#ccc",
+                  pointerEvents: "none",
                 }}
               />
+            </button>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {selected.attentionNeeded && (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    color: CRITICAL,
+                  }}
+                >
+                  <AlertTriangle size={17} strokeWidth={2} aria-hidden />
+                  <span
+                    style={{
+                      font: "var(--app-font-subhead)",
+                      lineHeight: "20px",
+                      letterSpacing: -0.23,
+                    }}
+                  >
+                    Attention Needed
+                  </span>
+                </div>
+              )}
+
+              <div style={{ position: "relative", minHeight: 48 }}>
+                <h2
+                  id="message-detail-title"
+                  style={{
+                    margin: 0,
+                    fontSize: 17,
+                    fontWeight: 600,
+                    lineHeight: "22px",
+                    letterSpacing: -0.43,
+                    color: "#000",
+                  }}
+                >
+                  {selected.title}
+                </h2>
+                <p
+                  style={{
+                    margin: "6px 0 0",
+                    fontSize: 13,
+                    lineHeight: "18px",
+                    letterSpacing: -0.08,
+                    color: "#5f6a94",
+                  }}
+                >
+                  {formatDetailTimestamp(selected.date)}
+                </p>
+              </div>
             </div>
-            <div style={{ padding: "16px 20px 32px" }}>
-              <div
+
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 16,
+                width: "100%",
+              }}
+            >
+              <div style={{ padding: "8px 0" }}>
+                <div style={{ height: 1, background: "#e3e7f4", width: "100%" }} />
+              </div>
+
+              <p
                 style={{
-                  font: "var(--app-font-title3)",
-                  color: "var(--app-text)",
-                  marginBottom: 6,
-                  lineHeight: "26px",
+                  margin: 0,
+                  fontSize: 17,
+                  fontWeight: 400,
+                  lineHeight: "22px",
+                  letterSpacing: -0.43,
+                  color: "#1d2c38",
                 }}
               >
-                {selected.subject}
-              </div>
-              <div style={{ font: "var(--app-font-caption1)", color: "var(--app-text-secondary)", marginBottom: 16 }}>
-                {selected.date}
-              </div>
-              <div
-                style={{
-                  font: "var(--app-font-body)",
-                  color: "var(--app-text)",
-                  lineHeight: "26px",
-                }}
-              >
-                {selected.body}
-              </div>
+                {selected.pdfAttached
+                  ? "Please see attachement."
+                  : selected.body}
+              </p>
+
+              {selected.pdfAttached && (
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "20px 1fr 20px",
+                    alignItems: "center",
+                    gap: 12,
+                    minHeight: 68,
+                    padding: "12px 16px",
+                    border: "1px solid #edeff0",
+                    borderRadius: 6,
+                    background: "#fff",
+                    boxSizing: "border-box",
+                  }}
+                >
+                  <FileText
+                    size={20}
+                    strokeWidth={1.75}
+                    style={{ color: "#1c6eff" }}
+                    aria-hidden
+                  />
+                  <a
+                    href="#"
+                    onClick={(e) => e.preventDefault()}
+                    style={{
+                      fontFamily: "Inter, var(--app-font), sans-serif",
+                      fontSize: 14,
+                      fontWeight: 600,
+                      lineHeight: "24px",
+                      letterSpacing: -0.6,
+                      color: "#1c6eff",
+                      textDecoration: "none",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {pdfFileNameFromTitle(selected.title)}
+                  </a>
+                  <button
+                    type="button"
+                    aria-label="Download attachment"
+                    onClick={(e) => e.preventDefault()}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: 0,
+                      border: "none",
+                      background: "none",
+                      cursor: "pointer",
+                      color: "#1c6eff",
+                    }}
+                  >
+                    <Download size={20} strokeWidth={2} aria-hidden />
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
       )}
+
+      <style>{`
+        .messages-filter-scroll {
+          background: transparent;
+        }
+        .messages-filter-scroll::-webkit-scrollbar {
+          display: none;
+        }
+        @keyframes messageDetailSheetIn {
+          from {
+            transform: translate3d(0, 105%, 0);
+          }
+          to {
+            transform: translate3d(0, 0, 0);
+          }
+        }
+        .message-detail-sheet-panel {
+          animation: messageDetailSheetIn 0.38s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+        }
+      `}</style>
     </div>
   );
 }

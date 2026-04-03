@@ -16,11 +16,14 @@ const AppShell = React.lazy(() =>
 const AppHomePage           = React.lazy(() => import("@/pages/app/AppHome"));
 const AppAccountOverviewPage = React.lazy(() => import("@/pages/app/AppAccountOverview"));
 const AppAccountDetailPage  = React.lazy(() => import("@/pages/app/AppAccountDetail"));
+const AppLpfsaDetailPage    = React.lazy(() => import("@/pages/app/AppLpfsaDetail"));
 const AppClaimsOverviewPage = React.lazy(() => import("@/pages/app/AppClaimsOverview"));
 const AppClaimsDetailPage   = React.lazy(() => import("@/pages/app/AppClaimsDetail"));
 const AppMessageCenterPage  = React.lazy(() => import("@/pages/app/AppMessageCenter"));
 const AppMyAccountPage      = React.lazy(() => import("@/pages/app/AppMyAccount"));
 const AppAssistIQPage       = React.lazy(() => import("@/pages/app/AppAssistIQ"));
+const AppLockScreenPage     = React.lazy(() => import("@/pages/app/AppLockScreen"));
+const AppPennyFlowPage      = React.lazy(() => import("@/pages/app/AppPennyFlow"));
 
 // Consumer Experience page - standalone route
 const HomePage = React.lazy(() => import("@/pages/HomePage"));
@@ -162,12 +165,15 @@ export function AppRoutes() {
         <Route path="app" element={<AppShell />}>
           <Route index element={<AppHomePage />} />
           <Route path="account" element={<AppAccountOverviewPage />} />
+          <Route path="account/lpfsa" element={<AppLpfsaDetailPage />} />
           <Route path="account/:id" element={<AppAccountDetailPage />} />
           <Route path="claims" element={<AppClaimsOverviewPage />} />
           <Route path="claims/:id" element={<AppClaimsDetailPage />} />
           <Route path="messages" element={<AppMessageCenterPage />} />
           <Route path="my-account" element={<AppMyAccountPage />} />
           <Route path="assist-iq" element={<AppAssistIQPage />} />
+          <Route path="lock-screen" element={<AppLockScreenPage />} />
+          <Route path="penny" element={<AppPennyFlowPage />} />
         </Route>
 
         {/* Catch-all for 404 */}
