@@ -1,5 +1,4 @@
 import {
-  Badge,
   Button,
   Card,
   CardContent,
@@ -12,10 +11,9 @@ import {
   Label,
 } from "@wexinc-healthbenefits/ben-ui-kit";
 import { useFormContext, useWatch } from "react-hook-form";
-import { ChevronRight, Info, Lightbulb, Wallet, CreditCard, Sparkles, MessageCircle, ArrowRight } from "lucide-react";
+import { Info, Wallet, Sparkles, MessageCircle, ArrowRight } from "lucide-react";
 import { ConsumerNavigation } from "@/components/layout/ConsumerNavigation";
 import type { ThemingEngineFormValues } from "@/pages/theming-engine/schema";
-import { cn } from "@/lib/utils";
 
 // ─── Decorative SVG for illustration ──────────────────────────────────────────
 
@@ -261,7 +259,7 @@ export function MemberDashboardPreview() {
                             <span className="font-semibold">$200</span>
                           </div>
                         </div>
-                        <Progress value={27} className="h-1.5" indicatorClassName="bg-[var(--theme-chart-2,var(--theme-secondary))]" />
+                        <Progress value={27} className="h-1.5" data-theme-token="secondary" />
                       </div>
                       <div className="space-y-1">
                         <div className="flex items-center justify-between text-xs">
@@ -274,7 +272,7 @@ export function MemberDashboardPreview() {
                             <span className="font-semibold">$100</span>
                           </div>
                         </div>
-                        <Progress value={13} className="h-1.5" indicatorClassName="bg-[var(--theme-chart-3,var(--theme-illustration))]" />
+                        <Progress value={13} className="h-1.5" data-theme-token="illustration" />
                       </div>
                     </div>
                   </div>
