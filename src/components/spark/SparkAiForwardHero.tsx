@@ -14,6 +14,7 @@ import {
   SPARK_MEMBER_FIRST_NAME,
   sparkAccountQuickActions,
 } from "@/data/sparkAiForwardMock";
+import { useReimburseWorkspace } from "@/context/ReimburseWorkspaceContext";
 import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
 import QRCode from "react-qr-code";
 import { ShineBorder } from "@/components/ui/shine-border";
@@ -27,6 +28,7 @@ const softEaseOut: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
  */
 export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 }) {
   const navigate = useNavigate();
+  const { openReimburseWorkspace } = useReimburseWorkspace();
   const prefersReducedMotion = useReducedMotion();
   const [uploadPhase, setUploadPhase] = useState<UploadPhase>("default");
   const [isTaskVisible, setIsTaskVisible] = useState(true);
@@ -290,7 +292,11 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
                   variants={pillVariants}
                   key={action.label}
                   type="button"
-                  onClick={() => navigate(action.href)}
+                  onClick={() =>
+                    action.href === "/reimburse"
+                      ? openReimburseWorkspace()
+                      : navigate(action.href)
+                  }
                   className="flex h-[38.5px] items-center gap-[7px] rounded-[28px] border border-[#b7c0da] bg-[#f8f9fe] px-[13.25px] transition-colors hover:border-[#5f6a94] hover:bg-[#eef2ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3958c3] focus-visible:ring-offset-2"
                 >
                   <Icon className="h-[15.75px] w-[15.75px] shrink-0 text-[#5f6a94]" />
@@ -583,7 +589,7 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
                     >
                       <motion.button
                         type="button"
-                        onClick={() => navigate("/reimburse")}
+                        onClick={() => openReimburseWorkspace()}
                         aria-label="Take photo or upload"
                         title="Take photo or upload"
                         whileTap={{ scale: 0.96 }}

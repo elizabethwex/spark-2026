@@ -10,6 +10,7 @@ import {
   sparkFsaSummary,
   sparkDcfsaSummary,
 } from "@/data/sparkAiForwardMock";
+import { useReimburseWorkspace } from "@/context/ReimburseWorkspaceContext";
 
 function useInView(options?: IntersectionObserverInit) {
   const ref = useRef<HTMLDivElement | null>(null);
@@ -49,6 +50,7 @@ export function SparkAccountsSection({
   activeView?: 1 | 2 | 3;
 }) {
   const navigate = useNavigate();
+  const { openReimburseWorkspace } = useReimburseWorkspace();
   const h = sparkHsaSummary;
   const l = sparkLpfsaSummary;
   const fsa = sparkFsaSummary;
@@ -318,7 +320,14 @@ export function SparkAccountsSection({
           {/* Footer */}
           <div className="px-6 pb-6 mt-auto">
             {variant === "modern" && (
-              <div className="h-[44px]" />
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full rounded-xl border-[#3958c3] py-[9.75px] text-[15.75px] font-medium text-[#3958c3] hover:bg-[#3958c3]/5"
+                onClick={() => openReimburseWorkspace()}
+              >
+                Reimburse Myself
+              </Button>
             )}
           </div>
         </div>

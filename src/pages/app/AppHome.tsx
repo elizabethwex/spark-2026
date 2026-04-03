@@ -11,6 +11,7 @@ import {
 import { AppNavBar } from "@/components/app-shell/AppNavBar";
 import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
 import { useDeviceMockup } from "@/hooks/useDeviceMockup";
+import { useReimburseWorkspace } from "@/context/ReimburseWorkspaceContext";
 
 // Figma asset URLs (valid for 7 days from design export)
 const FSA_STORE_LOGO =
@@ -219,6 +220,7 @@ function TransactionRow({ title, subtitle, amount, onClick }: TransactionRowProp
 export default function AppHome() {
   const navigate = useNavigate();
   const { deviceOn } = useDeviceMockup();
+  const { openReimburseWorkspace } = useReimburseWorkspace();
 
   /** Device frame: tab bar is fixed over the scroll area — clear it. Mobile web: shell already reserves tab bar + safe area; add a small inner gap. */
   const contentPaddingBottom = deviceOn
@@ -697,7 +699,7 @@ export default function AppHome() {
           >
             {/* Reimburse Myself */}
             <button
-              onClick={() => navigate("/reimburse")}
+              onClick={() => openReimburseWorkspace()}
               style={{
                 background: "#fff",
                 borderRadius: 24,

@@ -1,11 +1,11 @@
 import * as React from "react";
 import { Routes, Route } from "react-router-dom";
 import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground";
-import { ReimbursementProvider } from "@/pages/reimburse/ReimbursementContext";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { LightModeBoundary } from "@/components/LightModeBoundary";
 import { useAppModeHotkey } from "@/hooks/useAppModeHotkey";
+import { ReimburseWorkspaceHost } from "@/pages/reimburse/ReimburseWorkspaceHost";
 
 // iOS app mode shell
 const AppShell = React.lazy(() =>
@@ -46,12 +46,9 @@ const ClaimsPage = React.lazy(() => import("@/pages/Claims"));
 // Account Documents page - standalone route
 const AccountDocumentsPage = React.lazy(() => import("@/pages/AccountDocuments"));
 
-// Reimbursement flow pages - standalone routes
-const ReimburseMyselfPage = React.lazy(() => import("@/pages/reimburse/ReimburseMyself"));
-const ReimburseDocsPage = React.lazy(() => import("@/pages/reimburse/ReimburseDocs"));
-const ReimburseAnalyzePage = React.lazy(() => import("@/pages/reimburse/ReimburseAnalyze"));
-const ReimburseReviewPage = React.lazy(() => import("@/pages/reimburse/ReimburseReview"));
-const ReimburseConfirmPage = React.lazy(() => import("@/pages/reimburse/ReimburseConfirm"));
+const ReimburseWorkspaceRouteBridge = React.lazy(
+  () => import("@/pages/reimburse/ReimburseWorkspaceRouteBridge")
+);
 
 // Login page - standalone route
 const LoginPage = React.lazy(() => import("@/pages/Login"));
@@ -137,21 +134,11 @@ export function AppRoutes() {
         {/* Select an Account (authenticated; login wizard step 5 remains on /login) */}
         <Route path="select-profile" element={withConsumerLight(<SelectProfilePage />)} />
 
-        {/* Reimbursement flow routes */}
+        {/* Reimbursement route bridge (deep-link compatibility) */}
         <Route
           path="reimburse/*"
           element={
-            withConsumerLight(
-              <ReimbursementProvider>
-                <Routes>
-                  <Route index element={<ReimburseMyselfPage />} />
-                  <Route path="docs" element={<ReimburseDocsPage />} />
-                  <Route path="analyze" element={<ReimburseAnalyzePage />} />
-                  <Route path="review" element={<ReimburseReviewPage />} />
-                  <Route path="confirm" element={<ReimburseConfirmPage />} />
-                </Routes>
-              </ReimbursementProvider>
-            )
+            withConsumerLight(<ReimburseWorkspaceRouteBridge />)
           }
         />
         
@@ -179,6 +166,7 @@ export function AppRoutes() {
         {/* Catch-all for 404 */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
+      <ReimburseWorkspaceHost />
     </React.Suspense>
   );
 }
