@@ -63,7 +63,7 @@ export default function SelectProfilePage() {
     backgroundSize: "cover",
     backgroundPosition: "center",
     backgroundRepeat: "no-repeat",
-    backgroundColor: "#f0f4f8",
+    backgroundColor: "hsl(var(--background))",
   }
 
   const handleContinue = () => {

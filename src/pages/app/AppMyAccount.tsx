@@ -6,15 +6,14 @@ import {
   CreditCard,
   Building2,
   Lock,
-  Bell,
-  Globe,
-  Phone,
   Mail,
   LogOut,
+  DollarSign,
 } from "lucide-react";
 import { AppNavBar } from "@/components/app-shell/AppNavBar";
 import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
 import { AppListRow, AppListSection } from "@/components/app-shell/primitives/AppListRow";
+import { CLAIMS_PAGE_BACKGROUND } from "./claimsPageStyles";
 
 interface SectionItem {
   label: string;
@@ -27,28 +26,26 @@ interface SectionItem {
 
 const PROFILE_SECTIONS: { header: string; items: SectionItem[] }[] = [
   {
-    header: "Account",
+    header: "",
     items: [
-      { label: "My Profile",              icon: User,      iconBg: "hsl(208 100% 45%)", iconColor: "#fff", href: "/app/my-account/profile" },
-      { label: "Dependents",              icon: Users,     iconBg: "hsl(142 76% 36%)", iconColor: "#fff" },
-      { label: "Beneficiaries",           icon: UserCheck, iconBg: "hsl(270 60% 50%)", iconColor: "#fff" },
-      { label: "Authorized Signers",      icon: UserCheck, iconBg: "hsl(198 87% 40%)", iconColor: "#fff" },
+      { label: "Profile",              icon: User,      iconBg: "transparent", iconColor: "#5f6a94", href: "/app/my-account/profile" },
+      { label: "Dependents",           icon: Users,     iconBg: "transparent", iconColor: "#5f6a94" },
+      { label: "Beneficiaries",        icon: UserCheck, iconBg: "transparent", iconColor: "#5f6a94" },
     ],
   },
   {
-    header: "Financial",
+    header: "",
     items: [
-      { label: "Banking",    icon: Building2, iconBg: "hsl(38 92% 44%)",  iconColor: "#fff" },
-      { label: "Debit Card", icon: CreditCard,iconBg: "hsl(350 62% 48%)", iconColor: "#fff" },
+      { label: "Bank Accounts",          icon: Building2, iconBg: "transparent", iconColor: "#5f6a94" },
+      { label: "Debit Cards",            icon: CreditCard,iconBg: "transparent", iconColor: "#5f6a94" },
+      { label: "Reimbursement Methods",  icon: DollarSign,iconBg: "transparent", iconColor: "#5f6a94" },
     ],
   },
   {
-    header: "Security & Preferences",
+    header: "",
     items: [
-      { label: "Login & Security",           icon: Lock,  iconBg: "hsl(210 14% 37%)", iconColor: "#fff" },
-      { label: "Notification Preferences",   icon: Bell,  iconBg: "hsl(208 100% 45%)", iconColor: "#fff" },
-      { label: "Communication Preferences",  icon: Mail,  iconBg: "hsl(142 76% 36%)", iconColor: "#fff" },
-      { label: "Language",    sublabel: "English (Default)", icon: Globe, iconBg: "hsl(198 87% 40%)", iconColor: "#fff" },
+      { label: "Login and Security",         icon: Lock,  iconBg: "transparent", iconColor: "#5f6a94" },
+      { label: "Communication Preferences",  icon: Mail,  iconBg: "transparent", iconColor: "#5f6a94" },
     ],
   },
 ];
@@ -60,87 +57,54 @@ export default function AppMyAccount() {
     <div
       style={{
         minHeight: "100%",
-        background: "var(--app-bg)",
+        background: CLAIMS_PAGE_BACKGROUND,
         fontFamily: "var(--app-font)",
+        paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 64px)",
       }}
     >
       <AppTopSpacer variant="home" />
-      <AppNavBar variant="title" title="Profile" />
+      <AppNavBar variant="sub-page" title="My Account" backTo={-1} backLabel="Back" />
 
-      <div style={{ padding: "16px 0 32px" }}>
+      <div style={{ padding: "16px", display: "flex", flexDirection: "column", gap: 16, width: "100%", boxSizing: "border-box" }}>
         {/* Avatar + name hero */}
         <div
           style={{
+            background: "var(--app-surface)",
+            border: "1px solid var(--app-border)",
+            borderRadius: "var(--app-radius-xl)",
+            padding: "24px 16px",
             display: "flex",
-            flexDirection: "column",
             alignItems: "center",
-            padding: "12px 16px 28px",
-            gap: 12,
+            gap: 16,
           }}
         >
           <div
             style={{
-              width: 80,
-              height: 80,
+              width: 48,
+              height: 48,
               borderRadius: "50%",
-              background: "linear-gradient(135deg, hsl(208 100% 45%) 0%, hsl(270 60% 50%) 100%)",
+              background: "var(--app-primary)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              boxShadow: "0 4px 20px rgba(37,99,235,0.3)",
+              flexShrink: 0,
             }}
           >
-            <User size={36} strokeWidth={1.5} style={{ color: "#fff" }} />
+            <User size={24} strokeWidth={1.5} style={{ color: "#fff" }} />
           </div>
-          <div style={{ textAlign: "center" }}>
-            <div style={{ font: "var(--app-font-title2)", color: "var(--app-text)" }}>
-              Sarah Johnson
+          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            <div style={{ font: "var(--app-font-headline)", color: "var(--app-text)" }}>
+              Penny Smith
             </div>
-            <div style={{ font: "var(--app-font-subhead)", color: "var(--app-text-secondary)", marginTop: 4 }}>
-              sarah.johnson@example.com
-            </div>
-          </div>
-
-          {/* Contact info pills */}
-          <div style={{ display: "flex", gap: 10 }}>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                background: "var(--app-surface)",
-                borderRadius: "var(--app-radius-pill)",
-                padding: "7px 14px",
-                boxShadow: "var(--app-card-shadow)",
-              }}
-            >
-              <Phone size={14} strokeWidth={1.75} style={{ color: "var(--app-tint)" }} />
-              <span style={{ font: "var(--app-font-caption1)", color: "var(--app-text)" }}>
-                123-456-7890
-              </span>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                background: "var(--app-surface)",
-                borderRadius: "var(--app-radius-pill)",
-                padding: "7px 14px",
-                boxShadow: "var(--app-card-shadow)",
-              }}
-            >
-              <Building2 size={14} strokeWidth={1.75} style={{ color: "var(--app-tint)" }} />
-              <span style={{ font: "var(--app-font-caption1)", color: "var(--app-text)" }}>
-                WEX, Inc.
-              </span>
+            <div style={{ font: "var(--app-font-subhead)", color: "var(--app-text-secondary)" }}>
+              penny.smith@wexinc.com
             </div>
           </div>
         </div>
 
         {/* Settings sections */}
-        {PROFILE_SECTIONS.map((section) => (
-          <AppListSection key={section.header} header={section.header}>
+        {PROFILE_SECTIONS.map((section, idx) => (
+          <AppListSection key={idx} header={section.header}>
             {section.items.map((item, i) => {
               const Icon = item.icon;
               return (
@@ -156,14 +120,12 @@ export default function AppMyAccount() {
                       style={{
                         width: 28,
                         height: 28,
-                        borderRadius: 7,
-                        background: item.iconBg,
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
                       }}
                     >
-                      <Icon size={15} strokeWidth={1.75} style={{ color: item.iconColor }} />
+                      <Icon size={20} strokeWidth={1.75} style={{ color: item.iconColor }} />
                     </div>
                   }
                 />
@@ -173,14 +135,14 @@ export default function AppMyAccount() {
         ))}
 
         {/* Sign out */}
-        <div style={{ padding: "0 16px", marginTop: 8 }}>
+        <div>
           <button
             onClick={() => navigate("/login")}
             style={{
               width: "100%",
-              padding: "14px",
-              borderRadius: "var(--app-radius-lg)",
-              background: "var(--app-surface)",
+              padding: "16px 20px",
+              borderRadius: "var(--app-radius-pill)",
+              background: "var(--app-info-surface)",
               border: "none",
               cursor: "pointer",
               display: "flex",
@@ -188,27 +150,14 @@ export default function AppMyAccount() {
               justifyContent: "center",
               gap: 8,
               fontFamily: "var(--app-font)",
-              fontSize: 17,
+              fontSize: 16,
               fontWeight: 500,
-              color: "var(--app-destructive)",
-              boxShadow: "var(--app-card-shadow)",
+              color: "var(--app-primary-800)",
             }}
           >
-            <LogOut size={18} strokeWidth={1.75} />
-            Sign Out
+            Log out
+            <LogOut size={20} strokeWidth={1.75} />
           </button>
-        </div>
-
-        {/* App version */}
-        <div
-          style={{
-            textAlign: "center",
-            font: "var(--app-font-footnote)",
-            color: "var(--app-text-tertiary)",
-            marginTop: 24,
-          }}
-        >
-          WEX Health App · Version 2.0.0
         </div>
       </div>
     </div>

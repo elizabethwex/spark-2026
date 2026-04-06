@@ -1182,7 +1182,7 @@ export default function MessageCenter() {
                               <SidebarMenuButton
                                 isActive={selectedCategory === null}
                                 onClick={() => setSelectedCategory(null)}
-                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-[#E4F5FD] data-[active=true]:text-[#00437c] data-[active=false]:text-[#1d2c38] hover:bg-[#f7f7f7]"
+                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-[var(--theme-primary-ramp-50)] data-[active=true]:text-primary data-[active=false]:text-foreground hover:bg-muted"
                               >
                                 <div className="flex items-center gap-2 w-full">
                                   <Mails className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === null ? 'text-primary' : 'text-foreground'}`} />
@@ -1194,7 +1194,7 @@ export default function MessageCenter() {
                               <SidebarMenuButton
                                 isActive={selectedCategory === "action-required"}
                                 onClick={() => setSelectedCategory("action-required")}
-                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-[#E4F5FD] data-[active=true]:text-[#00437c] data-[active=false]:text-[#1d2c38] hover:bg-[#f7f7f7]"
+                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-[var(--theme-primary-ramp-50)] data-[active=true]:text-primary data-[active=false]:text-foreground hover:bg-muted"
                               >
                                 <div className="flex items-center gap-2 w-full">
                                   <AlertTriangle className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === "action-required" ? 'text-primary' : 'text-foreground'}`} />
@@ -1206,7 +1206,7 @@ export default function MessageCenter() {
                               <SidebarMenuButton
                                 isActive={selectedCategory === "unread"}
                                 onClick={() => setSelectedCategory("unread")}
-                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-[#E4F5FD] data-[active=true]:text-[#00437c] data-[active=false]:text-[#1d2c38] hover:bg-[#f7f7f7]"
+                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-[var(--theme-primary-ramp-50)] data-[active=true]:text-primary data-[active=false]:text-foreground hover:bg-muted"
                               >
                                 <div className="flex items-center gap-2 w-full">
                                   <Mail className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === "unread" ? 'text-primary' : 'text-foreground'}`} />
@@ -1218,7 +1218,7 @@ export default function MessageCenter() {
                               <SidebarMenuButton
                                 isActive={selectedCategory === "starred"}
                                 onClick={() => setSelectedCategory("starred")}
-                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-[#E4F5FD] data-[active=true]:text-[#00437c] data-[active=false]:text-[#1d2c38] hover:bg-[#f7f7f7]"
+                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-[var(--theme-primary-ramp-50)] data-[active=true]:text-primary data-[active=false]:text-foreground hover:bg-muted"
                               >
                                 <div className="flex items-center gap-2 w-full">
                                   <Star className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === "starred" ? 'text-primary' : 'text-foreground'}`} />
@@ -1230,7 +1230,7 @@ export default function MessageCenter() {
                               <SidebarMenuButton
                                 isActive={selectedCategory === "archive"}
                                 onClick={() => setSelectedCategory("archive")}
-                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-[#E4F5FD] data-[active=true]:text-[#00437c] data-[active=false]:text-[#1d2c38] hover:bg-[#f7f7f7]"
+                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-[var(--theme-primary-ramp-50)] data-[active=true]:text-primary data-[active=false]:text-foreground hover:bg-muted"
                               >
                                 <div className="flex items-center gap-2 w-full">
                                   <Archive className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === "archive" ? 'text-primary' : 'text-foreground'}`} />
@@ -1250,7 +1250,7 @@ export default function MessageCenter() {
                               <SidebarMenuButton
                                 isActive={selectedCategory === "Account & Security"}
                                 onClick={() => setSelectedCategory("Account & Security")}
-                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-[#E4F5FD] data-[active=true]:text-[#00437c] data-[active=false]:text-[#1d2c38] hover:bg-[#f7f7f7]"
+                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-[var(--theme-primary-ramp-50)] data-[active=true]:text-primary data-[active=false]:text-foreground hover:bg-muted"
                               >
                                 <div className="flex items-center gap-2 w-full">
                                   <Shield className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === "Account & Security" ? 'text-primary' : 'text-foreground'}`} />
@@ -1262,7 +1262,7 @@ export default function MessageCenter() {
                               <SidebarMenuButton
                                 isActive={selectedCategory === "Money Activity"}
                                 onClick={() => setSelectedCategory("Money Activity")}
-                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-[#E4F5FD] data-[active=true]:text-[#00437c] data-[active=false]:text-[#1d2c38] hover:bg-[#f7f7f7]"
+                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-[var(--theme-primary-ramp-50)] data-[active=true]:text-primary data-[active=false]:text-foreground hover:bg-muted"
                               >
                                 <div className="flex items-center gap-2 w-full">
                                   <DollarSign className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === "Money Activity" ? 'text-primary' : 'text-foreground'}`} />
@@ -1274,7 +1274,7 @@ export default function MessageCenter() {
                               <SidebarMenuButton
                                 isActive={selectedCategory === "Tax & Statements"}
                                 onClick={() => setSelectedCategory("Tax & Statements")}
-                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-[#E4F5FD] data-[active=true]:text-[#00437c] data-[active=false]:text-[#1d2c38] hover:bg-[#f7f7f7]"
+                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-[var(--theme-primary-ramp-50)] data-[active=true]:text-primary data-[active=false]:text-foreground hover:bg-muted"
                               >
                                 <div className="flex items-center gap-2 w-full">
                                   <FileSpreadsheet className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === "Tax & Statements" ? 'text-primary' : 'text-foreground'}`} />
@@ -1342,7 +1342,7 @@ export default function MessageCenter() {
                             <div className="flex items-start justify-between gap-3">
                               <div className="flex flex-1 items-start gap-2">
                                 {message.hasAttachment && (
-                                  <Paperclip className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                                  <Paperclip className="mt-0.5 h-4 w-4 shrink-0 text-[hsl(var(--wex-info))]" />
                                 )}
                                 <div className="space-y-1 flex-1">
                                   <p
@@ -1359,7 +1359,7 @@ export default function MessageCenter() {
                               </div>
                               <div className="flex items-center gap-1">
                                 {isMessageAttentionNeeded(message) && (
-                                  <AlertTriangle className="h-4 w-4 shrink-0 text-destructive" />
+                                  <AlertTriangle className="h-4 w-4 shrink-0 text-[hsl(var(--wex-destructive))]" />
                                 )}
                                 <button
                                   onClick={(e) => handleToggleStar(message, e)}
@@ -1484,8 +1484,8 @@ export default function MessageCenter() {
                               </TableRow>
                             ) : (
                               // Regular Table Header
-                              <TableRow className="border-b border-border bg-[#f7f7f7]">
-                                <TableHead className="w-[47px] min-w-[47px] max-w-[47px] px-3.5 py-2.5 text-left bg-[#f7f7f7] flex-shrink-0">
+                              <TableRow className="border-b border-border bg-muted">
+                                <TableHead className="w-[47px] min-w-[47px] max-w-[47px] px-3.5 py-2.5 text-left bg-muted flex-shrink-0">
                                   <div className="w-6 h-6 flex items-center justify-center flex-shrink-0" >
                                     <Checkbox
                                       checked={(() => {
@@ -1513,15 +1513,15 @@ export default function MessageCenter() {
                                     />
                                   </div>
                                 </TableHead>
-                                <TableHead className="w-[40px] min-w-[40px] max-w-[40px] px-3.5 py-2.5 text-center bg-[#f7f7f7] flex-shrink-0">
+                                <TableHead className="w-[40px] min-w-[40px] max-w-[40px] px-3.5 py-2.5 text-center bg-muted flex-shrink-0">
                                 </TableHead>
-                                <TableHead className="px-3.5 py-2.5 text-left bg-[#f7f7f7] min-w-0">
+                                <TableHead className="px-3.5 py-2.5 text-left bg-muted min-w-0">
                                   <span className="text-sm font-semibold text-foreground">Subject</span>
                                 </TableHead>
-                                <TableHead className="px-3.5 py-2.5 text-left bg-[#f7f7f7] min-w-0">
+                                <TableHead className="px-3.5 py-2.5 text-left bg-muted min-w-0">
                                   <span className="text-sm font-semibold text-foreground">Date</span>
                                 </TableHead>
-                                <TableHead className="w-[129px] min-w-[129px] max-w-[129px] px-3.5 py-2.5 text-right bg-[#f7f7f7] flex-shrink-0">
+                                <TableHead className="w-[129px] min-w-[129px] max-w-[129px] px-3.5 py-2.5 text-right bg-muted flex-shrink-0">
                                   <span className="text-sm font-semibold text-foreground">Action</span>
                                 </TableHead>
                               </TableRow>
@@ -1534,7 +1534,7 @@ export default function MessageCenter() {
                               key={message.id}
                               className={cn(
                                 "cursor-pointer border-b border-border hover:bg-gray-50",
-                                selectedMessage?.id === message.id && "bg-[#f7f7f7]/50"
+                                selectedMessage?.id === message.id && "bg-muted/50"
                               )}
                               onClick={(e) => {
                                 // Don't open modal if clicking on checkbox or dropdown menu
@@ -1592,7 +1592,7 @@ export default function MessageCenter() {
                               <TableCell className="px-3.5 py-2.5">
                                 <div className="flex items-center gap-2">
                                   {message.hasAttachment ? (
-                                    <Paperclip className="h-3.5 w-3.5 shrink-0 text-primary" />
+                                    <Paperclip className="h-3.5 w-3.5 shrink-0 text-[hsl(var(--wex-info))]" />
                                   ) : null}
                                   <span
                                     className={`text-sm tracking-[-0.084px] ${
@@ -1605,7 +1605,7 @@ export default function MessageCenter() {
                                   </span>
                                   {isMessageAttentionNeeded(message) && (
                                     <div className="flex items-center shrink-0 ml-3 mr-12">
-                                      <AlertTriangle className="h-6 w-6 text-destructive" />
+                                      <AlertTriangle className="h-6 w-6 text-[hsl(var(--wex-destructive))]" />
                                     </div>
                                   )}
                                 </div>
@@ -1769,7 +1769,7 @@ export default function MessageCenter() {
                           <div className="flex items-center justify-between gap-3">
                             <div className="flex items-center gap-3 flex-1 min-w-0">
                               {isMessageAttentionNeeded(selectedMessage) && (
-                                <AlertTriangle className="h-6 w-6 shrink-0 text-destructive" />
+                                <AlertTriangle className="h-6 w-6 shrink-0 text-[hsl(var(--wex-destructive))]" />
                               )}
                               <h3 className="text-sm font-semibold text-foreground tracking-[-0.084px] leading-6 flex-1 min-w-0">
                                 {selectedMessage.subject}

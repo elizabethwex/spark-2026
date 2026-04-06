@@ -3,6 +3,7 @@ import { AppRoutes } from '@/routes'
 import { TooltipProvider } from '@wexinc-healthbenefits/ben-ui-kit'
 import { AuthProvider } from '@/context/AuthContext'
 import { PrototypeProvider } from '@/context/PrototypeContext'
+import { ReimburseWorkspaceProvider } from '@/context/ReimburseWorkspaceContext'
 import { applyPortalThemeToDocument } from '@/lib/portalTheme'
 
 /**
@@ -83,9 +84,11 @@ function App() {
     <ErrorBoundary>
       <AuthProvider>
         <PrototypeProvider>
-          <TooltipProvider>
-            <AppRoutes />
-          </TooltipProvider>
+          <ReimburseWorkspaceProvider>
+            <TooltipProvider>
+              <AppRoutes />
+            </TooltipProvider>
+          </ReimburseWorkspaceProvider>
         </PrototypeProvider>
       </AuthProvider>
     </ErrorBoundary>

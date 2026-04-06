@@ -279,7 +279,6 @@ export default function AppLpfsaDetail() {
       style={{
         minHeight: "auto",
         fontFamily: "var(--app-font)",
-        background: "linear-gradient(186.833deg, #eef2ff 50%, #a5b4fc 140%)",
         paddingBottom: "calc(var(--app-tabbar-height, 95px) + env(safe-area-inset-bottom, 0px) + 64px)",
       }}
     >
@@ -345,7 +344,7 @@ export default function AppLpfsaDetail() {
           </span>
 
           <button
-            aria-label="Assist IQ"
+            aria-label="WEXly"
             onClick={() => navigate("/app/assist-iq")}
             style={{
               width: 48,

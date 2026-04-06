@@ -1,5 +1,5 @@
-import { useNavigate } from "react-router-dom";
 import { Button } from "@wexinc-healthbenefits/ben-ui-kit";
+import { useReimburseWorkspace } from "@/context/ReimburseWorkspaceContext";
 
 /**
  * Title Bar Component
@@ -10,7 +10,7 @@ import { Button } from "@wexinc-healthbenefits/ben-ui-kit";
  * - "Reimburse Myself" button (primary)
  */
 export function TitleBar() {
-  const navigate = useNavigate();
+  const { openReimburseWorkspace } = useReimburseWorkspace();
 
   return (
     <div className="flex items-center justify-between gap-4">
@@ -25,7 +25,7 @@ export function TitleBar() {
         >
           Send a Payment
         </Button>
-        <Button size="md" onClick={() => navigate("/reimburse")}>
+        <Button size="md" onClick={() => openReimburseWorkspace()}>
           Reimburse Myself
         </Button>
       </div>

@@ -18,8 +18,13 @@ const TABS: Tab[] = [
 export function AppTabBar() {
   const location = useLocation();
 
-  // Assist IQ takes over the full screen — hide the tab bar
-  if (["/app/assist-iq", "/app/penny", "/app/lock-screen"].includes(location.pathname)) return null;
+  // WEXly takes over the full screen — hide the tab bar
+  if (
+    ["/app/assist-iq", "/app/penny", "/app/lock-screen"].includes(location.pathname) ||
+    location.pathname.startsWith("/app/my-account")
+  ) {
+    return null;
+  }
 
   const isActive = (tab: Tab) => {
     if (tab.exact) return location.pathname === "/app" || location.pathname === "/app/";
@@ -108,7 +113,7 @@ export function AppTabBar() {
                       style={{
                         position: "absolute",
                         inset: 0,
-                        background: "hsl(208 100% 97%)",
+                        background: "var(--app-primary-50)",
                         borderRadius: 9999,
                       }}
                     />
@@ -117,7 +122,7 @@ export function AppTabBar() {
                     size={22}
                     strokeWidth={active ? 2.25 : 1.75}
                     style={{
-                      color: active ? "hsl(208 100% 38%)" : "#14182c",
+                      color: active ? "var(--app-primary)" : "var(--app-text)",
                       position: "relative",
                       zIndex: 1,
                     }}
@@ -131,7 +136,7 @@ export function AppTabBar() {
                     fontWeight: active ? 600 : 500,
                     letterSpacing: 0,
                     lineHeight: "16px",
-                    color: active ? "hsl(208 100% 38%)" : "#14182c",
+                    color: active ? "var(--app-primary)" : "var(--app-text)",
                   }}
                 >
                   {tab.label}

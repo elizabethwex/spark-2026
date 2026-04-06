@@ -105,12 +105,18 @@ export default function AppClaimsOverview() {
         minHeight: "100%",
         background: CLAIMS_PAGE_BACKGROUND,
         fontFamily: "var(--app-font)",
+        paddingBottom: "calc(var(--app-tabbar-height, 95px) + env(safe-area-inset-bottom, 0px) + 64px)",
       }}
     >
       <AppTopSpacer variant="home" />
       <AppNavBar variant="title" title="Claims" />
 
-      <div style={{ padding: "8px 16px 0", display: "flex", alignItems: "center", gap: 8 }}>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+      >
+        <div style={{ padding: "8px 16px 0", display: "flex", alignItems: "center", gap: 8 }}>
         <div
           style={{
             flex: 1,
@@ -125,7 +131,7 @@ export default function AppClaimsOverview() {
             boxSizing: "border-box",
           }}
         >
-          <Search size={18} strokeWidth={1.75} style={{ color: "#7a87b2", flexShrink: 0 }} />
+          <Search size={18} strokeWidth={1.75} style={{ color: "var(--app-text-secondary)", flexShrink: 0 }} />
           <input
             type="search"
             value={search}
@@ -139,20 +145,20 @@ export default function AppClaimsOverview() {
               background: "transparent",
               fontFamily: "var(--app-font)",
               fontSize: 14,
-              color: "#111322",
+              color: "var(--app-text)",
               outline: "none",
             }}
           />
           <button
             type="button"
             aria-label="Voice search (demo)"
-            style={{ border: "none", background: "none", padding: 0, cursor: "default", color: "#5f6a94", display: "flex" }}
+            style={{ border: "none", background: "none", padding: 0, cursor: "default", color: "var(--app-text-secondary)", display: "flex" }}
           >
             <Mic size={18} strokeWidth={1.75} />
           </button>
         </div>
         <button type="button" aria-label="Filter claims" onClick={() => setFilterSheetOpen(true)} style={LIQUID_SYMBOL}>
-          <SlidersHorizontal size={22} strokeWidth={1.75} style={{ color: "#14182c" }} />
+          <SlidersHorizontal size={22} strokeWidth={1.75} style={{ color: "var(--app-text)" }} />
         </button>
       </div>
 
@@ -196,7 +202,7 @@ export default function AppClaimsOverview() {
                     style={{
                       fontSize: 16,
                       fontWeight: 700,
-                      color: "#111322",
+                      color: "var(--app-text)",
                       lineHeight: "24px",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
@@ -205,10 +211,10 @@ export default function AppClaimsOverview() {
                   >
                     {claim.provider}
                   </div>
-                  <div style={{ fontSize: 14, fontWeight: 400, color: "#697586", lineHeight: "20px" }}>{claim.date}</div>
+                  <div style={{ fontSize: 14, fontWeight: 400, color: "var(--app-text-secondary)", lineHeight: "20px" }}>{claim.date}</div>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4, flexShrink: 0 }}>
-                  <span style={{ fontSize: 16, fontWeight: 600, color: "#111322", lineHeight: "24px" }}>{claim.amount}</span>
+                  <span style={{ fontSize: 16, fontWeight: 600, color: "var(--app-text)", lineHeight: "24px" }}>{claim.amount}</span>
                   {claim.status === "approved" ? (
                     <span
                       style={{
@@ -228,13 +234,15 @@ export default function AppClaimsOverview() {
                   )}
                 </div>
                 <div style={{ display: "flex", alignItems: "center", alignSelf: "stretch", paddingLeft: 4 }}>
-                  <ChevronRight size={22} strokeWidth={2} style={{ color: "#9ca3af" }} />
+                  <ChevronRight size={22} strokeWidth={2} style={{ color: "var(--app-text-tertiary)" }} />
                 </div>
               </button>
             );
           })
         )}
       </div>
+
+      </motion.div>
 
       <AnimatePresence>
         {filterSheetOpen && (
@@ -278,7 +286,7 @@ export default function AppClaimsOverview() {
               <div style={{ display: "flex", justifyContent: "center", paddingTop: 8, paddingBottom: 8 }}>
                 <div style={{ width: 36, height: 5, borderRadius: 100, background: "rgba(0,0,0,0.15)" }} />
               </div>
-              <div style={{ padding: "0 20px 8px", fontSize: 18, fontWeight: 600, color: "#111322" }}>Filter by status</div>
+              <div style={{ padding: "0 20px 8px", fontSize: 18, fontWeight: 600, color: "var(--app-text)" }}>Filter by status</div>
               <div style={{ display: "flex", flexDirection: "column", padding: "8px 12px 16px" }}>
                 {FILTER_OPTIONS.map((opt) => (
                   <button
@@ -292,8 +300,8 @@ export default function AppClaimsOverview() {
                       padding: "14px 12px",
                       border: "none",
                       borderRadius: 12,
-                      background: filter === opt.value ? "rgba(57, 88, 195, 0.12)" : "transparent",
-                      color: filter === opt.value ? "#3958c3" : "#111322",
+                      background: filter === opt.value ? "var(--app-primary-surface)" : "transparent",
+                      color: filter === opt.value ? "var(--app-primary)" : "var(--app-text)",
                       fontFamily: "var(--app-font)",
                       fontSize: 16,
                       fontWeight: filter === opt.value ? 600 : 400,

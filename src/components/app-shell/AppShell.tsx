@@ -29,6 +29,7 @@ export function AppShell() {
   const location = useLocation();
   const [scrollPort, setScrollPort] = useState<HTMLDivElement | null>(null);
   const [topChromeHidden, setTopChromeHidden] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const lastScrollY = useRef(0);
 
   const scrollRefCallback = useCallback((node: HTMLDivElement | null) => {
@@ -38,6 +39,7 @@ export function AppShell() {
   useEffect(() => {
     lastScrollY.current = 0;
     setTopChromeHidden(false);
+    setIsScrolled(false);
   }, [location.pathname]);
 
   useEffect(() => {
@@ -46,6 +48,7 @@ export function AppShell() {
 
     const onScroll = () => {
       const y = scrollPort?.scrollTop ?? 0;
+      setIsScrolled(y > 0);
       const dy = y - lastScrollY.current;
       lastScrollY.current = y;
 
@@ -62,7 +65,7 @@ export function AppShell() {
     return () => scrollPort.removeEventListener("scroll", onScroll);
   }, [scrollPort]);
 
-  const chromeValue = { topChromeHidden };
+  const chromeValue = { topChromeHidden, isScrolled };
 
   // ── Device ON ────────────────────────────────────────────────────────────────
   if (deviceOn) {
@@ -70,7 +73,7 @@ export function AppShell() {
       <div
         style={{
           minHeight: "100dvh",
-          background: "#060F3A",
+          background: "rgba(14, 0, 38, 1)",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -101,7 +104,7 @@ export function AppShell() {
                 overflow: "hidden",
                 transform: "translateZ(0)",
                 position: "relative",
-                background: "var(--app-bg)",
+                background: "linear-gradient(182.7628652606358deg, rgb(238, 242, 255) 50.004%, rgb(165, 180, 252) 140.09%)",
                 // @ts-expect-error custom CSS property
                 "--app-screen-height": `${CONTENT_HEIGHT}px`,
               }}
@@ -195,7 +198,7 @@ export function AppShell() {
             height: "100dvh",
             maxHeight: "100dvh",
             position: "relative",
-            background: "var(--app-bg)",
+            background: "linear-gradient(182.7628652606358deg, rgb(238, 242, 255) 50.004%, rgb(165, 180, 252) 140.09%)",
             overflowX: "hidden",
             overflowY: "auto",
           }}

@@ -18,8 +18,13 @@ import {
   Star,
   Trash2,
 } from "lucide-react";
+import { motion } from "framer-motion";
 import { AppNavBar } from "@/components/app-shell/AppNavBar";
 import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
+import { useDeviceMockup } from "@/hooks/useDeviceMockup";
+import { useAppChrome } from "@/context/AppChromeContext";
+import { APP_NAV_HOME_INNER_H } from "@/components/app-shell/appChromeLayout";
+import { STATUS_BAR_HEIGHT } from "@/components/app-shell/AppStatusBar";
 import { AppCard } from "@/components/app-shell/primitives/AppCard";
 import { getPrototypeInboxEntries, type MessageTag } from "./messageCatalog";
 
@@ -57,9 +62,9 @@ const SWIPE_ACTION_GAP = 10;
 const SWIPE_ROW_PR = 16;
 const SWIPE_MAX_PX =
   SWIPE_ROW_PR + SWIPE_ACTION_SIZE * 3 + SWIPE_ACTION_GAP * 2;
-const SWIPE_ACTION_BLUE = "#1c6eff";
-const SWIPE_ACTION_GOLD = "#e6a800";
-const SWIPE_ACTION_RED = "#dc2626";
+const SWIPE_ACTION_BLUE = "var(--app-info)";
+const SWIPE_ACTION_GOLD = "var(--app-warning)";
+const SWIPE_ACTION_RED = "var(--app-destructive)";
 
 type SwipeGestureState =
   | { kind: "idle" }
@@ -130,21 +135,18 @@ const PAGE_ROOT: CSSProperties = {
   flexDirection: "column",
   minHeight:
     "calc(100dvh - var(--app-tabbar-height) - env(safe-area-inset-bottom, 0px))",
-  background: "linear-gradient(33deg, #ffffff 18%, #eef2ff 87%, #c7d2fe 104%)",
   fontFamily: "var(--app-font)",
 };
 
-const PILL_SELECTED_BG = "#0c1a5c";
+const PILL_SELECTED_BG = "var(--app-primary-900)";
 const PILL_SELECTED_TEXT = "#ffffff";
-/** Figma labels/vibrant/controls primary */
-const PILL_IDLE_TEXT = "#1a1a1a";
-/** Figma 474:11927 — Fill + Shadow on idle liquid-glass button */
-const PILL_SHADOW = "0 8px 40px rgba(0, 0, 0, 0.12)";
-const CRITICAL = "#dc2626";
-const LABELS_SECONDARY = "rgba(60, 60, 67, 0.6)";
-const CHEVRON_MUTED = "#5f6a94";
-const INFO_SURFACE = "#eff6ff";
-const INFO_TEXT = "#172554";
+const PILL_IDLE_TEXT = "var(--app-text)";
+const PILL_SHADOW = "var(--theme-card-shadow, 0 6.03px 18.1px 0 rgba(43, 49, 78, 0.06))";
+const CRITICAL = "var(--app-destructive)";
+const LABELS_SECONDARY = "var(--app-text-secondary)";
+const CHEVRON_MUTED = "var(--app-text-secondary)";
+const INFO_SURFACE = "var(--app-info-surface)";
+const INFO_TEXT = "var(--app-info-text)";
 
 /** Figma View message / Modal — attachment filename from title */
 function pdfFileNameFromTitle(title: string): string {
@@ -414,7 +416,6 @@ export default function AppMessageCenter() {
   const [selected, setSelected] = useState<MessageRow | null>(null);
   const [swipe, setSwipe] = useState<SwipeGestureState>({ kind: "idle" });
 
-  const scrollRef = useRef<HTMLDivElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const loadMoreInFlight = useRef(false);
   const loadMoreFnRef = useRef<() => void>(() => {});
@@ -443,7 +444,10 @@ export default function AppMessageCenter() {
     setSwipe({ kind: "idle" });
     setFilter(next);
     setVisibleLimit(PAGE_SIZE);
-    queueMicrotask(() => scrollRef.current?.scrollTo({ top: 0 }));
+    queueMicrotask(() => {
+      const scrollContainer = document.getElementById("app-scroll-container");
+      if (scrollContainer) scrollContainer.scrollTo({ top: 0 });
+    });
   }, []);
 
   const loadMore = useCallback(() => {
@@ -463,15 +467,14 @@ export default function AppMessageCenter() {
   }, [loadMore]);
 
   useEffect(() => {
-    const root = scrollRef.current;
     const sentinel = sentinelRef.current;
-    if (!root || !sentinel) return;
+    if (!sentinel) return;
 
     const io = new IntersectionObserver(
       (entries) => {
         if (entries[0]?.isIntersecting) loadMoreFnRef.current();
       },
-      { root, rootMargin: "200px 0px", threshold: 0 }
+      { root: document.getElementById("app-scroll-container"), rootMargin: "200px 0px", threshold: 0 }
     );
     io.observe(sentinel);
     return () => io.disconnect();
@@ -589,13 +592,27 @@ export default function AppMessageCenter() {
   );
 
   const closeSheet = useCallback(() => setSelected(null), []);
+  const { deviceOn } = useDeviceMockup();
+  const { topChromeHidden } = useAppChrome();
+
+  const hideY = deviceOn ? -(STATUS_BAR_HEIGHT + APP_NAV_HOME_INNER_H) : "-100%";
 
   return (
     <div style={PAGE_ROOT}>
       <AppTopSpacer variant="home" />
       <AppNavBar variant="title" title="Messages" />
 
-      <div
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: topChromeHidden ? hideY : 0 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+        style={{
+          position: "sticky",
+          top: deviceOn ? STATUS_BAR_HEIGHT + APP_NAV_HOME_INNER_H : `calc(env(safe-area-inset-top, 0px) + ${APP_NAV_HOME_INNER_H}px)`,
+          zIndex: 40,
+        }}
+      >
+        <div
         data-name="Page filters"
         style={{
           flexShrink: 0,
@@ -637,12 +654,7 @@ export default function AppMessageCenter() {
       </div>
 
       <div
-        ref={scrollRef}
         style={{
-          flex: 1,
-          minHeight: 0,
-          overflowY: "auto",
-          WebkitOverflowScrolling: "touch",
           padding: "16px 16px 24px",
           display: "flex",
           flexDirection: "column",
@@ -697,7 +709,7 @@ export default function AppMessageCenter() {
           >
             <AppCard
               variant="solid"
-              padding="14px 20px"
+              padding="20px"
               style={{
                 height: "100%",
                 boxSizing: "border-box",
@@ -765,7 +777,7 @@ export default function AppMessageCenter() {
                       />
                     </span>
                   )}
-                  <span>{msg.date}</span>
+                  <span style={{ fontSize: "18px" }}>{msg.date}</span>
                   <ChevronRight
                     size={14}
                     strokeWidth={2.5}
@@ -800,7 +812,7 @@ export default function AppMessageCenter() {
                       width: 6,
                       height: 6,
                       borderRadius: "50%",
-                      background: "var(--app-tint)",
+                      background: "var(--app-primary)",
                       flexShrink: 0,
                     }}
                     aria-hidden
@@ -821,7 +833,7 @@ export default function AppMessageCenter() {
                       fontWeight: msg.read ? 400 : 600,
                       letterSpacing: -0.43,
                       lineHeight: "22px",
-                      color: "#000",
+                      color: "var(--app-text)",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
                       whiteSpace: "nowrap",
@@ -860,7 +872,7 @@ export default function AppMessageCenter() {
                           />
                         </span>
                       )}
-                      <span>{msg.date}</span>
+                      <span style={{ fontSize: "18px" }}>{msg.date}</span>
                       <ChevronRight
                         size={14}
                         strokeWidth={2.5}
@@ -913,6 +925,7 @@ export default function AppMessageCenter() {
         )}
 
       </div>
+      </motion.div>
 
       {selected && (
         <div
@@ -964,9 +977,9 @@ export default function AppMessageCenter() {
               margin: "0 auto",
               maxHeight: "min(85dvh, 520px)",
               background: "#fff",
-              borderTop: "1px solid #edeff0",
-              borderLeft: "1px solid #edeff0",
-              borderRight: "1px solid #edeff0",
+              borderTop: "1px solid var(--app-border)",
+              borderLeft: "1px solid var(--app-border)",
+              borderRight: "1px solid var(--app-border)",
               borderRadius: "16px 16px 0 0",
               padding: "0 16px calc(24px + env(safe-area-inset-bottom, 0px))",
               overflow: "auto",
@@ -1037,7 +1050,7 @@ export default function AppMessageCenter() {
                     fontWeight: 600,
                     lineHeight: "22px",
                     letterSpacing: -0.43,
-                    color: "#000",
+                    color: "var(--app-text)",
                   }}
                 >
                   {selected.title}
@@ -1048,7 +1061,7 @@ export default function AppMessageCenter() {
                     fontSize: 13,
                     lineHeight: "18px",
                     letterSpacing: -0.08,
-                    color: "#5f6a94",
+                    color: "var(--app-text-secondary)",
                   }}
                 >
                   {formatDetailTimestamp(selected.date)}
@@ -1065,7 +1078,7 @@ export default function AppMessageCenter() {
               }}
             >
               <div style={{ padding: "8px 0" }}>
-                <div style={{ height: 1, background: "#e3e7f4", width: "100%" }} />
+                <div style={{ height: 1, background: "var(--app-border)", width: "100%" }} />
               </div>
 
               <p
@@ -1075,11 +1088,11 @@ export default function AppMessageCenter() {
                   fontWeight: 400,
                   lineHeight: "22px",
                   letterSpacing: -0.43,
-                  color: "#1d2c38",
+                    color: "var(--app-text)",
                 }}
               >
                 {selected.pdfAttached
-                  ? "Please see attachement."
+                  ? "Please see attachment."
                   : selected.body}
               </p>
 
@@ -1092,7 +1105,7 @@ export default function AppMessageCenter() {
                     gap: 12,
                     minHeight: 68,
                     padding: "12px 16px",
-                    border: "1px solid #edeff0",
+                    border: "1px solid var(--app-border)",
                     borderRadius: 6,
                     background: "#fff",
                     boxSizing: "border-box",
@@ -1101,7 +1114,7 @@ export default function AppMessageCenter() {
                   <FileText
                     size={20}
                     strokeWidth={1.75}
-                    style={{ color: "#1c6eff" }}
+                    style={{ color: "var(--system-link, #1C6EFF)" }}
                     aria-hidden
                   />
                   <a
@@ -1113,7 +1126,7 @@ export default function AppMessageCenter() {
                       fontWeight: 600,
                       lineHeight: "24px",
                       letterSpacing: -0.6,
-                      color: "#1c6eff",
+                      color: "var(--system-link, #1C6EFF)",
                       textDecoration: "none",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
@@ -1134,7 +1147,7 @@ export default function AppMessageCenter() {
                       border: "none",
                       background: "none",
                       cursor: "pointer",
-                      color: "#1c6eff",
+                      color: "var(--system-link, #1C6EFF)",
                     }}
                   >
                     <Download size={20} strokeWidth={2} aria-hidden />

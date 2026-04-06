@@ -111,9 +111,9 @@ const DEFAULT_CLAIM: ClaimDetail = CLAIM_DATA.c2;
 
 const STATUS_RECEIPT: Record<ClaimStatus, { label: string; color: string; showCheck: boolean }> = {
   approved: { label: "Approved", color: CLAIMS_LIST_BADGE_SUCCESS_FG, showCheck: true },
-  pending: { label: "Pending", color: "hsl(38 92% 32%)", showCheck: false },
+  pending: { label: "Pending", color: "var(--app-warning)", showCheck: false },
   denied: { label: "Denied", color: "var(--app-destructive)", showCheck: false },
-  in_review: { label: "In Review", color: "hsl(208 100% 38%)", showCheck: false },
+  in_review: { label: "In Review", color: "var(--app-primary)", showCheck: false },
 };
 
 function DetailRow({
@@ -146,7 +146,7 @@ function DetailRow({
               fontSize: 17,
               lineHeight: "22px",
               letterSpacing: -0.43,
-              color: "#000",
+              color: "var(--app-text)",
               overflow: "hidden",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
@@ -159,7 +159,7 @@ function DetailRow({
               fontSize: 15,
               lineHeight: "20px",
               letterSpacing: -0.23,
-              color: "rgba(60,60,67,0.6)",
+              color: "var(--app-text-secondary)",
               overflow: "hidden",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
@@ -205,6 +205,7 @@ export default function AppClaimsDetail() {
         minHeight: "100%",
         background: CLAIMS_PAGE_BACKGROUND,
         fontFamily: "var(--app-font)",
+        paddingBottom: "calc(var(--app-tabbar-height, 95px) + env(safe-area-inset-bottom, 0px) + 64px)",
       }}
     >
       <AppTopSpacer variant="home" />
@@ -219,7 +220,7 @@ export default function AppClaimsDetail() {
             value={claim.provider}
             label="Transaction"
             trailing={
-              <span style={{ fontSize: 17, lineHeight: "22px", letterSpacing: -0.43, color: "rgba(60,60,67,0.6)" }}>
+              <span style={{ fontSize: 17, lineHeight: "22px", letterSpacing: -0.43, color: "var(--app-text-secondary)" }}>
                 {claim.transactionAmount}
               </span>
             }
@@ -242,13 +243,13 @@ export default function AppClaimsDetail() {
             <div style={{ width: 52, height: 52, borderRadius: 4, overflow: "hidden", flexShrink: 0 }}>
               <img src={RECEIPT_THUMB} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             </div>
-            <div style={{ flex: 1, minWidth: 0, fontSize: 17, lineHeight: "22px", letterSpacing: -0.43, color: "#000" }}>
+            <div style={{ flex: 1, minWidth: 0, fontSize: 17, lineHeight: "22px", letterSpacing: -0.43, color: "var(--app-text)" }}>
               Receipt
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
               <span style={{ fontSize: 17, lineHeight: "22px", color: receipt.color, fontWeight: 400 }}>{receipt.label}</span>
               {receipt.showCheck ? (
-                <Check size={22} strokeWidth={2.5} style={{ color: "#079455" }} aria-hidden />
+                <Check size={22} strokeWidth={2.5} style={{ color: "var(--app-success)" }} aria-hidden />
               ) : claim.status === "pending" ? (
                 <Clock size={22} strokeWidth={2} style={{ color: receipt.color }} aria-hidden />
               ) : claim.status === "denied" ? (
@@ -268,8 +269,8 @@ export default function AppClaimsDetail() {
                 justifyContent: "space-between",
               }}
             >
-              <span style={{ fontSize: 17, lineHeight: "22px", letterSpacing: -0.43, color: "#000" }}>Amount reimbursed</span>
-              <span style={{ fontSize: 17, lineHeight: "22px", letterSpacing: -0.43, color: "#111322", fontWeight: 400 }}>
+              <span style={{ fontSize: 17, lineHeight: "22px", letterSpacing: -0.43, color: "var(--app-text)" }}>Amount reimbursed</span>
+              <span style={{ fontSize: 17, lineHeight: "22px", letterSpacing: -0.43, color: "var(--app-text)", fontWeight: 400 }}>
                 {claim.reimbursedAmount}
               </span>
             </div>
@@ -294,12 +295,12 @@ export default function AppClaimsDetail() {
               fontWeight: 600,
               lineHeight: "24px",
               letterSpacing: -0.18,
-              color: "#111322",
+              color: "var(--app-text)",
             }}
           >
             Questions about this claim?
           </p>
-          <p style={{ margin: 0, fontSize: 16, lineHeight: "24px", color: "#111322" }}>
+          <p style={{ margin: 0, fontSize: 16, lineHeight: "24px", color: "var(--app-text)" }}>
             Here’s how we can help: review your claim details above, or reach out for personalized support.
           </p>
           <button

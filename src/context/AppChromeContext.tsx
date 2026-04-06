@@ -2,6 +2,7 @@ import { createContext, useContext, type ReactNode } from "react";
 
 export type AppChromeContextValue = {
   topChromeHidden: boolean;
+  isScrolled: boolean;
 };
 
 const AppChromeContext = createContext<AppChromeContextValue | null>(null);
@@ -17,5 +18,5 @@ export function AppChromeProvider({
 }
 
 export function useAppChrome(): AppChromeContextValue {
-  return useContext(AppChromeContext) ?? { topChromeHidden: false };
+  return useContext(AppChromeContext) ?? { topChromeHidden: false, isScrolled: false };
 }
