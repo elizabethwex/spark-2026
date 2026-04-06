@@ -3,12 +3,13 @@ import { useNavigate } from "react-router-dom";
 import {
   ArrowRight,
   Wallet,
+  Landmark,
   CreditCard,
+  CalendarCheck2,
   HeartPulse,
   Baby,
-  RefreshCw,
-  Lock,
-  Clock,
+    RefreshCw,
+    Clock,
   ChevronRight,
 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -47,15 +48,15 @@ interface HomeAccountCard {
 
 const HOME_ACCOUNTS: Record<AppVariant, HomeAccountCard[]> = {
   1: [
-    { id: "hsa", name: "Health Savings Account", tag: "HSA", balanceLabel: "Cash + Invested Assets", balance: "$15,900.00", icon: Wallet, route: "/app/account/hsa" },
-    { id: "lpfsa", name: "Limited Purpose FSA", tag: "01/01/2026 – 12/31/2026", balance: "$850.00", icon: CreditCard, warningTag: "28 Days left to spend", route: "/app/account/lpfsa" },
+    { id: "hsa", name: "Health Savings Account", tag: "HSA", balanceLabel: "Cash + Invested Assets", balance: "$15,900.00", icon: Landmark, route: "/app/account/hsa" },
+    { id: "lpfsa", name: "Limited Purpose FSA", tag: "01/01/2026 – 12/31/2026", balance: "$850.00", icon: CalendarCheck2, warningTag: "28 Days left to spend", route: "/app/account/lpfsa" },
   ],
   2: [
     { id: "fsa", name: "Healthcare FSA", tag: "01/01/2026 – 12/31/2026", balance: "$850.00", icon: HeartPulse, warningTag: "28 Days left to spend", route: "/app/account/fsa" },
     { id: "dcfsa", name: "DCFSA", tag: "01/01/2025 – 12/31/2025", balance: "$620.00", icon: Baby, warningTag: "28 Days left to spend", route: "/app/account/dcfsa" },
   ],
   3: [
-    { id: "hsa", name: "Health Savings Account", tag: "HSA", balanceLabel: "Cash + Invested Assets", balance: "$15,900.00", icon: Wallet, route: "/app/account/hsa" },
+    { id: "hsa", name: "Health Savings Account", tag: "HSA", balanceLabel: "Cash + Invested Assets", balance: "$15,900.00", icon: Landmark, route: "/app/account/hsa" },
   ],
 };
 
@@ -502,7 +503,7 @@ export default function AppHome() {
                   justifyContent: "center",
                 }}
               >
-                <Lock size={24} strokeWidth={1.75} style={{ color: TINT }} />
+                <CreditCard size={24} strokeWidth={1.75} style={{ color: TINT }} />
               </div>
               <span
                 style={{

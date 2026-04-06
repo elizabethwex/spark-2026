@@ -3,7 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Wallet,
+  Landmark,
   CreditCard,
+  CalendarCheck2,
   HeartPulse,
   Baby,
   ChevronRight,
@@ -40,21 +42,21 @@ interface AccountCardData {
   balanceLabel: string;
   balanceSubLabel?: string;
   balance: string;
-  icon: "wallet" | "credit-card" | "heart-pulse" | "baby";
+  icon: "wallet" | "credit-card" | "heart-pulse" | "baby" | "landmark" | "calendar-check";
   warningTag?: string;
 }
 
 const ACCOUNTS_BY_VARIANT: Record<AppVariant, AccountCardData[]> = {
   1: [
-    { id: "hsa", name: "Health Savings Account", subtitle: "HSA", balanceLabel: "Cash + Invested Assets", balance: "$15,900.00", icon: "wallet" },
-    { id: "lpfsa", name: "Limited Purpose FSA", subtitle: "01/01/2026 - 12/31/2026", balanceLabel: "", balance: "$850.00", icon: "credit-card", warningTag: "28 Days left to spend" },
+    { id: "hsa", name: "Health Savings Account", subtitle: "HSA", balanceLabel: "Cash + Invested Assets", balance: "$15,900.00", icon: "landmark" },
+    { id: "lpfsa", name: "Limited Purpose FSA", subtitle: "01/01/2026 - 12/31/2026", balanceLabel: "", balance: "$850.00", icon: "calendar-check", warningTag: "28 Days left to spend" },
   ],
   2: [
     { id: "fsa", name: "Healthcare FSA", subtitle: "01/01/2026 - 12/31/2026", balanceLabel: "", balance: "$850.00", icon: "heart-pulse", warningTag: "28 Days left to spend" },
     { id: "dcfsa", name: "DCFSA", subtitle: "01/01/2025 - 12/31/2025", balanceLabel: "", balance: "$620.00", icon: "baby", warningTag: "28 Days left to spend" },
   ],
   3: [
-    { id: "hsa", name: "Health Savings Account", subtitle: "HSA", balanceLabel: "Cash + Invested Assets", balance: "$15,900.00", icon: "wallet" },
+    { id: "hsa", name: "Health Savings Account", subtitle: "HSA", balanceLabel: "Cash + Invested Assets", balance: "$15,900.00", icon: "landmark" },
   ],
 };
 
@@ -227,7 +229,11 @@ export default function AppAccountOverview() {
                     flexShrink: 0,
                   }}
                 >
-                  {acct.icon === "wallet" ? (
+                  {acct.icon === "landmark" ? (
+                    <Landmark size={20} strokeWidth={1.75} style={{ color: TINT }} />
+                  ) : acct.icon === "calendar-check" ? (
+                    <CalendarCheck2 size={20} strokeWidth={1.75} style={{ color: TINT }} />
+                  ) : acct.icon === "wallet" ? (
                     <Wallet size={20} strokeWidth={1.75} style={{ color: TINT }} />
                   ) : acct.icon === "heart-pulse" ? (
                     <HeartPulse size={20} strokeWidth={1.75} style={{ color: TINT }} />

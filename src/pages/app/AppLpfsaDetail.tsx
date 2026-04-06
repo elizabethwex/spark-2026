@@ -1,5 +1,6 @@
+import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ChevronLeft, Sparkles, ChevronRight, Wallet, FileSearch, SlidersHorizontal } from "lucide-react";
+import { ChevronLeft, Sparkles, ChevronRight, Wallet, FileSearch, SlidersHorizontal, HeartPulse, Baby, CreditCard, CalendarCheck2 } from "lucide-react";
 
 const CARD_SHADOW = "0px 3.017px 9.051px rgba(43,49,78,0.04), 0px 6.034px 18.101px rgba(43,49,78,0.06)";
 const TEXT_PRIMARY = "#14182c";
@@ -26,6 +27,7 @@ interface BalanceRow {
 
 interface AccountData {
   title: string;
+  icon: React.ElementType;
   balanceSubtitle: string;
   balance: string;
   balanceRows: BalanceRow[];
@@ -46,6 +48,7 @@ interface AccountData {
 const ACCOUNT_DATA: Record<string, AccountData> = {
   lpfsa: {
     title: "Limited Purpose FSA",
+    icon: CalendarCheck2,
     balanceSubtitle: "FSA Available Balance",
     balance: "$850.00",
     balanceRows: [
@@ -87,6 +90,7 @@ const ACCOUNT_DATA: Record<string, AccountData> = {
   },
   fsa: {
     title: "Healthcare FSA",
+    icon: HeartPulse,
     balanceSubtitle: "FSA Available Balance",
     balance: "$850.00",
     balanceRows: [
@@ -128,6 +132,7 @@ const ACCOUNT_DATA: Record<string, AccountData> = {
   },
   dcfsa: {
     title: "DCFSA",
+    icon: Baby,
     balanceSubtitle: "DCFSA Available Balance",
     balance: "$620.00",
     balanceRows: [
@@ -533,7 +538,7 @@ export default function AppLpfsaDetail() {
                 flexShrink: 0,
               }}
             >
-              <Wallet size={20} strokeWidth={1.75} style={{ color: TINT }} />
+              <data.icon size={20} strokeWidth={1.75} style={{ color: TINT }} />
             </div>
             <div style={{ display: "flex", flexDirection: "column" }}>
               <div
