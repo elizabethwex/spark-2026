@@ -1,0 +1,1 @@
+const s="transparent",a="var(--app-border)",S="var(--app-success-surface)",_="var(--app-success-text)",r="var(--app-separator)",t="var(--system-link, #1C6EFF)";export{s as C,a,_ as b,S as c,r as d,t as e};
