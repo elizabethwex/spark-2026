@@ -15,9 +15,8 @@ import {
   Camera,
   Image as ImageIcon,
   Sparkles,
-  SquarePen,
 } from "lucide-react";
-import { AppNavBar, AppNavAction } from "@/components/app-shell/AppNavBar";
+import { AppNavBar } from "@/components/app-shell/AppNavBar";
 import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
 import {
   AppPromptChip,
@@ -1532,24 +1531,6 @@ export default function AppAssistIQ() {
     setDocState("submitted");
     finalApproval();
   }, [finalApproval]);
-
-  // ── Clear chat ──────────────────────────────────────────────────────
-  const clear = useCallback(() => {
-    setMessages([]);
-    setIsTyping(false);
-    setClaimWorked(false);
-    setDocState("idle");
-    setDocFileName("");
-    setUploadProgress(0);
-    setClaimsFlowStep(0);
-    setShowActionSheet(false);
-    setShowCamera(false);
-    setIsCapturing(false);
-    if (progressIntervalRef.current) {
-      clearInterval(progressIntervalRef.current);
-      progressIntervalRef.current = null;
-    }
-  }, []);
 
   const inWelcome = messages.length === 0 && !isTyping;
 

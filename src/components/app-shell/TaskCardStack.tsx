@@ -105,7 +105,7 @@ function SwipeableCard({
   // Fade out slightly at the edges
   const opacity = useTransform(x, [-150, 0, 150], [0.5, 1, 0.5]);
 
-  const handleDragEnd = (event: any, info: any) => {
+  const handleDragEnd = (_event: any, info: any) => {
     const threshold = 100;
     if (info.offset.x > threshold || info.offset.x < -threshold) {
       onSwipe();

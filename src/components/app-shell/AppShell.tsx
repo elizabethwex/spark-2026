@@ -73,7 +73,7 @@ export function AppShell() {
       <div
         style={{
           minHeight: "100dvh",
-          background: "#060F3A",
+          background: "rgba(14, 0, 38, 1)",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
