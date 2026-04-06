@@ -138,19 +138,15 @@ function CheckSquareIcon() {
     <svg
       width="16"
       height="16"
-      viewBox="0 0 16 16"
+      viewBox="0 0 24 24"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      style={{ flexShrink: 0 }}
+      stroke="currentColor"
+      strokeWidth="3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      style={{ flexShrink: 0, color: "var(--app-success, #1a6b45)" }}
     >
-      <rect width="16" height="16" rx="4" fill="#3958c3" />
-      <path
-        d="M4 8.5L6.5 11L12 5"
-        stroke="white"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      <polyline points="20 6 9 17 4 12" />
     </svg>
   );
 }
@@ -175,7 +171,7 @@ function AssistIQMessageHeader({ timestamp }: { timestamp: string }) {
           letterSpacing: -0.1,
         }}
       >
-        Assist IQ
+        WEXly
       </span>
       <span style={{ fontSize: 12, color: TEXT_SECONDARY }}>{timestamp}</span>
     </div>
@@ -331,7 +327,7 @@ function ClaimPreviewCard({
                 letterSpacing: -0.3,
               }}
             >
-              Dr. Miller — Dental
+              Bigtown Dentistry
             </div>
           </div>
           <div
@@ -342,7 +338,7 @@ function ClaimPreviewCard({
               letterSpacing: -0.5,
             }}
           >
-            $340.00
+            $210.00
           </div>
         </div>
 
@@ -366,7 +362,7 @@ function ClaimPreviewCard({
               <div
                 style={{ fontSize: 14, fontWeight: 500, color: TEXT_PRIMARY }}
               >
-                Apr 27, 2026
+                Apr 26, 2027
               </div>
             </div>
             <div>
@@ -433,7 +429,7 @@ function ClaimPreviewCard({
               lineHeight: 1.55,
             }}
           >
-            Upload your document to complete this claim for Dr. Miller.
+            Upload your document to complete this claim for Bigtown Dentistry.
           </p>
 
           {/* CTA button */}
@@ -622,7 +618,7 @@ function DocumentUploadCard({
               letterSpacing: -0.2,
             }}
           >
-            Dr. Miller — Dental · #123456
+            Bigtown Dentistry · #123456
           </div>
         </div>
 
@@ -1004,7 +1000,7 @@ function WelcomeSplash({ onChipSend }: { onChipSend: (text: string) => void }) {
             fontWeight: 700,
           }}
         >
-          Assist IQ
+          WEXly
         </span>
         , your Benefits helper.
         <br />
@@ -1132,7 +1128,7 @@ function DentistEobPlaceholder() {
 
         {/* Totals */}
         {[
-          ["Total Billed", "$420.00"],
+          ["Total Billed", "$290.00"],
           ["Plan Paid", "$80.00"],
         ].map(([label, value]) => (
           <div key={label} style={{ display: "flex", justifyContent: "space-between" }}>
@@ -1142,7 +1138,7 @@ function DentistEobPlaceholder() {
         ))}
         <div style={{ display: "flex", justifyContent: "space-between", marginTop: 2 }}>
           <span style={{ fontSize: 12, fontWeight: 700, color: "#25146F" }}>Patient Responsibility</span>
-          <span style={{ fontSize: 12, fontWeight: 700, color: "#25146F" }}>$340.00</span>
+          <span style={{ fontSize: 12, fontWeight: 700, color: "#25146F" }}>$210.00</span>
         </div>
       </div>
     </div>
@@ -1580,17 +1576,8 @@ export default function AppAssistIQ() {
       {/* Nav bar */}
       <AppNavBar
         variant="full-page"
-        title={inWelcome ? "" : "Assist IQ"}
+        title={inWelcome ? "" : "WEXly"}
         onClose={() => navigate(-1)}
-        rightActions={
-          !inWelcome ? (
-            <AppNavAction
-              icon={<SquarePen size={18} strokeWidth={2} />}
-              label="New chat"
-              onClick={clear}
-            />
-          ) : undefined
-        }
       />
 
       {/* Scrollable content */}
@@ -1763,7 +1750,7 @@ export default function AppAssistIQ() {
                 send(input);
               }
             }}
-            placeholder="Message Assist IQ…"
+            placeholder="Message WEXly…"
             style={{
               flex: 1,
               border: "none",
