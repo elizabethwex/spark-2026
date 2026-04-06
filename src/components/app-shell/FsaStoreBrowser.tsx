@@ -105,7 +105,7 @@ export function FsaStoreBrowser({ onClose }: FsaStoreBrowserProps) {
         ) : (
           <div className="absolute inset-0 overflow-y-auto bg-white">
             <img
-              src="/app-ui/fsa-res2.png"
+              src={`${import.meta.env.BASE_URL}app-ui/fsa-res2.png`}
               alt="FSA Store"
               className="w-full h-auto"
             />
