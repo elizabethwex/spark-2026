@@ -9,14 +9,17 @@ import {
   Clock,
   ChevronRight,
 } from "lucide-react";
+import { motion } from "framer-motion";
 import { AppNavBar } from "@/components/app-shell/AppNavBar";
 import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
+import { TaskCardStack } from "@/components/app-shell/TaskCardStack";
 import { useDeviceMockup } from "@/hooks/useDeviceMockup";
 import { FsaStoreBrowser } from "@/components/app-shell/FsaStoreBrowser";
 import { useReimburseWorkspace } from "@/context/ReimburseWorkspaceContext";
+import { TransactionDetailSheet, type TransactionRow as TransactionData } from "./AppAccountOverview";
 
-const FSA_STORE_LOGO = "/app-ui/fsastore-logo.svg";
-const FSA_STORE_IMAGE = "/app-ui/fsa-store-image.svg";
+const FSA_STORE_LOGO = `${import.meta.env.BASE_URL}app-ui/fsastore-logo.svg`;
+const FSA_STORE_IMAGE = `${import.meta.env.BASE_URL}app-ui/fsa-store-image.svg`;
 
 const CARD_SHADOW =
   "0px 3px 9px rgba(43,49,78,0.04), 0px 6px 18px rgba(43,49,78,0.06)";
@@ -221,6 +224,7 @@ export default function AppHome() {
   const navigate = useNavigate();
   const { deviceOn } = useDeviceMockup();
   const [showFsaStore, setShowFsaStore] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState<TransactionData | null>(null);
   const { openReimburseWorkspace } = useReimburseWorkspace();
 
   /** Device frame: tab bar is fixed over the scroll area — clear it. Mobile web: shell already reserves tab bar + safe area; add a small inner gap. */
@@ -232,7 +236,6 @@ export default function AppHome() {
     <div
       style={{
         minHeight: "auto",
-        background: "linear-gradient(189.07deg, var(--app-primary-50) 50%, var(--app-primary-300) 140%)",
         fontFamily: "var(--app-font)",
         paddingBottom:
           "calc(var(--app-tabbar-height, 95px) + env(safe-area-inset-bottom, 0px))",
@@ -242,191 +245,20 @@ export default function AppHome() {
       <AppNavBar variant="main" />
 
       {/* Scrollable content */}
-      <div
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
         style={{
           display: "flex",
           flexDirection: "column",
           gap: 24,
           paddingTop: 24,
           paddingBottom: contentPaddingBottom,
-          background: TINT_50,
         }}
       >
         {/* ── Missing document (debit card / Bigtown Dentistry) ── */}
-        <div style={{ padding: "0 16px" }}>
-          <div
-            style={{
-              background: "#fff",
-              borderRadius: 32,
-              padding: 16,
-              boxShadow: CARD_SHADOW,
-              display: "flex",
-              flexDirection: "column",
-              gap: 16,
-            }}
-          >
-            {/* Header text */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              <div
-                style={{
-                  fontSize: 20,
-                  fontWeight: 600,
-                  color: TEXT_PRIMARY,
-                  letterSpacing: -0.7,
-                  lineHeight: "25px",
-                }}
-              >
-                Missing Document Required
-              </div>
-              <div
-                style={{
-                  fontSize: 15,
-                  fontWeight: 400,
-                  color: TEXT_SECONDARY,
-                  letterSpacing: -0.23,
-                  lineHeight: "20px",
-                }}
-              >
-                Upload your document to complete this claim for Bigtown Dentistry.
-              </div>
-            </div>
-
-            {/* Claim row */}
-            <div
-              style={{
-                background: "var(--app-primary-50)",
-                border: "1px solid var(--app-primary-50)",
-                borderRadius: 24,
-                padding: 17,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-                {/* Icon box */}
-                <div
-                  style={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: 12,
-                    background: "#fff",
-                    border: "1px solid var(--app-border)",
-                    boxShadow: "0px 1px 2px rgba(0,0,0,0.05)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexShrink: 0,
-                  }}
-                >
-                  {/* Tooth / dental icon */}
-                  <svg
-                    width="18"
-                    height="19"
-                    viewBox="0 0 18 19"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M9 2C6.8 2 5 3.8 5 6c0 .8.2 1.5.6 2.1-.4 2.6-.8 5.2-1.2 6.8-.1.5.2 1.1.8 1.1.4 0 .8-.3.9-.7L7 12h4l1.9 3.3c.1.4.5.7.9.7.6 0 .9-.6.8-1.1-.4-1.6-.8-4.2-1.2-6.8.4-.6.6-1.3.6-2.1C14 3.8 12.2 2 10 2H9z"
-                      fill="var(--app-text-secondary)"
-                    />
-                  </svg>
-                </div>
-
-                {/* Details */}
-                <div>
-                  <div
-                    style={{
-                      fontSize: 17,
-                      fontWeight: 600,
-                      color: TEXT_PRIMARY,
-                      letterSpacing: -0.43,
-                      lineHeight: "22px",
-                    }}
-                  >
-                    Bigtown Dentistry
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 13,
-                      fontWeight: 400,
-                      color: TEXT_SECONDARY,
-                      letterSpacing: -0.08,
-                      lineHeight: "18px",
-                    }}
-                  >
-                    4/26/2027 · LPFSA Account
-                  </div>
-                </div>
-              </div>
-
-              {/* Amount */}
-              <div
-                style={{
-                  fontSize: 17,
-                  fontWeight: 600,
-                  color: TEXT_PRIMARY,
-                  letterSpacing: -0.43,
-                  lineHeight: "22px",
-                  flexShrink: 0,
-                }}
-              >
-                $210.00
-              </div>
-            </div>
-
-            {/* CTA button */}
-            <button
-              onClick={() => navigate("/app/claims")}
-              style={{
-                width: "100%",
-                borderRadius: 1000,
-                border: "none",
-                cursor: "pointer",
-                padding: "14px 20px",
-                background:
-                  "linear-gradient(170.9deg, #25146F 2.46%, #C8102E 100%)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 4,
-                fontFamily: "var(--app-font)",
-              }}
-            >
-              <span
-                style={{
-                  fontSize: 17,
-                  fontWeight: 400,
-                  color: "#fff",
-                  letterSpacing: -0.43,
-                  lineHeight: "22px",
-                }}
-              >
-                Upload document
-              </span>
-            </button>
-
-            {/* Remind me tomorrow */}
-            <div style={{ textAlign: "center" }}>
-              <button
-                style={{
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  fontSize: 12,
-                  fontWeight: 400,
-                  color: TEXT_SECONDARY,
-                  fontFamily: "var(--app-font)",
-                  lineHeight: "16px",
-                }}
-              >
-                Remind me tomorrow
-              </button>
-            </div>
-          </div>
-        </div>
+        <TaskCardStack />
 
         {/* ── Your Accounts ── */}
         <div style={{ padding: "0 16px" }}>
@@ -894,6 +726,11 @@ export default function AppHome() {
 
         {/* ── Recent Transactions ── */}
         <div style={{ padding: "0 16px" }}>
+          <SectionHeader
+            title="Recent Transactions"
+            onMore={() => navigate("/app/account")}
+          />
+
           <div
             style={{
               background: "#fff",
@@ -902,37 +739,86 @@ export default function AppHome() {
               boxShadow: CARD_SHADOW,
             }}
           >
-            {/* Section header inside card */}
-            <div style={{ padding: "0 0" }}>
-              <SectionHeader
-                title="Recent Transactions"
-                onMore={() => navigate("/app/account")}
-              />
-            </div>
-
             {/* Transaction rows */}
             {[
-              { title: "Pharmacy",      subtitle: "4/27/2026 · LPFSA", amount: "$42.50",  id: "c1" },
-              { title: "Bigtown Dentistry",subtitle: "4/27/2026 · LPFSA", amount: "$210.00", id: "c3" },
-              { title: "Investment Buy", subtitle: "4/27/2026 · HSA",   amount: "$500.00", id: "c2" },
+              {
+                title: "Pharmacy",
+                subtitle: "4/27/2026 · LPFSA",
+                amount: "$42.50",
+                id: "c1",
+                txData: {
+                  merchant: "Pharmacy",
+                  date: "4/27/2026",
+                  account: "LPFSA",
+                  amount: "$42.50",
+                  processedDate: "04/27/2026",
+                  description: "Vision (New Frames)",
+                  planYear: "2026",
+                  availableBalance: "$785.00",
+                  runningBalance: "$742.50",
+                  status: "complete" as const,
+                },
+              },
+              {
+                title: "Bigtown Dentistry",
+                subtitle: "4/27/2026 · LPFSA",
+                amount: "$210.00",
+                id: "c3",
+                txData: {
+                  merchant: "Bigtown Dentistry",
+                  date: "4/27/2026",
+                  account: "LPFSA",
+                  amount: "$210.00",
+                  processedDate: "04/27/2026",
+                  description: "Dental Care",
+                  planYear: "2026",
+                  availableBalance: "$445.00",
+                  runningBalance: "$402.50",
+                  status: "complete" as const,
+                },
+              },
+              {
+                title: "Investment Buy",
+                subtitle: "4/27/2026 · HSA",
+                amount: "$500.00",
+                id: "c2",
+                txData: {
+                  merchant: "Investment Buy",
+                  date: "4/27/2026",
+                  account: "HSA",
+                  amount: "$500.00",
+                  processedDate: "04/27/2026",
+                  description: "Investment Transfer",
+                  planYear: "2026",
+                  availableBalance: "$15,400.00",
+                  runningBalance: "$14,900.00",
+                  status: "complete" as const,
+                },
+              },
             ].map((tx) => (
               <TransactionRow
                 key={tx.id}
                 title={tx.title}
                 subtitle={tx.subtitle}
                 amount={tx.amount}
-                onClick={() => navigate(`/app/claims/${tx.id}`)}
+                onClick={() => setSelectedTransaction(tx.txData)}
               />
             ))}
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {showFsaStore && (
         <div style={{ position: "fixed", inset: 0, zIndex: 60 }}>
           <FsaStoreBrowser onClose={() => setShowFsaStore(false)} />
         </div>
       )}
+
+      {/* Transaction Detail Sheet */}
+      <TransactionDetailSheet
+        transaction={selectedTransaction}
+        onClose={() => setSelectedTransaction(null)}
+      />
     </div>
   );
 }

@@ -105,12 +105,18 @@ export default function AppClaimsOverview() {
         minHeight: "100%",
         background: CLAIMS_PAGE_BACKGROUND,
         fontFamily: "var(--app-font)",
+        paddingBottom: "calc(var(--app-tabbar-height, 95px) + env(safe-area-inset-bottom, 0px) + 64px)",
       }}
     >
       <AppTopSpacer variant="home" />
       <AppNavBar variant="title" title="Claims" />
 
-      <div style={{ padding: "8px 16px 0", display: "flex", alignItems: "center", gap: 8 }}>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+      >
+        <div style={{ padding: "8px 16px 0", display: "flex", alignItems: "center", gap: 8 }}>
         <div
           style={{
             flex: 1,
@@ -235,6 +241,8 @@ export default function AppClaimsOverview() {
           })
         )}
       </div>
+
+      </motion.div>
 
       <AnimatePresence>
         {filterSheetOpen && (

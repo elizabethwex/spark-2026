@@ -24,7 +24,7 @@ type UploadPhase = "default" | "options" | "uploading" | "success";
 const softEaseOut: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 
 /**
- * SPARK-2026 AI-forward hero: Assist IQ + "Your next steps" task insight (Figma).
+ * SPARK-2026 AI-forward hero: WEXly + "Your next steps" task insight (Figma).
  */
 export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 }) {
   const navigate = useNavigate();

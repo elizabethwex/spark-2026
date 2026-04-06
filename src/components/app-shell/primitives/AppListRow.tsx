@@ -137,7 +137,7 @@ export function AppListSection({
   children: ReactNode;
 }) {
   return (
-    <div style={{ marginBottom: 24 }}>
+    <div style={{ display: "flex", flexDirection: "column" }}>
       {header && (
         <div
           style={{
@@ -147,7 +147,7 @@ export function AppListSection({
             letterSpacing: 0.07,
             color: "var(--app-text-secondary)",
             textTransform: "uppercase",
-            padding: "0 16px 6px",
+            padding: "0 8px 6px",
           }}
         >
           {header}
@@ -159,7 +159,6 @@ export function AppListSection({
           borderRadius: "var(--app-radius-lg)",
           overflow: "hidden",
           boxShadow: "var(--app-card-shadow)",
-          margin: "0 16px",
         }}
       >
         {children}
@@ -170,7 +169,7 @@ export function AppListSection({
             fontFamily: "var(--app-font)",
             fontSize: 13,
             color: "var(--app-text-secondary)",
-            padding: "6px 16px 0",
+            padding: "6px 8px 0",
           }}
         >
           {footer}

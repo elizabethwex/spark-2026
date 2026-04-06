@@ -1015,7 +1015,6 @@ export default function AppAccountDetail() {
       style={{
         minHeight: "auto",
         fontFamily: "var(--app-font)",
-        background: "linear-gradient(186.833deg, var(--app-primary-50) 50%, var(--app-primary-300) 140%)",
         paddingBottom: "calc(var(--app-tabbar-height, 95px) + env(safe-area-inset-bottom, 0px) + 64px)",
       }}
     >
@@ -1082,9 +1081,9 @@ export default function AppAccountDetail() {
             {meta.name}
           </span>
 
-          {/* AssistIQ button */}
+          {/* WEXly button */}
           <button
-            aria-label="Assist IQ"
+            aria-label="WEXly"
             onClick={() => navigate("/app/assist-iq")}
             style={{
               width: 48,

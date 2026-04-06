@@ -9,11 +9,10 @@ import {
   SlidersHorizontal,
   Receipt,
   Send,
-  User,
-  Sparkles,
-  Clock,
   X,
 } from "lucide-react";
+import { AppNavBar } from "@/components/app-shell/AppNavBar";
+import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
 
 const CARD_SHADOW =
   "0px 3.017px 9.051px rgba(43,49,78,0.04), 0px 6.034px 18.101px rgba(43,49,78,0.06)";
@@ -23,7 +22,7 @@ const TINT = "var(--app-primary)";
 const TINT_50 = "var(--app-primary-50)";
 const WARNING_BG = "var(--app-warning)";
 const WARNING_TEXT = "#4a3500";
-const LINK_COLOR = "var(--app-info)";
+const LINK_COLOR = "var(--system-link, #1C6EFF)";
 const SEPARATOR = "var(--app-separator)";
 const SUCCESS_SURFACE = "var(--app-success-surface)";
 const SUCCESS_TEXT = "var(--app-success-text)";
@@ -62,7 +61,7 @@ const ACCOUNTS: AccountCardData[] = [
   },
 ];
 
-interface TransactionRow {
+export interface TransactionRow {
   merchant: string;
   date: string;
   account: string;
@@ -253,84 +252,18 @@ export default function AppAccountOverview() {
       style={{
         minHeight: "auto",
         fontFamily: "var(--app-font)",
-        background: "linear-gradient(189.07deg, var(--app-primary-50) 50%, var(--app-primary-300) 140%)",
         paddingBottom:
           "calc(var(--app-tabbar-height, 95px) + env(safe-area-inset-bottom, 0px) + 64px)",
       }}
     >
-      {/* Large-title header */}
-      <div
-        style={{
-          position: "sticky",
-          top: 0,
-          zIndex: 40,
-          paddingTop: "env(safe-area-inset-top, 0px)",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "10px 16px 10px",
-          }}
-        >
-          <div
-            style={{
-              fontSize: 34,
-              fontWeight: 700,
-              lineHeight: "41px",
-              letterSpacing: 0.4,
-              color: TEXT_PRIMARY,
-            }}
-          >
-            Accounts
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <button
-              aria-label="Profile"
-              onClick={() => navigate("/app/my-account")}
-              style={{
-                width: 48,
-                height: 48,
-                borderRadius: "50%",
-                background: "rgba(255,255,255,0.65)",
-                border: "none",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                boxShadow: "0 8px 40px rgba(0,0,0,0.12)",
-                flexShrink: 0,
-              }}
-            >
-              <User size={19} strokeWidth={2} style={{ color: TEXT_PRIMARY }} />
-            </button>
-            <button
-              aria-label="Assist IQ"
-              onClick={() => navigate("/app/assist-iq")}
-              style={{
-                width: 48,
-                height: 48,
-                borderRadius: "50%",
-                background: "linear-gradient(133.5deg, #25146F 2.46%, #C8102E 100%)",
-                border: "none",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                boxShadow: "0 4px 16px rgba(37,20,111,0.35)",
-                flexShrink: 0,
-              }}
-            >
-              <Sparkles size={20} strokeWidth={1.75} style={{ color: "#fff" }} />
-            </button>
-          </div>
-        </div>
-      </div>
+      <AppTopSpacer variant="home" />
+      <AppNavBar variant="title" title="Accounts" />
 
       {/* Page content */}
-      <div
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
         style={{
           display: "flex",
           flexDirection: "column",
@@ -467,12 +400,11 @@ export default function AppAccountOverview() {
                         gap: 4,
                         background: WARNING_BG,
                         borderRadius: 6,
-                        padding: "2px 8px 2px 4px",
+                        padding: "2px 8px",
                         marginTop: 2,
                         width: "fit-content",
                       }}
                     >
-                      <Clock size={12} strokeWidth={2} style={{ color: WARNING_TEXT }} />
                       <span
                         style={{
                           fontSize: 12,
@@ -887,7 +819,7 @@ export default function AppAccountOverview() {
             </div>
           ))}
         </div>
-      </div>
+      </motion.div>
 
       {/* Transaction Detail Sheet */}
       <TransactionDetailSheet
@@ -904,7 +836,7 @@ export default function AppAccountOverview() {
   );
 }
 
-function TransactionDetailSheet({
+export function TransactionDetailSheet({
   transaction,
   onClose,
 }: {

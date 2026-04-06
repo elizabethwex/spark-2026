@@ -18,8 +18,13 @@ const TABS: Tab[] = [
 export function AppTabBar() {
   const location = useLocation();
 
-  // Assist IQ takes over the full screen — hide the tab bar
-  if (["/app/assist-iq", "/app/penny", "/app/lock-screen"].includes(location.pathname)) return null;
+  // WEXly takes over the full screen — hide the tab bar
+  if (
+    ["/app/assist-iq", "/app/penny", "/app/lock-screen"].includes(location.pathname) ||
+    location.pathname.startsWith("/app/my-account")
+  ) {
+    return null;
+  }
 
   const isActive = (tab: Tab) => {
     if (tab.exact) return location.pathname === "/app" || location.pathname === "/app/";

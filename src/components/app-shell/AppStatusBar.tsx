@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAppChrome } from "@/context/AppChromeContext";
-import { APP_TOP_LIQUID_GLASS } from "./appChromeStyles";
 
 /** Height consumed by the status bar inside the phone screen. */
 export const STATUS_BAR_HEIGHT = 54;
@@ -89,7 +88,8 @@ export function AppStatusBar() {
         userSelect: "none",
         fontFamily: "var(--app-font)",
         zIndex: 50,
-        ...APP_TOP_LIQUID_GLASS,
+        background: "rgba(238, 243, 255, 1)",
+        transition: "background 0.2s ease",
       }}
     >
       {/* Time — left, uses flex-1 so it stops well before the DI */}

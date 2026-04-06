@@ -22,17 +22,17 @@ export type AppNavBarProps =
   | (BaseChrome & {
       variant: "sub-page";
       title: string;
-      backTo: string;
+      backTo: string | number;
       backLabel?: string;
     })
   | (BaseChrome & {
       variant: "full-page";
       title: string;
       /** Optional back affordance (liquid pill). */
-      backTo?: string;
+      backTo?: string | number;
       backLabel?: string;
       onClose: () => void;
-      /** Shown before the close control (e.g. Assist IQ “new chat”). */
+      /** Shown before the close control (e.g. WEXly “new chat”). */
       rightActions?: ReactNode;
     });
 
@@ -71,11 +71,10 @@ const ASSIST_GRADIENT_BTN: React.CSSProperties = {
 const BACK_PILL_BTN: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
-  gap: 2,
+  justifyContent: "center",
   height: 44,
-  minWidth: 44,
-  padding: "0 10px 0 6px",
-  borderRadius: 296,
+  width: 44,
+  borderRadius: "50%",
   border: "none",
   cursor: "pointer",
   flexShrink: 0,
@@ -100,7 +99,7 @@ function ProfileButton({ onClick }: { onClick: () => void }) {
 
 function AssistIqButton({ onClick }: { onClick: () => void }) {
   return (
-    <button type="button" aria-label="Assist IQ" onClick={onClick} style={ASSIST_GRADIENT_BTN}>
+    <button type="button" aria-label="WEXly" onClick={onClick} style={ASSIST_GRADIENT_BTN}>
       <Sparkles size={22} strokeWidth={1.75} style={{ color: "#fff" }} />
     </button>
   );
@@ -108,9 +107,8 @@ function AssistIqButton({ onClick }: { onClick: () => void }) {
 
 function BackPill({ label, onClick }: { label: string; onClick: () => void }) {
   return (
-    <button type="button" onClick={onClick} style={BACK_PILL_BTN}>
-      <ChevronLeft size={22} strokeWidth={2} style={{ color: "var(--app-text)", marginLeft: -2 }} />
-      <span>{label}</span>
+    <button type="button" onClick={onClick} style={BACK_PILL_BTN} aria-label={label}>
+      <ChevronLeft size={22} strokeWidth={2} style={{ color: "var(--app-text)" }} />
     </button>
   );
 }
@@ -118,7 +116,7 @@ function BackPill({ label, onClick }: { label: string; onClick: () => void }) {
 export function AppNavBar(props: AppNavBarProps) {
   const navigate = useNavigate();
   const { deviceOn } = useDeviceMockup();
-  const { topChromeHidden } = useAppChrome();
+  const { topChromeHidden, isScrolled } = useAppChrome();
 
   const hideY = deviceOn ? -(STATUS_BAR_HEIGHT + APP_NAV_HOME_INNER_H) : "-100%";
 
@@ -133,7 +131,14 @@ export function AppNavBar(props: AppNavBarProps) {
     fontFamily: "var(--app-font)",
     paddingTop: deviceOn ? 0 : "env(safe-area-inset-top, 0px)",
     top: deviceOn ? STATUS_BAR_HEIGHT : 0,
-    ...APP_TOP_LIQUID_GLASS,
+    ...(isScrolled 
+      ? APP_TOP_LIQUID_GLASS 
+      : { 
+          background: "transparent",
+          backdropFilter: "none",
+          WebkitBackdropFilter: "none",
+        }),
+    transition: "background 0.2s ease, backdrop-filter 0.2s ease, -webkit-backdrop-filter 0.2s ease",
   };
 
   const applySolid = (base: React.CSSProperties): React.CSSProperties => {
@@ -219,7 +224,7 @@ export function AppNavBar(props: AppNavBarProps) {
         style={applySolid({ ...fixedChrome, borderBottom: "none" })}
       >
         <div style={{ ...rowStyle, justifyContent: "space-between", position: "relative" }}>
-          <BackPill label={backLabel} onClick={() => navigate(backTo)} />
+          <BackPill label={backLabel} onClick={() => typeof backTo === "number" ? navigate(backTo) : navigate(backTo)} />
           <span
             style={{
               position: "absolute",
@@ -254,7 +259,7 @@ export function AppNavBar(props: AppNavBarProps) {
     >
       <div style={{ ...rowStyle, justifyContent: "space-between", position: "relative" }}>
         <div style={{ flex: "0 0 auto", minWidth: 44, display: "flex", justifyContent: "flex-start" }}>
-          {backTo ? <BackPill label={backLabel} onClick={() => navigate(backTo)} /> : <span style={{ width: 44 }} aria-hidden />}
+          {backTo !== undefined ? <BackPill label={backLabel} onClick={() => typeof backTo === "number" ? navigate(backTo) : navigate(backTo)} /> : <span style={{ width: 44 }} aria-hidden />}
         </div>
         {title ? (
           <span

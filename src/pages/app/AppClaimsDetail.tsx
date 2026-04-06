@@ -205,6 +205,7 @@ export default function AppClaimsDetail() {
         minHeight: "100%",
         background: CLAIMS_PAGE_BACKGROUND,
         fontFamily: "var(--app-font)",
+        paddingBottom: "calc(var(--app-tabbar-height, 95px) + env(safe-area-inset-bottom, 0px) + 64px)",
       }}
     >
       <AppTopSpacer variant="home" />
