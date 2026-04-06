@@ -4,6 +4,8 @@ import {
   ArrowRight,
   Wallet,
   CreditCard,
+  HeartPulse,
+  Baby,
   RefreshCw,
   Lock,
   Clock,
@@ -16,6 +18,7 @@ import { TaskCardStack } from "@/components/app-shell/TaskCardStack";
 import { useDeviceMockup } from "@/hooks/useDeviceMockup";
 import { FsaStoreBrowser } from "@/components/app-shell/FsaStoreBrowser";
 import { useReimburseWorkspace } from "@/context/ReimburseWorkspaceContext";
+import { useAppVariant, type AppVariant } from "@/context/AppVariantContext";
 import { TransactionDetailSheet, type TransactionRow as TransactionData } from "./AppAccountOverview";
 
 const FSA_STORE_LOGO = `${import.meta.env.BASE_URL}app-ui/fsastore-logo.svg`;
@@ -28,6 +31,59 @@ const TEXT_PRIMARY = "var(--app-text)";
 const TEXT_SECONDARY = "var(--app-text-secondary)";
 const TINT = "var(--app-primary)";
 const TINT_50 = "var(--app-primary-50)";
+
+/* ── Variant-specific account card data ─────────────────────────────── */
+
+interface HomeAccountCard {
+  id: string;
+  name: string;
+  tag: string;
+  balanceLabel?: string;
+  balance: string;
+  icon: typeof Wallet;
+  warningTag?: string;
+  route: string;
+}
+
+const HOME_ACCOUNTS: Record<AppVariant, HomeAccountCard[]> = {
+  1: [
+    { id: "hsa", name: "Health Savings Account", tag: "HSA", balanceLabel: "Cash + Invested Assets", balance: "$15,900.00", icon: Wallet, route: "/app/account/hsa" },
+    { id: "lpfsa", name: "Limited Purpose FSA", tag: "01/01/2026 – 12/31/2026", balance: "$850.00", icon: CreditCard, warningTag: "28 Days left to spend", route: "/app/account/lpfsa" },
+  ],
+  2: [
+    { id: "fsa", name: "Healthcare FSA", tag: "01/01/2026 – 12/31/2026", balance: "$850.00", icon: HeartPulse, warningTag: "28 Days left to spend", route: "/app/account/fsa" },
+    { id: "dcfsa", name: "DCFSA", tag: "01/01/2025 – 12/31/2025", balance: "$620.00", icon: Baby, warningTag: "28 Days left to spend", route: "/app/account/dcfsa" },
+  ],
+  3: [
+    { id: "hsa", name: "Health Savings Account", tag: "HSA", balanceLabel: "Cash + Invested Assets", balance: "$15,900.00", icon: Wallet, route: "/app/account/hsa" },
+  ],
+};
+
+interface HomeTxRow {
+  id: string;
+  title: string;
+  subtitle: string;
+  amount: string;
+  txData: TransactionData;
+}
+
+const HOME_TRANSACTIONS: Record<AppVariant, HomeTxRow[]> = {
+  1: [
+    { id: "c1", title: "Pharmacy", subtitle: "4/27/2026 · LPFSA", amount: "$42.50", txData: { merchant: "Pharmacy", date: "4/27/2026", account: "LPFSA", amount: "$42.50", processedDate: "04/27/2026", description: "Vision (New Frames)", planYear: "2026", availableBalance: "$785.00", runningBalance: "$742.50", status: "complete" } },
+    { id: "c3", title: "Bigtown Dentistry", subtitle: "4/27/2026 · LPFSA", amount: "$210.00", txData: { merchant: "Bigtown Dentistry", date: "4/27/2026", account: "LPFSA", amount: "$210.00", processedDate: "04/27/2026", description: "Dental Care", planYear: "2026", availableBalance: "$445.00", runningBalance: "$402.50", status: "complete" } },
+    { id: "c2", title: "Investment Buy", subtitle: "4/27/2026 · HSA", amount: "$500.00", txData: { merchant: "Investment Buy", date: "4/27/2026", account: "HSA", amount: "$500.00", processedDate: "04/27/2026", description: "Investment Transfer", planYear: "2026", availableBalance: "$15,400.00", runningBalance: "$14,900.00", status: "complete" } },
+  ],
+  2: [
+    { id: "c1", title: "Pharmacy", subtitle: "4/27/2026 · FSA", amount: "$42.50", txData: { merchant: "Pharmacy", date: "4/27/2026", account: "FSA", amount: "$42.50", processedDate: "04/27/2026", description: "Prescription Medicine", planYear: "2026", availableBalance: "$807.50", runningBalance: "$765.00", status: "complete" } },
+    { id: "c3", title: "Bright Horizons Daycare", subtitle: "4/27/2026 · DCFSA", amount: "$185.00", txData: { merchant: "Bright Horizons Daycare", date: "4/27/2026", account: "DCFSA", amount: "$185.00", processedDate: "04/27/2026", description: "Childcare", planYear: "2025", availableBalance: "$620.00", runningBalance: "$435.00", status: "complete" } },
+    { id: "c2", title: "CVS Pharmacy", subtitle: "4/25/2026 · FSA", amount: "$28.10", txData: { merchant: "CVS Pharmacy", date: "4/25/2026", account: "FSA", amount: "$28.10", processedDate: "04/25/2026", description: "OTC Medicine", planYear: "2026", availableBalance: "$878.10", runningBalance: "$850.00", status: "complete" } },
+  ],
+  3: [
+    { id: "c1", title: "Investment Buy", subtitle: "4/27/2026 · HSA", amount: "$500.00", txData: { merchant: "Investment Buy", date: "4/27/2026", account: "HSA", amount: "$500.00", processedDate: "04/27/2026", description: "Investment Transfer", planYear: "2026", availableBalance: "$15,400.00", runningBalance: "$14,900.00", status: "complete" } },
+    { id: "c2", title: "Shell Gas Station", subtitle: "4/25/2026 · HSA", amount: "$54.12", txData: { merchant: "Shell Gas Station", date: "4/25/2026", account: "HSA", amount: "$54.12", processedDate: "04/25/2026", description: "Transportation", planYear: "2026", availableBalance: "$15,454.12", runningBalance: "$15,400.00", status: "complete" } },
+    { id: "c3", title: "Quest Diagnostics", subtitle: "3/22/2026 · HSA", amount: "$95.10", txData: { merchant: "Quest Diagnostics", date: "3/22/2026", account: "HSA", amount: "$95.10", processedDate: "03/22/2026", description: "Lab Tests", planYear: "2026", availableBalance: "$15,549.22", runningBalance: "$15,454.12", status: "complete" } },
+  ],
+};
 
 interface SectionHeaderProps {
   title: string;
@@ -226,6 +282,9 @@ export default function AppHome() {
   const [showFsaStore, setShowFsaStore] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<TransactionData | null>(null);
   const { openReimburseWorkspace } = useReimburseWorkspace();
+  const { variant } = useAppVariant();
+  const accounts = HOME_ACCOUNTS[variant];
+  const transactions = HOME_TRANSACTIONS[variant];
 
   /** Device frame: tab bar is fixed over the scroll area — clear it. Mobile web: shell already reserves tab bar + safe area; add a small inner gap. */
   const contentPaddingBottom = deviceOn
@@ -268,255 +327,98 @@ export default function AppHome() {
           />
 
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {/* HSA card */}
-            <div
-              onClick={() => navigate("/app/account/hsa")}
-              style={{
-                background: "#fff",
-                borderRadius: 24,
-                overflow: "hidden",
-                boxShadow: CARD_SHADOW,
-                cursor: "pointer",
-              }}
-            >
-              {/* Top row: icon + name */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 12,
-                  padding: "12px 16px 0",
-                }}
-              >
+            {accounts.map((acct) => {
+              const Icon = acct.icon;
+              return (
                 <div
+                  key={acct.id}
+                  onClick={() => navigate(acct.route)}
                   style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 9999,
-                    background: TINT_50,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexShrink: 0,
+                    background: "#fff",
+                    borderRadius: 24,
+                    overflow: "hidden",
+                    boxShadow: CARD_SHADOW,
+                    cursor: "pointer",
                   }}
                 >
-                  <Wallet size={20} strokeWidth={1.75} style={{ color: TINT }} />
-                </div>
-                <div>
                   <div
                     style={{
-                      fontSize: 17,
-                      fontWeight: 600,
-                      color: TEXT_PRIMARY,
-                      letterSpacing: -0.43,
-                      lineHeight: "22px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 12,
+                      padding: "12px 16px 0",
                     }}
                   >
-                    Health Savings Account
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 12,
-                      color: TEXT_SECONDARY,
-                      lineHeight: "16px",
-                    }}
-                  >
-                    HSA
-                  </div>
-                </div>
-              </div>
-
-              {/* Balance row */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "flex-start",
-                  justifyContent: "space-between",
-                  padding: "8px 16px 16px",
-                  gap: 16,
-                }}
-              >
-                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
                     <div
                       style={{
-                        fontSize: 17,
-                        fontWeight: 400,
-                        color: TEXT_SECONDARY,
-                        letterSpacing: -0.43,
-                        lineHeight: "22px",
-                      }}
-                    >
-                      Total Account Balance
-                    </div>
-                    <div
-                      style={{
-                        fontSize: 12,
-                        color: TEXT_SECONDARY,
-                        lineHeight: "16px",
-                      }}
-                    >
-                      Cash + Invested Assets
-                    </div>
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 22,
-                      fontWeight: 700,
-                      color: TEXT_PRIMARY,
-                      letterSpacing: -0.9,
-                      lineHeight: "28px",
-                    }}
-                  >
-                    $15,900.00
-                  </div>
-                </div>
-
-                <div
-                  style={{
-                    height: 68,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "flex-end",
-                    flexShrink: 0,
-                  }}
-                >
-                  <ChevronRight size={17} strokeWidth={2.5} style={{ color: TEXT_SECONDARY }} />
-                </div>
-              </div>
-            </div>
-
-            {/* LPFSA card */}
-            <div
-              onClick={() => navigate("/app/account/lpfsa")}
-              style={{
-                background: "#fff",
-                borderRadius: 24,
-                boxShadow: CARD_SHADOW,
-                cursor: "pointer",
-              }}
-            >
-              {/* Top row: icon + name */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 12,
-                  padding: "12px 16px 0",
-                }}
-              >
-                <div
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 9999,
-                    background: TINT_50,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexShrink: 0,
-                  }}
-                >
-                  <CreditCard size={20} strokeWidth={1.75} style={{ color: TINT }} />
-                </div>
-                <div>
-                  <div
-                    style={{
-                      fontSize: 17,
-                      fontWeight: 600,
-                      color: TEXT_PRIMARY,
-                      letterSpacing: -0.43,
-                      lineHeight: "22px",
-                    }}
-                  >
-                    Limited Purpose FSA
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 12,
-                      color: TEXT_SECONDARY,
-                      lineHeight: "16px",
-                    }}
-                  >
-                    01/01/2026 – 12/31/2026
-                  </div>
-                </div>
-              </div>
-
-              {/* Balance + warning tag */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "flex-start",
-                  justifyContent: "space-between",
-                  padding: "8px 16px 16px",
-                  gap: 16,
-                }}
-              >
-                <div style={{ display: "flex", flexDirection: "column", gap: 4, flex: 1, minWidth: 0 }}>
-                  <div
-                    style={{
-                      fontSize: 17,
-                      fontWeight: 400,
-                      color: TEXT_SECONDARY,
-                      letterSpacing: -0.43,
-                      lineHeight: "22px",
-                    }}
-                  >
-                    Available balance
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 22,
-                      fontWeight: 700,
-                      color: TEXT_PRIMARY,
-                      letterSpacing: -0.9,
-                      lineHeight: "28px",
-                    }}
-                  >
-                    $850.00
-                  </div>
-
-                  {/* Warning tag */}
-                  <div style={{ display: "flex", alignItems: "center" }}>
-                    <div
-                      style={{
-                        display: "inline-flex",
+                        width: 40,
+                        height: 40,
+                        borderRadius: 9999,
+                        background: TINT_50,
+                        display: "flex",
                         alignItems: "center",
-                        gap: 4,
-                        background: "var(--app-warning)",
-                        borderRadius: 6,
-                        padding: "2px 8px",
+                        justifyContent: "center",
+                        flexShrink: 0,
                       }}
                     >
-                      <span
-                        style={{
-                          fontSize: 12,
-                          fontWeight: 400,
-                          color: "#4a3500",
-                          lineHeight: "16px",
-                          whiteSpace: "nowrap",
-                        }}
-                      >
-                        28 Days left to spend
-                      </span>
+                      <Icon size={20} strokeWidth={1.75} style={{ color: TINT }} />
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 17, fontWeight: 600, color: TEXT_PRIMARY, letterSpacing: -0.43, lineHeight: "22px" }}>
+                        {acct.name}
+                      </div>
+                      <div style={{ fontSize: 12, color: TEXT_SECONDARY, lineHeight: "16px" }}>
+                        {acct.tag}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "flex-start",
+                      justifyContent: "space-between",
+                      padding: "8px 16px 16px",
+                      gap: 16,
+                    }}
+                  >
+                    <div style={{ display: "flex", flexDirection: "column", gap: 4, flex: 1, minWidth: 0 }}>
+                      {acct.balanceLabel && (
+                        <div style={{ fontSize: 12, color: TEXT_SECONDARY, lineHeight: "16px" }}>
+                          {acct.balanceLabel}
+                        </div>
+                      )}
+                      <div style={{ fontSize: 34, fontWeight: 700, color: TEXT_PRIMARY, letterSpacing: 0.4, lineHeight: "41px" }}>
+                        {acct.balance}
+                      </div>
+                      {acct.warningTag && (
+                        <div style={{ display: "flex", alignItems: "center" }}>
+                          <div
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: 4,
+                              background: "var(--app-warning)",
+                              borderRadius: 6,
+                              padding: "2px 8px 2px 4px",
+                            }}
+                          >
+                            <Clock size={12} strokeWidth={2} style={{ color: "#4a3500" }} />
+                            <span style={{ fontSize: 12, fontWeight: 500, color: "#4a3500", lineHeight: "16px", whiteSpace: "nowrap" }}>
+                              {acct.warningTag}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div style={{ height: 68, display: "flex", alignItems: "center", justifyContent: "flex-end", flexShrink: 0 }}>
+                      <ChevronRight size={17} strokeWidth={2.5} style={{ color: TEXT_SECONDARY }} />
                     </div>
                   </div>
                 </div>
-
-                <div
-                  style={{
-                    height: 68,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "flex-end",
-                    flexShrink: 0,
-                  }}
-                >
-                  <ChevronRight size={17} strokeWidth={2.5} style={{ color: TEXT_SECONDARY }} />
-                </div>
-              </div>
-            </div>
+              );
+            })}
           </div>
         </div>
 
@@ -739,63 +641,7 @@ export default function AppHome() {
               boxShadow: CARD_SHADOW,
             }}
           >
-            {/* Transaction rows */}
-            {[
-              {
-                title: "Pharmacy",
-                subtitle: "4/27/2026 · LPFSA",
-                amount: "$42.50",
-                id: "c1",
-                txData: {
-                  merchant: "Pharmacy",
-                  date: "4/27/2026",
-                  account: "LPFSA",
-                  amount: "$42.50",
-                  processedDate: "04/27/2026",
-                  description: "Vision (New Frames)",
-                  planYear: "2026",
-                  availableBalance: "$785.00",
-                  runningBalance: "$742.50",
-                  status: "complete" as const,
-                },
-              },
-              {
-                title: "Bigtown Dentistry",
-                subtitle: "4/27/2026 · LPFSA",
-                amount: "$210.00",
-                id: "c3",
-                txData: {
-                  merchant: "Bigtown Dentistry",
-                  date: "4/27/2026",
-                  account: "LPFSA",
-                  amount: "$210.00",
-                  processedDate: "04/27/2026",
-                  description: "Dental Care",
-                  planYear: "2026",
-                  availableBalance: "$445.00",
-                  runningBalance: "$402.50",
-                  status: "complete" as const,
-                },
-              },
-              {
-                title: "Investment Buy",
-                subtitle: "4/27/2026 · HSA",
-                amount: "$500.00",
-                id: "c2",
-                txData: {
-                  merchant: "Investment Buy",
-                  date: "4/27/2026",
-                  account: "HSA",
-                  amount: "$500.00",
-                  processedDate: "04/27/2026",
-                  description: "Investment Transfer",
-                  planYear: "2026",
-                  availableBalance: "$15,400.00",
-                  runningBalance: "$14,900.00",
-                  status: "complete" as const,
-                },
-              },
-            ].map((tx) => (
+            {transactions.map((tx) => (
               <TransactionRow
                 key={tx.id}
                 title={tx.title}

@@ -4,15 +4,19 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Wallet,
   CreditCard,
+  HeartPulse,
+  Baby,
   ChevronRight,
   ChevronDown,
   SlidersHorizontal,
   Receipt,
   Send,
   X,
+  Clock,
 } from "lucide-react";
 import { AppNavBar } from "@/components/app-shell/AppNavBar";
 import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
+import { useAppVariant, type AppVariant } from "@/context/AppVariantContext";
 
 const CARD_SHADOW =
   "0px 3.017px 9.051px rgba(43,49,78,0.04), 0px 6.034px 18.101px rgba(43,49,78,0.06)";
@@ -36,30 +40,23 @@ interface AccountCardData {
   balanceLabel: string;
   balanceSubLabel?: string;
   balance: string;
-  icon: "wallet" | "credit-card";
+  icon: "wallet" | "credit-card" | "heart-pulse" | "baby";
   warningTag?: string;
 }
 
-const ACCOUNTS: AccountCardData[] = [
-  {
-    id: "hsa",
-    name: "Health Savings Account",
-    subtitle: "HSA",
-    balanceLabel: "Total Account Balance",
-    balanceSubLabel: "Cash + Invested Assets",
-    balance: "$15,900.00",
-    icon: "wallet",
-  },
-  {
-    id: "lpfsa",
-    name: "Limited Purpose FSA",
-    subtitle: "01/01/2026 - 12/31/2026",
-    balanceLabel: "Available balance",
-    balance: "$850.00",
-    icon: "credit-card",
-    warningTag: "28 Days left to spend",
-  },
-];
+const ACCOUNTS_BY_VARIANT: Record<AppVariant, AccountCardData[]> = {
+  1: [
+    { id: "hsa", name: "Health Savings Account", subtitle: "HSA", balanceLabel: "Cash + Invested Assets", balance: "$15,900.00", icon: "wallet" },
+    { id: "lpfsa", name: "Limited Purpose FSA", subtitle: "01/01/2026 - 12/31/2026", balanceLabel: "", balance: "$850.00", icon: "credit-card", warningTag: "28 Days left to spend" },
+  ],
+  2: [
+    { id: "fsa", name: "Healthcare FSA", subtitle: "01/01/2026 - 12/31/2026", balanceLabel: "", balance: "$850.00", icon: "heart-pulse", warningTag: "28 Days left to spend" },
+    { id: "dcfsa", name: "DCFSA", subtitle: "01/01/2025 - 12/31/2025", balanceLabel: "", balance: "$620.00", icon: "baby", warningTag: "28 Days left to spend" },
+  ],
+  3: [
+    { id: "hsa", name: "Health Savings Account", subtitle: "HSA", balanceLabel: "Cash + Invested Assets", balance: "$15,900.00", icon: "wallet" },
+  ],
+};
 
 export interface TransactionRow {
   merchant: string;
@@ -95,156 +92,71 @@ interface PreviousPlanYearAccount {
   claimsDenied: string;
 }
 
-const TRANSACTIONS: TransactionRow[] = [
-  { 
-    merchant: "Pharmacy", 
-    date: "4/27/2026", 
-    account: "LPFSA", 
-    amount: "$42.50",
-    processedDate: "04/27/2026",
-    description: "Vision (New Frames)",
-    planYear: "2026",
-    availableBalance: "$785.00",
-    runningBalance: "$742.50",
-    status: "complete"
-  },
-  { 
-    merchant: "Dr. Miller DDS", 
-    date: "4/27/2026", 
-    account: "LPFSA", 
-    amount: "$340.00",
-    processedDate: "04/27/2026",
-    description: "Dental Care",
-    planYear: "2026",
-    availableBalance: "$445.00",
-    runningBalance: "$402.50",
-    status: "complete"
-  },
-  { 
-    merchant: "Investment Buy", 
-    date: "4/27/2026", 
-    account: "HSA", 
-    amount: "$500.00",
-    processedDate: "04/27/2026",
-    description: "Investment Transfer",
-    planYear: "2026",
-    availableBalance: "$15,400.00",
-    runningBalance: "$14,900.00",
-    status: "complete"
-  },
-  { 
-    merchant: "Shell Gas Station", 
-    date: "4/25/2026", 
-    account: "HSA", 
-    amount: "$54.12",
-    processedDate: "04/25/2026",
-    description: "Transportation",
-    planYear: "2026",
-    availableBalance: "$15,454.12",
-    runningBalance: "$15,400.00",
-    status: "complete"
-  },
-  { 
-    merchant: "CVS Pharmacy", 
-    date: "4/24/2026", 
-    account: "LPFSA", 
-    amount: "$28.10",
-    processedDate: "04/24/2026",
-    description: "Prescription Medicine",
-    planYear: "2026",
-    availableBalance: "$473.10",
-    runningBalance: "$445.00",
-    status: "complete"
-  },
-  { 
-    merchant: "Target Store", 
-    date: "4/20/2026", 
-    account: "LPFSA", 
-    amount: "$34.99",
-    processedDate: "04/20/2026",
-    description: "Health Products",
-    planYear: "2026",
-    availableBalance: "$508.09",
-    runningBalance: "$473.10",
-    status: "complete"
-  },
-  { 
-    merchant: "Walgreens Pharmacy", 
-    date: "4/18/2026", 
-    account: "LPFSA", 
-    amount: "$19.50",
-    processedDate: "04/18/2026",
-    description: "Prescription Medicine",
-    planYear: "2026",
-    availableBalance: "$527.59",
-    runningBalance: "$508.09",
-    status: "complete"
-  },
-  { 
-    merchant: "Quest Diagnostics", 
-    date: "3/22/2026", 
-    account: "HSA", 
-    amount: "$95.10",
-    processedDate: "03/22/2026",
-    description: "Lab Tests",
-    planYear: "2026",
-    availableBalance: "$15,549.22",
-    runningBalance: "$15,454.12",
-    status: "complete"
-  },
-  { 
-    merchant: "Dr. Smith Family Med", 
-    date: "3/18/2026", 
-    account: "HSA", 
-    amount: "$30.00",
-    processedDate: "03/18/2026",
-    description: "Primary Care Visit",
-    planYear: "2026",
-    availableBalance: "$15,579.22",
-    runningBalance: "$15,549.22",
-    status: "complete"
-  },
-  { 
-    merchant: "Orthodontic Care", 
-    date: "3/15/2026", 
-    account: "LPFSA", 
-    amount: "$150.50",
-    processedDate: "03/15/2026",
-    description: "Dental Orthodontics",
-    planYear: "2026",
-    availableBalance: "$678.09",
-    runningBalance: "$527.59",
-    status: "complete"
-  },
+const TRANSACTIONS_V1: TransactionRow[] = [
+  { merchant: "Pharmacy", date: "4/27/2026", account: "LPFSA", amount: "$42.50", processedDate: "04/27/2026", description: "Vision (New Frames)", planYear: "2026", availableBalance: "$785.00", runningBalance: "$742.50", status: "complete" },
+  { merchant: "Dr. Miller DDS", date: "4/27/2026", account: "LPFSA", amount: "$340.00", processedDate: "04/27/2026", description: "Dental Care", planYear: "2026", availableBalance: "$445.00", runningBalance: "$402.50", status: "complete" },
+  { merchant: "Investment Buy", date: "4/27/2026", account: "HSA", amount: "$500.00", processedDate: "04/27/2026", description: "Investment Transfer", planYear: "2026", availableBalance: "$15,400.00", runningBalance: "$14,900.00", status: "complete" },
+  { merchant: "Shell Gas Station", date: "4/25/2026", account: "HSA", amount: "$54.12", processedDate: "04/25/2026", description: "Transportation", planYear: "2026", availableBalance: "$15,454.12", runningBalance: "$15,400.00", status: "complete" },
+  { merchant: "CVS Pharmacy", date: "4/24/2026", account: "LPFSA", amount: "$28.10", processedDate: "04/24/2026", description: "Prescription Medicine", planYear: "2026", availableBalance: "$473.10", runningBalance: "$445.00", status: "complete" },
+  { merchant: "Target Store", date: "4/20/2026", account: "LPFSA", amount: "$34.99", processedDate: "04/20/2026", description: "Health Products", planYear: "2026", availableBalance: "$508.09", runningBalance: "$473.10", status: "complete" },
+  { merchant: "Walgreens Pharmacy", date: "4/18/2026", account: "LPFSA", amount: "$19.50", processedDate: "04/18/2026", description: "Prescription Medicine", planYear: "2026", availableBalance: "$527.59", runningBalance: "$508.09", status: "complete" },
+  { merchant: "Quest Diagnostics", date: "3/22/2026", account: "HSA", amount: "$95.10", processedDate: "03/22/2026", description: "Lab Tests", planYear: "2026", availableBalance: "$15,549.22", runningBalance: "$15,454.12", status: "complete" },
+  { merchant: "Dr. Smith Family Med", date: "3/18/2026", account: "HSA", amount: "$30.00", processedDate: "03/18/2026", description: "Primary Care Visit", planYear: "2026", availableBalance: "$15,579.22", runningBalance: "$15,549.22", status: "complete" },
+  { merchant: "Orthodontic Care", date: "3/15/2026", account: "LPFSA", amount: "$150.50", processedDate: "03/15/2026", description: "Dental Orthodontics", planYear: "2026", availableBalance: "$678.09", runningBalance: "$527.59", status: "complete" },
 ];
 
-const PREVIOUS_YEAR_ACCOUNTS: PreviousPlanYearAccount[] = [
-  {
-    name: "Limited Purpose FSA",
-    dates: "01/01/2024 - 12/31/2024",
-    balance: "$660.00",
-    // Detail fields
-    availableBalance: "$2,000.00",
-    effectiveDate: "01/01/2024",
-    electionAmount: "$1,200.00",
-    myAnnualElection: "$1,200.00",
-    companyContributions: "$100.00 of 100.00",
-    myContributionsToDate: "$1,200.00",
-    estimatedPayrollDeductions: "$23.08",
-    planYearBalance: "$1,300.00",
-    // Claims fields
-    claimsSubmitted: "$252.00",
-    claimsPaid: "$0.00",
-    claimsPending: "$0.00",
-    claimsDenied: "$252.00",
-  },
+const TRANSACTIONS_V2: TransactionRow[] = [
+  { merchant: "Pharmacy", date: "4/27/2026", account: "FSA", amount: "$42.50", processedDate: "04/27/2026", description: "Prescription Medicine", planYear: "2026", availableBalance: "$807.50", runningBalance: "$765.00", status: "complete" },
+  { merchant: "Bright Horizons Daycare", date: "4/27/2026", account: "DCFSA", amount: "$185.00", processedDate: "04/27/2026", description: "Childcare", planYear: "2025", availableBalance: "$620.00", runningBalance: "$435.00", status: "complete" },
+  { merchant: "CVS Pharmacy", date: "4/25/2026", account: "FSA", amount: "$28.10", processedDate: "04/25/2026", description: "OTC Medicine", planYear: "2026", availableBalance: "$878.10", runningBalance: "$850.00", status: "complete" },
+  { merchant: "KinderCare", date: "4/22/2026", account: "DCFSA", amount: "$210.00", processedDate: "04/22/2026", description: "Daycare", planYear: "2025", availableBalance: "$830.00", runningBalance: "$620.00", status: "complete" },
+  { merchant: "Target Store", date: "4/20/2026", account: "FSA", amount: "$34.99", processedDate: "04/20/2026", description: "Health Products", planYear: "2026", availableBalance: "$913.09", runningBalance: "$878.10", status: "complete" },
+  { merchant: "Walgreens Pharmacy", date: "4/18/2026", account: "FSA", amount: "$19.50", processedDate: "04/18/2026", description: "Prescription Medicine", planYear: "2026", availableBalance: "$932.59", runningBalance: "$913.09", status: "complete" },
+  { merchant: "Dr. Smith Family Med", date: "3/18/2026", account: "FSA", amount: "$30.00", processedDate: "03/18/2026", description: "Primary Care Visit", planYear: "2026", availableBalance: "$962.59", runningBalance: "$932.59", status: "complete" },
+  { merchant: "Camp Discovery", date: "3/10/2026", account: "DCFSA", amount: "$150.00", processedDate: "03/10/2026", description: "Day Camp", planYear: "2025", availableBalance: "$1,040.00", runningBalance: "$830.00", status: "complete" },
 ];
+
+const TRANSACTIONS_V3: TransactionRow[] = [
+  { merchant: "Investment Buy", date: "4/27/2026", account: "HSA", amount: "$500.00", processedDate: "04/27/2026", description: "Investment Transfer", planYear: "2026", availableBalance: "$15,400.00", runningBalance: "$14,900.00", status: "complete" },
+  { merchant: "Shell Gas Station", date: "4/25/2026", account: "HSA", amount: "$54.12", processedDate: "04/25/2026", description: "Transportation", planYear: "2026", availableBalance: "$15,454.12", runningBalance: "$15,400.00", status: "complete" },
+  { merchant: "Quest Diagnostics", date: "3/22/2026", account: "HSA", amount: "$95.10", processedDate: "03/22/2026", description: "Lab Tests", planYear: "2026", availableBalance: "$15,549.22", runningBalance: "$15,454.12", status: "complete" },
+  { merchant: "Dr. Smith Family Med", date: "3/18/2026", account: "HSA", amount: "$30.00", processedDate: "03/18/2026", description: "Primary Care Visit", planYear: "2026", availableBalance: "$15,579.22", runningBalance: "$15,549.22", status: "complete" },
+  { merchant: "CVS Pharmacy", date: "3/12/2026", account: "HSA", amount: "$28.10", processedDate: "03/12/2026", description: "Prescription Medicine", planYear: "2026", availableBalance: "$15,607.32", runningBalance: "$15,579.22", status: "complete" },
+  { merchant: "Urgent Care Center", date: "2/28/2026", account: "HSA", amount: "$125.00", processedDate: "02/28/2026", description: "Urgent Care Visit", planYear: "2026", availableBalance: "$15,732.32", runningBalance: "$15,607.32", status: "complete" },
+];
+
+const TRANSACTIONS_BY_VARIANT: Record<AppVariant, TransactionRow[]> = {
+  1: TRANSACTIONS_V1,
+  2: TRANSACTIONS_V2,
+  3: TRANSACTIONS_V3,
+};
+
+const PREV_YEAR_V1: PreviousPlanYearAccount[] = [
+  { name: "Limited Purpose FSA", dates: "01/01/2024 - 12/31/2024", balance: "$660.00", availableBalance: "$2,000.00", effectiveDate: "01/01/2024", electionAmount: "$1,200.00", myAnnualElection: "$1,200.00", companyContributions: "$100.00 of 100.00", myContributionsToDate: "$1,200.00", estimatedPayrollDeductions: "$23.08", planYearBalance: "$1,300.00", claimsSubmitted: "$252.00", claimsPaid: "$0.00", claimsPending: "$0.00", claimsDenied: "$252.00" },
+];
+
+const PREV_YEAR_V2: PreviousPlanYearAccount[] = [
+  { name: "Healthcare FSA", dates: "01/01/2024 - 12/31/2024", balance: "$480.00", availableBalance: "$1,800.00", effectiveDate: "01/01/2024", electionAmount: "$1,500.00", myAnnualElection: "$1,500.00", companyContributions: "$0.00 of 0.00", myContributionsToDate: "$1,500.00", estimatedPayrollDeductions: "$57.69", planYearBalance: "$1,500.00", claimsSubmitted: "$1,020.00", claimsPaid: "$1,020.00", claimsPending: "$0.00", claimsDenied: "$0.00" },
+  { name: "DCFSA", dates: "01/01/2024 - 12/31/2024", balance: "$0.00", availableBalance: "$5,000.00", effectiveDate: "01/01/2024", electionAmount: "$5,000.00", myAnnualElection: "$5,000.00", companyContributions: "$0.00 of 0.00", myContributionsToDate: "$5,000.00", estimatedPayrollDeductions: "$192.31", planYearBalance: "$5,000.00", claimsSubmitted: "$5,000.00", claimsPaid: "$5,000.00", claimsPending: "$0.00", claimsDenied: "$0.00" },
+];
+
+const PREV_YEAR_V3: PreviousPlanYearAccount[] = [];
+
+const PREV_YEAR_BY_VARIANT: Record<AppVariant, PreviousPlanYearAccount[]> = {
+  1: PREV_YEAR_V1,
+  2: PREV_YEAR_V2,
+  3: PREV_YEAR_V3,
+};
 
 export default function AppAccountOverview() {
   const navigate = useNavigate();
   const [showAllTx, setShowAllTx] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<TransactionRow | null>(null);
   const [selectedPlanYear, setSelectedPlanYear] = useState<PreviousPlanYearAccount | null>(null);
+  const { variant } = useAppVariant();
+  const ACCOUNTS = ACCOUNTS_BY_VARIANT[variant];
+  const TRANSACTIONS = TRANSACTIONS_BY_VARIANT[variant];
+  const PREVIOUS_YEAR_ACCOUNTS = PREV_YEAR_BY_VARIANT[variant];
   const visibleTx = showAllTx ? TRANSACTIONS : TRANSACTIONS.slice(0, 10);
 
   return (
@@ -317,6 +229,10 @@ export default function AppAccountOverview() {
                 >
                   {acct.icon === "wallet" ? (
                     <Wallet size={20} strokeWidth={1.75} style={{ color: TINT }} />
+                  ) : acct.icon === "heart-pulse" ? (
+                    <HeartPulse size={20} strokeWidth={1.75} style={{ color: TINT }} />
+                  ) : acct.icon === "baby" ? (
+                    <Baby size={20} strokeWidth={1.75} style={{ color: TINT }} />
                   ) : (
                     <CreditCard size={20} strokeWidth={1.75} style={{ color: TINT }} />
                   )}
@@ -356,37 +272,23 @@ export default function AppAccountOverview() {
                 }}
               >
                 <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                  <div>
+                  {acct.balanceLabel && (
                     <div
                       style={{
-                        fontSize: 17,
-                        fontWeight: 400,
-                        lineHeight: "22px",
-                        letterSpacing: -0.43,
+                        fontSize: 12,
                         color: TEXT_SECONDARY,
+                        lineHeight: "16px",
                       }}
                     >
                       {acct.balanceLabel}
                     </div>
-                    {acct.balanceSubLabel && (
-                      <div
-                        style={{
-                          fontSize: 12,
-                          fontWeight: 400,
-                          lineHeight: "16px",
-                          color: TEXT_SECONDARY,
-                        }}
-                      >
-                        {acct.balanceSubLabel}
-                      </div>
-                    )}
-                  </div>
+                  )}
                   <div
                     style={{
-                      fontSize: 22,
+                      fontSize: 34,
                       fontWeight: 700,
-                      lineHeight: "28px",
-                      letterSpacing: -0.9,
+                      lineHeight: "41px",
+                      letterSpacing: 0.4,
                       color: TEXT_PRIMARY,
                     }}
                   >
@@ -400,15 +302,16 @@ export default function AppAccountOverview() {
                         gap: 4,
                         background: WARNING_BG,
                         borderRadius: 6,
-                        padding: "2px 8px",
+                        padding: "2px 8px 2px 4px",
                         marginTop: 2,
                         width: "fit-content",
                       }}
                     >
+                      <Clock size={12} strokeWidth={2} style={{ color: WARNING_TEXT }} />
                       <span
                         style={{
                           fontSize: 12,
-                          fontWeight: 400,
+                          fontWeight: 500,
                           lineHeight: "16px",
                           color: WARNING_TEXT,
                         }}
@@ -667,6 +570,7 @@ export default function AppAccountOverview() {
         </div>
 
         {/* Previous Plan Year */}
+        {PREVIOUS_YEAR_ACCOUNTS.length > 0 && (
         <div
           style={{
             background: "white",
@@ -819,6 +723,7 @@ export default function AppAccountOverview() {
             </div>
           ))}
         </div>
+        )}
       </motion.div>
 
       {/* Transaction Detail Sheet */}
