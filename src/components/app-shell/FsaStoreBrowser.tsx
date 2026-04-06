@@ -5,9 +5,6 @@ import {
   ChevronRight,
   Share,
   BookOpen,
-  Battery,
-  Wifi,
-  Signal,
 } from "lucide-react";
 import { AppStatusBar } from "./AppStatusBar";
 
