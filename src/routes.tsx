@@ -153,6 +153,8 @@ export function AppRoutes() {
           <Route index element={<AppHomePage />} />
           <Route path="account" element={<AppAccountOverviewPage />} />
           <Route path="account/lpfsa" element={<AppLpfsaDetailPage />} />
+          <Route path="account/fsa" element={<AppLpfsaDetailPage />} />
+          <Route path="account/dcfsa" element={<AppLpfsaDetailPage />} />
           <Route path="account/:id" element={<AppAccountDetailPage />} />
           <Route path="claims" element={<AppClaimsOverviewPage />} />
           <Route path="claims/:id" element={<AppClaimsDetailPage />} />

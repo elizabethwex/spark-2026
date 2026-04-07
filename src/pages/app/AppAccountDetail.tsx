@@ -14,6 +14,7 @@ import {
   FileText,
   ArrowLeftRight,
   HandCoins,
+  Landmark,
 } from "lucide-react";
 
 const CARD_SHADOW = "0px 3.017px 9.051px rgba(43,49,78,0.04), 0px 6.034px 18.101px rgba(43,49,78,0.06)";
@@ -148,16 +149,32 @@ export default function AppAccountDetail() {
           gap: 4,
         }}
       >
-        <div
-          style={{
-            fontSize: 17,
-            fontWeight: 400,
-            lineHeight: "22px",
-            letterSpacing: -0.43,
-            color: TEXT_SECONDARY,
-          }}
-        >
-          Available HSA Cash
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: "50%",
+              background: TINT_50,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            <Landmark size={20} strokeWidth={1.75} style={{ color: TINT }} />
+          </div>
+          <div
+            style={{
+              fontSize: 17,
+              fontWeight: 400,
+              lineHeight: "22px",
+              letterSpacing: -0.43,
+              color: TEXT_SECONDARY,
+            }}
+          >
+            Available HSA Cash
+          </div>
         </div>
         <div
           style={{
@@ -166,6 +183,7 @@ export default function AppAccountDetail() {
             lineHeight: "34px",
             letterSpacing: 0.38,
             color: TEXT_PRIMARY,
+            marginTop: 8,
           }}
         >
           {meta.availableCash}

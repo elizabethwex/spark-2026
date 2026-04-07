@@ -5,11 +5,8 @@ import {
   ChevronRight,
   Share,
   BookOpen,
-  Battery,
-  Wifi,
-  Signal,
 } from "lucide-react";
-import { Progress } from "@wexinc-healthbenefits/ben-ui-kit";
+import { AppStatusBar } from "./AppStatusBar";
 
 interface FsaStoreBrowserProps {
   onClose: () => void;
@@ -42,14 +39,10 @@ export function FsaStoreBrowser({ onClose }: FsaStoreBrowserProps) {
   return (
     <div className="fixed inset-0 z-[60] flex flex-col bg-white">
       {/* iOS Status Bar Mockup */}
-      <div className="flex h-14 shrink-0 items-center justify-between px-6">
-        <span className="text-[17px] font-semibold tracking-tight">9:41</span>
-        <div className="flex items-center gap-1.5">
-          <Signal className="h-4 w-4" />
-          <Wifi className="h-4 w-4" />
-          <Battery className="h-5 w-5" />
-        </div>
+      <div className="shrink-0 relative z-50">
+        <AppStatusBar />
       </div>
+      <div className="h-[54px] shrink-0" /> {/* Spacer for the fixed status bar */}
 
       {/* Browser Toolbar - Top */}
       <div className="flex flex-col shrink-0">
@@ -78,11 +71,12 @@ export function FsaStoreBrowser({ onClose }: FsaStoreBrowserProps) {
 
         {/* Progress Bar (only visible while loading) */}
         {isLoading && (
-          <Progress
-            value={progress}
-            className="h-1 w-full rounded-none bg-muted/30"
-            data-theme-token="primary"
-          />
+          <div className="h-1 w-full bg-muted/30 overflow-hidden">
+            <div 
+              className="h-full bg-primary transition-all duration-50 ease-linear" 
+              style={{ width: `${progress}%` }} 
+            />
+          </div>
         )}
       </div>
 
@@ -92,8 +86,8 @@ export function FsaStoreBrowser({ onClose }: FsaStoreBrowserProps) {
           <div
             className="absolute inset-0 flex flex-col items-center justify-center px-4"
             style={{
-              backgroundImage:
-                "linear-gradient(2deg, rgba(28, 110, 255, 0.6) 21%, rgba(129, 174, 255, 0.6) 7%, rgba(231, 236, 255, 0.6) 61%)",
+              background:
+                "linear-gradient(182.7628652606358deg, rgb(238, 242, 255) 50.004%, rgb(165, 180, 252) 140.09%)",
             }}
           >
             <div className="flex flex-col items-center gap-3">
@@ -111,7 +105,7 @@ export function FsaStoreBrowser({ onClose }: FsaStoreBrowserProps) {
         ) : (
           <div className="absolute inset-0 overflow-y-auto bg-white">
             <img
-              src="/app-ui/fsa-res2.png"
+              src={`${import.meta.env.BASE_URL}app-ui/fsa-res2.png`}
               alt="FSA Store"
               className="w-full h-auto"
             />
