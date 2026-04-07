@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ChevronLeft, Sparkles, ChevronRight, Wallet, FileSearch, SlidersHorizontal, HeartPulse, Baby, CreditCard, CalendarCheck2 } from "lucide-react";
+import { ChevronLeft, Sparkles, ChevronRight, FileSearch, SlidersHorizontal, HeartPulse, Baby, CalendarCheck2 } from "lucide-react";
 
 const CARD_SHADOW = "0px 3.017px 9.051px rgba(43,49,78,0.04), 0px 6.034px 18.101px rgba(43,49,78,0.06)";
 const TEXT_PRIMARY = "#14182c";
