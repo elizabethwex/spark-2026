@@ -58,6 +58,18 @@ export function SparkAccountsSection({
 
   const { ref, isInView } = useInView({ threshold: 0.3, rootMargin: "0px 0px -15% 0px" });
 
+  const [showInvestments, setShowInvestments] = useState(true);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() === 'i' && e.target instanceof Element && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+        setShowInvestments(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   return (
     <section className="space-y-4" aria-labelledby="spark-accounts-heading">
       {variant === "partner-safe" ? (
@@ -111,57 +123,96 @@ export function SparkAccountsSection({
 
           {/* Body */}
           <div className="flex flex-1 flex-col gap-4 px-6 pb-8 pt-6">
-            <div className="flex flex-col gap-1">
-              <div className="flex flex-col gap-[2px]">
-                <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#5f6a94]">
-                  Total Account Value
-                </p>
-                <p className="text-[12px] leading-[16px] text-[#5f6a94]">
-                  Cash + Invested Assets
-                </p>
-              </div>
-              <p className="text-[40px] font-bold leading-[40px] tracking-[-0.9px] text-[#14182c]">
-                {h.totalValue}
-              </p>
-            </div>
-
-            {/* Balances Box */}
-            <div className="flex flex-col gap-3 rounded-xl bg-[#f1f3fb] px-4 py-3">
-              <div className="flex h-[44px] items-center gap-3">
-                <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
-                  <TrendingUp className="h-5 w-5" />
-                </div>
-                <div className="flex flex-1 items-center justify-between">
-                  <p className="text-[16px] font-semibold leading-[24px] tracking-[-0.176px] text-[#14182c]">
-                    Invested assets
-                  </p>
-                  <div className="flex items-center gap-4">
-                    <p className="text-[14px] font-semibold leading-[24px] tracking-[-0.084px] text-[#009966]">
-                      {h.ytdReturnPct} YTD
+            {showInvestments ? (
+              <>
+                <div className="flex flex-col gap-1">
+                  <div className="flex flex-col gap-[2px]">
+                    <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#5f6a94]">
+                      Total Account Value
                     </p>
-                    <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#14182c]">
-                      {h.investedAssets}
+                    <p className="text-[12px] leading-[16px] text-[#5f6a94]">
+                      Cash + Invested Assets
                     </p>
                   </div>
+                  <p className="text-[40px] font-bold leading-[40px] tracking-[-0.9px] text-[#14182c]">
+                    {h.totalValue}
+                  </p>
                 </div>
-              </div>
-              
-              <div className="h-px w-full bg-[#d1d5db]" />
-              
-              <div className="flex h-[44px] items-center gap-3">
-                <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
-                  <CircleDollarSign className="h-5 w-5" />
+
+                {/* Balances Box */}
+                <div className="flex flex-col gap-3 rounded-xl bg-[#f1f3fb] px-4 py-3">
+                  <div className="flex h-[44px] items-center gap-3">
+                    <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
+                      <TrendingUp className="h-5 w-5" />
+                    </div>
+                    <div className="flex flex-1 items-center justify-between">
+                      <p className="text-[16px] font-semibold leading-[24px] tracking-[-0.176px] text-[#14182c]">
+                        Invested assets
+                      </p>
+                      <div className="flex items-center gap-4">
+                        <p className="text-[14px] font-semibold leading-[24px] tracking-[-0.084px] text-[#009966]">
+                          {h.ytdReturnPct} YTD
+                        </p>
+                        <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#14182c]">
+                          {h.investedAssets}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="h-px w-full bg-[#d1d5db]" />
+                  
+                  <div className="flex h-[44px] items-center gap-3">
+                    <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
+                      <CircleDollarSign className="h-5 w-5" />
+                    </div>
+                    <div className="flex flex-1 items-center justify-between">
+                      <p className="text-[16px] font-semibold leading-[24px] tracking-[-0.176px] text-[#14182c]">
+                        Cash Balance
+                      </p>
+                      <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#14182c]">
+                        {h.cashBalance}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex flex-1 items-center justify-between">
-                  <p className="text-[16px] font-semibold leading-[24px] tracking-[-0.176px] text-[#14182c]">
+              </>
+            ) : (
+              <>
+                <div className="flex flex-col gap-1">
+                  <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#5f6a94]">
                     Cash Balance
                   </p>
-                  <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#14182c]">
+                  <p className="text-[40px] font-bold leading-[40px] tracking-[-0.9px] text-[#14182c]">
                     {h.cashBalance}
                   </p>
                 </div>
-              </div>
-            </div>
+
+                {/* Promo Box */}
+                <div className="flex items-center justify-between rounded-xl bg-[#f1f3fb] px-4 py-2">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
+                      <TrendingUp className="h-5 w-5" />
+                    </div>
+                    <div className="flex flex-col gap-[2px]">
+                      <p className="text-[14px] font-bold leading-[20px] text-[#14182c]">
+                        Invest Your HSA
+                      </p>
+                      <p className="text-[12px] leading-[16px] text-[#5f6a94]">
+                        Grow your healthcare funds tax-free
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    className="flex items-center gap-2 text-[14px] leading-[20px] text-[#3958c3] hover:underline"
+                  >
+                    Start Investing
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                </div>
+              </>
+            )}
 
             {/* Progress Section */}
             <div className="flex flex-col gap-[6px]">
@@ -188,17 +239,6 @@ export function SparkAccountsSection({
             </div>
           </div>
 
-          {/* Footer */}
-          <div className="px-6 pb-6 mt-auto">
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full rounded-xl border-[#3958c3] py-[9.75px] text-[15.75px] font-medium text-[#3958c3] hover:bg-[#3958c3]/5"
-              onClick={() => navigate("/account-overview")}
-            >
-              Manage Investments
-            </Button>
-          </div>
         </div>
 
         {/* LPFSA Card */}
@@ -451,8 +491,6 @@ export function SparkAccountsSection({
                 </div>
               </div>
 
-              {/* Footer */}
-              <div className="px-6 pb-6 mt-auto" />
             </div>
 
             {/* DCFSA Card */}
@@ -570,8 +608,6 @@ export function SparkAccountsSection({
                 </div>
               </div>
 
-              {/* Footer */}
-              <div className="px-6 pb-6 mt-auto" />
             </div>
           </>
         )}
