@@ -1,0 +1,1344 @@
+/* ============================================================
+   WEX COMPONENT SLOT TOKENS (LAYER 3) & UTILITIES
+   ============================================================
+   This file contains:
+   1. Component slot tokens - Maps WEX component slots to semantic tokens
+   2. Component utilities - CSS utilities and overrides required by components
+   
+   PURPOSE:
+   - Provides granular component-level customization
+   - Reduces "primary bleed" by giving components explicit tokens
+   - Enables rich variant support (PrimeNG-like richness)
+   - Provides CSS utilities needed for component functionality
+   
+   RULES:
+   - All tokens MUST start with --wex-component-*
+   - All values MUST reference Layer 1 tokens (--wex-* semantics or palette)
+   - NO raw hex/HSL values (except opacity values)
+   - NO circular references
+   
+   NAMING CONVENTION:
+   --wex-component-{component}-{variant?}-{slot}
+   
+   Examples:
+   --wex-component-button-primary-bg
+   --wex-component-input-border-hover
+   --wex-component-badge-info-fg
+   ============================================================ */
+
+   :root {
+      /* ============================================================
+         SHARED FORM CONTROL TOKENS
+         ============================================================
+         These tokens are shared across form controls to ensure 
+         consistent styling. Individual components can override these
+         but by default they inherit from these shared values.
+         
+         Components using these tokens:
+         - Input, Textarea, Select, Checkbox, Radio, Switch, InputOTP
+         ============================================================ */
+      $wex-component-form-bg: $wex-content-bg;
+      $wex-component-form-fg: $wex-text;
+      $wex-component-form-border: $wex-input-border;
+      $wex-component-form-border-hover: $wex-palette-slate-500;
+      $wex-component-form-border-focus: $wex-primary;
+      $wex-component-form-focus-ring: $wex-focus-ring-color;
+      $wex-component-form-placeholder: $wex-text-muted;
+      $wex-component-form-disabled-bg: $wex-surface-subtle;
+      $wex-component-form-disabled-fg: $wex-text-muted;
+      $wex-component-form-disabled-border: $wex-content-border;
+      $wex-component-form-disabled-opacity: 0.6;
+      $wex-component-form-invalid-border: $wex-destructive;
+      $wex-component-form-invalid-focus-ring: $wex-destructive;
+      $wex-component-form-checked-bg: $wex-primary;
+      $wex-component-form-checked-fg: $wex-primary-contrast;
+      $wex-component-form-checked-border: $wex-primary;
+    
+      /* ============================================================
+         BUTTON
+         ============================================================ */
+      
+      /* ----- Button: Primary ----- */
+      $wex-component-button-primary-bg: $wex-primary;
+      $wex-component-button-primary-fg: $wex-primary-contrast;
+      $wex-component-button-primary-border: $wex-primary;
+      $wex-component-button-primary-hover-bg: $wex-primary-hover;
+      $wex-component-button-primary-active-bg: $wex-primary-active;
+      $wex-component-button-primary-focus-ring: $wex-focus-ring-color;
+      $wex-component-button-primary-disabled-bg: $wex-primary;
+      $wex-component-button-primary-disabled-fg: $wex-primary-contrast;
+      $wex-component-button-primary-disabled-border: $wex-primary;
+      
+      /* ----- Button: Secondary ----- */
+      $wex-component-button-secondary-bg: $wex-surface-subtle;
+      $wex-component-button-secondary-fg: $wex-text;
+      $wex-component-button-secondary-border: $wex-content-border;
+      $wex-component-button-secondary-hover-bg: $wex-content-border;
+      $wex-component-button-secondary-active-bg: $wex-content-border;
+      $wex-component-button-secondary-focus-ring: $wex-focus-ring-color;
+      $wex-component-button-secondary-disabled-bg: $wex-surface-subtle;
+      $wex-component-button-secondary-disabled-fg: $wex-text-muted;
+      $wex-component-button-secondary-disabled-border: $wex-content-border;
+      
+      /* ----- Button: Destructive ----- */
+      $wex-component-button-destructive-bg: $wex-destructive;
+      $wex-component-button-destructive-fg: $wex-destructive-foreground;
+      $wex-component-button-destructive-border: $wex-destructive;
+      $wex-component-button-destructive-hover-bg: $wex-destructive-hover;
+      $wex-component-button-destructive-active-bg: $wex-destructive;
+      $wex-component-button-destructive-focus-ring: $wex-destructive;
+      $wex-component-button-destructive-disabled-bg: $wex-destructive;
+      $wex-component-button-destructive-disabled-fg: $wex-destructive-foreground;
+      $wex-component-button-destructive-disabled-border: $wex-destructive;
+      
+      /* ----- Button: Tertiary (tokens only, no CVA variant yet) ----- */
+      $wex-component-button-tertiary-bg: transparent;
+      $wex-component-button-tertiary-fg: $wex-text;
+      $wex-component-button-tertiary-border: transparent;
+      $wex-component-button-tertiary-hover-bg: $wex-surface-subtle;
+      $wex-component-button-tertiary-active-bg: $wex-content-border;
+      $wex-component-button-tertiary-focus-ring: $wex-focus-ring-color;
+      $wex-component-button-tertiary-disabled-bg: transparent;
+      $wex-component-button-tertiary-disabled-fg: $wex-text-muted;
+      $wex-component-button-tertiary-disabled-border: transparent;
+      
+      /* ----- Button: Success ----- */
+      $wex-component-button-success-bg: $wex-palette-green-700; /* One shade darker for WCAG contrast */
+      $wex-component-button-success-fg: $wex-success-foreground;
+      $wex-component-button-success-border: $wex-success;
+      $wex-component-button-success-hover-bg: $wex-palette-green-600;
+      $wex-component-button-success-active-bg: $wex-palette-green-700;
+      $wex-component-button-success-focus-ring: $wex-success;
+      $wex-component-button-success-disabled-bg: $wex-success;
+      $wex-component-button-success-disabled-fg: $wex-success-foreground;
+      
+      /* ----- Button: Info ----- */
+      $wex-component-button-info-bg: $wex-palette-cyan-700; /* Two shades darker for WCAG 4.5:1 contrast */
+      $wex-component-button-info-fg: $wex-info-foreground;
+      $wex-component-button-info-border: $wex-info;
+      $wex-component-button-info-hover-bg: $wex-palette-cyan-600;
+      $wex-component-button-info-active-bg: $wex-palette-cyan-700;
+      $wex-component-button-info-focus-ring: $wex-info;
+      $wex-component-button-info-disabled-bg: $wex-info;
+      $wex-component-button-info-disabled-fg: $wex-info-foreground;
+      
+      /* ----- Button: Warning ----- */
+      $wex-component-button-warning-bg: $wex-warning;
+      $wex-component-button-warning-fg: $wex-warning-foreground;
+      $wex-component-button-warning-border: $wex-warning;
+      $wex-component-button-warning-hover-bg: $wex-palette-amber-600;
+      $wex-component-button-warning-active-bg: $wex-palette-amber-700;
+      $wex-component-button-warning-focus-ring: $wex-warning;
+      $wex-component-button-warning-disabled-bg: $wex-warning;
+      $wex-component-button-warning-disabled-fg: $wex-warning-foreground;
+      
+      /* ----- Button: Help ----- */
+      $wex-component-button-help-bg: $wex-palette-purple-500;
+      $wex-component-button-help-fg: $wex-palette-white;
+      $wex-component-button-help-border: $wex-palette-purple-500;
+      $wex-component-button-help-hover-bg: $wex-palette-purple-600;
+      $wex-component-button-help-active-bg: $wex-palette-purple-700;
+      $wex-component-button-help-focus-ring: $wex-palette-purple-500;
+      $wex-component-button-help-disabled-bg: $wex-palette-purple-500;
+      $wex-component-button-help-disabled-fg: $wex-palette-white;
+      
+      /* ----- Button: Contrast ----- */
+      $wex-component-button-contrast-bg: $wex-palette-slate-900;
+      $wex-component-button-contrast-fg: $wex-palette-slate-50;
+      $wex-component-button-contrast-border: $wex-palette-slate-900;
+      $wex-component-button-contrast-hover-bg: $wex-palette-slate-800;
+      $wex-component-button-contrast-active-bg: $wex-palette-slate-700;
+      $wex-component-button-contrast-focus-ring: $wex-palette-slate-900;
+      $wex-component-button-contrast-disabled-bg: $wex-palette-slate-900;
+      $wex-component-button-contrast-disabled-fg: $wex-palette-slate-50;
+      
+      /* ----- Button: Link ----- */
+      $wex-component-button-link-fg: $wex-link;
+      $wex-component-button-link-hover-fg: $wex-link-hover;
+      $wex-component-button-link-active-fg: $wex-link-active;
+      $wex-component-button-link-disabled-fg: $wex-text-muted;
+      
+      /* ----- Button: Link ----- */
+      /* (link tokens already defined above) */
+      
+      /* ═══════════════════════════════════════════════════════════════════
+         OUTLINE VARIANTS - transparent bg, colored border, tinted hover
+         ═══════════════════════════════════════════════════════════════════ */
+      
+      /* ----- Button: Primary Outline ----- */
+      $wex-component-button-primary-outline-fg: $wex-palette-blue-900;
+      $wex-component-button-primary-outline-border: $wex-primary;
+      $wex-component-button-primary-outline-hover-bg: $wex-palette-blue-50;
+      $wex-component-button-primary-outline-active-bg: $wex-palette-blue-100;
+      $wex-component-button-primary-outline-disabled-fg: $wex-primary;
+      $wex-component-button-primary-outline-disabled-border: $wex-primary;
+      
+      /* ----- Button: Secondary Outline ----- */
+      $wex-component-button-secondary-outline-fg: $wex-text;
+      $wex-component-button-secondary-outline-border: $wex-content-border;
+      $wex-component-button-secondary-outline-hover-bg: $wex-surface-subtle;
+      $wex-component-button-secondary-outline-active-bg: $wex-content-border;
+      $wex-component-button-secondary-outline-disabled-fg: $wex-text-muted;
+      $wex-component-button-secondary-outline-disabled-border: $wex-content-border;
+      
+      /* ----- Button: Destructive Outline ----- */
+      $wex-component-button-destructive-outline-fg: $wex-destructive;
+      $wex-component-button-destructive-outline-border: $wex-destructive;
+      $wex-component-button-destructive-outline-hover-bg: $wex-palette-red-50;
+      $wex-component-button-destructive-outline-active-bg: $wex-palette-red-100;
+      $wex-component-button-destructive-outline-disabled-fg: $wex-destructive;
+      $wex-component-button-destructive-outline-disabled-border: $wex-destructive;
+      
+      /* ----- Button: Success Outline ----- */
+      $wex-component-button-success-outline-fg: $wex-palette-green-700;
+      $wex-component-button-success-outline-border: $wex-success;
+      $wex-component-button-success-outline-hover-bg: $wex-palette-green-50;
+      $wex-component-button-success-outline-active-bg: $wex-palette-green-100;
+      $wex-component-button-success-outline-disabled-fg: $wex-success;
+      $wex-component-button-success-outline-disabled-border: $wex-success;
+      
+      /* ----- Button: Info Outline ----- */
+      $wex-component-button-info-outline-fg: $wex-palette-cyan-700;
+      $wex-component-button-info-outline-border: $wex-info;
+      $wex-component-button-info-outline-hover-bg: $wex-palette-cyan-50;
+      $wex-component-button-info-outline-active-bg: $wex-palette-cyan-100;
+      $wex-component-button-info-outline-disabled-fg: $wex-info;
+      $wex-component-button-info-outline-disabled-border: $wex-info;
+      
+      /* ----- Button: Warning Outline ----- */
+      $wex-component-button-warning-outline-fg: $wex-palette-amber-800; /* Darker for WCAG 4.5:1 on white */
+      $wex-component-button-warning-outline-border: $wex-palette-amber-600;
+      $wex-component-button-warning-outline-hover-bg: $wex-palette-amber-50;
+      $wex-component-button-warning-outline-active-bg: $wex-palette-amber-100;
+      $wex-component-button-warning-outline-disabled-fg: $wex-palette-amber-800;
+      $wex-component-button-warning-outline-disabled-border: $wex-palette-amber-600;
+      
+      /* ----- Button: Help Outline ----- */
+      $wex-component-button-help-outline-fg: $wex-palette-purple-600;
+      $wex-component-button-help-outline-border: $wex-palette-purple-500;
+      $wex-component-button-help-outline-hover-bg: $wex-palette-purple-50;
+      $wex-component-button-help-outline-active-bg: $wex-palette-purple-100;
+      $wex-component-button-help-outline-disabled-fg: $wex-palette-purple-500;
+      $wex-component-button-help-outline-disabled-border: $wex-palette-purple-500;
+      
+      /* ----- Button: Contrast Outline ----- */
+      $wex-component-button-contrast-outline-fg: $wex-palette-slate-900;
+      $wex-component-button-contrast-outline-border: $wex-palette-slate-900;
+      $wex-component-button-contrast-outline-hover-bg: $wex-palette-slate-100;
+      $wex-component-button-contrast-outline-active-bg: $wex-palette-slate-200;
+      $wex-component-button-contrast-outline-disabled-fg: $wex-palette-slate-900;
+      $wex-component-button-contrast-outline-disabled-border: $wex-palette-slate-900;
+      
+      /* ----- Button: Shared ----- */
+      $wex-component-button-disabled-opacity: 0.5;
+      $wex-component-button-radius: $wex-radius-md;
+    
+      /* ============================================================
+         INPUT
+         ============================================================
+         References shared form control tokens for consistency.
+         ============================================================ */
+      $wex-component-input-bg: $wex-component-form-bg;
+      $wex-component-input-fg: $wex-component-form-fg;
+      $wex-component-input-placeholder: $wex-component-form-placeholder;
+      $wex-component-input-border: $wex-component-form-border;
+      $wex-component-input-border-hover: $wex-component-form-border-hover;
+      $wex-component-input-border-focus: $wex-component-form-border-focus;
+      $wex-component-input-focus-ring: $wex-component-form-focus-ring;
+      $wex-component-input-disabled-bg: $wex-component-form-disabled-bg;
+      $wex-component-input-disabled-fg: $wex-component-form-disabled-fg;
+      $wex-component-input-disabled-border: $wex-component-form-disabled-border;
+      $wex-component-input-disabled-opacity: $wex-component-form-disabled-opacity;
+      /* ----- Input: Filled variant ----- */
+      $wex-component-input-filled-bg: $wex-surface-subtle;
+      $wex-component-input-filled-border: transparent;
+      $wex-component-input-filled-hover-bg: $wex-palette-slate-200;
+      /* ----- Input: Invalid state ----- */
+      $wex-component-input-invalid-border: $wex-component-form-invalid-border;
+      $wex-component-input-invalid-focus-ring: $wex-component-form-invalid-focus-ring;
+      /* ----- Input: Sizes ----- */
+      $wex-component-input-height-sm: 2rem;
+      $wex-component-input-height-md: 2.75rem;
+      $wex-component-input-height-lg: 3rem;
+      $wex-component-input-radius: $wex-radius-md;
+    
+      /* ============================================================
+         FLOAT LABEL
+         ============================================================
+         Floating label input component (PrimeNG-style).
+         The label floats from inside the input to above when focused
+         or containing a value.
+         ============================================================ */
+      $wex-component-floatlabel-label-fg: $wex-text-muted;
+      $wex-component-floatlabel-label-focus-fg: $wex-primary;
+      $wex-component-floatlabel-label-filled-fg: $wex-text-muted;
+    
+      /* ============================================================
+         SELECT
+         ============================================================
+         References shared form control tokens for consistency.
+         ============================================================ */
+      $wex-component-select-trigger-bg: $wex-component-form-bg;
+      $wex-component-select-trigger-fg: $wex-component-form-fg;
+      $wex-component-select-trigger-border: $wex-component-form-border;
+      $wex-component-select-trigger-focus-ring: $wex-component-form-focus-ring;
+      $wex-component-select-content-bg: $wex-content-bg;
+      $wex-component-select-item-hover-bg: $wex-surface-subtle;
+      $wex-component-select-item-selected-bg: $wex-component-form-checked-bg;
+      $wex-component-select-item-selected-fg: $wex-component-form-checked-fg;
+      $wex-component-select-disabled-opacity: $wex-component-form-disabled-opacity;
+    
+      /* ============================================================
+         TABLE
+         ============================================================ */
+      $wex-component-table-header-bg: $wex-surface-subtle;
+      $wex-component-table-header-fg: $wex-text;
+      $wex-component-table-row-bg: $wex-content-bg;
+      $wex-component-table-row-alt-bg: $wex-surface-subtle;
+      $wex-component-table-row-hover-bg: $wex-surface-subtle;
+      $wex-component-table-border: $wex-content-border;
+      $wex-component-table-selected-bg: $wex-surface-subtle;
+      $wex-component-table-selected-fg: $wex-text;
+      $wex-component-table-focus-ring: $wex-focus-ring-color;
+      $wex-component-table-cell-fg: $wex-text;
+    
+      /* ============================================================
+         CARD
+         ============================================================ */
+      $wex-component-card-bg: $wex-content-bg;
+      $wex-component-card-fg: $wex-text;
+      $wex-component-card-border: $wex-content-border;
+      $wex-component-card-header-fg: $wex-text;
+      $wex-component-card-footer-fg: $wex-text-muted;
+      $wex-component-card-radius: $wex-radius-md;
+      /* Note: shadow not tokenized in Phase 1 */
+    
+      /* ============================================================
+         DIALOG
+         ============================================================ */
+      $wex-component-dialog-overlay-bg: hsl(0, 0%, 0%);
+      $wex-component-dialog-overlay-opacity: 0.5;
+      $wex-component-dialog-bg: $wex-content-bg;
+      $wex-component-dialog-fg: $wex-text;
+      $wex-component-dialog-border: $wex-content-border;
+      $wex-component-dialog-header-fg: $wex-text;
+      $wex-component-dialog-footer-fg: $wex-text-muted;
+      $wex-component-dialog-focus-ring: $wex-focus-ring-color;
+      $wex-component-dialog-close-hover-bg: $wex-surface-subtle;
+      $wex-component-dialog-overlay: hsl($wex-component-dialog-overlay-bg / $wex-component-dialog-overlay-opacity);
+    
+      /* ============================================================
+         BADGE
+         ============================================================ */
+      $wex-component-badge-focus-ring: $wex-ring;
+      
+      /* ----- Badge: Neutral ----- */
+      $wex-component-badge-neutral-bg: $wex-surface-subtle;
+      $wex-component-badge-neutral-fg: $wex-text;
+      $wex-component-badge-neutral-border: $wex-content-border;
+      
+      /* ----- Badge: Primary ----- */
+      $wex-component-badge-primary-bg: $wex-component-button-primary-bg;
+      $wex-component-badge-primary-fg: $wex-component-button-primary-fg;
+      $wex-component-badge-primary-border: transparent;
+      
+      /* ----- Badge: Info ----- */
+      $wex-component-badge-info-bg: $wex-component-button-info-bg;
+      $wex-component-badge-info-fg: $wex-component-button-info-fg;
+      $wex-component-badge-info-border: transparent;
+      
+      /* ----- Badge: Success ----- */
+      $wex-component-badge-success-bg: $wex-component-button-success-bg;
+      $wex-component-badge-success-fg: $wex-component-button-success-fg;
+      $wex-component-badge-success-border: transparent;
+      
+      /* ----- Badge: Warning ----- */
+      $wex-component-badge-warning-bg: $wex-component-button-warning-bg;
+      $wex-component-badge-warning-fg: $wex-component-button-warning-fg;
+      $wex-component-badge-warning-border: transparent;
+      
+      /* ----- Badge: Destructive ----- */
+      $wex-component-badge-destructive-bg: $wex-component-button-destructive-bg;
+      $wex-component-badge-destructive-fg: $wex-component-button-destructive-fg;
+      $wex-component-badge-destructive-border: transparent;
+      
+      /* ----- Badge: Contrast ----- */
+      $wex-component-badge-contrast-bg: $wex-component-button-contrast-bg;
+      $wex-component-badge-contrast-fg: $wex-component-button-contrast-fg;
+      $wex-component-badge-contrast-border: transparent;
+      
+      /* ----- Badge: Secondary ----- */
+      $wex-component-badge-secondary-bg: $wex-component-button-secondary-bg;
+      $wex-component-badge-secondary-fg: $wex-component-button-secondary-fg;
+      $wex-component-badge-secondary-border: transparent;
+      $wex-component-badge-secondary-hover-bg: $wex-component-button-secondary-hover-bg;
+      
+      $wex-component-badge-radius: $wex-radius-md;
+    
+      /* ============================================================
+         ALERT
+         ============================================================ */
+      
+      /* ----- Alert: Default ----- */
+      $wex-component-alert-default-bg: $wex-content-bg;
+      $wex-component-alert-default-title-fg: $wex-text;
+      $wex-component-alert-default-fg: $wex-text;
+      $wex-component-alert-default-border: $wex-content-border;
+      $wex-component-alert-default-icon: $wex-text;
+      
+      /* ----- Alert: Info (tinted style) ----- */
+      $wex-component-alert-info-bg: $wex-palette-cyan-50;
+      $wex-component-alert-info-title-fg: $wex-palette-cyan-700; /* Two shades darker for 4.5:1 contrast */
+      $wex-component-alert-info-fg: $wex-palette-cyan-700; /* Two shades darker for 4.5:1 contrast */
+      $wex-component-alert-info-border: $wex-palette-cyan-200;
+      $wex-component-alert-info-icon: $wex-info;
+      
+      /* ----- Alert: Success (tinted style) ----- */
+      $wex-component-alert-success-bg: $wex-palette-green-50;
+      $wex-component-alert-success-title-fg: $wex-palette-green-800; /* Two shades darker for 4.5:1 contrast */
+      $wex-component-alert-success-fg: $wex-palette-green-800; /* Two shades darker for 4.5:1 contrast */
+      $wex-component-alert-success-border: $wex-palette-green-200;
+      $wex-component-alert-success-icon: $wex-success;
+      
+      /* ----- Alert: Warning (tinted style) ----- */
+      $wex-component-alert-warning-bg: $wex-palette-amber-50;
+      $wex-component-alert-warning-title-fg: $wex-palette-amber-800; /* Three shades darker for 4.5:1 contrast */
+      $wex-component-alert-warning-fg: $wex-palette-amber-800; /* Three shades darker for 4.5:1 contrast */
+      $wex-component-alert-warning-border: $wex-palette-amber-200;
+      $wex-component-alert-warning-icon: $wex-warning;
+      
+      /* ----- Alert: Destructive (tinted style) ----- */
+      $wex-component-alert-destructive-bg: $wex-palette-red-50;
+      $wex-component-alert-destructive-title-fg: $wex-palette-red-600; /* One shade darker for contrast */
+      $wex-component-alert-destructive-fg: $wex-palette-red-600; /* One shade darker for contrast */
+      $wex-component-alert-destructive-border: $wex-palette-red-200;
+      $wex-component-alert-destructive-icon: $wex-destructive;
+      $wex-component-alert-radius: $wex-radius-md;
+    
+      /* ============================================================
+         TOAST
+         ============================================================ */
+      
+      /* ----- Toast: Info ----- */
+      $wex-component-toast-info-bg: $wex-palette-cyan-50;
+      $wex-component-toast-info-fg: $wex-info-text;
+      $wex-component-toast-info-border: $wex-palette-cyan-200;
+      $wex-component-toast-info-icon: $wex-info-text;
+      
+      /* ----- Toast: Success ----- */
+      $wex-component-toast-success-bg: $wex-palette-green-50;
+      $wex-component-toast-success-fg: $wex-success-text;
+      $wex-component-toast-success-border: $wex-palette-green-200;
+      $wex-component-toast-success-icon: $wex-success-text;
+      
+      /* ----- Toast: Destructive ----- */
+      $wex-component-toast-destructive-bg: $wex-palette-red-50;
+      $wex-component-toast-destructive-fg: $wex-destructive-text;
+      $wex-component-toast-destructive-border: $wex-palette-red-200;
+      $wex-component-toast-destructive-icon: $wex-destructive-text;
+      
+      /* ----- Toast: Close button ----- */
+      $wex-component-toast-close-hover-bg: $wex-surface-subtle;
+    
+      /* ============================================================
+         TABS
+         ============================================================ */
+      $wex-component-tabs-trigger-fg: $wex-text-muted;
+      $wex-component-tabs-trigger-bg: transparent;
+      $wex-component-tabs-trigger-hover-bg: $wex-surface-subtle;
+      $wex-component-tabs-trigger-active-fg: $wex-primary;
+      $wex-component-tabs-trigger-active-bg: transparent;
+      $wex-component-tabs-indicator: $wex-primary;
+      $wex-component-tabs-divider: $wex-content-border;
+      $wex-component-tabs-focus-ring: $wex-focus-ring-color;
+    
+      /* ============================================================
+         CHECKBOX
+         ============================================================
+         References shared form control tokens for consistency.
+         ============================================================ */
+      $wex-component-checkbox-bg: $wex-component-form-bg;
+      $wex-component-checkbox-border: $wex-component-form-checked-border;
+      $wex-component-checkbox-checked-bg: $wex-component-form-checked-bg;
+      $wex-component-checkbox-checked-fg: $wex-component-form-checked-fg;
+      $wex-component-checkbox-focus-ring: $wex-component-form-focus-ring;
+      $wex-component-checkbox-disabled-opacity: $wex-component-form-disabled-opacity;
+    
+      /* ============================================================
+         RADIO GROUP
+         ============================================================
+         References shared form control tokens for consistency.
+         ============================================================ */
+      $wex-component-radio-bg: $wex-component-form-bg;
+      $wex-component-radio-border: $wex-component-form-checked-border;
+      $wex-component-radio-checked-bg: $wex-component-form-checked-bg;
+      $wex-component-radio-checked-fg: $wex-component-form-checked-bg;
+      $wex-component-radio-focus-ring: $wex-component-form-focus-ring;
+      $wex-component-radio-disabled-opacity: $wex-component-form-disabled-opacity;
+    
+      /* ============================================================
+         SWITCH
+         ============================================================
+         References shared form control tokens for consistency.
+         ============================================================ */
+      $wex-component-switch-bg: $wex-component-form-border;
+      $wex-component-switch-checked-bg: $wex-component-form-checked-bg;
+      $wex-component-switch-thumb: $wex-component-form-bg;
+      $wex-component-switch-focus-ring: $wex-component-form-focus-ring;
+      $wex-component-switch-disabled-opacity: $wex-component-form-disabled-opacity;
+    
+      /* ============================================================
+         SLIDER
+         ============================================================ */
+      $wex-component-slider-track-bg: $wex-surface-subtle;
+      $wex-component-slider-range-bg: $wex-primary;
+      $wex-component-slider-thumb-bg: $wex-content-bg;
+      $wex-component-slider-thumb-border: $wex-primary;
+      $wex-component-slider-focus-ring: $wex-focus-ring-color;
+      $wex-component-slider-disabled-opacity: 0.5;
+      $wex-component-slider-disabled-thumb-bg: $wex-content-bg;
+      $wex-component-slider-disabled-thumb-border: $wex-content-border;
+    
+      /* ============================================================
+         TEXTAREA
+         ============================================================
+         References shared form control tokens for consistency.
+         ============================================================ */
+      $wex-component-textarea-bg: $wex-component-form-bg;
+      $wex-component-textarea-fg: $wex-component-form-fg;
+      $wex-component-textarea-border: $wex-component-form-border;
+      $wex-component-textarea-placeholder: $wex-component-form-placeholder;
+      $wex-component-textarea-focus-ring: $wex-component-form-focus-ring;
+      $wex-component-textarea-disabled-opacity: $wex-component-form-disabled-opacity;
+    
+      /* ============================================================
+         INPUT OTP
+         ============================================================
+         References shared form control tokens for consistency.
+         ============================================================ */
+      $wex-component-inputotp-bg: $wex-component-form-bg;
+      $wex-component-inputotp-border: $wex-component-form-border;
+      $wex-component-inputotp-focus-ring: $wex-component-form-focus-ring;
+      $wex-component-inputotp-caret: $wex-component-form-fg;
+      $wex-component-inputotp-disabled-opacity: $wex-component-form-disabled-opacity;
+    
+      /* ============================================================
+         PROGRESS
+         ============================================================ */
+      $wex-component-progress-track-bg: $wex-surface-subtle;
+      $wex-component-progress-indicator-bg: $wex-primary;
+    
+      /* ============================================================
+         DROPDOWN MENU / CONTEXT MENU (shared tokens)
+         ============================================================ */
+      $wex-component-menu-content-bg: $wex-content-bg;
+      $wex-component-menu-content-border: $wex-content-border;
+      $wex-component-menu-item-fg: $wex-text;
+      $wex-component-menu-item-hover-bg: $wex-surface-subtle;
+      $wex-component-menu-item-focus-bg: $wex-surface-subtle;
+      $wex-component-menu-separator: $wex-content-border;
+      $wex-component-menu-shortcut-fg: $wex-text-muted;
+      $wex-component-menu-disabled-opacity: 0.5;
+    
+      /* ============================================================
+         MENUBAR
+         ============================================================ */
+      $wex-component-menubar-bg: $wex-content-bg;
+      $wex-component-menubar-border: $wex-content-border;
+      $wex-component-menubar-trigger-hover-bg: $wex-surface-subtle;
+      $wex-component-menubar-trigger-focus-bg: $wex-surface-subtle;
+    
+      /* ============================================================
+         NAVIGATION MENU
+         ============================================================ */
+      $wex-component-navmenu-trigger-hover-bg: $wex-surface-subtle;
+      $wex-component-navmenu-trigger-focus-bg: $wex-surface-subtle;
+      $wex-component-navmenu-content-bg: $wex-content-bg;
+      $wex-component-navmenu-link-hover-bg: $wex-surface-subtle;
+      $wex-component-navmenu-indicator: $wex-primary;
+    
+      /* ============================================================
+         COMMAND
+         ============================================================ */
+      $wex-component-command-bg: $wex-content-bg;
+      $wex-component-command-border: $wex-content-border;
+      $wex-component-command-input-bg: transparent;
+      $wex-component-command-input-placeholder: $wex-text-muted;
+      $wex-component-command-item-hover-bg: $wex-surface-subtle;
+      $wex-component-command-item-selected-bg: $wex-surface-subtle;
+      $wex-component-command-separator: $wex-content-border;
+      $wex-component-command-group-heading: $wex-text-muted;
+      $wex-component-command-empty-fg: $wex-text-muted;
+    
+      /* ============================================================
+         SHEET
+         ============================================================ */
+      $wex-component-sheet-overlay-bg: hsl(0, 0%, 0%);
+      $wex-component-sheet-overlay-opacity: 0.5;
+      $wex-component-sheet-bg: $wex-content-bg;
+      $wex-component-sheet-border: $wex-content-border;
+      $wex-component-sheet-close-hover-bg: $wex-surface-subtle;
+      $wex-component-sheet-overlay: hsl($wex-component-sheet-overlay-bg / $wex-component-sheet-overlay-opacity);
+    
+      /* ============================================================
+         DRAWER
+         ============================================================ */
+      $wex-component-drawer-overlay-bg: hsl(0, 0%, 0%);
+      $wex-component-drawer-overlay-opacity: 0.5;
+      $wex-component-drawer-bg: $wex-content-bg;
+      $wex-component-drawer-border: $wex-content-border;
+      $wex-component-drawer-handle-bg: $wex-text-muted;
+      $wex-component-drawer-overlay: hsl($wex-component-drawer-overlay-bg / $wex-component-drawer-overlay-opacity);
+    
+      /* ============================================================
+         ALERT DIALOG
+         ============================================================ */
+      $wex-component-alertdialog-overlay-bg: hsl(0, 0%, 0%);
+      $wex-component-alertdialog-overlay-opacity: 0.5;
+      $wex-component-alertdialog-bg: $wex-content-bg;
+      $wex-component-alertdialog-fg: $wex-text;
+      $wex-component-alertdialog-border: $wex-content-border;
+      $wex-component-alertdialog-action-bg: $wex-primary;
+      $wex-component-alertdialog-action-fg: $wex-primary-contrast;
+      $wex-component-alertdialog-cancel-bg: $wex-surface-subtle;
+      $wex-component-alertdialog-cancel-fg: $wex-text;
+      $wex-component-alertdialog-overlay: hsl($wex-component-alertdialog-overlay-bg / $wex-component-alertdialog-overlay-opacity);
+    
+      /* ============================================================
+         TOGGLE
+         ============================================================ */
+      $wex-component-toggle-border: $wex-input-border;
+      $wex-component-toggle-bg: transparent;
+      $wex-component-toggle-fg: $wex-text-muted;
+      $wex-component-toggle-hover-bg: $wex-surface-subtle;
+      $wex-component-toggle-hover-fg: $wex-text;
+      $wex-component-toggle-pressed-bg: $wex-surface-subtle;
+      $wex-component-toggle-pressed-fg: $wex-text;
+      $wex-component-toggle-focus-ring: $wex-focus-ring-color;
+      $wex-component-toggle-disabled-opacity: 0.5;
+    
+      /* ============================================================
+         ACCORDION
+         ============================================================ */
+      $wex-component-accordion-border: $wex-content-border;
+      $wex-component-accordion-trigger-fg: $wex-text;
+      $wex-component-accordion-trigger-hover-bg: $wex-surface-subtle;
+      $wex-component-accordion-content-bg: transparent;
+      $wex-component-accordion-icon-fg: $wex-text-muted;
+    
+      /* ============================================================
+         PAGINATION
+         ============================================================ */
+      $wex-component-pagination-item-bg: transparent;
+      $wex-component-pagination-item-fg: $wex-text;
+      $wex-component-pagination-item-hover-bg: $wex-surface-subtle;
+      $wex-component-pagination-active-bg: $wex-primary;
+      $wex-component-pagination-active-fg: $wex-primary-contrast;
+      $wex-component-pagination-disabled-opacity: 0.5;
+    
+      /* ============================================================
+         BREADCRUMB
+         ============================================================ */
+      $wex-component-breadcrumb-link-fg: $wex-palette-slate-700;
+      $wex-component-breadcrumb-link-hover-fg: $wex-text;
+      $wex-component-breadcrumb-separator-fg: $wex-text-muted;
+      $wex-component-breadcrumb-current-fg: $wex-text;
+    
+      /* ============================================================
+         POPOVER
+         ============================================================ */
+      $wex-component-popover-bg: $wex-content-bg;
+      $wex-component-popover-fg: $wex-text;
+      $wex-component-popover-border: $wex-content-border;
+    
+      /* ============================================================
+         HOVER CARD
+         ============================================================ */
+      $wex-component-hovercard-bg: $wex-content-bg;
+      $wex-component-hovercard-fg: $wex-text;
+      $wex-component-hovercard-border: $wex-content-border;
+    
+      /* ============================================================
+         TOOLTIP
+         ============================================================ */
+      $wex-component-tooltip-bg: $wex-palette-slate-900;
+      $wex-component-tooltip-fg: $wex-palette-slate-50;
+      $wex-component-tooltip-border: transparent;
+    
+      /* ============================================================
+         SKELETON
+         ============================================================ */
+      $wex-component-skeleton-bg: $wex-surface-subtle;
+    
+      /* ============================================================
+         SEPARATOR
+         ============================================================ */
+      $wex-component-separator-bg: $wex-content-border;
+    
+      /* ============================================================
+         KBD (Keyboard)
+         ============================================================ */
+      $wex-component-kbd-bg: $wex-surface-subtle;
+      $wex-component-kbd-fg: $wex-text;
+      $wex-component-kbd-border: $wex-content-border;
+    
+      /* ============================================================
+         AVATAR
+         ============================================================ */
+      $wex-component-avatar-bg: $wex-surface-subtle;
+      $wex-component-avatar-fg: $wex-text-muted;
+      $wex-component-avatar-border: $wex-content-border;
+      $wex-component-avatar-fallback-bg: $wex-surface-subtle;
+      $wex-component-avatar-fallback-fg: $wex-text-muted;
+      $wex-component-avatar-status-online-bg: $wex-success;
+      $wex-component-avatar-status-offline-bg: $wex-text-muted;
+      $wex-component-avatar-status-busy-bg: $wex-destructive;
+      $wex-component-avatar-status-away-bg: $wex-warning;
+    
+      /* ============================================================
+         CALENDAR / DATE-PICKER
+         ============================================================ */
+      $wex-component-calendar-bg: $wex-content-bg;
+      $wex-component-calendar-fg: $wex-text;
+      $wex-component-calendar-header-fg: $wex-text;
+      $wex-component-calendar-weekday-fg: $wex-text-muted;
+      $wex-component-calendar-nav-button-bg: transparent;
+      $wex-component-calendar-nav-button-hover-bg: $wex-surface-subtle;
+      $wex-component-calendar-day-fg: $wex-text;
+      $wex-component-calendar-day-hover-bg: $wex-surface-subtle;
+      $wex-component-calendar-day-selected-bg: $wex-primary;
+      $wex-component-calendar-day-selected-fg: $wex-primary-contrast;
+      $wex-component-calendar-day-today-bg: $wex-surface-subtle;
+      $wex-component-calendar-day-today-fg: $wex-text;
+      $wex-component-calendar-day-outside-fg: $wex-text-muted;
+      $wex-component-calendar-day-disabled-fg: $wex-text-muted;
+      $wex-component-calendar-day-range-bg: $wex-surface-subtle;
+      $wex-component-calendar-day-range-fg: $wex-text;
+    
+      /* ============================================================
+         SIDEBAR
+         ============================================================ */
+      $wex-component-sidebar-bg: $wex-content-bg;
+      $wex-component-sidebar-fg: $wex-text;
+      $wex-component-sidebar-border: $wex-content-border;
+      $wex-component-sidebar-item-fg: $wex-text;
+      $wex-component-sidebar-item-hover-bg: $wex-surface-subtle;
+      $wex-component-sidebar-item-hover-fg: $wex-text;
+      $wex-component-sidebar-item-active-bg: $wex-surface-subtle;
+      $wex-component-sidebar-item-active-fg: $wex-primary;
+      $wex-component-sidebar-header-fg: $wex-text-muted;
+      $wex-component-sidebar-accent-bg: $wex-surface-subtle;
+      $wex-component-sidebar-accent-fg: $wex-text;
+      $wex-component-sidebar-ring: $wex-focus-ring-color;
+    
+      /* ============================================================
+         FIELD (Form field wrapper)
+         ============================================================ */
+      $wex-component-field-label-fg: $wex-text;
+      $wex-component-field-description-fg: $wex-text-muted;
+      $wex-component-field-error-fg: $wex-palette-red-600; /* One shade darker for WCAG contrast */
+      $wex-component-field-required-fg: $wex-destructive;
+    
+      /* ============================================================
+         EMPTY STATE
+         ============================================================ */
+      $wex-component-empty-bg: transparent;
+      $wex-component-empty-fg: $wex-text-muted;
+      $wex-component-empty-icon-fg: $wex-text-muted;
+      $wex-component-empty-title-fg: $wex-text;
+    
+      /* ============================================================
+         ITEM (Generic list item)
+         ============================================================ */
+      $wex-component-item-bg: transparent;
+      $wex-component-item-fg: $wex-text;
+      $wex-component-item-hover-bg: $wex-surface-subtle;
+      $wex-component-item-hover-fg: $wex-text;
+      $wex-component-item-selected-bg: $wex-surface-subtle;
+      $wex-component-item-selected-fg: $wex-primary;
+      $wex-component-item-disabled-fg: $wex-text-muted;
+      $wex-component-item-disabled-opacity: 0.5;
+      /* Description text needs better contrast - use darker shade for WCAG AA (4.5:1) */
+      $wex-component-item-description-fg: $wex-palette-slate-700;
+    
+      /* ============================================================
+         INPUT GROUP
+         ============================================================ */
+      $wex-component-inputgroup-addon-bg: $wex-surface-subtle;
+      $wex-component-inputgroup-addon-fg: $wex-text-muted;
+      $wex-component-inputgroup-addon-border: $wex-content-border;
+      $wex-component-inputgroup-radius: $wex-radius-md;
+    
+      /* ============================================================
+         CHART
+         ============================================================ */
+      $wex-component-chart-bg: $wex-content-bg;
+      $wex-component-chart-fg: $wex-text;
+      $wex-component-chart-grid-fg: $wex-content-border;
+      $wex-component-chart-axis-fg: $wex-text-muted;
+      $wex-component-chart-tooltip-bg: $wex-content-bg;
+      $wex-component-chart-tooltip-fg: $wex-text;
+      $wex-component-chart-tooltip-border: $wex-content-border;
+    
+      /* ============================================================
+         DATA TABLE (extends Table)
+         ============================================================ */
+      $wex-component-datatable-toolbar-bg: transparent;
+      $wex-component-datatable-toolbar-fg: $wex-text;
+      $wex-component-datatable-filter-bg: $wex-content-bg;
+      $wex-component-datatable-filter-border: $wex-content-border;
+      $wex-component-datatable-action-hover-bg: $wex-surface-subtle;
+      $wex-component-datatable-info-fg: $wex-text-muted;
+    
+      /* ============================================================
+         MULTISELECT
+         ============================================================
+         Multi-selection dropdown/listbox component.
+         ============================================================ */
+      $wex-component-multiselect-bg: $wex-content-bg;
+      $wex-component-multiselect-fg: $wex-text;
+      $wex-component-multiselect-border: $wex-component-form-border;
+      $wex-component-multiselect-focus-ring: $wex-component-form-focus-ring;
+      $wex-component-multiselect-placeholder-fg: $wex-text-muted;
+      $wex-component-multiselect-item-fg: $wex-text;
+      $wex-component-multiselect-item-hover-bg: $wex-surface-subtle;
+      $wex-component-multiselect-item-focus-bg: $wex-surface-subtle;
+      $wex-component-multiselect-item-selected-bg: $wex-primary;
+      $wex-component-multiselect-item-selected-fg: $wex-primary-contrast;
+      $wex-component-multiselect-item-selected-hover-bg: $wex-primary-hover;
+      $wex-component-multiselect-tag-bg: $wex-primary;
+      $wex-component-multiselect-tag-fg: $wex-primary-contrast;
+      $wex-component-multiselect-tag-remove-hover-bg: $wex-primary-hover;
+      $wex-component-multiselect-checkbox-bg: $wex-content-bg;
+      $wex-component-multiselect-checkbox-checked-bg: $wex-primary;
+      $wex-component-multiselect-checkbox-checked-fg: $wex-primary-contrast;
+      $wex-component-multiselect-search-icon-fg: $wex-text-muted;
+      $wex-component-multiselect-group-heading-fg: $wex-text-muted;
+      $wex-component-multiselect-empty-fg: $wex-text-muted;
+      $wex-component-multiselect-count-fg: $wex-text-muted;
+    
+      /* ============================================================
+         LISTBOX
+         ============================================================
+         Single/multi selection listbox component.
+         ============================================================ */
+      $wex-component-listbox-bg: $wex-content-bg;
+      $wex-component-listbox-fg: $wex-text;
+      $wex-component-listbox-border: $wex-component-form-border;
+      $wex-component-listbox-focus-ring: $wex-component-form-focus-ring;
+      $wex-component-listbox-invalid-border: $wex-component-form-invalid-border;
+      $wex-component-listbox-item-fg: $wex-text;
+      $wex-component-listbox-item-hover-bg: $wex-surface-subtle;
+      $wex-component-listbox-item-focus-bg: $wex-surface-subtle;
+      $wex-component-listbox-item-selected-bg: $wex-primary;
+      $wex-component-listbox-item-selected-fg: $wex-primary-contrast;
+      $wex-component-listbox-item-selected-hover-bg: $wex-primary-hover;
+      $wex-component-listbox-checkbox-bg: $wex-content-bg;
+      $wex-component-listbox-checkbox-checked-bg: $wex-primary;
+      $wex-component-listbox-checkbox-checked-fg: $wex-primary-contrast;
+      $wex-component-listbox-search-icon-fg: $wex-text-muted;
+      $wex-component-listbox-group-heading-fg: $wex-text-muted;
+      $wex-component-listbox-empty-fg: $wex-text-muted;
+      $wex-component-listbox-count-fg: $wex-text-muted;
+    
+      /* ============================================================
+         RESIZABLE
+         ============================================================ */
+      $wex-component-resizable-handle-bg: $wex-content-border;
+      $wex-component-resizable-focus-ring: $wex-focus-ring-color;
+    
+      /* ============================================================
+         SCROLL AREA
+         ============================================================ */
+      $wex-component-scrollarea-thumb-bg: $wex-content-border;
+    
+      /* ============================================================
+         DATE PICKER
+         ============================================================ */
+      $wex-component-datepicker-placeholder-fg: $wex-text-muted;
+    
+      /* ============================================================
+         BUTTON GHOST VARIANT
+         ============================================================ */
+      $wex-component-button-ghost-fg: $wex-text;
+      $wex-component-button-ghost-hover-bg: $wex-surface-subtle;
+      $wex-component-button-ghost-active-bg: $wex-content-border;
+      $wex-component-button-ghost-disabled-fg: $wex-text-muted;
+    
+      /* ============================================================
+         BUTTON GHOST VARIANT - Intent-specific text colors
+         ============================================================ */
+      $wex-component-button-destructive-ghost-fg: $wex-destructive-text;
+      $wex-component-button-destructive-ghost-hover-fg: $wex-destructive-text-hover;
+      $wex-component-button-success-ghost-fg: $wex-success-text;
+      $wex-component-button-success-ghost-hover-fg: $wex-success-text-hover;
+      $wex-component-button-info-ghost-fg: $wex-info-text;
+      $wex-component-button-info-ghost-hover-fg: $wex-info-text-hover;
+      $wex-component-button-warning-ghost-fg: $wex-warning-text;
+      $wex-component-button-warning-ghost-hover-fg: $wex-warning-text-hover;
+      $wex-component-button-help-ghost-fg: $wex-help-text;
+      $wex-component-button-help-ghost-hover-fg: $wex-help-text-hover;
+      $wex-component-button-contrast-ghost-fg: $wex-contrast;
+      $wex-component-button-contrast-ghost-hover-fg: $wex-contrast-hover;
+    
+      /* ============================================================
+         BUTTON LINK VARIANT - Intent-specific text colors
+         ============================================================ */
+      $wex-component-button-destructive-link-fg: $wex-destructive-text;
+      $wex-component-button-destructive-link-hover-fg: $wex-destructive-text-hover;
+      $wex-component-button-destructive-link-active-fg: $wex-destructive-text;
+      $wex-component-button-success-link-fg: $wex-success-text;
+      $wex-component-button-success-link-hover-fg: $wex-success-text-hover;
+      $wex-component-button-success-link-active-fg: $wex-success-text;
+      $wex-component-button-info-link-fg: $wex-info-text;
+      $wex-component-button-info-link-hover-fg: $wex-info-text-hover;
+      $wex-component-button-info-link-active-fg: $wex-info-text;
+      $wex-component-button-warning-link-fg: $wex-warning-text;
+      $wex-component-button-warning-link-hover-fg: $wex-warning-text-hover;
+      $wex-component-button-warning-link-active-fg: $wex-warning-text;
+      $wex-component-button-help-link-fg: $wex-help-text;
+      $wex-component-button-help-link-hover-fg: $wex-help-text-hover;
+      $wex-component-button-help-link-active-fg: $wex-help-text;
+      $wex-component-button-contrast-link-fg: $wex-contrast;
+      $wex-component-button-contrast-link-hover-fg: $wex-contrast-hover;
+      $wex-component-button-contrast-link-active-fg: $wex-contrast;
+    
+      /* ============================================================
+         ADDITIONAL SELECT TOKENS
+         ============================================================ */
+      $wex-component-select-placeholder-fg: $wex-text-muted;
+      $wex-component-select-content-fg: $wex-text;
+      $wex-component-select-item-fg: $wex-text;
+      $wex-component-select-separator-bg: $wex-surface-subtle;
+    
+      /* ============================================================
+         ADDITIONAL DIALOG TOKENS
+         ============================================================ */
+      $wex-component-dialog-description-fg: $wex-text-muted;
+    
+      /* ============================================================
+         ADDITIONAL COMMAND TOKENS
+         ============================================================ */
+      $wex-component-command-fg: $wex-text;
+    
+      /* ============================================================
+         ADDITIONAL NAVMENU TOKENS
+         ============================================================ */
+      $wex-component-navmenu-bg: $wex-content-bg;
+    
+      /* ============================================================
+         ADDITIONAL ITEM TOKENS
+         ============================================================ */
+      $wex-component-item-border: $wex-content-border;
+      $wex-component-item-muted-bg: $wex-surface-subtle;
+      $wex-component-item-link-fg: $wex-link;
+      $wex-component-item-icon-bg: $wex-surface-subtle;
+      $wex-component-item-focus-border: $wex-focus-ring-color;
+      $wex-component-item-focus-ring: $wex-focus-ring-color;
+    
+      /* ============================================================
+         ADDITIONAL FIELD TOKENS
+         ============================================================ */
+      $wex-component-field-card-checked-bg: $wex-primary;
+      $wex-component-field-card-checked-border: $wex-primary;
+      $wex-component-field-link-fg: $wex-link;
+      $wex-component-field-checked-bg: $wex-primary;
+      $wex-component-field-checked-border: $wex-primary;
+    
+      /* ============================================================
+         ADDITIONAL INPUT TOKENS
+         ============================================================ */
+      $wex-component-input-file-fg: $wex-text;
+    
+      /* ============================================================
+         TEXT UTILITY COLORS
+         ============================================================
+         For text on any background (light or dark mode aware)
+         ============================================================ */
+      $wex-component-text-success: $wex-success-text; /* Darker green for WCAG contrast in light mode */
+      $wex-component-text-destructive: $wex-destructive;
+      $wex-component-text-info: $wex-info;
+      $wex-component-text-warning: $wex-warning;
+    
+      /* ============================================================
+         TREE
+         ============================================================ */
+      $wex-component-tree-bg: $wex-content-bg;
+      $wex-component-tree-node-fg: $wex-text;
+      $wex-component-tree-node-hover-bg: $wex-surface-subtle;
+      $wex-component-tree-node-selected-bg: $wex-primary;
+      $wex-component-tree-focus-ring: $wex-focus-ring-color;
+      $wex-component-tree-search-icon-fg: $wex-text-muted;
+      $wex-component-tree-empty-fg: $wex-text-muted;
+      $wex-component-tree-checkbox-bg: $wex-content-bg;
+      $wex-component-tree-checkbox-checked-bg: $wex-primary;
+      $wex-component-tree-checkbox-checked-fg: $wex-primary-contrast;
+      $wex-component-tree-check-fg: $wex-primary;
+    
+      /* ============================================================
+         TOAST / SONNER
+         ============================================================ */
+      $wex-component-toast-border: $wex-content-border;
+      $wex-component-toast-bg: $wex-content-bg;
+      $wex-component-toast-fg: $wex-text;
+      $wex-component-toast-description-fg: $wex-text-muted;
+      $wex-component-toast-action-bg: $wex-primary;
+      $wex-component-toast-action-fg: $wex-primary-contrast;
+      $wex-component-toast-cancel-bg: $wex-surface-subtle;
+      $wex-component-toast-cancel-fg: $wex-text-muted;
+    
+      /* ============================================================
+         KBD
+         ============================================================ */
+      $wex-component-kbd-bg: $wex-surface-subtle;
+      $wex-component-kbd-fg: $wex-text-muted;
+    
+      /* ============================================================
+         TOOLTIP
+         ============================================================ */
+      $wex-component-tooltip-bg: $wex-text;
+      $wex-component-tooltip-fg: $wex-content-bg;
+    
+      /* ============================================================
+         EMPTY
+         ============================================================ */
+      $wex-component-empty-icon-bg: $wex-surface-subtle;
+      $wex-component-empty-icon-fg: $wex-text-muted;
+      $wex-component-empty-description-fg: $wex-text-muted;
+      $wex-component-empty-link-fg: $wex-link;
+    
+      /* ============================================================
+         TIMELINE
+         ============================================================ */
+      $wex-component-timeline-marker-bg: $wex-content-bg;
+      $wex-component-timeline-marker-border: $wex-text;
+      $wex-component-timeline-opposite-fg: $wex-text-muted;
+      $wex-component-timeline-connector-bg: $wex-content-border;
+    
+      /* ============================================================
+         BADGE (additional)
+         ============================================================ */
+      $wex-component-badge-fg: $wex-text;
+    
+      /* ============================================================
+         DATA TABLE
+         ============================================================ */
+      $wex-component-datatable-info-fg: $wex-text-muted;
+      $wex-component-datatable-action-hover-bg: $wex-surface-subtle;
+    
+      /* ============================================================
+         INPUT (additional)
+         ============================================================ */
+      $wex-component-input-filled-bg: $wex-surface-subtle;
+      $wex-component-input-fg: $wex-text;
+    
+      /* ============================================================
+         TEXTAREA
+         ============================================================ */
+      $wex-component-textarea-border: $wex-content-border;
+      $wex-component-textarea-placeholder: $wex-text-muted;
+      $wex-component-textarea-focus-ring: $wex-focus-ring-color;
+    
+      /* ============================================================
+         ACCORDION
+         ============================================================ */
+      $wex-component-accordion-icon-fg: $wex-text-muted;
+    }
+    
+    /* ============================================================
+       DARK MODE OVERRIDES
+       ============================================================
+       Only include explicit overrides when semantic tokens don't
+       auto-shift correctly. Most tokens reference Layer 1 semantics
+       which already have dark mode overrides.
+       ============================================================ */
+    
+    .dark {
+      /* ----- Shared form controls: border-hover needs explicit dark override ----- */
+      $wex-component-form-border-hover: $wex-palette-slate-600;
+      
+      /* ═══════════════════════════════════════════════════════════════════
+         OUTLINE VARIANTS - Dark Mode Overrides
+         ═══════════════════════════════════════════════════════════════════ */
+      
+      /* ----- Button: Primary Outline (dark) ----- */
+      $wex-component-button-primary-outline-fg: $wex-palette-blue-200;
+      $wex-component-button-primary-outline-border: $wex-palette-blue-500;
+      $wex-component-button-primary-outline-hover-bg: $wex-palette-blue-900;
+      $wex-component-button-primary-outline-active-bg: $wex-palette-blue-800;
+      
+      /* ----- Button: Ghost/Link Primary (dark) - lighter for contrast ----- */
+      $wex-component-button-primary-ghost-fg-dark: $wex-palette-blue-100;
+      $wex-component-button-primary-link-fg-dark: $wex-palette-blue-100;
+      
+      /* ----- Button: Secondary Outline (dark) ----- */
+      $wex-component-button-secondary-outline-fg: $wex-palette-slate-200;
+      $wex-component-button-secondary-outline-hover-bg: $wex-palette-slate-700;
+      $wex-component-button-secondary-outline-active-bg: $wex-palette-slate-600;
+      
+      /* ----- Button: Destructive Outline (dark) ----- */
+      $wex-component-button-destructive-outline-fg: $wex-palette-red-300; /* Brighter for WCAG 4.5:1 on dark */
+      $wex-component-button-destructive-outline-border: $wex-palette-red-400;
+      $wex-component-button-destructive-outline-hover-bg: $wex-palette-red-900;
+      $wex-component-button-destructive-outline-active-bg: $wex-palette-red-800;
+      
+      /* ----- Button: Success Outline (dark) ----- */
+      $wex-component-button-success-outline-fg: $wex-palette-green-400;
+      $wex-component-button-success-outline-border: $wex-palette-green-500;
+      $wex-component-button-success-outline-hover-bg: $wex-palette-green-900;
+      $wex-component-button-success-outline-active-bg: $wex-palette-green-800;
+      
+      /* ----- Button: Info Outline (dark) ----- */
+      $wex-component-button-info-outline-fg: $wex-palette-cyan-400;
+      $wex-component-button-info-outline-border: $wex-palette-cyan-500;
+      $wex-component-button-info-outline-hover-bg: $wex-palette-cyan-900;
+      $wex-component-button-info-outline-active-bg: $wex-palette-cyan-800;
+      
+      /* ----- Button: Warning Outline (dark) ----- */
+      $wex-component-button-warning-outline-fg: $wex-palette-amber-400;
+      $wex-component-button-warning-outline-border: $wex-palette-amber-500;
+      $wex-component-button-warning-outline-hover-bg: $wex-palette-amber-900;
+      $wex-component-button-warning-outline-active-bg: $wex-palette-amber-800;
+      
+      /* ----- Button: Help Outline (dark) ----- */
+      $wex-component-button-help-outline-fg: $wex-palette-purple-300; /* Brighter for WCAG 4.5:1 on dark */
+      $wex-component-button-help-outline-border: $wex-palette-purple-400;
+      $wex-component-button-help-outline-hover-bg: $wex-palette-purple-900;
+      $wex-component-button-help-outline-active-bg: $wex-palette-purple-800;
+      
+      /* ----- Button: Contrast Outline (dark) - inverts ----- */
+      $wex-component-button-contrast-outline-fg: $wex-palette-slate-100;
+      $wex-component-button-contrast-outline-border: $wex-palette-slate-200;
+      $wex-component-button-contrast-outline-hover-bg: $wex-palette-slate-700;
+      $wex-component-button-contrast-outline-active-bg: $wex-palette-slate-600;
+      
+      /* ----- Button: Contrast inverts in dark mode ----- */
+      $wex-component-button-contrast-bg: $wex-palette-slate-50;
+      $wex-component-button-contrast-fg: $wex-palette-slate-900;
+      $wex-component-button-contrast-border: $wex-palette-slate-50;
+      $wex-component-button-contrast-hover-bg: $wex-palette-slate-200;
+      
+      /* ----- Item: Description text (dark mode) ----- */
+      $wex-component-item-description-fg: $wex-text-muted;
+      $wex-component-button-contrast-active-bg: $wex-palette-slate-300;
+      $wex-component-button-contrast-disabled-bg: $wex-palette-slate-50;
+      $wex-component-button-contrast-disabled-fg: $wex-palette-slate-900;
+      
+      /* ----- Input: Filled variant dark override ----- */
+      $wex-component-input-filled-hover-bg: $wex-palette-slate-700;
+      
+      /* ----- Alert/Toast: tinted backgrounds need dark overrides ----- */
+      $wex-component-alert-info-bg: $wex-palette-cyan-900;
+      $wex-component-alert-info-border: $wex-palette-cyan-700;
+      
+      $wex-component-alert-success-bg: $wex-palette-green-900;
+      $wex-component-alert-success-border: $wex-palette-green-700;
+      
+      $wex-component-alert-warning-bg: $wex-palette-amber-900;
+      $wex-component-alert-warning-border: $wex-palette-amber-700;
+      
+      $wex-component-alert-destructive-bg: $wex-palette-red-900;
+      $wex-component-alert-destructive-border: $wex-palette-red-700;
+      
+      /* Alert text: white for contrast on dark tinted backgrounds */
+      $wex-component-alert-default-title-fg: $wex-palette-white;
+      $wex-component-alert-default-fg: $wex-palette-white;
+      $wex-component-alert-info-title-fg: $wex-palette-white;
+      $wex-component-alert-info-fg: $wex-palette-white;
+      $wex-component-alert-success-title-fg: $wex-palette-white;
+      $wex-component-alert-success-fg: $wex-palette-white;
+      $wex-component-alert-warning-title-fg: $wex-palette-white;
+      $wex-component-alert-warning-fg: $wex-palette-white;
+      $wex-component-alert-destructive-title-fg: $wex-palette-white;
+      $wex-component-alert-destructive-fg: $wex-palette-white;
+      
+      $wex-component-toast-info-bg: $wex-palette-cyan-900;
+      $wex-component-toast-info-fg: $wex-palette-white;
+      $wex-component-toast-info-border: $wex-palette-cyan-700;
+      
+      $wex-component-toast-success-bg: $wex-palette-green-900;
+      $wex-component-toast-success-fg: $wex-palette-white;
+      $wex-component-toast-success-border: $wex-palette-green-700;
+      
+      $wex-component-toast-destructive-bg: $wex-palette-red-900;
+      $wex-component-toast-destructive-fg: $wex-palette-white;
+      $wex-component-toast-destructive-border: $wex-palette-red-700;
+    
+      /* ----- Tooltip: invert colors in dark mode ----- */
+      $wex-component-tooltip-bg: $wex-palette-slate-50;
+      $wex-component-tooltip-fg: $wex-palette-slate-900;
+      
+      /* ----- Text/Foreground uses of link color: now inherit from --wex-link tokens ----- */
+      /* Button link now uses --wex-link which has proper dark mode overrides */
+      
+      $wex-component-tabs-trigger-active-fg: $wex-link;
+      $wex-component-tabs-indicator: $wex-link;
+      
+      $wex-component-navmenu-indicator: $wex-link;
+      
+      $wex-component-sidebar-item-active-fg: $wex-link;
+      
+      $wex-component-item-selected-fg: $wex-link;
+      
+      /* ----- Button: Ghost/Link Intent-specific (dark mode) ----- */
+      $wex-component-button-destructive-ghost-fg: $wex-destructive-text;
+      $wex-component-button-destructive-ghost-hover-fg: $wex-destructive-text-hover;
+      $wex-component-button-success-ghost-fg: $wex-success-text;
+      $wex-component-button-success-ghost-hover-fg: $wex-success-text-hover;
+      $wex-component-button-info-ghost-fg: $wex-info-text;
+      $wex-component-button-info-ghost-hover-fg: $wex-info-text-hover;
+      $wex-component-button-warning-ghost-fg: $wex-warning-text;
+      $wex-component-button-warning-ghost-hover-fg: $wex-warning-text-hover;
+      $wex-component-button-help-ghost-fg: $wex-help-text;
+      $wex-component-button-help-ghost-hover-fg: $wex-help-text-hover;
+      $wex-component-button-contrast-ghost-fg: $wex-contrast;
+      $wex-component-button-contrast-ghost-hover-fg: $wex-contrast-hover;
+      
+      $wex-component-button-destructive-link-fg: $wex-destructive-text;
+      $wex-component-button-destructive-link-hover-fg: $wex-destructive-text-hover;
+      $wex-component-button-success-link-fg: $wex-success-text;
+      $wex-component-button-success-link-hover-fg: $wex-success-text-hover;
+      $wex-component-button-info-link-fg: $wex-info-text;
+      $wex-component-button-info-link-hover-fg: $wex-info-text-hover;
+      $wex-component-button-warning-link-fg: $wex-warning-text;
+      $wex-component-button-warning-link-hover-fg: $wex-warning-text-hover;
+      $wex-component-button-help-link-fg: $wex-help-text;
+      $wex-component-button-help-link-hover-fg: $wex-help-text-hover;
+      $wex-component-button-contrast-link-fg: $wex-contrast;
+      $wex-component-button-contrast-link-hover-fg: $wex-contrast-hover;
+      
+      /* ----- Field error: brighter red for contrast on dark backgrounds ----- */
+      $wex-component-field-error-fg: $wex-destructive-text; /* Brighter red for WCAG contrast in dark mode */
+    
+      /* ----- Breadcrumb: lighter colors for dark mode contrast ----- */
+      $wex-component-breadcrumb-link-fg: $wex-palette-slate-300;
+      $wex-component-breadcrumb-link-hover-fg: $wex-palette-slate-100;
+      $wex-component-breadcrumb-separator-fg: $wex-palette-slate-400;
+      $wex-component-breadcrumb-current-fg: $wex-text;
+      
+      /* ----- Text utility colors: brighter for contrast on dark backgrounds ----- */
+      $wex-component-text-success: $wex-palette-green-400;
+      $wex-component-text-destructive: $wex-palette-red-400;
+      $wex-component-text-info: $wex-palette-cyan-400;
+      $wex-component-text-warning: $wex-palette-amber-400;
+      
+      /* ----- Badge: Contrast inverts in dark mode ----- */
+      $wex-component-badge-contrast-bg: $wex-component-button-contrast-bg;
+      $wex-component-badge-contrast-fg: $wex-component-button-contrast-fg;
+      $wex-component-badge-contrast-border: transparent;
+    
+      /* ----- Item: link color for dark mode ----- */
+      $wex-component-item-link-fg: $wex-link;
+    
+      /* ----- Field: link color for dark mode ----- */
+      $wex-component-field-link-fg: $wex-link;
+    }
+
+/* ============================================================
+   COMPONENT UTILITIES & OVERRIDES
+   ============================================================
+   CSS utilities and overrides required by WEX components.
+   These styles are needed for components to function correctly.
+   Note: No @layer directives here - this file is imported and
+   Tailwind processes layers only in files with @tailwind directives.
+   ============================================================ */
+
+/* Shimmer animation for skeleton wave effect */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.animate-\[shimmer_2s_infinite\] {
+  animation: shimmer 2s infinite;
+  background: linear-gradient(
+    to right,
+    hsl($wex-skeleton-bg) 0%,
+    hsl($wex-skeleton-bg) 40%,
+    hsl($wex-skeleton-bg / 0.5) 50%,
+    hsl($wex-skeleton-bg) 60%,
+    hsl($wex-skeleton-bg) 100%
+  );
+  background-size: 2000px 100%;
+}
+
+/* Hide scrollbar while maintaining scroll functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Indeterminate progress bar animation */
+@keyframes progress-indeterminate {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(300%);
+  }
+}
+.animate-progress-indeterminate {
+  animation: progress-indeterminate 1.5s ease-in-out infinite;
+}
+
+/* Sonner toast overrides - Required for wex-sonner component */
+/* Sonner generates [data-sonner-toast] elements internally that need theming */
+[data-sonner-toast][data-type="error"] {
+  $normal-bg: hsl($wex-component-toast-destructive-bg);
+  $normal-border: hsl($wex-component-toast-destructive-border);
+  $normal-text: hsl($wex-component-toast-destructive-fg);
+  background: var(--normal-bg) !important;
+  border-color: var(--normal-border) !important;
+  color: var(--normal-text) !important;
+}
+[data-sonner-toast][data-type="error"] [data-title],
+[data-sonner-toast][data-type="error"] [data-description] {
+  color: hsl($wex-component-toast-destructive-fg) !important;
+}
+
+[data-sonner-toast][data-type="success"] {
+  $normal-bg: hsl($wex-component-toast-success-bg);
+  $normal-border: hsl($wex-component-toast-success-border);
+  $normal-text: hsl($wex-component-toast-success-fg);
+  background: var(--normal-bg) !important;
+  border-color: var(--normal-border) !important;
+  color: var(--normal-text) !important;
+}
+[data-sonner-toast][data-type="success"] [data-title],
+[data-sonner-toast][data-type="success"] [data-description] {
+  color: hsl($wex-component-toast-success-fg) !important;
+}
+
+[data-sonner-toast][data-type="warning"] {
+  $normal-bg: hsl(var(--warning));
+  $normal-border: hsl(var(--warning));
+  $normal-text: hsl(var(--warning-foreground));
+  background: var(--normal-bg) !important;
+  border-color: var(--normal-border) !important;
+  color: var(--normal-text) !important;
+}
+[data-sonner-toast][data-type="warning"] [data-title],
+[data-sonner-toast][data-type="warning"] [data-description] {
+  color: hsl(var(--warning-foreground)) !important;
+}
+
+[data-sonner-toast][data-type="info"] {
+  $normal-bg: hsl($wex-component-toast-info-bg);
+  $normal-border: hsl($wex-component-toast-info-border);
+  $normal-text: hsl($wex-component-toast-info-fg);
+  background: var(--normal-bg) !important;
+  border-color: var(--normal-border) !important;
+  color: var(--normal-text) !important;
+}
+[data-sonner-toast][data-type="info"] [data-title],
+[data-sonner-toast][data-type="info"] [data-description] {
+  color: hsl($wex-component-toast-info-fg) !important;
+}
+    

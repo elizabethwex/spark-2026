@@ -1,0 +1,134 @@
+/* ============================================================
+   SHADCN SEMANTIC BRIDGE
+   ============================================================
+   This file maps WEX tokens to shadcn semantic variables.
+   
+   This file is HAND-AUTHORED (semantic decisions require intent).
+   It will NOT become a Style Dictionary output.
+   
+   RULES:
+   - All values MUST reference --wex-* variables
+   - NO raw HSL values allowed
+   - State variants (hover, active) are included for Tailwind utilities
+   ============================================================ */
+
+:root {
+  /* ===== BACKGROUNDS ===== */
+  $background: $wex-content-bg;
+  $foreground: $wex-text;
+
+  /* ===== CARD ===== */
+  $card: $wex-content-bg;
+  $card-foreground: $wex-text;
+
+  /* ===== POPOVER ===== */
+  $popover: $wex-content-bg;
+  $popover-foreground: $wex-text;
+
+  /* ===== BRAND ===== */
+  $brand-red: $wex-brand-red;
+
+  /* ===== PRIMARY (with state) ===== */
+  $primary: $wex-primary;
+  $primary-foreground: $wex-primary-contrast;
+  $primary-hover: $wex-primary-hover;
+
+  /* ===== LINK (for text links) ===== */
+  $link: $wex-link;
+  $link-hover: $wex-link-hover;
+  $link-active: $wex-link-active;
+
+  /* ===== SECONDARY (with state) ===== */
+  $secondary: $wex-content-border;
+  $secondary-foreground: $wex-text;
+  $secondary-hover: $wex-surface-subtle;
+
+  /* ===== MUTED ===== */
+  $muted: $wex-surface-subtle;
+  $muted-foreground: $wex-text-muted;
+
+  /* ===== ACCENT (subtle interactive hover surface) ===== */
+  $accent: $wex-surface-subtle;
+  $accent-foreground: $wex-text;
+
+  /* ===== DESTRUCTIVE (with state) ===== */
+  $destructive: $wex-destructive;
+  $destructive-foreground: $wex-destructive-foreground;
+  $destructive-hover: $wex-destructive-hover;
+  $destructive-text: $wex-destructive-text;
+  $destructive-text-hover: $wex-destructive-text-hover;
+
+  /* ===== SUCCESS (with state) ===== */
+  $success: $wex-success;
+  $success-foreground: $wex-success-foreground;
+  $success-hover: $wex-success-hover;
+  $success-text: $wex-success-text;
+  $success-text-hover: $wex-success-text-hover;
+
+  /* ===== WARNING (with state) ===== */
+  $warning: $wex-warning;
+  $warning-foreground: $wex-warning-foreground;
+  $warning-hover: $wex-warning-hover;
+  $warning-text: $wex-warning-text;
+  $warning-text-hover: $wex-warning-text-hover;
+
+  /* ===== INFO (with state) ===== */
+  $info: $wex-info;
+  $info-foreground: $wex-info-foreground;
+  $info-hover: $wex-info-hover;
+  $info-text: $wex-info-text;
+  $info-text-hover: $wex-info-text-hover;
+
+  /* ===== HELP (with state) ===== */
+  $help: $wex-help;
+  $help-foreground: $wex-help-foreground;
+  $help-hover: $wex-help-hover;
+  $help-text: $wex-help-text;
+  $help-text-hover: $wex-help-text-hover;
+
+  /* ===== CONTRAST (with state) ===== */
+  $contrast: $wex-contrast;
+  $contrast-foreground: $wex-contrast-foreground;
+  $contrast-hover: $wex-contrast-hover;
+
+  /* ===== BORDERS & INPUTS ===== */
+  $border: $wex-content-border;
+  $input: $wex-input-border;
+  $ring: $wex-focus-ring-color;
+
+  /* ===== RADII ===== */
+  $radius: $wex-radius-md;
+
+  /* ===== SIDEBAR (maps to existing surface tokens) ===== */
+  $sidebar-background: $wex-content-bg;
+  $sidebar-foreground: $wex-text;
+  $sidebar-primary: $wex-primary;
+  $sidebar-primary-foreground: $wex-primary-contrast;
+  $sidebar-accent: $wex-surface-subtle;
+  $sidebar-accent-foreground: $wex-text;
+  $sidebar-border: $wex-content-border;
+  $sidebar-ring: $wex-focus-ring-color;
+
+  /* ===== CHART (placeholder - requires brand guidance) ===== */
+  $chart-1: $wex-chart-1;
+  $chart-2: $wex-chart-2;
+  $chart-3: $wex-chart-3;
+  $chart-4: $wex-chart-4;
+  $chart-5: $wex-chart-5;
+}
+
+.dark {
+  /* ===== SECONDARY (dark mode hover adjustment) ===== */
+  $secondary-hover: $wex-content-border;
+}
+
+/* ===== TEXT SELECTION ===== */
+::selection {
+  background-color: hsl($wex-palette-blue-100);
+  color: hsl($wex-palette-blue-900);
+}
+
+.dark ::selection {
+  background-color: hsl($wex-palette-blue-800);
+  color: hsl($wex-palette-blue-100);
+}

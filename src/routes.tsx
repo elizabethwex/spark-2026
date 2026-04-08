@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
@@ -61,6 +61,15 @@ const ModernDocumentPage = React.lazy(() => import("@/pages/ModernDocument"));
 
 // Select an Account (authenticated; same UI as login step 5)
 const SelectProfilePage = React.lazy(() => import("@/pages/SelectProfilePage"));
+
+// Enrollment flow pages
+const EnrollmentHomePage = React.lazy(() => import("@/pages/enrollment/EnrollmentHomePage"));
+const EnrollmentStepRoute = React.lazy(() => import("@/pages/enrollment/EnrollmentStepRoute"));
+const DecisionSupportOptInPage = React.lazy(() => import("@/pages/enrollment/DecisionSupportOptInPage"));
+const PlansCheckpointPage = React.lazy(() => import("@/pages/enrollment/PlansCheckpointPage"));
+const SpendingAccountsCheckpointPage = React.lazy(() => import("@/pages/enrollment/SpendingAccountsCheckpointPage"));
+const EnrollmentSuccessPage = React.lazy(() => import("@/pages/enrollment/EnrollmentSuccessPage"));
+const EnrollmentStatementPage = React.lazy(() => import("@/pages/enrollment/EnrollmentStatementPage"));
 
 
 /**
@@ -163,6 +172,18 @@ export function AppRoutes() {
           <Route path="assist-iq" element={<AppAssistIQPage />} />
           <Route path="lock-screen" element={<AppLockScreenPage />} />
           <Route path="penny" element={<AppPennyFlowPage />} />
+        </Route>
+
+        {/* Enrollment flow — /enrollment/* (standalone, no auth gate) */}
+        <Route path="enrollment">
+          <Route index element={<Navigate to="home" replace />} />
+          <Route path="home" element={withLightOnly(<EnrollmentHomePage />)} />
+          <Route path="decision-support-opt-in" element={withLightOnly(<DecisionSupportOptInPage />)} />
+          <Route path="plans-checkpoint" element={withLightOnly(<PlansCheckpointPage />)} />
+          <Route path="spending-accounts-checkpoint" element={withLightOnly(<SpendingAccountsCheckpointPage />)} />
+          <Route path="success" element={withLightOnly(<EnrollmentSuccessPage />)} />
+          <Route path="statement" element={withLightOnly(<EnrollmentStatementPage />)} />
+          <Route path=":stepId" element={withLightOnly(<EnrollmentStepRoute />)} />
         </Route>
 
         {/* Catch-all for 404 */}

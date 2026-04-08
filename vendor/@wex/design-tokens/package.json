@@ -1,0 +1,72 @@
+{
+  "name": "@wex/design-tokens",
+  "version": "0.2.0",
+  "description": "WEX Design System tokens - CSS variables and Tailwind preset for React and Angular applications",
+  "main": "./css/index.css",
+  "module": "./index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.js",
+      "require": "./index.js",
+      "style": "./css/index.css",
+      "default": "./css/index.css"
+    },
+    "./css/index.css": "./css/index.css",
+    "./index.css": "./index.css",
+    "./tailwind-preset": "./tailwind-preset.js",
+    "./css": "./css/index.css",
+    "./css/tokens": "./css/design-tokens.css",
+    "./css/design-tokens": "./css/design-tokens.css",
+    "./css/shadcn-bridge": "./css/shadcn-bridge.css",
+    "./css/components-bridge": "./css/components-bridge.css",
+    "./scss": "./scss/index.scss",
+    "./scss/tokens": "./scss/design-tokens.scss",
+    "./scss/design-tokens": "./scss/design-tokens.scss",
+    "./scss/shadcn-bridge": "./scss/shadcn-bridge.scss",
+    "./scss/components-bridge": "./scss/components-bridge.scss",
+    "./ts": "./design-tokens.ts",
+    "./typescript": "./design-tokens.ts",
+    "./json": "./design-tokens.json",
+    "./source": "./design-tokens.json"
+  },
+  "scripts": {
+    "build": "cd ../.. && node scripts/build-tokens.cjs",
+    "dev": "cd ../.. && node scripts/watch-tokens.cjs",
+    "prepublishOnly": "cd ../.. && node scripts/build-tokens.cjs"
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "index.css",
+    "css",
+    "scss",
+    "ios",
+    "android",
+    "design-tokens.ts",
+    "design-tokens.json",
+    "tailwind-preset.js",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "tailwindcss": ">=3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "tailwindcss": {
+      "optional": true
+    }
+  },
+  "keywords": [
+    "wex",
+    "design-system",
+    "design-tokens",
+    "css-variables",
+    "tailwind",
+    "theme",
+    "shadcn"
+  ],
+  "author": "WEX Design System Team",
+  "license": "UNLICENSED",
+  "private": false
+}
