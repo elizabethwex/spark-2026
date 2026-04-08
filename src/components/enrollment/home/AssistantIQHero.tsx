@@ -15,6 +15,7 @@ import {
   PawPrint,
 } from "lucide-react";
 import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
+import { type SimulationMode } from "@/lib/simulatedExpenses";
 
 const BRAND_LINEAR_GRADIENT =
   "linear-gradient(172.91deg, rgb(37, 20, 111) 2.4625%, rgb(200, 16, 46) 100%)";
@@ -43,7 +44,7 @@ const QUICK_ACTIONS: QuickAction[] = [
 interface Props {
   memberName: string;
   showHsaInvestCta: boolean;
-  simulationMode?: "modern" | "simulated" | "cobra" | "cobraEnroll";
+  simulationMode?: SimulationMode;
 }
 
 export function AssistantIQHero({ memberName, showHsaInvestCta, simulationMode = "modern" }: Props) {

@@ -52,7 +52,6 @@ export const WexCombobox = ({
   onValueChange,
   placeholder = "Select option...",
   disabled = false,
-  searchPlaceholder = "Search...",
   ...props
 }: ComboboxProps) => {
   const [open, setOpen] = React.useState(false);

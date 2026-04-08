@@ -2,7 +2,7 @@ import * as React from "react";
 import { useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/enrollment/Navigation";
 import { Footer } from "@/components/enrollment/Footer";
-import { loadEnrollmentSubmission } from "@/lib/enrollmentSubmissionStorage";
+import { loadEnrollmentSubmission, type EnrollmentSubmissionV1 } from "@/lib/enrollmentSubmissionStorage";
 import {
   coveragePeriodFromEffectiveDate,
   EFFECTIVE_DATE,
@@ -30,14 +30,25 @@ function getGreeting(): string {
 export default function EnrollmentHomePage() {
   const navigate = useNavigate();
   const greeting = getGreeting();
-  const submission = React.useMemo(() => loadEnrollmentSubmission(), []);
+  const [submission, setSubmission] = React.useState<EnrollmentSubmissionV1 | null>(
+    () => loadEnrollmentSubmission(),
+  );
   const coveragePeriod = React.useMemo(
     () => coveragePeriodFromEffectiveDate(EFFECTIVE_DATE),
     [],
   );
-  const [simulationMode, setSimulationMode] = React.useState<SimulationMode>("modern");
+  const [simulationMode, setSimulationMode] = React.useState<SimulationMode>(
+    () => (loadEnrollmentSubmission() ? "modern" : "preEnrollment"),
+  );
 
-  // No submission: empty state (navigation/footer untouched)
+  const handleModeChange = (newMode: SimulationMode) => {
+    if (newMode === "preEnrollment") {
+      clearEnrollmentStorage();
+      setSubmission(null);
+    }
+    setSimulationMode(newMode);
+  };
+
   if (!submission) {
     return (
       <div className="min-h-screen bg-[hsl(228,53%,96%)] flex flex-col">
@@ -45,7 +56,6 @@ export default function EnrollmentHomePage() {
 
         <main className="flex-1 relative pt-16">
           <div className="relative max-w-[1200px] mx-auto px-6 sm:px-8 pt-10 pb-12">
-            {/* Single hero card: two panes separated by one divider (see screenshot) */}
             <div
               className="rounded-[20px] shadow-[0_4px_24px_-4px_rgba(15,23,42,0.08),0_8px_16px_-8px_rgba(15,23,42,0.06)] border border-border/40 overflow-hidden grid grid-cols-1 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1.15fr)] divide-y divide-slate-200 lg:divide-y-0 lg:divide-x lg:divide-slate-200"
               style={{
@@ -57,7 +67,6 @@ export default function EnrollmentHomePage() {
 
               {/* ── Left: Assistant IQ ── */}
               <div className="flex flex-col gap-8 p-8 sm:p-10 lg:min-h-[520px]">
-                {/* Brand orb + star */}
                 <div className="relative shrink-0 size-[52px] rounded-full overflow-hidden shadow-sm ring-1 ring-white/80">
                   <div
                     className="absolute inset-0 rounded-full"
@@ -77,7 +86,6 @@ export default function EnrollmentHomePage() {
                   </p>
                 </div>
 
-                {/* AI search */}
                 <div className="bg-white rounded-full border border-slate-200/90 flex items-center pl-5 pr-1.5 py-1.5 max-w-xl">
                   <input
                     type="text"
@@ -109,7 +117,7 @@ export default function EnrollmentHomePage() {
                 </div>
               </div>
 
-              {/* ── Right: Your next steps (same card surface as left; divider from parent divide-x/y) ── */}
+              {/* ── Right: Your next steps ── */}
               <div className="flex flex-col gap-4 p-8 sm:p-10 lg:min-h-[520px]">
                 <div className="flex items-center gap-2 flex-wrap">
                   <Bell className="h-4 w-4 text-primary shrink-0" />
@@ -163,6 +171,7 @@ export default function EnrollmentHomePage() {
           </div>
         </main>
 
+        <PrototypeToggle mode={simulationMode} onChange={handleModeChange} hasSubmission={false} />
         <Footer />
       </div>
     );
@@ -229,7 +238,7 @@ export default function EnrollmentHomePage() {
         </div>
       </main>
 
-      <PrototypeToggle mode={simulationMode} onChange={setSimulationMode} />
+      <PrototypeToggle mode={simulationMode} onChange={handleModeChange} hasSubmission={true} />
       <Footer />
     </div>
   );

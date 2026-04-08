@@ -31,7 +31,7 @@ export default defineConfig({
   // Output to dist/ directory (will be copied to root by publish script)
   // Use outExtension to ensure .js extension and preserve directory structure
   outDir: 'dist',
-  outExtension({ format }) {
+  outExtension() {
     return {
       js: `.js`,
     };

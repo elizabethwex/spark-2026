@@ -1,7 +1,7 @@
 import { type EnrollmentSubmissionV1 } from "@/lib/enrollmentSubmissionStorage";
 import { getPlanDetails } from "@/lib/planDetailsLookup";
 
-export type SimulationMode = "modern" | "simulated" | "cobra" | "cobraEnroll";
+export type SimulationMode = "modern" | "simulated" | "cobra" | "cobraEnroll" | "preEnrollment";
 
 export interface SimulatedData {
   medicalDeductibleSpent: number;
