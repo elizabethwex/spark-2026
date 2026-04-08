@@ -1018,8 +1018,8 @@ function DetailRow({
             fontSize: 17,
             fontWeight: 400,
             lineHeight: "22px",
-            letterSpacing: -0.43,
-            color: TEXT_PRIMARY,
+            letterSpacing: 0,
+            color: "var(--app-text)",
           }}
         >
           {label}
@@ -1029,8 +1029,8 @@ function DetailRow({
             fontSize: 17,
             fontWeight: 400,
             lineHeight: "22px",
-            letterSpacing: -0.43,
-            color: TEXT_SECONDARY,
+            letterSpacing: 0,
+            color: "var(--app-text-secondary)",
             textAlign: "right",
           }}
         >

@@ -1,8 +1,6 @@
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import {
-  ChevronLeft,
-  Sparkles,
   DollarSign,
   Receipt,
   SlidersHorizontal,
@@ -16,6 +14,8 @@ import {
   HandCoins,
   Landmark,
 } from "lucide-react";
+import { AppNavBar } from "@/components/app-shell/AppNavBar";
+import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
 
 const CARD_SHADOW = "0px 3.017px 9.051px rgba(43,49,78,0.04), 0px 6.034px 18.101px rgba(43,49,78,0.06)";
 const INVESTMENT_SHADOW =
@@ -131,7 +131,6 @@ const ACCOUNT_META: Record<string, { name: string; totalBalance: string; availab
 
 export default function AppAccountDetail() {
   const { id = "hsa" } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"spending" | "investments">("spending");
   const meta = ACCOUNT_META[id] ?? ACCOUNT_META["hsa"];
 
@@ -1036,91 +1035,8 @@ export default function AppAccountDetail() {
         paddingBottom: "calc(var(--app-tabbar-height, 95px) + env(safe-area-inset-bottom, 0px) + 64px)",
       }}
     >
-      {/* Custom Navigation Header */}
-      <div
-        style={{
-          position: "sticky",
-          top: 0,
-          zIndex: 40,
-          background: "rgba(255,255,255,0.72)",
-          backdropFilter: "blur(20px) saturate(180%)",
-          WebkitBackdropFilter: "blur(20px) saturate(180%)",
-          borderBottom: "0.5px solid rgba(255,255,255,0.5)",
-          paddingTop: "env(safe-area-inset-top, 0px)",
-        }}
-      >
-        <div
-          style={{
-            height: 56,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "0 16px 8px",
-            position: "relative",
-          }}
-        >
-          {/* Back button */}
-          <button
-            onClick={() => navigate("/app/account")}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 4,
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              padding: "8px 4px",
-              minWidth: 44,
-              height: 44,
-              color: TEXT_PRIMARY,
-              fontSize: 17,
-              fontWeight: 500,
-            }}
-          >
-            <ChevronLeft size={20} strokeWidth={2} />
-            <span>Back</span>
-          </button>
-
-          {/* Center title */}
-          <span
-            style={{
-              position: "absolute",
-              left: "50%",
-              transform: "translateX(-50%)",
-              fontSize: 14,
-              fontWeight: 600,
-              lineHeight: "24px",
-              letterSpacing: -0.084,
-              color: TEXT_PRIMARY,
-              whiteSpace: "nowrap",
-              pointerEvents: "none",
-            }}
-          >
-            {meta.name}
-          </span>
-
-          {/* WEXly button */}
-          <button
-            aria-label="WEXly"
-            onClick={() => navigate("/app/assist-iq")}
-            style={{
-              width: 48,
-              height: 48,
-              borderRadius: "50%",
-              background: "linear-gradient(133.5deg, #25146F 2.46%, #C8102E 100%)",
-              border: "none",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-              boxShadow: "0 4px 16px rgba(37,20,111,0.35)",
-            }}
-          >
-            <Sparkles size={20} strokeWidth={1.75} style={{ color: "#fff" }} />
-          </button>
-        </div>
-      </div>
+      <AppTopSpacer variant="page" />
+      <AppNavBar variant="sub-page" title={meta.name} backTo="/app/account" />
 
       {/* Page content */}
       <div

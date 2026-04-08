@@ -1,6 +1,10 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ChevronLeft, Sparkles, ChevronRight, FileSearch, SlidersHorizontal, HeartPulse, Baby, CalendarCheck2 } from "lucide-react";
+import { ChevronRight, FileSearch, SlidersHorizontal, HeartPulse, Baby, CalendarCheck2 } from "lucide-react";
+import { AppNavBar } from "@/components/app-shell/AppNavBar";
+import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
+import type { TransactionRow } from "./AppAccountOverview";
+import { TransactionDetailSheet } from "./AppAccountOverview";
 
 const CARD_SHADOW = "0px 3.017px 9.051px rgba(43,49,78,0.04), 0px 6.034px 18.101px rgba(43,49,78,0.06)";
 const TEXT_PRIMARY = "#14182c";
@@ -42,7 +46,7 @@ interface AccountData {
   electionAmount: string;
   contributions: { label: string; value: string }[];
   status: { label: string; value: string }[];
-  transactions: { merchant: string; date: string; amount: string }[];
+  transactions: TransactionRow[];
 }
 
 const ACCOUNT_DATA: Record<string, AccountData> = {
@@ -81,11 +85,11 @@ const ACCOUNT_DATA: Record<string, AccountData> = {
       { label: "Estimated Payroll Deductible", value: "$252.00" },
     ],
     transactions: [
-      { merchant: "Pharmacy", date: "4/27/2026 • LPFSA", amount: "$42.50" },
-      { merchant: "Dr. Miller DDS", date: "4/27/2026 • LPFSA", amount: "$340.00" },
-      { merchant: "CVS Pharmacy", date: "4/24/2026 • LPFSA", amount: "$28.10" },
-      { merchant: "Target Store", date: "4/20/2026 • LPFSA", amount: "$34.99" },
-      { merchant: "Walgreens Pharmacy", date: "4/18/2026 • LPFSA", amount: "$19.50" },
+      { merchant: "Pharmacy", date: "4/27/2026", account: "LPFSA", amount: "$42.50", processedDate: "04/27/2026", description: "Prescription Medicine", planYear: "2026", availableBalance: "$807.50", runningBalance: "$765.00", status: "complete" },
+      { merchant: "Dr. Miller DDS", date: "4/27/2026", account: "LPFSA", amount: "$340.00", processedDate: "04/27/2026", description: "Dental Services", planYear: "2026", availableBalance: "$1,147.50", runningBalance: "$807.50", status: "complete" },
+      { merchant: "CVS Pharmacy", date: "4/24/2026", account: "LPFSA", amount: "$28.10", processedDate: "04/24/2026", description: "Prescription Medicine", planYear: "2026", availableBalance: "$1,175.60", runningBalance: "$1,147.50", status: "complete" },
+      { merchant: "Target Store", date: "4/20/2026", account: "LPFSA", amount: "$34.99", processedDate: "04/20/2026", description: "Health Products", planYear: "2026", availableBalance: "$1,210.59", runningBalance: "$1,175.60", status: "complete" },
+      { merchant: "Walgreens Pharmacy", date: "4/18/2026", account: "LPFSA", amount: "$19.50", processedDate: "04/18/2026", description: "Prescription Medicine", planYear: "2026", availableBalance: "$1,230.09", runningBalance: "$1,210.59", status: "complete" },
     ],
   },
   fsa: {
@@ -123,11 +127,11 @@ const ACCOUNT_DATA: Record<string, AccountData> = {
       { label: "Estimated Payroll Deductible", value: "$57.69" },
     ],
     transactions: [
-      { merchant: "Pharmacy", date: "4/27/2026 • FSA", amount: "$42.50" },
-      { merchant: "CVS Pharmacy", date: "4/25/2026 • FSA", amount: "$28.10" },
-      { merchant: "Target Store", date: "4/20/2026 • FSA", amount: "$34.99" },
-      { merchant: "Walgreens Pharmacy", date: "4/18/2026 • FSA", amount: "$19.50" },
-      { merchant: "Dr. Smith Family Med", date: "3/18/2026 • FSA", amount: "$30.00" },
+      { merchant: "Pharmacy", date: "4/27/2026", account: "FSA", amount: "$42.50", processedDate: "04/27/2026", description: "Prescription Medicine", planYear: "2026", availableBalance: "$807.50", runningBalance: "$765.00", status: "complete" },
+      { merchant: "CVS Pharmacy", date: "4/25/2026", account: "FSA", amount: "$28.10", processedDate: "04/25/2026", description: "OTC Medicine", planYear: "2026", availableBalance: "$835.60", runningBalance: "$807.50", status: "complete" },
+      { merchant: "Target Store", date: "4/20/2026", account: "FSA", amount: "$34.99", processedDate: "04/20/2026", description: "Health Products", planYear: "2026", availableBalance: "$870.59", runningBalance: "$835.60", status: "complete" },
+      { merchant: "Walgreens Pharmacy", date: "4/18/2026", account: "FSA", amount: "$19.50", processedDate: "04/18/2026", description: "Prescription Medicine", planYear: "2026", availableBalance: "$890.09", runningBalance: "$870.59", status: "complete" },
+      { merchant: "Dr. Smith Family Med", date: "3/18/2026", account: "FSA", amount: "$30.00", processedDate: "03/18/2026", description: "Primary Care Visit", planYear: "2026", availableBalance: "$920.09", runningBalance: "$890.09", status: "complete" },
     ],
   },
   dcfsa: {
@@ -164,11 +168,11 @@ const ACCOUNT_DATA: Record<string, AccountData> = {
       { label: "Estimated Payroll Deductible", value: "$192.31" },
     ],
     transactions: [
-      { merchant: "Bright Horizons Daycare", date: "4/27/2026 • DCFSA", amount: "$185.00" },
-      { merchant: "KinderCare", date: "4/22/2026 • DCFSA", amount: "$210.00" },
-      { merchant: "Camp Discovery", date: "3/10/2026 • DCFSA", amount: "$150.00" },
-      { merchant: "Little Stars Preschool", date: "2/15/2026 • DCFSA", amount: "$320.00" },
-      { merchant: "YMCA After School", date: "1/28/2026 • DCFSA", amount: "$175.00" },
+      { merchant: "Bright Horizons Daycare", date: "4/27/2026", account: "DCFSA", amount: "$185.00", processedDate: "04/27/2026", description: "Childcare", planYear: "2025", availableBalance: "$620.00", runningBalance: "$435.00", status: "complete" },
+      { merchant: "KinderCare", date: "4/22/2026", account: "DCFSA", amount: "$210.00", processedDate: "04/22/2026", description: "Daycare", planYear: "2025", availableBalance: "$830.00", runningBalance: "$620.00", status: "complete" },
+      { merchant: "Camp Discovery", date: "3/10/2026", account: "DCFSA", amount: "$150.00", processedDate: "03/10/2026", description: "Day Camp", planYear: "2025", availableBalance: "$980.00", runningBalance: "$830.00", status: "complete" },
+      { merchant: "Little Stars Preschool", date: "2/15/2026", account: "DCFSA", amount: "$320.00", processedDate: "02/15/2026", description: "Preschool", planYear: "2025", availableBalance: "$1,300.00", runningBalance: "$980.00", status: "complete" },
+      { merchant: "YMCA After School", date: "1/28/2026", account: "DCFSA", amount: "$175.00", processedDate: "01/28/2026", description: "After School Care", planYear: "2025", availableBalance: "$1,475.00", runningBalance: "$1,300.00", status: "complete" },
     ],
   },
 };
@@ -239,8 +243,8 @@ function InfoRow({
             fontSize: 17,
             fontWeight: 400,
             lineHeight: "22px",
-            letterSpacing: -0.43,
-            color: TEXT_PRIMARY,
+            letterSpacing: 0,
+            color: "var(--app-text)",
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
@@ -255,8 +259,8 @@ function InfoRow({
               fontSize: 17,
               fontWeight: 600,
               lineHeight: "22px",
-              letterSpacing: -0.43,
-              color: valueColor ?? TEXT_SECONDARY,
+              letterSpacing: 0,
+              color: valueColor ?? "var(--app-text-secondary)",
               textAlign: "right",
               flexShrink: 0,
             }}
@@ -411,6 +415,7 @@ export default function AppLpfsaDetail() {
   const location = useLocation();
   const accountId = location.pathname.split("/").pop() ?? "lpfsa";
   const data = ACCOUNT_DATA[accountId] ?? ACCOUNT_DATA["lpfsa"];
+  const [selectedTransaction, setSelectedTransaction] = React.useState<TransactionRow | null>(null);
 
   return (
     <div
@@ -420,88 +425,8 @@ export default function AppLpfsaDetail() {
         paddingBottom: "calc(var(--app-tabbar-height, 95px) + env(safe-area-inset-bottom, 0px) + 64px)",
       }}
     >
-      {/* Sticky Navigation Header */}
-      <div
-        style={{
-          position: "sticky",
-          top: 0,
-          zIndex: 40,
-          background: "rgba(255,255,255,0.72)",
-          backdropFilter: "blur(20px) saturate(180%)",
-          WebkitBackdropFilter: "blur(20px) saturate(180%)",
-          borderBottom: "0.5px solid rgba(255,255,255,0.5)",
-          paddingTop: "env(safe-area-inset-top, 0px)",
-        }}
-      >
-        <div
-          style={{
-            height: 56,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "0 16px 8px",
-            position: "relative",
-          }}
-        >
-          <button
-            onClick={() => navigate("/app/account")}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 4,
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              padding: "8px 4px",
-              minWidth: 44,
-              height: 44,
-              color: TEXT_PRIMARY,
-              fontSize: 17,
-              fontWeight: 500,
-            }}
-          >
-            <ChevronLeft size={20} strokeWidth={2} />
-            <span>Back</span>
-          </button>
-
-          <span
-            style={{
-              position: "absolute",
-              left: "50%",
-              transform: "translateX(-50%)",
-              fontSize: 14,
-              fontWeight: 600,
-              lineHeight: "24px",
-              letterSpacing: -0.084,
-              color: TEXT_PRIMARY,
-              whiteSpace: "nowrap",
-              pointerEvents: "none",
-            }}
-          >
-            {data.title}
-          </span>
-
-          <button
-            aria-label="WEXly"
-            onClick={() => navigate("/app/assist-iq")}
-            style={{
-              width: 48,
-              height: 48,
-              borderRadius: "50%",
-              background: "linear-gradient(133.5deg, #25146F 2.46%, #C8102E 100%)",
-              border: "none",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-              boxShadow: "0 4px 16px rgba(37,20,111,0.35)",
-            }}
-          >
-            <Sparkles size={20} strokeWidth={1.75} style={{ color: "#fff" }} />
-          </button>
-        </div>
-      </div>
+      <AppTopSpacer variant="page" />
+      <AppNavBar variant="sub-page" title={data.title} backTo="/app/account" />
 
       {/* Page Content */}
       <div
@@ -589,6 +514,27 @@ export default function AppLpfsaDetail() {
                 showSeparator={i > 0}
               />
             ))}
+          </div>
+
+          <div style={{ paddingTop: 8 }}>
+            <button
+              onClick={() => navigate("/app/reimburse")}
+              style={{
+                width: "100%",
+                height: 50,
+                borderRadius: 1000,
+                background: TINT,
+                border: "none",
+                cursor: "pointer",
+                fontSize: 17,
+                fontWeight: 600,
+                lineHeight: "22px",
+                letterSpacing: -0.43,
+                color: "white",
+              }}
+            >
+              Reimburse Myself
+            </button>
           </div>
         </div>
 
@@ -856,6 +802,7 @@ export default function AppLpfsaDetail() {
             <div key={`${tx.merchant}-${i}`}>
               <div style={{ height: 1, background: SEPARATOR }} />
               <div
+                onClick={() => setSelectedTransaction(tx)}
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -888,7 +835,7 @@ export default function AppLpfsaDetail() {
                       color: TEXT_SECONDARY,
                     }}
                   >
-                    {tx.date}
+                    {tx.date} &bull; {tx.account}
                   </div>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
@@ -911,26 +858,12 @@ export default function AppLpfsaDetail() {
           ))}
         </div>
 
-        {/* 7. Reimburse Myself Button */}
-        <button
-          onClick={() => navigate("/app/reimburse")}
-          style={{
-            width: "100%",
-            height: 50,
-            borderRadius: 1000,
-            background: TINT,
-            border: "none",
-            cursor: "pointer",
-            fontSize: 17,
-            fontWeight: 600,
-            lineHeight: "22px",
-            letterSpacing: -0.43,
-            color: "white",
-          }}
-        >
-          Reimburse Myself
-        </button>
       </div>
+
+      <TransactionDetailSheet
+        transaction={selectedTransaction}
+        onClose={() => setSelectedTransaction(null)}
+      />
     </div>
   );
 }

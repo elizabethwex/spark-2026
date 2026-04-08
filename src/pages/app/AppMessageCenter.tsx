@@ -18,7 +18,7 @@ import {
   Star,
   Trash2,
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { AppNavBar } from "@/components/app-shell/AppNavBar";
 import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
 import { useDeviceMockup } from "@/hooks/useDeviceMockup";
@@ -62,6 +62,13 @@ const SWIPE_ACTION_GAP = 10;
 const SWIPE_ROW_PR = 16;
 const SWIPE_MAX_PX =
   SWIPE_ROW_PR + SWIPE_ACTION_SIZE * 3 + SWIPE_ACTION_GAP * 2;
+
+/** One-time nudge so the first row briefly reveals swipe actions (app Messages only). */
+const FIRST_ROW_INTRO_PEEK_PX = 40;
+const FIRST_ROW_INTRO_DELAY_MS = 480;
+const FIRST_ROW_INTRO_SLIDE_MS = 320;
+const FIRST_ROW_INTRO_HOLD_MS = 160;
+
 const SWIPE_ACTION_BLUE = "var(--app-info)";
 const SWIPE_ACTION_GOLD = "var(--app-warning)";
 const SWIPE_ACTION_RED = "var(--app-destructive)";
@@ -270,6 +277,7 @@ function FilterPill({
 function MessageSwipeRow({
   translateX,
   isDragging,
+  transformTransition,
   onForegroundPointerDown,
   onForegroundPointerMove,
   onForegroundPointerUp,
@@ -283,6 +291,8 @@ function MessageSwipeRow({
 }: {
   translateX: number;
   isDragging: boolean;
+  /** When set, used instead of the default swipe release transition (e.g. intro peek). */
+  transformTransition?: string;
   onForegroundPointerDown: (e: ReactPointerEvent<HTMLDivElement>) => void;
   onForegroundPointerMove: (e: ReactPointerEvent<HTMLDivElement>) => void;
   onForegroundPointerUp: (e: ReactPointerEvent<HTMLDivElement>) => void;
@@ -395,7 +405,8 @@ function MessageSwipeRow({
           transform: `translate3d(${translateX}px, 0, 0)`,
           transition: isDragging
             ? "none"
-            : "transform 0.22s cubic-bezier(0.32, 0.72, 0, 1)",
+            : transformTransition ??
+              "transform 0.22s cubic-bezier(0.32, 0.72, 0, 1)",
           touchAction: "pan-y",
           background: "#fff",
           borderRadius: "var(--app-radius-lg)",
@@ -439,6 +450,56 @@ export default function AppMessageCenter() {
     () => filtered.slice(0, visibleLimit),
     [filtered, visibleLimit]
   );
+
+  const firstDisplayedId = displayed[0]?.id;
+  const [firstRowIntroPeekPx, setFirstRowIntroPeekPx] = useState(0);
+  const [firstRowIntroMotion, setFirstRowIntroMotion] = useState(false);
+  /** Set after the intro peek finishes — avoids replay when filters change. */
+  const firstRowIntroDoneRef = useRef(false);
+  const firstRowIdForIntroRef = useRef<string | undefined>(undefined);
+  const firstDisplayedIdRef = useRef<string | undefined>(undefined);
+  firstDisplayedIdRef.current = firstDisplayedId;
+
+  useEffect(() => {
+    if (firstRowIntroDoneRef.current) return;
+    if (!firstDisplayedId) return;
+    if (
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      firstRowIntroDoneRef.current = true;
+      return;
+    }
+
+    firstRowIdForIntroRef.current = firstDisplayedId;
+
+    let cancelled = false;
+    let endMotionTimer = 0;
+
+    const show = window.setTimeout(() => {
+      if (cancelled) return;
+      setFirstRowIntroMotion(true);
+      setFirstRowIntroPeekPx(-FIRST_ROW_INTRO_PEEK_PX);
+    }, FIRST_ROW_INTRO_DELAY_MS);
+
+    const hide = window.setTimeout(() => {
+      if (cancelled) return;
+      setFirstRowIntroPeekPx(0);
+      firstRowIdForIntroRef.current = undefined;
+      endMotionTimer = window.setTimeout(() => {
+        if (cancelled) return;
+        setFirstRowIntroMotion(false);
+        firstRowIntroDoneRef.current = true;
+      }, 420);
+    }, FIRST_ROW_INTRO_DELAY_MS + FIRST_ROW_INTRO_SLIDE_MS + FIRST_ROW_INTRO_HOLD_MS);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(show);
+      window.clearTimeout(hide);
+      if (endMotionTimer) window.clearTimeout(endMotionTimer);
+    };
+  }, [firstDisplayedId]);
 
   const selectFilter = useCallback((next: FilterId) => {
     setSwipe({ kind: "idle" });
@@ -491,6 +552,12 @@ export default function AppMessageCenter() {
   const beginRowPointer = useCallback(
     (id: string, e: ReactPointerEvent<HTMLDivElement>) => {
       if (e.pointerType === "mouse" && e.button !== 0) return;
+      if (id === firstDisplayedIdRef.current) {
+        setFirstRowIntroPeekPx(0);
+        setFirstRowIntroMotion(false);
+        firstRowIdForIntroRef.current = undefined;
+        firstRowIntroDoneRef.current = true;
+      }
       swipeAxisRef.current = "undecided";
       swipeDidDragRef.current = false;
       swipePointerStartRef.current = { x: e.clientX, y: e.clientY };
@@ -676,7 +743,15 @@ export default function AppMessageCenter() {
         {displayed.map((msg) => (
           <MessageSwipeRow
             key={msg.id}
-            translateX={swipeOffsetFromState(swipe, msg.id)}
+            translateX={
+              swipeOffsetFromState(swipe, msg.id) +
+              (msg.id === firstDisplayedId ? firstRowIntroPeekPx : 0)
+            }
+            transformTransition={
+              msg.id === firstDisplayedId && firstRowIntroMotion
+                ? "transform 0.38s cubic-bezier(0.34, 1.2, 0.64, 1)"
+                : undefined
+            }
             isDragging={swipe.kind === "drag" && swipe.id === msg.id}
             onForegroundPointerDown={(e) => beginRowPointer(msg.id, e)}
             onForegroundPointerMove={(e) => moveRowPointer(msg.id, e)}
@@ -927,67 +1002,70 @@ export default function AppMessageCenter() {
       </div>
       </motion.div>
 
-      {selected && (
-        <div
-          role="presentation"
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            width: "100%",
-            maxWidth: 430,
-            marginLeft: "auto",
-            marginRight: "auto",
-            zIndex: 100,
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "flex-end",
-          }}
-        >
-          <button
-            type="button"
-            aria-label="Close message"
-            onClick={closeSheet}
-            style={{
-              position: "absolute",
-              inset: 0,
-              zIndex: 0,
-              margin: 0,
-              padding: 0,
-              border: "none",
-              background: "rgba(18, 24, 29, 0.3)",
-              cursor: "pointer",
-            }}
-          />
-          <div
-            className="message-detail-sheet-panel"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="message-detail-title"
-            style={{
-              position: "relative",
-              zIndex: 1,
-              display: "flex",
-              flexDirection: "column",
-              gap: 8,
-              width: "100%",
-              maxWidth: 430,
-              margin: "0 auto",
-              maxHeight: "min(85dvh, 520px)",
-              background: "#fff",
-              borderTop: "1px solid var(--app-border)",
-              borderLeft: "1px solid var(--app-border)",
-              borderRight: "1px solid var(--app-border)",
-              borderRadius: "16px 16px 0 0",
-              padding: "0 16px calc(24px + env(safe-area-inset-bottom, 0px))",
-              overflow: "auto",
-              boxSizing: "border-box",
-              touchAction: "pan-y",
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
+      <AnimatePresence>
+        {selected && (
+          <>
+            <motion.button
+              key={`message-detail-backdrop-${selected.id}`}
+              type="button"
+              aria-label="Close message"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.22, ease: "easeOut" }}
+              onClick={closeSheet}
+              style={{
+                position: "fixed",
+                inset: 0,
+                width: "100%",
+                maxWidth: 430,
+                marginLeft: "auto",
+                marginRight: "auto",
+                zIndex: 100,
+                padding: 0,
+                border: "none",
+                background: "rgba(18, 24, 29, 0.3)",
+                cursor: "pointer",
+              }}
+            />
+            <motion.div
+              key={`message-detail-sheet-${selected.id}`}
+              className="message-detail-sheet-panel"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="message-detail-title"
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{
+                duration: 0.38,
+                ease: [0.32, 0.72, 0, 1],
+              }}
+              style={{
+                position: "fixed",
+                left: 0,
+                right: 0,
+                bottom: 0,
+                zIndex: 101,
+                display: "flex",
+                flexDirection: "column",
+                gap: 8,
+                width: "100%",
+                maxWidth: 430,
+                margin: "0 auto",
+                maxHeight: "min(85dvh, 520px)",
+                background: "#fff",
+                borderTop: "1px solid var(--app-border)",
+                borderLeft: "1px solid var(--app-border)",
+                borderRight: "1px solid var(--app-border)",
+                borderRadius: "16px 16px 0 0",
+                padding: "0 16px calc(24px + env(safe-area-inset-bottom, 0px))",
+                overflow: "auto",
+                boxSizing: "border-box",
+                touchAction: "pan-y",
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
             <button
               type="button"
               aria-label="Close message"
@@ -1155,9 +1233,10 @@ export default function AppMessageCenter() {
                 </div>
               )}
             </div>
-          </div>
-        </div>
-      )}
+          </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       <style>{`
         .messages-filter-scroll {
@@ -1165,17 +1244,6 @@ export default function AppMessageCenter() {
         }
         .messages-filter-scroll::-webkit-scrollbar {
           display: none;
-        }
-        @keyframes messageDetailSheetIn {
-          from {
-            transform: translate3d(0, 105%, 0);
-          }
-          to {
-            transform: translate3d(0, 0, 0);
-          }
-        }
-        .message-detail-sheet-panel {
-          animation: messageDetailSheetIn 0.38s cubic-bezier(0.32, 0.72, 0, 1) forwards;
         }
       `}</style>
     </div>

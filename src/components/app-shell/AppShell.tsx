@@ -41,7 +41,10 @@ export function AppShell() {
     lastScrollY.current = 0;
     setTopChromeHidden(false);
     setIsScrolled(false);
-  }, [location.pathname]);
+    if (scrollPort) {
+      scrollPort.scrollTo(0, 0);
+    }
+  }, [location.pathname, scrollPort]);
 
   useEffect(() => {
     const threshold = 8;
