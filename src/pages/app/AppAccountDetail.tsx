@@ -1,347 +1,1152 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { Wallet, ArrowUpRight, ArrowDownLeft, Check, Clock, X } from "lucide-react";
+import {
+  DollarSign,
+  Receipt,
+  SlidersHorizontal,
+  ChevronRight,
+  TrendingUp,
+  ArrowRight,
+  CheckCircle2,
+  PieChart,
+  FileText,
+  ArrowLeftRight,
+  HandCoins,
+  Landmark,
+} from "lucide-react";
 import { AppNavBar } from "@/components/app-shell/AppNavBar";
-import { AppCard } from "@/components/app-shell/primitives/AppCard";
-import { AppBadge } from "@/components/app-shell/primitives/AppBadge";
+import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
 
-interface TxItem {
-  date: string;
-  merchant: string;
-  amount: string;
-  status: "paid" | "pending" | "processing" | "denied";
-  category: string;
+const CARD_SHADOW = "0px 3.017px 9.051px rgba(43,49,78,0.04), 0px 6.034px 18.101px rgba(43,49,78,0.06)";
+const INVESTMENT_SHADOW =
+  "0px 12px 16px -4px rgba(10,13,18,0.08), 0px 4px 6px -2px rgba(10,13,18,0.03), 0px 2px 2px -1px rgba(10,13,18,0.04)";
+const TEXT_PRIMARY = "var(--app-text)";
+const TEXT_SECONDARY = "var(--app-text-secondary)";
+const TINT = "var(--app-primary)";
+const TINT_50 = "var(--app-primary-50)";
+const LIGHT_BLUE = "#a0dcf8";
+const DARK_BLUE = "#0058a3";
+const SEPARATOR = "var(--app-separator)";
+const BG_TERTIARY = "rgba(118,118,128,0.12)";
+const SUCCESS_GREEN = "var(--app-success)";
+const SUCCESS_BG = "var(--app-success)";
+const LIGHT_BLUE_BORDER = "var(--app-border)";
+const LIGHT_BLUE_BG = "var(--app-primary-50)";
+
+/** Degrees clockwise from 12 o'clock (Figma: first slice starts ~7 o'clock). */
+const DONUT_START_DEG = 210;
+
+/** SVG path for one donut ring slice; angles are degrees clockwise from top. */
+function donutSlicePath(
+  cx: number,
+  cy: number,
+  rOut: number,
+  rIn: number,
+  startDeg: number,
+  sweepDeg: number
+): string {
+  const endDeg = startDeg + sweepDeg;
+  const polar = (r: number, deg: number) => {
+    const t = (deg * Math.PI) / 180;
+    return { x: cx + r * Math.sin(t), y: cy - r * Math.cos(t) };
+  };
+  const p1 = polar(rOut, startDeg);
+  const p2 = polar(rOut, endDeg);
+  const p3 = polar(rIn, endDeg);
+  const p4 = polar(rIn, startDeg);
+  const largeArc = sweepDeg > 180 ? 1 : 0;
+  return [
+    "M",
+    p1.x,
+    p1.y,
+    "A",
+    rOut,
+    rOut,
+    0,
+    largeArc,
+    1,
+    p2.x,
+    p2.y,
+    "L",
+    p3.x,
+    p3.y,
+    "A",
+    rIn,
+    rIn,
+    0,
+    largeArc,
+    0,
+    p4.x,
+    p4.y,
+    "Z",
+  ].join(" ");
 }
 
-const ALL_TX: TxItem[] = [
-  { date: "Jan 17, 2025", merchant: "Payroll Contribution", amount: "+ $158.00", status: "pending", category: "Contribution" },
-  { date: "Jan 14, 2025", merchant: "Walgreens", amount: "- $26.00", status: "paid", category: "Pharmacy" },
-  { date: "Jan 14, 2025", merchant: "Payroll Contribution", amount: "+ $158.00", status: "paid", category: "Contribution" },
-  { date: "Jan 10, 2025", merchant: "Dr. Smith – Copay", amount: "- $40.00", status: "paid", category: "Medical" },
-  { date: "Jan 7, 2025", merchant: "Vision Works", amount: "- $120.00", status: "paid", category: "Vision" },
-  { date: "Jan 3, 2025", merchant: "CVS Pharmacy", amount: "- $18.50", status: "denied", category: "Pharmacy" },
+interface TransactionItem {
+  merchant: string;
+  date: string;
+  amount: string;
+  type: "credit" | "debit";
+}
+
+const TRANSACTIONS: TransactionItem[] = [
+  { merchant: "Claim reimbursement", date: "Feb 14", amount: "+ $50.08", type: "credit" },
+  { merchant: "Employer contribution", date: "Feb 10", amount: "+ $750.00", type: "credit" },
+  { merchant: "Primary care visit", date: "Feb 8", amount: "- $78.12", type: "debit" },
+  { merchant: "Pharmacy purchase", date: "Feb 5", amount: "- $46.21", type: "debit" },
 ];
 
-const STATUS_INFO: Record<TxItem["status"], { label: string; variant: "success" | "warning" | "neutral" | "destructive"; icon: React.ComponentType<{ size?: number; strokeWidth?: number }> }> = {
-  paid:       { label: "Paid",       variant: "success",     icon: Check },
-  pending:    { label: "Pending",    variant: "warning",     icon: Clock },
-  processing: { label: "Processing", variant: "neutral",     icon: Clock },
-  denied:     { label: "Denied",     variant: "destructive", icon: X },
-};
+const PORTFOLIO_ALLOCATION = [
+  { label: "Large cap growth", percent: "24%", color: "#25146f" },
+  { label: "Large cap value", percent: "20%", color: "#1c6eff" },
+  { label: "Commodities", percent: "9%", color: "#81aeff" },
+  { label: "International", percent: "9%", color: "#d2ddff" },
+  { label: "Other", percent: "38%", color: "#edf1ff" },
+];
 
-const ACCOUNT_META: Record<string, { name: string; balance: string; color: string; planYear: string }> = {
-  hsa:       { name: "HSA For Life®",   balance: "$0.00",     color: "hsl(208 100% 45%)", planYear: "2025" },
-  "fsa-health": { name: "Health FSA",   balance: "$250.00",   color: "hsl(142 76% 36%)", planYear: "Jan 1 – Dec 31, 2025" },
-  "fsa-dep": { name: "Dep. Care FSA",   balance: "$1,592.00", color: "hsl(270 60% 50%)", planYear: "Jan 1 – Dec 31, 2025" },
+const HOLDINGS = [
+  { ticker: "VUG", name: "Vanguard Growth ETF", value: "$3,096.00" },
+  { ticker: "VTV", name: "Vanguard Value ETF", value: "$2,580.00" },
+  { ticker: "PDBC", name: "Invesco Optimum Yield Diversified", value: "$1,161.00" },
+];
+
+const INVESTMENT_TRANSACTIONS = [
+  { description: "Bought VUG", date: "4/27/2026", amount: "$250.00", icon: "check" },
+  { description: "Bought VTV", date: "4/27/2026", amount: "$250.00", icon: "check" },
+  { description: "Funds transferred", date: "4/27/2026 • HSA", amount: "$500.00", icon: "transfer" },
+];
+
+const ACCOUNT_META: Record<string, { name: string; totalBalance: string; availableCash: string }> = {
+  hsa: {
+    name: "Health Savings Account",
+    totalBalance: "$15,900.00",
+    availableCash: "$3,000.00",
+  },
+  lpfsa: {
+    name: "Limited Purpose FSA",
+    totalBalance: "$850.00",
+    availableCash: "$850.00",
+  },
 };
 
 export default function AppAccountDetail() {
   const { id = "hsa" } = useParams<{ id: string }>();
-  const [selectedTx, setSelectedTx] = useState<TxItem | null>(null);
+  const [activeTab, setActiveTab] = useState<"spending" | "investments">("spending");
   const meta = ACCOUNT_META[id] ?? ACCOUNT_META["hsa"];
 
-  return (
-    <div
-      style={{
-        minHeight: "100%",
-        background: "var(--app-bg)",
-        fontFamily: "var(--app-font)",
-      }}
-    >
-      <AppNavBar title={meta.name} backTo="/app/account" backLabel="Accounts" />
-
-      <div style={{ padding: "0 0 24px" }}>
-        {/* Balance hero */}
-        <div
-          style={{
-            background: meta.color,
-            padding: "20px 20px 28px",
-          }}
-        >
+  const renderSpendingView = () => (
+    <>
+      {/* Available HSA Cash Card */}
+      <div
+        style={{
+          background: "white",
+          borderRadius: 24,
+          boxShadow: CARD_SHADOW,
+          padding: 16,
+          display: "flex",
+          flexDirection: "column",
+          gap: 4,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <div
             style={{
-              font: "var(--app-font-caption1)",
-              color: "rgba(255,255,255,0.75)",
-              textTransform: "uppercase",
-              letterSpacing: 0.4,
-            }}
-          >
-            Available Balance
-          </div>
-          <div
-            style={{
-              font: "var(--app-font-large-title)",
-              color: "#fff",
-              marginTop: 4,
-            }}
-          >
-            {meta.balance}
-          </div>
-          <div
-            style={{
-              font: "var(--app-font-caption1)",
-              color: "rgba(255,255,255,0.65)",
-              marginTop: 6,
-            }}
-          >
-            {meta.planYear}
-          </div>
-
-          {/* Quick stat row */}
-          <div
-            style={{
+              width: 40,
+              height: 40,
+              borderRadius: "50%",
+              background: TINT_50,
               display: "flex",
-              gap: 12,
-              marginTop: 18,
-              paddingTop: 16,
-              borderTop: "0.5px solid rgba(255,255,255,0.2)",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
             }}
           >
-            {[
-              { label: "Contributions", value: "$2,530", icon: ArrowDownLeft },
-              { label: "Expenses", value: "$2,530", icon: ArrowUpRight },
-            ].map(({ label, value, icon: Icon }) => (
-              <div
-                key={label}
-                style={{
-                  flex: 1,
-                  background: "rgba(255,255,255,0.12)",
-                  borderRadius: "var(--app-radius-md)",
-                  padding: "10px 12px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                }}
-              >
-                <Icon size={16} strokeWidth={2} style={{ color: "rgba(255,255,255,0.8)" }} />
-                <div>
-                  <div style={{ font: "var(--app-font-caption2)", color: "rgba(255,255,255,0.7)" }}>
-                    {label}
-                  </div>
-                  <div style={{ font: "var(--app-font-callout)", fontWeight: 600, color: "#fff" }}>
-                    {value}
-                  </div>
-                </div>
-              </div>
-            ))}
+            <Landmark size={20} strokeWidth={1.75} style={{ color: TINT }} />
+          </div>
+          <div
+            style={{
+              fontSize: 17,
+              fontWeight: 400,
+              lineHeight: "22px",
+              letterSpacing: -0.43,
+              color: TEXT_SECONDARY,
+            }}
+          >
+            Available HSA Cash
           </div>
         </div>
-
-        {/* Transaction list */}
-        <div style={{ padding: "20px 16px 0" }}>
-          <div
-            style={{
-              font: "var(--app-font-footnote)",
-              fontWeight: 600,
-              color: "var(--app-text-secondary)",
-              textTransform: "uppercase",
-              letterSpacing: 0.4,
-              marginBottom: 8,
-            }}
-          >
-            Transactions
-          </div>
-          <AppCard variant="solid" padding="0">
-            {ALL_TX.map((tx, i) => {
-              const si = STATUS_INFO[tx.status];
-              const isLast = i === ALL_TX.length - 1;
-              const isPositive = tx.amount.startsWith("+");
-              return (
-                <div
-                  key={i}
-                  onClick={() => setSelectedTx(tx)}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    padding: "12px 16px",
-                    gap: 12,
-                    cursor: "pointer",
-                    position: "relative",
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 38,
-                      height: 38,
-                      borderRadius: "50%",
-                      background: isPositive ? "hsl(142 76% 94%)" : "hsl(208 100% 95%)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexShrink: 0,
-                    }}
-                  >
-                    {isPositive ? (
-                      <ArrowDownLeft
-                        size={16}
-                        strokeWidth={2}
-                        style={{ color: "hsl(142 76% 30%)" }}
-                      />
-                    ) : (
-                      <Wallet size={16} strokeWidth={1.75} style={{ color: "var(--app-tint)" }} />
-                    )}
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div
-                      style={{
-                        font: "var(--app-font-subhead)",
-                        fontWeight: 500,
-                        color: "var(--app-text)",
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                      }}
-                    >
-                      {tx.merchant}
-                    </div>
-                    <div
-                      style={{
-                        font: "var(--app-font-caption1)",
-                        color: "var(--app-text-secondary)",
-                        marginTop: 2,
-                      }}
-                    >
-                      {tx.date} · {tx.category}
-                    </div>
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
-                    <span
-                      style={{
-                        font: "var(--app-font-subhead)",
-                        fontWeight: 600,
-                        color: isPositive ? "var(--app-success)" : "var(--app-text)",
-                      }}
-                    >
-                      {tx.amount}
-                    </span>
-                    <AppBadge label={si.label} variant={si.variant} size="sm" />
-                  </div>
-                  {!isLast && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        bottom: 0,
-                        left: 66,
-                        right: 0,
-                        height: "0.5px",
-                        background: "var(--app-separator)",
-                      }}
-                    />
-                  )}
-                </div>
-              );
-            })}
-          </AppCard>
+        <div
+          style={{
+            fontSize: 28,
+            fontWeight: 700,
+            lineHeight: "34px",
+            letterSpacing: 0.38,
+            color: TEXT_PRIMARY,
+            marginTop: 8,
+          }}
+        >
+          {meta.availableCash}
         </div>
       </div>
 
-      {/* Transaction detail sheet */}
-      {selectedTx && (
+      {/* 2026 Contributions Card */}
+      <div
+        style={{
+          background: "white",
+          borderRadius: 24,
+          boxShadow: CARD_SHADOW,
+          padding: 24,
+          display: "flex",
+          flexDirection: "column",
+          gap: 16,
+        }}
+      >
         <div
           style={{
-            position: "fixed",
-            inset: 0,
-            zIndex: 100,
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "flex-end",
-            background: "rgba(0,0,0,0.4)",
+            fontSize: 17,
+            fontWeight: 400,
+            lineHeight: "22px",
+            letterSpacing: -0.43,
+            color: TEXT_SECONDARY,
           }}
-          onClick={() => setSelectedTx(null)}
         >
-          <div
-            style={{
-              background: "var(--app-surface)",
-              borderRadius: "var(--app-radius-xl) var(--app-radius-xl) 0 0",
-              padding: "0 0 env(safe-area-inset-bottom, 24px)",
-              maxHeight: "85dvh",
-              overflow: "auto",
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Handle */}
-            <div style={{ display: "flex", justifyContent: "center", paddingTop: 10 }}>
+          2026 Contributions
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <div
+              style={{
+                fontSize: 15,
+                fontWeight: 400,
+                lineHeight: "20px",
+                letterSpacing: -0.23,
+                color: TEXT_PRIMARY,
+              }}
+            >
+              <span style={{ fontWeight: 800 }}>$3,500.00</span>
+              {" contributed of "}
+              <span style={{ fontWeight: 800 }}>$4,150.00</span>
+              {" limit"}
+            </div>
+
+            <div
+              style={{
+                position: "relative",
+                height: 20,
+                borderRadius: 24,
+                overflow: "hidden",
+                background: "#edeff0",
+              }}
+            >
               <div
                 style={{
-                  width: 36,
-                  height: 4,
-                  borderRadius: 2,
-                  background: "var(--app-border)",
+                  position: "absolute",
+                  left: 0,
+                  top: 0,
+                  height: "100%",
+                  width: "42%",
+                  background: LIGHT_BLUE,
+                }}
+              />
+              <div
+                style={{
+                  position: "absolute",
+                  left: 0,
+                  top: 0,
+                  height: "100%",
+                  width: "35%",
+                  background: DARK_BLUE,
                 }}
               />
             </div>
+          </div>
 
-            <div style={{ padding: "16px 20px 24px" }}>
-              <div
-                style={{
-                  font: "var(--app-font-title2)",
-                  color: "var(--app-text)",
-                  marginBottom: 4,
-                }}
-              >
-                {selectedTx.merchant}
-              </div>
-              <div
-                style={{
-                  font: "var(--app-font-title1)",
-                  color: selectedTx.amount.startsWith("+") ? "var(--app-success)" : "var(--app-text)",
-                  marginBottom: 16,
-                }}
-              >
-                {selectedTx.amount}
-              </div>
-
-              {[
-                { label: "Date", value: selectedTx.date },
-                { label: "Category", value: selectedTx.category },
-                { label: "Account", value: meta.name },
-                { label: "Status", value: selectedTx.status },
-              ].map((row, i, arr) => (
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 8,
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 4, flex: 1 }}>
                 <div
-                  key={row.label}
                   style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    padding: "12px 0",
-                    position: "relative",
+                    width: 16,
+                    height: 16,
+                    borderRadius: "50%",
+                    background: DARK_BLUE,
+                    flexShrink: 0,
+                  }}
+                />
+                <div
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 400,
+                    lineHeight: "18px",
+                    letterSpacing: -0.08,
+                    color: TEXT_PRIMARY,
                   }}
                 >
-                  <span
-                    style={{
-                      font: "var(--app-font-subhead)",
-                      color: "var(--app-text-secondary)",
-                    }}
-                  >
-                    {row.label}
-                  </span>
-                  <span
-                    style={{
-                      font: "var(--app-font-subhead)",
-                      fontWeight: 500,
-                      color: "var(--app-text)",
-                      textTransform: "capitalize",
-                    }}
-                  >
-                    {row.value}
-                  </span>
-                  {i < arr.length - 1 && (
+                  Your Contributions
+                </div>
+              </div>
+              <div
+                style={{
+                  fontSize: 13,
+                  fontWeight: 600,
+                  lineHeight: "18px",
+                  letterSpacing: -0.08,
+                  color: TEXT_PRIMARY,
+                }}
+              >
+                $3,000.00
+              </div>
+            </div>
+
+            <div style={{ height: 1, background: SEPARATOR }} />
+
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 8,
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 4, flex: 1 }}>
+                <div
+                  style={{
+                    width: 16,
+                    height: 16,
+                    borderRadius: "50%",
+                    background: LIGHT_BLUE,
+                    flexShrink: 0,
+                  }}
+                />
+                <div
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 400,
+                    lineHeight: "18px",
+                    letterSpacing: -0.08,
+                    color: TEXT_PRIMARY,
+                  }}
+                >
+                  Employer Contributions
+                </div>
+              </div>
+              <div
+                style={{
+                  fontSize: 13,
+                  fontWeight: 600,
+                  lineHeight: "18px",
+                  letterSpacing: -0.08,
+                  color: TEXT_PRIMARY,
+                }}
+              >
+                $500.00
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: 12,
+        }}
+      >
+        <div
+          style={{
+            background: "white",
+            borderRadius: 24,
+            boxShadow: CARD_SHADOW,
+            padding: "20px 16px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 12,
+            cursor: "pointer",
+          }}
+        >
+          <div
+            style={{
+              width: 56,
+              height: 56,
+              borderRadius: "50%",
+              background: TINT_50,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <DollarSign size={28} strokeWidth={2} style={{ color: TINT }} />
+          </div>
+          <div
+            style={{
+              fontSize: 15,
+              fontWeight: 600,
+              lineHeight: "20px",
+              letterSpacing: -0.23,
+              color: TEXT_PRIMARY,
+              textAlign: "center",
+            }}
+          >
+            Make a payment
+          </div>
+        </div>
+
+        <div
+          style={{
+            background: "white",
+            borderRadius: 24,
+            boxShadow: CARD_SHADOW,
+            padding: "20px 16px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 12,
+            cursor: "pointer",
+          }}
+        >
+          <div
+            style={{
+              width: 56,
+              height: 56,
+              borderRadius: "50%",
+              background: TINT_50,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Receipt size={28} strokeWidth={2} style={{ color: TINT }} />
+          </div>
+          <div
+            style={{
+              fontSize: 15,
+              fontWeight: 600,
+              lineHeight: "20px",
+              letterSpacing: -0.23,
+              color: TEXT_PRIMARY,
+              textAlign: "center",
+            }}
+          >
+            Reimburse Myself
+          </div>
+        </div>
+      </div>
+
+      {/* Account Transactions Section */}
+      <div
+        style={{
+          background: "white",
+          borderRadius: 24,
+          boxShadow: CARD_SHADOW,
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "16px 16px 12px",
+          }}
+        >
+          <span
+            style={{
+              fontSize: 17,
+              fontWeight: 400,
+              lineHeight: "22px",
+              letterSpacing: -0.43,
+              color: TEXT_PRIMARY,
+            }}
+          >
+            Account transactions
+          </span>
+          <button
+            aria-label="Filter transactions"
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: "50%",
+              background: "transparent",
+              border: "none",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <SlidersHorizontal size={20} strokeWidth={1.75} style={{ color: TINT }} />
+          </button>
+        </div>
+
+        {TRANSACTIONS.map((tx, i) => (
+          <div key={`${tx.merchant}-${i}`}>
+            {i > 0 && (
+              <div
+                style={{
+                  height: 1,
+                  background: SEPARATOR,
+                  marginLeft: 16,
+                }}
+              />
+            )}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                padding: "12px 16px",
+                gap: 12,
+                cursor: "pointer",
+              }}
+            >
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div
+                  style={{
+                    fontSize: 17,
+                    fontWeight: 600,
+                    lineHeight: "22px",
+                    letterSpacing: -0.43,
+                    color: TEXT_PRIMARY,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {tx.merchant}
+                </div>
+                <div
+                  style={{
+                    fontSize: 15,
+                    fontWeight: 400,
+                    lineHeight: "20px",
+                    letterSpacing: -0.23,
+                    color: TEXT_SECONDARY,
+                  }}
+                >
+                  {tx.date}
+                </div>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span
+                  style={{
+                    fontSize: 17,
+                    fontWeight: 400,
+                    lineHeight: "22px",
+                    letterSpacing: -0.43,
+                    color: tx.type === "credit" ? "var(--app-success)" : TEXT_PRIMARY,
+                    textAlign: "right",
+                  }}
+                >
+                  {tx.amount}
+                </span>
+                <ChevronRight size={14} strokeWidth={2.5} style={{ color: TEXT_SECONDARY }} />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+
+  const renderInvestmentsView = () => (
+    <>
+      {/* Total Invested Card with Pie Chart */}
+      <div
+        style={{
+          background: "white",
+          borderRadius: 24,
+          boxShadow: CARD_SHADOW,
+          padding: 24,
+          display: "flex",
+          flexDirection: "column",
+          gap: 16,
+        }}
+      >
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <div
+              style={{
+                fontSize: 17,
+                fontWeight: 400,
+                lineHeight: "22px",
+                letterSpacing: -0.43,
+                color: TEXT_SECONDARY,
+              }}
+            >
+              Total Invested
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 4 }}>
+              <div
+                style={{
+                  fontSize: 28,
+                  fontWeight: 700,
+                  lineHeight: "34px",
+                  letterSpacing: 0.38,
+                  color: TEXT_PRIMARY,
+                }}
+              >
+                $12,900.00
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 4,
+                  background: SUCCESS_BG,
+                  borderRadius: 9999,
+                  padding: "4px 10px",
+                }}
+              >
+                <TrendingUp size={10} strokeWidth={2.5} style={{ color: "white" }} />
+                <span
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 600,
+                    lineHeight: "20px",
+                    color: "white",
+                  }}
+                >
+                  +8.5%
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+            {/* Donut chart (132px) — slices start at 7 o’clock, clockwise; matches legend order */}
+            <svg
+              width={132}
+              height={132}
+              viewBox="0 0 132 132"
+              style={{ flexShrink: 0 }}
+              aria-hidden
+            >
+              {(() => {
+                const cx = 66;
+                const cy = 66;
+                const rOut = 66;
+                const rIn = 40;
+                let cursor = DONUT_START_DEG;
+                return PORTFOLIO_ALLOCATION.map((item) => {
+                  const sweep = (parseFloat(item.percent) / 100) * 360;
+                  const d = donutSlicePath(cx, cy, rOut, rIn, cursor, sweep);
+                  cursor += sweep;
+                  return (
+                    <path
+                      key={item.label}
+                      d={d}
+                      fill={item.color}
+                      stroke="#ffffff"
+                      strokeWidth={1.25}
+                      vectorEffect="non-scaling-stroke"
+                    />
+                  );
+                });
+              })()}
+            </svg>
+
+            {/* Portfolio Allocation Legend */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, flex: 1, paddingLeft: 8 }}>
+              <div
+                style={{
+                  fontSize: 15,
+                  fontWeight: 600,
+                  lineHeight: "20px",
+                  letterSpacing: -0.23,
+                  color: TEXT_PRIMARY,
+                }}
+              >
+                Aggressive Portfolio
+              </div>
+              {PORTFOLIO_ALLOCATION.map((item) => (
+                <div
+                  key={item.label}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 8,
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1 }}>
                     <div
                       style={{
-                        position: "absolute",
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        height: "0.5px",
-                        background: "var(--app-separator)",
+                        width: 8,
+                        height: 8,
+                        borderRadius: "50%",
+                        background: item.color,
+                        flexShrink: 0,
                       }}
                     />
-                  )}
+                    <div
+                      style={{
+                        fontSize: 13,
+                        fontWeight: 600,
+                        lineHeight: "18px",
+                        letterSpacing: -0.08,
+                        color: TEXT_PRIMARY,
+                      }}
+                    >
+                      {item.label}
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 600,
+                      lineHeight: "18px",
+                      letterSpacing: -0.08,
+                      color: TEXT_PRIMARY,
+                      paddingLeft: 8,
+                    }}
+                  >
+                    {item.percent}
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         </div>
-      )}
+      </div>
+
+      {/* Your Portfolio Section */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-end",
+            justifyContent: "space-between",
+            height: 50,
+            paddingBottom: 16,
+          }}
+        >
+          <span
+            style={{
+              fontSize: 18,
+              fontWeight: 600,
+              lineHeight: "24px",
+              letterSpacing: -0.18,
+              color: TEXT_PRIMARY,
+            }}
+          >
+            Your Portfolio
+          </span>
+          <button
+            aria-label="View all"
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: "50%",
+              background: "transparent",
+              border: "none",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <ArrowRight size={20} strokeWidth={2} style={{ color: TINT }} />
+          </button>
+        </div>
+
+        <div
+          style={{
+            background: "white",
+            borderRadius: 24,
+            boxShadow: CARD_SHADOW,
+            padding: "8px 16px",
+          }}
+        >
+          {HOLDINGS.map((holding, i) => (
+            <div key={holding.ticker}>
+              {i > 0 && (
+                <div
+                  style={{
+                    height: 1,
+                    background: SEPARATOR,
+                  }}
+                />
+              )}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  height: 68,
+                  gap: 12,
+                  cursor: "pointer",
+                }}
+              >
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div
+                    style={{
+                      fontSize: 17,
+                      fontWeight: 600,
+                      lineHeight: "22px",
+                      letterSpacing: -0.43,
+                      color: TEXT_PRIMARY,
+                    }}
+                  >
+                    {holding.ticker}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 15,
+                      fontWeight: 400,
+                      lineHeight: "20px",
+                      letterSpacing: -0.23,
+                      color: TEXT_SECONDARY,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {holding.name}
+                  </div>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                  <span
+                    style={{
+                      fontSize: 17,
+                      fontWeight: 600,
+                      lineHeight: "22px",
+                      letterSpacing: -0.43,
+                      color: TEXT_PRIMARY,
+                      textAlign: "right",
+                    }}
+                  >
+                    {holding.value}
+                  </span>
+                  <ChevronRight size={14} strokeWidth={2.5} style={{ color: TEXT_SECONDARY }} />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Investment Action Buttons (2x2 Grid) */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gridTemplateRows: "1fr 1fr",
+          gap: 12,
+        }}
+      >
+        {[
+          { label: "Change Portfolio", icon: PieChart },
+          { label: "Retake Assessment", icon: FileText },
+          { label: "Edit Auto-transfer", icon: ArrowLeftRight },
+          { label: "Liquidate account", icon: HandCoins },
+        ].map(({ label, icon: Icon }) => (
+          <div
+            key={label}
+            style={{
+              background: "white",
+              border: `1px solid ${LIGHT_BLUE_BORDER}`,
+              borderRadius: 24,
+              boxShadow: INVESTMENT_SHADOW,
+              padding: 16,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 8,
+              cursor: "pointer",
+            }}
+          >
+            <div
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: "50%",
+                background: LIGHT_BLUE_BG,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Icon size={22} strokeWidth={1.75} style={{ color: TINT }} />
+            </div>
+            <div
+              style={{
+                fontSize: 14,
+                fontWeight: 600,
+                lineHeight: "20px",
+                color: TEXT_PRIMARY,
+                textAlign: "center",
+              }}
+            >
+              {label}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Recent Investment Transactions */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-end",
+            justifyContent: "space-between",
+            height: 50,
+            paddingBottom: 16,
+          }}
+        >
+          <span
+            style={{
+              fontSize: 18,
+              fontWeight: 600,
+              lineHeight: "24px",
+              letterSpacing: -0.18,
+              color: TEXT_PRIMARY,
+            }}
+          >
+            Recent Investment Transactions
+          </span>
+          <button
+            aria-label="View all"
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: "50%",
+              background: "transparent",
+              border: "none",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <ArrowRight size={20} strokeWidth={2} style={{ color: TINT }} />
+          </button>
+        </div>
+
+        <div
+          style={{
+            background: "white",
+            borderRadius: 24,
+            boxShadow: CARD_SHADOW,
+            padding: "8px 16px",
+          }}
+        >
+          {INVESTMENT_TRANSACTIONS.map((tx, i) => (
+            <div key={`${tx.description}-${i}`}>
+              {i > 0 && (
+                <div
+                  style={{
+                    height: 1,
+                    background: SEPARATOR,
+                  }}
+                />
+              )}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  height: 68,
+                  gap: 8,
+                  cursor: "pointer",
+                }}
+              >
+                <div
+                  style={{
+                    width: 24,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                  }}
+                >
+                  {tx.icon === "check" ? (
+                    <CheckCircle2 size={17} strokeWidth={2} style={{ color: SUCCESS_GREEN }} />
+                  ) : (
+                    <ArrowLeftRight size={17} strokeWidth={2} style={{ color: TEXT_SECONDARY }} />
+                  )}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div
+                    style={{
+                      fontSize: 17,
+                      fontWeight: 600,
+                      lineHeight: "22px",
+                      letterSpacing: -0.43,
+                      color: TEXT_PRIMARY,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {tx.description}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 15,
+                      fontWeight: 400,
+                      lineHeight: "20px",
+                      letterSpacing: -0.23,
+                      color: TEXT_SECONDARY,
+                    }}
+                  >
+                    {tx.date}
+                  </div>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                  <span
+                    style={{
+                      fontSize: 17,
+                      fontWeight: 600,
+                      lineHeight: "22px",
+                      letterSpacing: -0.43,
+                      color: TEXT_PRIMARY,
+                      textAlign: "right",
+                    }}
+                  >
+                    {tx.amount}
+                  </span>
+                  <ChevronRight size={14} strokeWidth={2.5} style={{ color: TEXT_SECONDARY }} />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+
+  return (
+    <div
+      style={{
+        minHeight: "auto",
+        fontFamily: "var(--app-font)",
+        paddingBottom: "calc(var(--app-tabbar-height, 95px) + env(safe-area-inset-bottom, 0px) + 64px)",
+      }}
+    >
+      <AppTopSpacer variant="page" />
+      <AppNavBar variant="sub-page" title={meta.name} backTo="/app/account" />
+
+      {/* Page content */}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 24,
+          padding: "24px 16px 0",
+        }}
+      >
+        {/* Total Account Balance Card */}
+        <div
+          style={{
+            background: "white",
+            borderRadius: 24,
+            boxShadow: CARD_SHADOW,
+            padding: 16,
+            display: "flex",
+            flexDirection: "column",
+            gap: 4,
+          }}
+        >
+          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            <div
+              style={{
+                fontSize: 17,
+                fontWeight: 400,
+                lineHeight: "22px",
+                letterSpacing: -0.43,
+                color: TEXT_SECONDARY,
+              }}
+            >
+              Total Account Balance
+            </div>
+            <div
+              style={{
+                fontSize: 12,
+                fontWeight: 400,
+                lineHeight: "16px",
+                color: TEXT_SECONDARY,
+              }}
+            >
+              Cash + Invested Assets
+            </div>
+          </div>
+          <div
+            style={{
+              fontSize: 34,
+              fontWeight: 700,
+              lineHeight: "41px",
+              letterSpacing: 0.4,
+              color: TEXT_PRIMARY,
+            }}
+          >
+            {meta.totalBalance}
+          </div>
+        </div>
+
+        {/* Segmented Control */}
+        <div
+          style={{
+            background: BG_TERTIARY,
+            borderRadius: 100,
+            height: 48,
+            padding: 2,
+            display: "flex",
+            gap: 4,
+          }}
+        >
+          <button
+            onClick={() => setActiveTab("spending")}
+            style={{
+              flex: 1,
+              height: "100%",
+              border: "none",
+              cursor: "pointer",
+              borderRadius: 20,
+              fontSize: 13,
+              fontWeight: activeTab === "spending" ? 600 : 400,
+              letterSpacing: -0.08,
+              background: activeTab === "spending" ? TINT : "transparent",
+              color: activeTab === "spending" ? "white" : TEXT_PRIMARY,
+              transition: "all 0.2s ease",
+            }}
+          >
+            Spending
+          </button>
+          <button
+            onClick={() => setActiveTab("investments")}
+            style={{
+              flex: 1,
+              height: "100%",
+              border: "none",
+              cursor: "pointer",
+              borderRadius: 20,
+              fontSize: 13,
+              fontWeight: activeTab === "investments" ? 600 : 400,
+              letterSpacing: -0.08,
+              background: activeTab === "investments" ? TINT : "transparent",
+              color: activeTab === "investments" ? "white" : TEXT_PRIMARY,
+              transition: "all 0.2s ease",
+            }}
+          >
+            Investments
+          </button>
+        </div>
+
+        {/* Conditional Content */}
+        {activeTab === "spending" ? renderSpendingView() : renderInvestmentsView()}
+      </div>
     </div>
   );
 }

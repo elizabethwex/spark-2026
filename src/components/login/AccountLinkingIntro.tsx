@@ -6,6 +6,15 @@ import {
   MATCHED_ACCOUNT_ROWS,
   ProductTag,
 } from "@/components/login/accountLinkingShared"
+import {
+  loginSelectableSelected,
+  loginSelectableUnselectedIntro,
+} from "@/components/login/loginFlowCardStyles"
+import {
+  loginFlowLinkTextClass,
+  loginFlowPrimaryButtonClass,
+  loginFlowTertiaryGhostButtonClass,
+} from "@/components/login/loginFlowTheme"
 
 export interface AccountLinkingIntroProps {
   primaryUsername: string
@@ -43,7 +52,7 @@ export function AccountLinkingIntro({
   return (
     <div className="flex w-full flex-col gap-8">
       {/* Primary account (read-only context) */}
-      <div className="w-full rounded-xl border border-border p-4">
+      <div className="w-full rounded-xl border border-[#E3E7F4] p-4">
         <div className="flex flex-wrap items-center gap-1 gap-x-2">
           <span className="flex-1 text-left text-base font-bold leading-6 tracking-[-0.176px] text-[#12181d]">
             {primaryUsername || "ux-nicole"}
@@ -73,11 +82,9 @@ export function AccountLinkingIntro({
               <div
                 key={row.id}
                 className={cn(
-                  "flex gap-4 rounded-xl border p-4 text-left transition-colors select-none",
-                  "cursor-pointer hover:bg-accent/40",
-                  isOn
-                    ? "border-[hsl(var(--wex-primary))] bg-[hsl(var(--wex-primary)/0.08)]"
-                    : "border-border bg-card"
+                  "flex gap-4 rounded-xl p-4 text-left transition-colors select-none",
+                  "cursor-pointer",
+                  isOn ? loginSelectableSelected : loginSelectableUnselectedIntro
                 )}
                 onClick={() => toggle(row.id)}
               >
@@ -122,14 +129,14 @@ export function AccountLinkingIntro({
         <button
           type="button"
           onClick={onAddAnotherAccount}
-          className="text-[hsl(var(--wex-primary))] hover:underline"
+          className={loginFlowLinkTextClass}
         >
           Add Another Account
         </button>
       </div>
 
       {/* Why link */}
-      <div className="flex w-full flex-col gap-2 rounded-xl border border-border bg-[#eff6ff] p-4">
+      <div className="flex w-full flex-col gap-2 rounded-xl border border-[#E3E7F4] bg-[#eff6ff] p-4">
         <p className="text-base font-bold leading-6 tracking-[-0.176px] text-foreground">
           Why link your accounts?
         </p>
@@ -159,7 +166,10 @@ export function AccountLinkingIntro({
           type="button"
           disabled={!canContinue}
           onClick={() => onContinue(selectedIds)}
-          className="h-10 w-full rounded-lg text-[14px] font-medium leading-6 tracking-[-0.084px]"
+          className={cn(
+            "h-10 w-full rounded-lg text-[14px] font-medium leading-6 tracking-[-0.084px]",
+            loginFlowPrimaryButtonClass
+          )}
         >
           Continue
         </Button>
@@ -167,7 +177,10 @@ export function AccountLinkingIntro({
           type="button"
           variant="ghost"
           onClick={onNotNow}
-          className="h-10 w-full rounded-lg text-[14px] font-medium leading-6 tracking-[-0.084px] text-[hsl(var(--wex-primary))] hover:bg-transparent hover:text-[hsl(var(--wex-primary))]"
+          className={cn(
+            "h-10 w-full rounded-lg text-[14px] font-medium leading-6 tracking-[-0.084px]",
+            loginFlowTertiaryGhostButtonClass
+          )}
         >
           Not Now
         </Button>

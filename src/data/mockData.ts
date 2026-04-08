@@ -64,6 +64,7 @@ export interface InfoCard {
   description: string;
   buttonText: string;
   imageAlt: string;
+  imageUrl?: string;
 }
 
 export interface ChartData {
@@ -235,28 +236,18 @@ export const aiSuggestions: string[] = [
 
 export const infoCardsData: InfoCard[] = [
   {
-    title: "HSA +401(k) = Retire a millionaire",
-    description: "With an HSA in hand plus a 401(k), standard that you can exceed your retirement savings goal to retirement with $1M+ after 40(k), standard that you can exceed your retirement savings goal",
+    title: "Smarter Spending for Everyday Health",
+    description: "Simplify your healthcare expenses with a tax-advantaged account. Using pre-tax funds for eligible out-of-pocket medical costs reduces your overall tax burden, giving you a smart, straightforward way to pay for the care you need today.",
     buttonText: "Learn More",
     imageAlt: "Family together",
+    imageUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=600&auto=format&fit=crop",
   },
   {
-    title: "Don't put off designating a beneficiary",
-    description: "Designate a beneficiary for your Health Savings Account so your loved ones can be in your account and easily transfer funds to their accounts. Once a claim is approved.",
+    title: "Smart Healthcare Funding for Every Family Stage",
+    description: "Whether budgeting for a baby, braces, or daily prescriptions, your account is built for family life. Use your funds to easily manage eligible medical costs and keep everyone healthy.",
     buttonText: "Get Started",
     imageAlt: "Beneficiary designation",
-  },
-  {
-    title: "Get reimbursed faster",
-    description: "If you've paid for qualified health care expenses with your own money, you can access your benefit account checks instead to use the eligible health care expenses using our tool.",
-    buttonText: "Learn More",
-    imageAlt: "Reimbursement process",
-  },
-  {
-    title: "App like change and stabilization process",
-    description: "When using the tools in your Health and benefit account to pay for eligible health care expenses. It's where it is calculated, it handles all documents and transaction. A fee legit tax.",
-    buttonText: "Learn More",
-    imageAlt: "Account tools",
+    imageUrl: "https://images.unsplash.com/photo-1609220136736-443140cffec6?q=80&w=600&auto=format&fit=crop",
   },
 ];
 

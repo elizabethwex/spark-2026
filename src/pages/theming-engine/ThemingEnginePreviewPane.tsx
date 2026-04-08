@@ -62,8 +62,8 @@ export function ThemingEnginePreviewPane() {
   const maxW = PREVIEW_MAX_WIDTH[previewDevice];
 
   return (
-    <div className="flex h-full flex-col overflow-hidden">
-      <div className="flex shrink-0 flex-wrap items-center justify-between gap-4 border-b border-border bg-background px-6 py-4">
+    <div className="flex h-full flex-col overflow-hidden bg-background">
+      <div className="flex shrink-0 flex-wrap items-center justify-between gap-4 px-6 py-4">
         <h2 className="text-lg font-display font-semibold text-foreground">Preview</h2>
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex items-center gap-1 rounded-md border border-border bg-muted/30 p-0.5">
@@ -114,16 +114,11 @@ export function ThemingEnginePreviewPane() {
           </Button>
         </div>
       </div>
-      <div
-        className={cn(
-          "flex-1 min-h-0 overflow-auto transition-colors",
-          darkMode && "dark bg-zinc-900"
-        )}
-      >
+      <div className="flex-1 overflow-hidden px-4 pb-4 min-[400px]:px-6 min-[400px]:pb-6 lg:px-8 lg:pb-8">
         <div
           className={cn(
-            "min-h-full bg-background text-foreground",
-            darkMode && "bg-zinc-800 text-zinc-100"
+            "h-full w-full overflow-y-auto rounded-[24px] bg-[#F7F7F7] p-4 md:p-8 transition-colors",
+            darkMode && "dark bg-zinc-900"
           )}
         >
           <div
@@ -132,7 +127,7 @@ export function ThemingEnginePreviewPane() {
           >
             <div
               className={cn(
-                "min-h-full bg-background text-foreground",
+                "relative overflow-hidden rounded-xl border border-border bg-background shadow-xl min-h-full text-foreground",
                 darkMode && "bg-zinc-800 text-zinc-100"
               )}
               style={style}

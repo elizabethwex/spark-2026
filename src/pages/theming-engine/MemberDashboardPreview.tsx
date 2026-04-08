@@ -1,5 +1,4 @@
 import {
-  Badge,
   Button,
   Card,
   CardContent,
@@ -8,51 +7,19 @@ import {
   CardHeader,
   CardTitle,
   Progress,
-  Separator,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Input,
+  Label,
 } from "@wexinc-healthbenefits/ben-ui-kit";
 import { useFormContext, useWatch } from "react-hook-form";
-import { ChevronRight, Info, Lightbulb, Wallet, CreditCard, Sparkles, MessageCircle } from "lucide-react";
+import { Info, Wallet, Sparkles, MessageCircle, ArrowRight } from "lucide-react";
 import { ConsumerNavigation } from "@/components/layout/ConsumerNavigation";
 import type { ThemingEngineFormValues } from "@/pages/theming-engine/schema";
 
-// ─── Static data ──────────────────────────────────────────────────────────────
-
-const TRANSACTIONS = [
-  { date: "Jan 17, 2025", status: "Pending" as const, account: "HSA", description: "Payroll Contribution", category: "Contribution", member: "JB", amount: "$158.00" },
-  { date: "Jan 14, 2025", status: "Complete" as const, account: "HSA", description: "Walgreens", category: "Pharmacy", member: "AB", amount: "- $26.00" },
-  { date: "Jan 14, 2025", status: "Complete" as const, account: "HSA", description: "Payroll Contribution", category: "Contribution", member: "JB", amount: "$158.00" },
-];
-
-const FSA_ACCOUNTS = [
-  { icon: "📋", label: "LPFSA", amount: "$850.00", highlight: true },
-  { icon: "⚙️", label: "DCFSA", amount: "$2,100.00", highlight: false },
-  { icon: "🚌", label: "Commuter", amount: "$315.00", highlight: false },
-  { icon: "🅿️", label: "Parking FSA", amount: "$290.00", highlight: false },
-];
-
-const BAR_CHART_DATA = [
-  { year: "2023", yours: 55, remaining: 45 },
-  { year: "2024", yours: 70, remaining: 30 },
-  { year: "2025", yours: 65, remaining: 35 },
-];
-
-const DONUT_SEGMENTS = [
-  { label: "Medical", pct: 60, amount: "$450" },
-  { label: "Dental", pct: 27, amount: "$200" },
-  { label: "Vision", pct: 13, amount: "$100" },
-];
-
-// ─── Decorative SVG for banner ────────────────────────────────────────────────
+// ─── Decorative SVG for illustration ──────────────────────────────────────────
 
 function IllustrationSvg() {
   return (
-    <svg viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-48 h-auto shrink-0" aria-hidden>
+    <svg viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto shrink-0" aria-hidden>
       <circle cx="40" cy="60" r="35" fill="var(--theme-illustration)" opacity="0.15" />
       <circle cx="40" cy="60" r="20" fill="var(--theme-illustration)" opacity="0.35" />
       <rect x="90" y="30" width="50" height="60" rx="8" fill="var(--theme-illustration)" opacity="0.2" />
@@ -60,30 +27,6 @@ function IllustrationSvg() {
       <circle cx="170" cy="80" r="25" fill="var(--theme-illustration)" opacity="0.12" />
       <path d="M150 100 Q170 60 190 100" stroke="var(--theme-illustration)" strokeWidth="3" opacity="0.5" fill="none" />
     </svg>
-  );
-}
-
-// ─── Countdown ring SVG ───────────────────────────────────────────────────────
-
-function DaysLeftRing({ days }: { days: number }) {
-  const circumference = 2 * Math.PI * 28;
-  const progress = (days / 60) * circumference;
-  return (
-    <div className="relative w-16 h-16 shrink-0">
-      <svg viewBox="0 0 64 64" className="w-full h-full -rotate-90">
-        <circle cx="32" cy="32" r="28" fill="none" stroke="#E2E8F0" strokeWidth="4" />
-        <circle
-          cx="32" cy="32" r="28" fill="none"
-          stroke="var(--theme-primary)"
-          strokeWidth="4" strokeLinecap="round"
-          strokeDasharray={`${progress} ${circumference}`}
-        />
-      </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-sm font-bold leading-none" style={{ color: "var(--theme-primary)" }}>{days}</span>
-        <span className="text-[7px] font-semibold uppercase tracking-wide text-muted-foreground">Days Left</span>
-      </div>
-    </div>
   );
 }
 
@@ -96,7 +39,7 @@ function AiAgentPreviewChip() {
   const preset = ai?.iconPreset ?? "orb";
   return (
     <div
-      className="inline-flex items-center gap-2 rounded-[var(--preview-ai-chip-radius,8px)] border px-3 py-2 text-sm font-semibold shadow-sm"
+      className="inline-flex items-center gap-2 rounded-[var(--preview-ai-chip-radius,8px)] border px-4 py-2.5 text-sm font-semibold shadow-sm cursor-pointer hover:opacity-90 transition-opacity"
       style={{
         borderColor: "hsl(var(--theme-ai-accent-hsl) / 0.35)",
         backgroundColor: "hsl(var(--theme-ai-accent-hsl) / 0.08)",
@@ -115,315 +58,277 @@ function AiAgentPreviewChip() {
 
 export function MemberDashboardPreview() {
   return (
-    <div className="flex flex-col min-h-full">
-
+    <div className="flex flex-col min-h-full bg-muted/30">
       {/* ─── Navigation ──────────────────────────────────────── */}
       <ConsumerNavigation hidePrototypeFloating />
 
-      {/* ─── Banner Placeholder ──────────────────────────────── */}
-      <section
-        className="px-6 py-8 flex items-center justify-between gap-6"
-        style={{ backgroundColor: "var(--theme-page-bg)" }}
-        data-theme-token="pageBg"
-      >
-        <div className="space-y-3">
-          <AiAgentPreviewChip />
-          <div className="space-y-1">
-            <h2 className="text-2xl font-bold tracking-tight" style={{ color: "var(--theme-primary)" }} data-theme-token="primary">
-              Welcome back, Sarah
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              Here&rsquo;s what&rsquo;s happening with your benefits today.
-            </p>
+      {/* ─── Two-Column Layout ───────────────────────────────── */}
+      <div className="flex-1 p-6 md:p-8 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-8 items-start">
+        
+        {/* ═══ Left Column ═══ */}
+        <div className="flex flex-col gap-8">
+          
+          {/* Button Styles */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-semibold text-foreground">Button Styles</h3>
+            <div className="flex flex-col gap-3">
+              <Button intent="primary" variant="solid" size="md" className="w-full justify-center" data-preview-button data-theme-token="primary">
+                Primary Button
+              </Button>
+              <Button intent="secondary" variant="solid" size="md" className="w-full justify-center" data-preview-button data-theme-token="secondary">
+                Secondary Button
+              </Button>
+            </div>
           </div>
-        </div>
-        <div data-theme-token="illustration">
-          <IllustrationSvg />
-        </div>
-      </section>
 
-      {/* ─── Bento Box Grid ──────────────────────────────────── */}
-      <div
-        className="flex-1 px-6 pb-6 grid grid-cols-2 gap-4 items-start"
-        style={{ backgroundColor: "var(--theme-page-bg)" }}
-      >
+          {/* AI Agent */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-semibold text-foreground">AI Agent</h3>
+            <AiAgentPreviewChip />
+          </div>
 
-        {/* ═══ Row 1: Quick Actions + Recent Transactions ═══ */}
-
-        {/* Quick Actions */}
-        <Card data-preview-card>
-          <CardHeader>
-            <CardTitle className="text-base font-semibold">Quick Actions</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <Button intent="primary" variant="solid" size="md" className="w-full" data-preview-button data-theme-token="primary">
-              File a Claim
-            </Button>
-            <Button intent="primary" variant="outline" size="md" className="w-full" data-preview-button data-theme-token="primary">
-              View Statements
-            </Button>
-            <Button intent="primary" variant="outline" size="md" className="w-full" data-preview-button data-theme-token="primary">
-              Contact Support
-            </Button>
-            <Button
-              intent="secondary" variant="solid" size="md" className="w-full"
-              data-preview-button data-theme-token="secondary"
-            >
-              Manage Dependents
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* Recent Transactions */}
-        <Card data-preview-card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0">
-            <CardTitle className="text-base font-semibold">Recent Transactions</CardTitle>
-            <button className="text-xs font-medium flex items-center gap-0.5" style={{ color: "var(--theme-primary)" }} data-theme-token="primary">
-              View All Transactions <ChevronRight className="h-3 w-3" />
-            </button>
-          </CardHeader>
-          <CardContent className="px-0">
-            <Table>
-              <TableHeader>
-                <TableRow style={{ backgroundColor: "var(--theme-primary-surface)" }}>
-                  <TableHead className="text-xs font-medium">Date</TableHead>
-                  <TableHead className="text-xs font-medium">Status</TableHead>
-                  <TableHead className="text-xs font-medium">Account</TableHead>
-                  <TableHead className="text-xs font-medium">Description</TableHead>
-                  <TableHead className="text-xs font-medium">Category</TableHead>
-                  <TableHead className="text-xs font-medium">Member</TableHead>
-                  <TableHead className="text-xs font-medium text-right">Amount</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {TRANSACTIONS.map((tx, i) => (
-                  <TableRow key={i} className="border-[#E2E8F0]">
-                    <TableCell className="text-xs whitespace-nowrap">{tx.date}</TableCell>
-                    <TableCell>
-                      <Badge intent={tx.status === "Pending" ? "warning" : "success"} size="sm">
-                        {tx.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-xs">{tx.account}</TableCell>
-                    <TableCell className="text-xs">{tx.description}</TableCell>
-                    <TableCell>
-                      <Badge intent={tx.category === "Pharmacy" ? "info" : "default"} size="sm">
-                        {tx.category}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <span className="inline-flex items-center justify-center h-6 w-6 rounded-full text-[10px] font-medium" style={{ backgroundColor: "var(--theme-primary)", color: "white" }}>
-                        {tx.member}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-xs text-right font-medium">{tx.amount}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-
-        {/* ═══ Row 2: HSA For Life + Health Care FSA ═══ */}
-
-        {/* HSA For Life */}
-        <Card data-preview-card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-full flex items-center justify-center" style={{ backgroundColor: "var(--theme-primary-surface)" }}>
-                <Wallet className="h-4 w-4" style={{ color: "var(--theme-primary)" }} />
-              </div>
-              <div>
-                <CardTitle className="text-sm font-semibold">HSA For Life</CardTitle>
-                <CardDescription className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                  Health Savings &ndash; 2025 Plan Year
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <p className="text-xs text-muted-foreground">Cash balance</p>
-              <p className="text-3xl font-bold tracking-tight">$1,248.00</p>
-            </div>
-
-            <div className="flex items-start gap-2 rounded-md border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2">
-              <Lightbulb className="h-4 w-4 shrink-0 mt-0.5" style={{ color: "var(--theme-primary)" }} />
-              <div>
-                <p className="text-xs font-semibold">You&rsquo;re on track!</p>
-                <p className="text-xs text-muted-foreground">Keep contributing to maximize your pre-tax savings this year.</p>
-              </div>
-            </div>
-
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span>29% of contribution limit used</span>
-                <span>$3,052.00 remaining</span>
-              </div>
-              <Progress value={29} data-theme-token="primary" />
-            </div>
-
-            <p className="text-[10px] text-muted-foreground">2025 IRS limit: $4,300.00 (individual)</p>
-          </CardContent>
-          <CardFooter>
-            <Button intent="primary" variant="outline" size="md" className="w-full" data-preview-button data-theme-token="primary">
-              Make your first contribution
-            </Button>
-          </CardFooter>
-        </Card>
-
-        {/* Health Care FSA */}
-        <Card data-preview-card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="h-8 w-8 rounded-full flex items-center justify-center" style={{ backgroundColor: "var(--theme-primary-surface)" }}>
-                  <CreditCard className="h-4 w-4" style={{ color: "var(--theme-primary)" }} />
-                </div>
-                <div>
-                  <div className="flex items-center gap-1">
-                    <CardTitle className="text-sm font-semibold">Health Care FSA</CardTitle>
-                    <Info className="h-3 w-3 text-muted-foreground" />
-                  </div>
-                  <CardDescription className="text-[10px] text-muted-foreground">
-                    01/01/2025 &ndash; 12/31/2025
-                  </CardDescription>
-                </div>
-              </div>
-              <Badge intent="destructive" size="sm">Expires Soon</Badge>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-xs text-muted-foreground">Available balance</p>
-                <p className="text-3xl font-bold tracking-tight">$850.00</p>
-                <p className="text-xs text-muted-foreground mt-1">Deadline: Dec 31, 2025</p>
-              </div>
-              <DaysLeftRing days={28} />
-            </div>
-
-            <Separator />
-
-            <div className="space-y-1">
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Accounts</p>
-              {FSA_ACCOUNTS.map((acct, i) => (
-                <div
-                  key={acct.label}
-                  className="flex items-center justify-between py-1.5 text-xs"
-                  style={{ borderBottom: i < FSA_ACCOUNTS.length - 1 ? "1px solid #E2E8F0" : "none" }}
+          {/* Input Style */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-semibold text-foreground">Input Style</h3>
+            <div className="space-y-4">
+              <div className="relative">
+                <Input id="preview-input-1" placeholder=" " className="peer pt-5 pb-1 h-14" />
+                <Label
+                  htmlFor="preview-input-1"
+                  className="absolute left-3 top-2 text-xs text-muted-foreground transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-focus:top-2 peer-focus:text-xs"
                 >
+                  First Name
+                </Label>
+              </div>
+              <div className="relative">
+                <Input id="preview-input-2" placeholder=" " className="peer pt-5 pb-1 h-14" defaultValue="Jane" />
+                <Label
+                  htmlFor="preview-input-2"
+                  className="absolute left-3 top-2 text-xs text-muted-foreground transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-focus:top-2 peer-focus:text-xs"
+                >
+                  Last Name
+                </Label>
+              </div>
+            </div>
+          </div>
+
+          {/* Progress Indicators */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-semibold text-foreground">Progress Indicators</h3>
+            <div className="space-y-6">
+              {/* Stepper */}
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold text-white" style={{ backgroundColor: "var(--theme-primary)" }}>
+                    1
+                  </div>
+                  <span className="text-sm font-medium">Personal Info</span>
+                </div>
+                <div className="ml-3 h-4 w-px bg-border" />
+                <div className="flex items-center gap-2">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-primary text-xs font-bold" style={{ color: "var(--theme-primary)" }}>
+                    2
+                  </div>
+                  <span className="text-sm font-medium" style={{ color: "var(--theme-primary)" }}>Verification</span>
+                </div>
+                <div className="ml-3 h-4 w-px bg-border" />
+                <div className="flex items-center gap-2">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-muted text-xs font-bold text-muted-foreground">
+                    3
+                  </div>
+                  <span className="text-sm font-medium text-muted-foreground">Confirmation</span>
+                </div>
+              </div>
+
+              {/* Progress Bar */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-medium">HSA Cash</span>
+                  <span className="text-muted-foreground">50%</span>
+                </div>
+                <Progress value={50} data-theme-token="primary" className="h-2" />
+              </div>
+            </div>
+          </div>
+
+          {/* Illustration Accents */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-semibold text-foreground">Illustration Accents</h3>
+            <div className="rounded-xl border border-border bg-card p-6 flex items-center justify-center" data-theme-token="illustration">
+              <IllustrationSvg />
+            </div>
+          </div>
+
+        </div>
+
+        {/* ═══ Right Column ═══ */}
+        <div className="flex flex-col gap-8">
+          
+          {/* Chart Styles */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-semibold text-foreground">Chart Styles</h3>
+            <Card data-preview-card className="w-full">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-base font-semibold">HSA Contributions by Tax Year</CardTitle>
+                <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Bar Chart Mock */}
+                <div className="flex items-end gap-6 h-[180px] pt-4">
+                  {/* Y-axis */}
+                  <div className="flex flex-col justify-between h-full text-xs text-muted-foreground pb-6">
+                    <span>$10K</span>
+                    <span>$8K</span>
+                    <span>$6K</span>
+                    <span>$4K</span>
+                    <span>$2K</span>
+                    <span>$0K</span>
+                  </div>
+                  {/* Bars */}
+                  <div className="flex-1 flex items-end justify-around h-full border-b border-border pb-0 relative">
+                    {/* 2023 */}
+                    <div className="flex flex-col items-center gap-2 w-12">
+                      <div className="w-full rounded-t-sm" style={{ height: "55%", backgroundColor: "var(--theme-chart-1, var(--theme-primary))" }} />
+                      <span className="text-xs text-muted-foreground absolute -bottom-6">2023</span>
+                    </div>
+                    {/* 2024 */}
+                    <div className="flex flex-col items-center gap-2 w-12">
+                      <div className="w-full rounded-t-sm" style={{ height: "70%", backgroundColor: "var(--theme-chart-1, var(--theme-primary))" }} />
+                      <span className="text-xs text-muted-foreground absolute -bottom-6">2024</span>
+                    </div>
+                    {/* 2025 */}
+                    <div className="flex flex-col items-center gap-2 w-12">
+                      <div className="w-full rounded-t-sm" style={{ height: "65%", backgroundColor: "var(--theme-chart-1, var(--theme-primary))" }} />
+                      <span className="text-xs text-muted-foreground absolute -bottom-6">2025</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Legend */}
+                <div className="flex items-center gap-6 pt-4">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm">{acct.icon}</span>
-                    <span className={acct.highlight ? "font-medium" : "text-muted-foreground"}>{acct.label}</span>
+                    <div className="h-3 w-3 rounded-sm" style={{ backgroundColor: "var(--theme-chart-1, var(--theme-primary))" }} />
+                    <span className="text-xs text-muted-foreground">Your Contributions</span>
                   </div>
-                  <span className="font-medium">{acct.amount}</span>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* ═══ Row 3: HSA Contributions Chart + Paid Claims Donut ═══ */}
-
-        {/* HSA Contributions by Tax Year */}
-        <Card data-preview-card>
-          <CardHeader className="flex flex-row items-center gap-1 space-y-0">
-            <CardTitle className="text-base font-semibold">HSA Contributions by Tax Year</CardTitle>
-            <Info className="h-3.5 w-3.5 text-muted-foreground" />
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Bar chart */}
-            <div className="flex items-end justify-around gap-3 h-40">
-              {BAR_CHART_DATA.map((bar) => (
-                <div key={bar.year} className="flex flex-col items-center gap-1 flex-1">
-                  <div className="w-full flex gap-0.5" style={{ height: "120px" }}>
-                    {/* Stacked vertical bars */}
-                    <div className="flex-1 flex flex-col justify-end rounded-t">
-                      <div
-                        className="rounded-t transition-all"
-                        style={{ height: `${bar.remaining}%`, backgroundColor: "hsl(var(--chart-1) / 0.2)" }}
-                      />
-                      <div
-                        className="rounded-t transition-all"
-                        style={{ height: `${bar.yours}%`, backgroundColor: "hsl(var(--chart-1))" }}
-                      />
-                    </div>
+                  <div className="flex items-center gap-2">
+                    <div className="h-3 w-3 rounded-sm bg-muted" />
+                    <span className="text-xs text-muted-foreground">Remaining to IRS Max</span>
                   </div>
-                  <span className="text-xs text-muted-foreground font-medium">{bar.year}</span>
                 </div>
-              ))}
-            </div>
 
-            <div className="flex items-center justify-center gap-4 text-xs">
-              <div className="flex items-center gap-1.5">
-                <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: "hsl(var(--chart-1))" }} />
-                <span className="text-muted-foreground">Your Contributions</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: "hsl(var(--chart-1) / 0.2)" }} />
-                <span className="text-muted-foreground">Remaining to IRS Max</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Paid Claims by Category */}
-        <Card data-preview-card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0">
-            <CardTitle className="text-base font-semibold">Paid Claims by Category</CardTitle>
-            <span className="text-xs text-muted-foreground">01/01/2025 &ndash; 12/31/2025</span>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-6">
-              {/* Donut chart via conic-gradient */}
-              <div className="relative w-32 h-32 shrink-0">
-                <div
-                  className="w-full h-full rounded-full"
-                  style={{
-                    background: `conic-gradient(
-                      hsl(var(--chart-1)) 0% 60%,
-                      hsl(var(--chart-2)) 60% 87%,
-                      hsl(var(--chart-3)) 87% 100%
-                    )`,
-                  }}
-                />
-                <div className="absolute inset-3 rounded-full bg-white flex flex-col items-center justify-center">
-                  <span className="text-lg font-bold">$750</span>
-                  <span className="text-[10px] text-muted-foreground">Total Paid</span>
-                </div>
-              </div>
-
-              {/* Legend */}
-              <div className="flex-1 space-y-3">
-                {DONUT_SEGMENTS.map((seg, i) => {
-                  const varName = `--chart-${i + 1}`;
-                  return (
-                    <div key={seg.label} className="space-y-1">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1.5">
-                          <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: `hsl(var(${varName}))` }} />
-                          <span className="text-xs font-medium">{seg.label}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-xs">
-                          <span className="text-muted-foreground">{seg.pct}%</span>
-                          <span className="font-semibold">{seg.amount}</span>
-                        </div>
-                      </div>
-                      <div className="h-1.5 w-full rounded-full bg-[#F1F5F9] overflow-hidden">
-                        <div
-                          className="h-full rounded-full transition-all"
-                          style={{ width: `${seg.pct}%`, backgroundColor: `hsl(var(${varName}))` }}
-                        />
+                {/* Donut Chart Mock (Paid Claims) */}
+                <div className="pt-6 border-t border-border space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-sm font-semibold">Paid Claims by Category</h4>
+                    <span className="text-xs text-muted-foreground">01/01/2025 &ndash; 12/31/2025</span>
+                  </div>
+                  <div className="flex items-center gap-6">
+                    {/* Donut */}
+                    <div className="relative h-24 w-24 shrink-0 rounded-full border-[8px] border-muted">
+                      <div className="absolute inset-0 rounded-full border-[8px] border-transparent border-t-primary border-r-primary rotate-45" style={{ borderColor: "var(--theme-chart-1, var(--theme-primary))" }} />
+                      <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <span className="text-lg font-bold">$750</span>
+                        <span className="text-[10px] text-muted-foreground">Total Paid</span>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+                    {/* Legend List */}
+                    <div className="flex-1 space-y-3">
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between text-xs">
+                          <div className="flex items-center gap-2">
+                            <div className="h-2 w-2 rounded-sm" style={{ backgroundColor: "var(--theme-chart-1, var(--theme-primary))" }} />
+                            <span className="font-medium">Medical</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-muted-foreground">60%</span>
+                            <span className="font-semibold">$450</span>
+                          </div>
+                        </div>
+                        <Progress value={60} className="h-1.5" data-theme-token="primary" />
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between text-xs">
+                          <div className="flex items-center gap-2">
+                            <div className="h-2 w-2 rounded-sm" style={{ backgroundColor: "var(--theme-chart-2, var(--theme-secondary))" }} />
+                            <span className="font-medium">Dental</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-muted-foreground">27%</span>
+                            <span className="font-semibold">$200</span>
+                          </div>
+                        </div>
+                        <Progress value={27} className="h-1.5" data-theme-token="secondary" />
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between text-xs">
+                          <div className="flex items-center gap-2">
+                            <div className="h-2 w-2 rounded-sm" style={{ backgroundColor: "var(--theme-chart-3, var(--theme-illustration))" }} />
+                            <span className="font-medium">Vision</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-muted-foreground">13%</span>
+                            <span className="font-semibold">$100</span>
+                          </div>
+                        </div>
+                        <Progress value={13} className="h-1.5" data-theme-token="illustration" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
+          {/* HSA For Life */}
+          <div className="space-y-4">
+            <Card data-preview-card className="w-full">
+              <CardHeader className="pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full flex items-center justify-center" style={{ backgroundColor: "var(--theme-primary-ramp-50)" }}>
+                    <Wallet className="h-5 w-5" style={{ color: "var(--theme-primary)" }} />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg font-display">HSA For Life</CardTitle>
+                    <CardDescription className="text-xs">
+                      Health Savings - 2026 plan year
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div>
+                  <p className="text-sm text-muted-foreground">Cash balance</p>
+                  <p className="text-4xl font-bold tracking-tight">$0.00</p>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <Info className="h-5 w-5 shrink-0 mt-0.5" style={{ color: "var(--theme-primary)" }} />
+                  <div>
+                    <p className="text-sm font-medium">Your HSA is ready to fund</p>
+                    <p className="text-xs text-muted-foreground mt-1">Contribute pre-tax dollars to save on eligible medical expenses.</p>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-xs">
+                    <span>0% of contribution limit used</span>
+                    <span className="font-medium">$4,300.00 remaining</span>
+                  </div>
+                  <Progress value={0} data-theme-token="primary" className="h-1.5" />
+                  <p className="text-[10px] text-muted-foreground">2025 IRS limit: $4,300.00 (individual)</p>
+                </div>
+              </CardContent>
+              <CardFooter className="pt-2">
+                <Button intent="primary" variant="solid" size="md" className="w-full justify-center" data-preview-button data-theme-token="primary">
+                  Make your first contribution
+                </Button>
+              </CardFooter>
+            </Card>
+          </div>
+
+        </div>
       </div>
     </div>
   );

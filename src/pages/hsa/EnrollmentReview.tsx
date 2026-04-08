@@ -132,7 +132,7 @@ export default function HSAEnrollmentReview({
             </div>
             <div className="h-px bg-border" />
             <div className="border border-border rounded-sm overflow-hidden">
-              <div className="flex bg-[#F7F7F7] border-b border-border">
+              <div className="flex bg-muted border-b border-border">
                 <div className="flex-[0_0_148px] px-4 py-2 font-semibold text-sm leading-6 tracking-[-0.084px] text-foreground">Name</div>
                 <div className="flex-1 px-4 py-2 font-semibold text-sm leading-6 tracking-[-0.084px] text-foreground border-l border-border">Birth Date</div>
                 <div className="flex-1 px-4 py-2 font-semibold text-sm leading-6 tracking-[-0.084px] text-foreground border-l border-border">Relationship</div>
@@ -154,7 +154,7 @@ export default function HSAEnrollmentReview({
             </div>
             <div className="h-px bg-border" />
             <div className="border border-border rounded-sm overflow-hidden">
-              <div className="flex bg-[#F7F7F7] border-b border-border">
+              <div className="flex bg-muted border-b border-border">
                 <div className="flex-[0_0_165px] px-4 py-2 font-semibold text-sm leading-6 tracking-[-0.084px] text-foreground">Name</div>
                 <div className="flex-[0_0_100px] px-4 py-2 font-semibold text-sm leading-6 tracking-[-0.084px] text-foreground border-l border-border whitespace-nowrap">Share %</div>
                 <div className="flex-1 px-4 py-2 font-semibold text-sm leading-6 tracking-[-0.084px] text-foreground border-l border-border">Relationship</div>

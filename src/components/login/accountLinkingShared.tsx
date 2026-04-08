@@ -37,7 +37,7 @@ export function LinkingAccountSummary({ row }: { row: MatchedAccountRow }) {
       <p className="w-full text-left text-base font-bold leading-6 tracking-[-0.176px] text-foreground">
         Linking account:
       </p>
-      <div className="rounded-xl border border-border p-4">
+      <div className="rounded-xl border border-[#E3E7F4] p-4">
         <div className="flex flex-col gap-1">
           <div className="flex flex-wrap items-start gap-2">
             <ProductTag label={row.productLabel} variant={row.tagVariant} />

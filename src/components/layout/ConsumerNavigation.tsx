@@ -26,6 +26,7 @@ import {
   FileText,
   Mail,
   ChevronDown,
+  ChevronRight,
   Languages,
   LogOut,
   Menu,
@@ -148,7 +149,7 @@ export function ConsumerNavigation({
 
   return (
     <>
-    <header className="sticky top-0 z-50 w-full border-b border-[#e3e7f4] bg-[rgba(255,255,255,0.41)] shadow-[0_2px_16px_rgba(0,0,0,0.08)] backdrop-blur-md">
+    <header className="sticky top-0 z-50 w-full border-b border-[#e3e7f4] bg-[rgba(255,255,255,0.41)] shadow-[0_2px_16px_rgba(0,0,0,0.08)] backdrop-blur-md will-change-transform">
       <div className="flex h-[80px] items-center px-[32px] gap-[24px]">
         {/* Hamburger (mobile <= lg) — hidden when nav items are suppressed */}
         {!hideNav && (
@@ -301,7 +302,7 @@ export function ConsumerNavigation({
                     <DropdownMenuTrigger asChild>
                       <button
                         className={`flex h-[44px] items-center justify-center gap-[6px] rounded-[6px] px-[17px] py-[9px] transition-colors hover:bg-black/5 ${
-                          active ? "text-[#3958c3] font-semibold" : "text-[#14182c] font-normal"
+                          active ? "text-primary font-semibold" : "text-foreground font-normal"
                         }`}
                       >
                         {Icon && <Icon className="h-4 w-4" />}
@@ -340,7 +341,7 @@ export function ConsumerNavigation({
                     {/* Icon wrapper — badge sits on top of icon for Messages */}
                     {Icon && (
                       <div className="relative">
-                        <Icon className={`h-4 w-4 ${active ? "text-[#3958c3]" : "text-[#14182c]"}`} />
+                        <Icon className={`h-4 w-4 ${active ? "text-primary" : "text-foreground"}`} />
                         {isMessages && unreadCount > 0 && (
                           <div className="absolute -top-[8px] -right-[8px] flex h-[16px] min-w-[16px] items-center justify-center rounded-full bg-[#d24159] px-[3px] shadow-[0_1px_3px_rgba(0,0,0,0.2)]">
                             <span className="text-[10px] font-bold leading-none text-white">
@@ -350,12 +351,12 @@ export function ConsumerNavigation({
                         )}
                       </div>
                     )}
-                    <span className={`text-[14px] leading-[24px] tracking-[-0.084px] ${active ? "font-semibold text-[#3958c3]" : "font-normal text-[#14182c]"}`}>
+                    <span className={`text-[14px] leading-[24px] tracking-[-0.084px] ${active ? "font-semibold text-primary" : "font-normal text-foreground"}`}>
                       {item.label}
                     </span>
                   </div>
                   {active && (
-                    <div className="absolute bottom-0 h-[2px] w-[83px] rounded-[4px] bg-[#3958c3]" />
+                    <div className="absolute bottom-0 h-[2px] w-[83px] rounded-[4px] bg-primary" />
                   )}
                 </Link>
               );
@@ -371,7 +372,7 @@ export function ConsumerNavigation({
                 className="hidden lg:flex h-[44px] w-[44px] items-center justify-center rounded-[6px] hover:bg-black/5 transition-colors"
                 aria-label="Language"
               >
-                <Languages className="h-4 w-4 text-[#14182c]" />
+                <Languages className="h-4 w-4 text-foreground" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
@@ -397,7 +398,7 @@ export function ConsumerNavigation({
                 aria-label="User profile"
               >
                 <div className="flex h-[40px] w-[40px] items-center justify-center rounded-full border border-[#d0d6ea] bg-[#e3e7f4]">
-                  <User className="h-4 w-4 text-[#14182c]" />
+                  <User className="h-4 w-4 text-foreground" />
                 </div>
               </button>
             </DropdownMenuTrigger>
@@ -405,20 +406,27 @@ export function ConsumerNavigation({
               align="end"
               className="w-[240px] rounded-[8px] border border-border bg-white px-0 py-[8px] shadow-[0px_4px_10px_0px_rgba(2,13,36,0.15),0px_0px_1px_0px_rgba(2,13,36,0.3)]"
             >
-              {/* Header Section */}
-              <div className="flex gap-[8px] items-center pl-[12px] pr-0 py-[8px]">
-                <div className="flex items-center justify-center shrink-0 size-[16px]">
-                  <User className="h-4 w-4 text-foreground" />
-                </div>
-                <div className="flex flex-col items-start justify-center flex-1 min-w-0">
-                  <p className="font-semibold text-sm text-foreground tracking-[-0.084px] leading-[24px]">
-                    WEX, Inc.
-                  </p>
-                  <p className="font-normal text-[13px] text-muted-foreground tracking-[-0.0325px] leading-[24px]">
-                    Switch Account
-                  </p>
-                </div>
-              </div>
+              {/* Header Section — navigate to account selection */}
+              <DropdownMenuItem asChild className="h-auto cursor-default p-0">
+                <Link
+                  to="/select-profile"
+                  className="flex w-full items-center gap-[8px] rounded-sm py-[8px] pl-[12px] pr-[12px] outline-none hover:bg-gray-50 focus-visible:bg-gray-50"
+                  aria-label="Switch account — select profile"
+                >
+                  <div className="flex size-[16px] shrink-0 items-center justify-center">
+                    <User className="h-4 w-4 text-foreground" />
+                  </div>
+                  <div className="flex min-w-0 flex-1 flex-col items-start justify-center">
+                    <p className="text-sm font-semibold leading-[24px] tracking-[-0.084px] text-foreground">
+                      WEX, Inc.
+                    </p>
+                    <p className="text-[13px] font-normal leading-[24px] tracking-[-0.0325px] text-muted-foreground">
+                      Switch Account
+                    </p>
+                  </div>
+                  <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+                </Link>
+              </DropdownMenuItem>
 
               <DropdownMenuSeparator />
 

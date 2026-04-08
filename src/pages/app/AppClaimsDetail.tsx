@@ -1,351 +1,326 @@
+import type { ReactNode } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Check, Clock, X, AlertCircle, FileText, Upload, Phone } from "lucide-react";
+import { Check, Clock, X, AlertCircle } from "lucide-react";
 import { AppNavBar } from "@/components/app-shell/AppNavBar";
-import { AppCard } from "@/components/app-shell/primitives/AppCard";
-import { AppBadge } from "@/components/app-shell/primitives/AppBadge";
-import { AppButton } from "@/components/app-shell/primitives/AppButton";
+import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
+import {
+  CLAIMS_PAGE_BACKGROUND,
+  CLAIMS_STROKE,
+  CLAIMS_ROW_SEPARATOR,
+  CLAIMS_SUPPORT_LINK,
+  CLAIMS_LIST_BADGE_SUCCESS_FG,
+} from "./claimsPageStyles";
 
 type ClaimStatus = "approved" | "pending" | "denied" | "in_review";
-
-interface TimelineStep {
-  label: string;
-  date?: string;
-  completed: boolean;
-  active: boolean;
-}
 
 interface ClaimDetail {
   id: string;
   provider: string;
-  date: string;
-  serviceDate: string;
-  amount: string;
-  eligible: string;
+  displayDate: string;
   account: string;
+  transactionAmount: string;
+  careRecipient: string;
+  claimNumber: string;
   status: ClaimStatus;
-  category: string;
-  member: string;
-  notes?: string;
-  timeline: TimelineStep[];
+  reimbursedAmount: string;
 }
 
+const RECEIPT_THUMB = `${import.meta.env.BASE_URL}app-ui/penny-receipt.svg`;
+
 const CLAIM_DATA: Record<string, ClaimDetail> = {
+  c2: {
+    id: "c2",
+    provider: "CVS Pharmacy",
+    displayDate: "February 24, 2026",
+    account: "Flexible Spending 2025 (FSA)",
+    transactionAmount: "$24.99",
+    careRecipient: "Nicole Moretti",
+    claimNumber: "01SMA251117P0000301",
+    status: "approved",
+    reimbursedAmount: "$24.99",
+  },
   c1: {
     id: "c1",
     provider: "Dr. Lisa Monroe – Primary Care",
-    date: "Jan 10, 2025",
-    serviceDate: "Jan 8, 2025",
-    amount: "$120.00",
-    eligible: "$120.00",
+    displayDate: "January 10, 2025",
     account: "Health FSA",
+    transactionAmount: "$120.00",
+    careRecipient: "Sarah J.",
+    claimNumber: "CLM-2025-C1",
     status: "approved",
-    category: "Medical",
-    member: "Sarah J.",
-    timeline: [
-      { label: "Submitted",  date: "Jan 10, 2025", completed: true,  active: false },
-      { label: "In Review",  date: "Jan 11, 2025", completed: true,  active: false },
-      { label: "Approved",   date: "Jan 12, 2025", completed: true,  active: false },
-      { label: "Paid",       date: "Jan 13, 2025", completed: true,  active: false },
-    ],
+    reimbursedAmount: "$120.00",
+  },
+  c7: {
+    id: "c7",
+    provider: "Walgreens",
+    displayDate: "January 8, 2025",
+    account: "HSA",
+    transactionAmount: "$26.00",
+    careRecipient: "Sarah J.",
+    claimNumber: "CLM-2025-C7",
+    status: "approved",
+    reimbursedAmount: "$26.00",
   },
   c3: {
     id: "c3",
     provider: "Vision Works",
-    date: "Dec 28, 2024",
-    serviceDate: "Dec 26, 2024",
-    amount: "$215.00",
-    eligible: "$215.00",
+    displayDate: "December 28, 2024",
     account: "Health FSA",
+    transactionAmount: "$215.00",
+    careRecipient: "Sarah J.",
+    claimNumber: "CLM-2025-C3",
     status: "in_review",
-    category: "Vision",
-    member: "Sarah J.",
-    notes: "Additional documentation requested for vision care claim.",
-    timeline: [
-      { label: "Submitted",  date: "Dec 28, 2024", completed: true,  active: false },
-      { label: "In Review",  date: "Dec 30, 2024", completed: false, active: true  },
-      { label: "Decision",                         completed: false, active: false },
-      { label: "Paid",                             completed: false, active: false },
-    ],
+    reimbursedAmount: "—",
   },
   c4: {
     id: "c4",
     provider: "Advanced Dental Group",
-    date: "Dec 15, 2024",
-    serviceDate: "Dec 13, 2024",
-    amount: "$340.00",
-    eligible: "$340.00",
+    displayDate: "December 15, 2024",
     account: "Health FSA",
+    transactionAmount: "$340.00",
+    careRecipient: "Sarah J.",
+    claimNumber: "CLM-2025-C4",
     status: "pending",
-    category: "Dental",
-    member: "Sarah J.",
-    timeline: [
-      { label: "Submitted",  date: "Dec 15, 2024", completed: true,  active: false },
-      { label: "In Review",                        completed: false, active: true  },
-      { label: "Decision",                         completed: false, active: false },
-      { label: "Paid",                             completed: false, active: false },
-    ],
+    reimbursedAmount: "—",
   },
   c5: {
     id: "c5",
-    provider: "CVS Pharmacy",
-    date: "Dec 10, 2024",
-    serviceDate: "Dec 10, 2024",
-    amount: "$18.50",
-    eligible: "$0.00",
+    provider: "CVS Pharmacy (prior)",
+    displayDate: "December 10, 2024",
     account: "HSA",
+    transactionAmount: "$18.50",
+    careRecipient: "Sarah J.",
+    claimNumber: "CLM-2025-C5",
     status: "denied",
-    category: "Pharmacy",
-    member: "Sarah J.",
-    notes: "Item is not an eligible HSA expense. Cosmetics and personal care are excluded.",
-    timeline: [
-      { label: "Submitted",  date: "Dec 10, 2024", completed: true, active: false },
-      { label: "In Review",  date: "Dec 11, 2024", completed: true, active: false },
-      { label: "Denied",     date: "Dec 12, 2024", completed: true, active: false },
-    ],
+    reimbursedAmount: "$0.00",
+  },
+  c6: {
+    id: "c6",
+    provider: "MRI Imaging Center",
+    displayDate: "November 30, 2024",
+    account: "Health FSA",
+    transactionAmount: "$850.00",
+    careRecipient: "Sarah J.",
+    claimNumber: "CLM-2025-C6",
+    status: "approved",
+    reimbursedAmount: "$850.00",
   },
 };
 
-const DEFAULT_CLAIM: ClaimDetail = {
-  id: "c2",
-  provider: "Walgreens",
-  date: "Jan 8, 2025",
-  serviceDate: "Jan 8, 2025",
-  amount: "$26.00",
-  eligible: "$26.00",
-  account: "HSA",
-  status: "approved",
-  category: "Pharmacy",
-  member: "Sarah J.",
-  timeline: [
-    { label: "Submitted",  date: "Jan 8,  2025", completed: true, active: false },
-    { label: "Processing", date: "Jan 9,  2025", completed: true, active: false },
-    { label: "Approved",   date: "Jan 10, 2025", completed: true, active: false },
-  ],
+const DEFAULT_CLAIM: ClaimDetail = CLAIM_DATA.c2;
+
+const STATUS_RECEIPT: Record<ClaimStatus, { label: string; color: string; showCheck: boolean }> = {
+  approved: { label: "Approved", color: CLAIMS_LIST_BADGE_SUCCESS_FG, showCheck: true },
+  pending: { label: "Pending", color: "var(--app-warning)", showCheck: false },
+  denied: { label: "Denied", color: "var(--app-destructive)", showCheck: false },
+  in_review: { label: "In Review", color: "var(--app-primary)", showCheck: false },
 };
 
-const STATUS_META: Record<ClaimStatus, { label: string; variant: "success" | "warning" | "info" | "destructive" | "neutral"; icon: React.ComponentType<{ size?: number; strokeWidth?: number; style?: React.CSSProperties }> }> = {
-  approved:  { label: "Approved",  variant: "success",     icon: Check },
-  pending:   { label: "Pending",   variant: "warning",     icon: Clock },
-  denied:    { label: "Denied",    variant: "destructive", icon: X },
-  in_review: { label: "In Review", variant: "info",        icon: AlertCircle },
-};
+function DetailRow({
+  value,
+  label,
+  trailing,
+  topSeparator,
+}: {
+  value: string;
+  label: string;
+  trailing?: ReactNode;
+  topSeparator?: boolean;
+}) {
+  return (
+    <div
+      style={{
+        padding: "0 16px",
+        minHeight: 68,
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        boxSizing: "border-box",
+        borderTop: topSeparator ? `1px solid ${CLAIMS_ROW_SEPARATOR}` : undefined,
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", width: "100%", gap: 12 }}>
+        <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", justifyContent: "center", gap: 0 }}>
+          <div
+            style={{
+              fontSize: 17,
+              lineHeight: "22px",
+              letterSpacing: -0.43,
+              color: "var(--app-text)",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {value}
+          </div>
+          <div
+            style={{
+              fontSize: 15,
+              lineHeight: "20px",
+              letterSpacing: -0.23,
+              color: "var(--app-text-secondary)",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {label}
+          </div>
+        </div>
+        {trailing != null ? (
+          <div style={{ flexShrink: 0, display: "flex", alignItems: "center" }}>{trailing}</div>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+function BorderedCard({ children }: { children: ReactNode }) {
+  return (
+    <div
+      style={{
+        background: "#fff",
+        border: `1px solid ${CLAIMS_STROKE}`,
+        borderRadius: 12,
+        overflow: "hidden",
+        width: "100%",
+        boxSizing: "border-box",
+      }}
+    >
+      {children}
+    </div>
+  );
+}
 
 export default function AppClaimsDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const claim = (id && CLAIM_DATA[id]) ? CLAIM_DATA[id] : DEFAULT_CLAIM;
-  const sm = STATUS_META[claim.status];
-
-  const timelineColor = {
-    approved: "var(--app-success)",
-    pending:  "hsl(38 92% 44%)",
-    denied:   "var(--app-destructive)",
-    in_review:"var(--app-tint)",
-  }[claim.status];
+  const claim = id && CLAIM_DATA[id] ? CLAIM_DATA[id] : DEFAULT_CLAIM;
+  const receipt = STATUS_RECEIPT[claim.status];
 
   return (
     <div
       style={{
         minHeight: "100%",
-        background: "var(--app-bg)",
+        background: CLAIMS_PAGE_BACKGROUND,
         fontFamily: "var(--app-font)",
+        paddingBottom: "calc(var(--app-tabbar-height, 95px) + env(safe-area-inset-bottom, 0px) + 64px)",
       }}
     >
-      <AppNavBar title="Claim Detail" backTo="/app/claims" backLabel="Claims" />
+      <AppTopSpacer variant="home" />
+      <AppNavBar variant="sub-page" title="Claim details" backTo="/app/claims" backLabel="Back" />
 
-      <div style={{ padding: "16px 16px 32px", display: "flex", flexDirection: "column", gap: 20 }}>
-        {/* Header card */}
-        <AppCard variant="solid" padding="18px 20px">
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
-            <div style={{ flex: 1 }}>
-              <div style={{ font: "var(--app-font-title3)", color: "var(--app-text)" }}>
-                {claim.provider}
-              </div>
-              <div style={{ font: "var(--app-font-footnote)", color: "var(--app-text-secondary)", marginTop: 4 }}>
-                {claim.category} · {claim.date}
-              </div>
-            </div>
-            <AppBadge label={sm.label} variant={sm.variant} />
-          </div>
-
-          <div style={{ marginTop: 16, display: "flex", gap: 24 }}>
-            <div>
-              <div style={{ font: "var(--app-font-caption1)", color: "var(--app-text-secondary)", textTransform: "uppercase", letterSpacing: 0.3 }}>
-                Claimed
-              </div>
-              <div style={{ font: "var(--app-font-title2)", color: "var(--app-text)", marginTop: 2 }}>
-                {claim.amount}
-              </div>
-            </div>
-            <div>
-              <div style={{ font: "var(--app-font-caption1)", color: "var(--app-text-secondary)", textTransform: "uppercase", letterSpacing: 0.3 }}>
-                Eligible
-              </div>
-              <div style={{ font: "var(--app-font-title2)", color: claim.status === "denied" ? "var(--app-destructive)" : "var(--app-success)", marginTop: 2 }}>
-                {claim.eligible}
-              </div>
-            </div>
-          </div>
-        </AppCard>
-
-        {/* Timeline */}
-        <AppCard variant="solid" padding="16px 20px">
-          <div style={{ font: "var(--app-font-headline)", color: "var(--app-text)", marginBottom: 16 }}>
-            Claim Status
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
-            {claim.timeline.map((step, i) => {
-              const isLast = i === claim.timeline.length - 1;
-              return (
-                <div key={i} style={{ display: "flex", gap: 14, position: "relative" }}>
-                  {/* Connector line */}
-                  {!isLast && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        left: 11,
-                        top: 24,
-                        width: 2,
-                        height: "calc(100% - 4px)",
-                        background: step.completed ? timelineColor : "var(--app-border)",
-                        borderRadius: 1,
-                      }}
-                    />
-                  )}
-
-                  {/* Node */}
-                  <div
-                    style={{
-                      width: 24,
-                      height: 24,
-                      borderRadius: "50%",
-                      background: step.completed ? timelineColor : step.active ? "transparent" : "var(--app-border)",
-                      border: step.active ? `2px solid ${timelineColor}` : "none",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexShrink: 0,
-                      zIndex: 1,
-                    }}
-                  >
-                    {step.completed && (
-                      <Check size={12} strokeWidth={3} style={{ color: "#fff" }} />
-                    )}
-                    {step.active && (
-                      <div
-                        style={{
-                          width: 8,
-                          height: 8,
-                          borderRadius: "50%",
-                          background: timelineColor,
-                        }}
-                      />
-                    )}
-                  </div>
-
-                  {/* Label */}
-                  <div style={{ paddingBottom: isLast ? 0 : 20, flex: 1 }}>
-                    <div
-                      style={{
-                        font: "var(--app-font-subhead)",
-                        fontWeight: step.active ? 600 : 500,
-                        color: step.completed || step.active ? "var(--app-text)" : "var(--app-text-secondary)",
-                        lineHeight: "24px",
-                      }}
-                    >
-                      {step.label}
-                    </div>
-                    {step.date && (
-                      <div
-                        style={{
-                          font: "var(--app-font-caption1)",
-                          color: "var(--app-text-secondary)",
-                          marginTop: 2,
-                        }}
-                      >
-                        {step.date}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </AppCard>
-
-        {/* Claim details */}
-        <AppCard variant="solid" padding="0">
-          {[
-            { label: "Service Date", value: claim.serviceDate },
-            { label: "Account",      value: claim.account },
-            { label: "Member",       value: claim.member },
-            { label: "Claim #",      value: `CLM-2025-${claim.id.toUpperCase()}` },
-          ].map((row, i, arr) => (
-            <div
-              key={row.label}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                padding: "13px 16px",
-                position: "relative",
-              }}
-            >
-              <span style={{ font: "var(--app-font-subhead)", color: "var(--app-text-secondary)" }}>
-                {row.label}
+      <div style={{ padding: "16px 16px 32px", display: "flex", flexDirection: "column", gap: 16 }}>
+        <BorderedCard>
+          <DetailRow topSeparator value={claim.displayDate} label="Date" />
+          <DetailRow value={claim.account} label="Account" />
+          <DetailRow
+            topSeparator
+            value={claim.provider}
+            label="Transaction"
+            trailing={
+              <span style={{ fontSize: 17, lineHeight: "22px", letterSpacing: -0.43, color: "var(--app-text-secondary)" }}>
+                {claim.transactionAmount}
               </span>
-              <span style={{ font: "var(--app-font-subhead)", fontWeight: 500, color: "var(--app-text)" }}>
-                {row.value}
-              </span>
-              {i < arr.length - 1 && (
-                <div
-                  style={{
-                    position: "absolute",
-                    bottom: 0,
-                    left: 16,
-                    right: 0,
-                    height: "0.5px",
-                    background: "var(--app-separator)",
-                  }}
-                />
+            }
+          />
+          <DetailRow topSeparator value={claim.careRecipient} label="Care recipient" />
+          <DetailRow topSeparator value={claim.claimNumber} label="Claim number" />
+        </BorderedCard>
+
+        <BorderedCard>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              padding: "0 16px",
+              minHeight: 52,
+              boxSizing: "border-box",
+            }}
+          >
+            <div style={{ width: 52, height: 52, borderRadius: 4, overflow: "hidden", flexShrink: 0 }}>
+              <img src={RECEIPT_THUMB} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            </div>
+            <div style={{ flex: 1, minWidth: 0, fontSize: 17, lineHeight: "22px", letterSpacing: -0.43, color: "var(--app-text)" }}>
+              Receipt
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+              <span style={{ fontSize: 17, lineHeight: "22px", color: receipt.color, fontWeight: 400 }}>{receipt.label}</span>
+              {receipt.showCheck ? (
+                <Check size={22} strokeWidth={2.5} style={{ color: "var(--app-success)" }} aria-hidden />
+              ) : claim.status === "pending" ? (
+                <Clock size={22} strokeWidth={2} style={{ color: receipt.color }} aria-hidden />
+              ) : claim.status === "denied" ? (
+                <X size={22} strokeWidth={2} style={{ color: receipt.color }} aria-hidden />
+              ) : (
+                <AlertCircle size={22} strokeWidth={2} style={{ color: receipt.color }} aria-hidden />
               )}
             </div>
-          ))}
-        </AppCard>
-
-        {/* Notes */}
-        {claim.notes && (
-          <AppCard variant="solid" padding="14px 16px">
-            <div style={{ display: "flex", gap: 10 }}>
-              <AlertCircle size={18} strokeWidth={1.75} style={{ color: "hsl(38 92% 44%)", flexShrink: 0, marginTop: 1 }} />
-              <div style={{ font: "var(--app-font-subhead)", color: "var(--app-text)", lineHeight: "22px" }}>
-                {claim.notes}
-              </div>
+          </div>
+          <div style={{ borderTop: `1px solid ${CLAIMS_ROW_SEPARATOR}` }}>
+            <div
+              style={{
+                padding: "0 16px",
+                minHeight: 68,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <span style={{ fontSize: 17, lineHeight: "22px", letterSpacing: -0.43, color: "var(--app-text)" }}>Amount reimbursed</span>
+              <span style={{ fontSize: 17, lineHeight: "22px", letterSpacing: -0.43, color: "var(--app-text)", fontWeight: 400 }}>
+                {claim.reimbursedAmount}
+              </span>
             </div>
-          </AppCard>
-        )}
+          </div>
+        </BorderedCard>
 
-        {/* Actions */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {claim.status === "denied" && (
-            <AppButton variant="primary" size="lg" fullWidth icon={<FileText size={18} strokeWidth={1.75} />}>
-              File an Appeal
-            </AppButton>
-          )}
-          {(claim.status === "in_review" || claim.status === "pending") && (
-            <AppButton variant="primary" size="lg" fullWidth icon={<Upload size={18} strokeWidth={1.75} />}>
-              Upload Documentation
-            </AppButton>
-          )}
-          <AppButton
-            variant="secondary"
-            size="lg"
-            fullWidth
-            icon={<Phone size={18} strokeWidth={1.75} />}
-            onClick={() => navigate("/app/assist-iq")}
+        <div
+          style={{
+            background: "#fff",
+            borderRadius: 12,
+            padding: 16,
+            boxShadow: "0px 3.017px 9.051px rgba(43,49,78,0.04), 0px 6.034px 18.101px rgba(43,49,78,0.06)",
+            display: "flex",
+            flexDirection: "column",
+            gap: 8,
+          }}
+        >
+          <p
+            style={{
+              margin: 0,
+              fontSize: 18,
+              fontWeight: 600,
+              lineHeight: "24px",
+              letterSpacing: -0.18,
+              color: "var(--app-text)",
+            }}
           >
-            Ask Assist IQ
-          </AppButton>
+            Questions about this claim?
+          </p>
+          <p style={{ margin: 0, fontSize: 16, lineHeight: "24px", color: "var(--app-text)" }}>
+            Here’s how we can help: review your claim details above, or reach out for personalized support.
+          </p>
+          <button
+            type="button"
+            onClick={() => navigate("/app/assist-iq")}
+            style={{
+              alignSelf: "flex-start",
+              border: "none",
+              background: "none",
+              padding: 0,
+              fontFamily: "var(--app-font)",
+              fontSize: 16,
+              fontWeight: 500,
+              lineHeight: "24px",
+              color: CLAIMS_SUPPORT_LINK,
+              cursor: "pointer",
+            }}
+          >
+            Get support
+          </button>
         </div>
       </div>
     </div>

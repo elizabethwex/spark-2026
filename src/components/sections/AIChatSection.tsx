@@ -5,9 +5,11 @@ import {
 import { Send, Mic, FileText } from "lucide-react";
 import SiriOrb from "@/components/ui/siri-orb";
 import { quickActions } from "@/data/mockData";
+import { useReimburseWorkspace } from "@/context/ReimburseWorkspaceContext";
 
 export function AIChatSection() {
   const navigate = useNavigate();
+  const { openReimburseWorkspace } = useReimburseWorkspace();
 
   return (
     <div className="space-y-3">
@@ -45,10 +47,10 @@ export function AIChatSection() {
               intent="primary" 
               size="sm" 
               className="rounded-full shrink-0 shadow-md shadow-primary/20 hidden sm:flex"
-              onClick={() => navigate("/reimburse")}
+              onClick={() => openReimburseWorkspace()}
             >
               <FileText className="h-4 w-4 mr-1.5" />
-              Upload documentation
+              Upload Document
             </Button>
           </div>
 
@@ -84,7 +86,11 @@ export function AIChatSection() {
             {quickActions.map((action) => (
               <button
                 key={action.href}
-                onClick={() => navigate(action.href)}
+                onClick={() =>
+                  action.href === "/reimburse"
+                    ? openReimburseWorkspace()
+                    : navigate(action.href)
+                }
                 className="rounded-full px-4 py-2.5 min-h-[44px] text-sm font-semibold text-foreground bg-white border border-slate-200/60 shadow-[0_1px_3px_rgb(0,0,0,0.04)] hover:shadow-md hover:-translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--wex-focus-ring-color))] focus-visible:ring-offset-2 motion-reduce:transition-none motion-reduce:transform-none transition-all duration-200"
               >
                 {action.label}

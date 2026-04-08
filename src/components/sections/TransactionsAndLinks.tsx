@@ -7,105 +7,75 @@ import {
 } from "@wexinc-healthbenefits/ben-ui-kit";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import { Clock, ChevronDown, Check } from "lucide-react";
+import { cn } from "@/lib/utils";
+
 import {
-  ChevronDown,
-  Calendar,
-  Check,
-  X,
-} from "lucide-react";
-import { transactionsData } from "@/data/mockData";
-import type { TransactionStatus, TransactionTimelineStep } from "@/data/mockData";
+  sparkRecentActivity,
+  type SparkActivityStatus,
+  type SparkActivityRow,
+} from "@/data/sparkAiForwardMock";
 
-const STATUS_BADGE: Record<TransactionStatus, { bg: string; text: string; icon: React.ReactNode; label: string }> = {
-  pending: {
-    bg: "bg-amber-50 border-amber-200/60",
-    text: "text-amber-600",
-    icon: <div className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />,
-    label: "Pending",
-  },
-  processing: {
-    bg: "bg-blue-50 border-blue-200/60",
-    text: "text-blue-600",
-    icon: <div className="h-1.5 w-1.5 rounded-full bg-blue-500 animate-pulse" />,
-    label: "Processing",
-  },
-  paid: {
-    bg: "bg-emerald-50 border-emerald-200/60",
-    text: "text-emerald-600",
-    icon: <Check className="h-3 w-3" />,
-    label: "Complete",
-  },
-  denied: {
-    bg: "bg-red-50 border-red-200/60",
-    text: "text-red-600",
-    icon: <X className="h-3 w-3" />,
-    label: "Denied",
-  },
-};
-
-function getMemberColor(_name: string): string {
-  return "bg-blue-100 text-blue-700";
-}
-
-function getMemberInitial(name: string): string {
-  if (name === "You") return "Y";
-  return name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
-}
-
-function formatDate(dateStr: string): string {
-  const [month, day, year] = dateStr.split("/");
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  const m = months[parseInt(month, 10) - 1];
-  return m ? `${m} ${day}, ${year}` : dateStr;
-}
-
-function capitalizeCategory(cat: string): string {
-  return cat.charAt(0).toUpperCase() + cat.slice(1);
+function statusStyles(status: SparkActivityStatus): string {
+  switch (status) {
+    case "approved":
+      return "text-[#009966]";
+    case "needs_attention":
+      return "text-[#996e00]";
+    case "completed":
+      return "text-[#009966]";
+    default:
+      return "text-[#5f6a94]";
+  }
 }
 
 const STEP_TOOLTIPS: Record<string, string> = {
-  Submitted: "Your claim is currently being submitted and queued for review.",
-  Processing: "Your claim is currently being reviewed and verified against your plan's eligible expenses. This typically takes 3–5 business days.",
-  Complete: "Your claim has been approved and the funds are being disbursed to your account.",
+  "Submitted": "Your claim is currently being submitted and queued for review.",
+  "Processing": "Your claim is currently being reviewed and verified against your plan's eligible expenses.",
+  "Action Required": "Missing documentation required. Please upload your receipt or EOB to continue processing this claim.",
+  "Complete": "Your claim has been approved and the funds are being disbursed to your account.",
 };
 
-function TimelineTracker({ steps }: { steps: TransactionTimelineStep[] }) {
+function TimelineTracker({ steps }: { steps: NonNullable<SparkActivityRow["timeline"]> }) {
   return (
     <div className="flex items-center gap-0 w-full">
-      {steps.map((step, i) => (
-        <div key={step.label} className="flex items-center flex-1 last:flex-none">
-          {(() => {
-            const stepContent = (
-              <div className={`flex flex-col items-center gap-1 ${step.active ? "cursor-help" : ""}`}>
-                <div
-                  className={[
-                    "h-5 w-5 rounded-full flex items-center justify-center text-white transition-all duration-500",
-                    step.completed
-                      ? "bg-emerald-500"
-                      : step.active
-                        ? "bg-blue-500 animate-pulse"
-                        : "bg-slate-200",
-                  ].join(" ")}
-                  style={{ animationDelay: `${i * 150}ms`, animationDuration: step.active ? "3s" : undefined }}
-                >
-                  {step.completed && <Check className="h-3 w-3" />}
-                  {step.active && <div className="h-1.5 w-1.5 rounded-full bg-white" />}
-                </div>
-                <span className={[
-                  "text-[10px] leading-tight text-center whitespace-nowrap",
-                  step.completed || step.active ? "text-foreground font-medium" : "text-muted-foreground",
-                ].join(" ")}>
-                  {step.label}
-                </span>
-                {step.date && (
-                  <span className="text-[10px] text-muted-foreground leading-tight">
-                    {step.date}
-                  </span>
-                )}
-              </div>
-            );
+      {steps.map((step, i) => {
+        const stepContent = (
+          <div className={`flex flex-col items-center gap-1 ${step.active ? "cursor-help" : ""}`}>
+            <div
+              className={[
+                "h-5 w-5 rounded-full flex items-center justify-center text-white transition-all duration-500",
+                step.completed
+                  ? "bg-[#009966]"
+                  : step.active
+                    ? "bg-[#3958c3] animate-pulse"
+                    : "bg-slate-200",
+              ].join(" ")}
+              style={{ animationDelay: `${i * 150}ms`, animationDuration: step.active ? "3s" : undefined }}
+            >
+              {step.completed ? (
+                <Check className="h-3 w-3" strokeWidth={3} />
+              ) : step.active ? (
+                <div className="h-1.5 w-1.5 rounded-full bg-white" />
+              ) : null}
+            </div>
+            <span className={[
+              "text-[10px] leading-tight text-center whitespace-nowrap",
+              step.completed || step.active ? "text-[#14182c] font-medium" : "text-[#5f6a94]",
+            ].join(" ")}>
+              {step.label}
+            </span>
+            {step.date && (
+              <span className="text-[10px] text-[#5f6a94] leading-tight">
+                {step.date}
+              </span>
+            )}
+          </div>
+        );
 
-            return step.active ? (
+        return (
+          <div key={step.label} className="flex items-center flex-1 last:flex-none">
+            {step.active ? (
               <Tooltip>
                 <TooltipTrigger asChild>{stepContent}</TooltipTrigger>
                 <TooltipContent>
@@ -114,26 +84,44 @@ function TimelineTracker({ steps }: { steps: TransactionTimelineStep[] }) {
                   </p>
                 </TooltipContent>
               </Tooltip>
-            ) : stepContent;
-          })()}
-          {i < steps.length - 1 && (
-            <div className={[
-              "h-0.5 flex-1 mx-1 rounded-full transition-all duration-500",
-              step.completed ? "bg-emerald-500" : "bg-slate-200",
-            ].join(" ")} />
-          )}
-        </div>
-      ))}
+            ) : (
+              stepContent
+            )}
+            {i < steps.length - 1 && (
+              <div className={[
+                "h-0.5 flex-1 mx-1 rounded-full transition-all duration-500",
+                step.completed ? "bg-[#009966]" : "bg-slate-200",
+              ].join(" ")} />
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
 
-const ROW_GRID =
-  "grid grid-cols-[minmax(0,1.2fr)_minmax(0,1.2fr)_minmax(0,1.2fr)_minmax(0,1.5fr)_minmax(0,1.2fr)_auto_minmax(0,1.2fr)_28px] gap-x-5 items-center";
-
-export function TransactionsAndLinks() {
+export function TransactionsAndLinks({ activeView = 1 }: { activeView?: 1 | 2 | 3 }) {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
-  const lastThree = transactionsData.slice(0, 3);
+
+  const displayActivity = sparkRecentActivity.map((row) => {
+    if (activeView === 2) {
+      if (row.meta.includes("LPFSA")) {
+        return { ...row, meta: row.meta.replace("LPFSA", "FSA") };
+      }
+      if (row.merchant === "Vanguard Invest") {
+        return {
+          ...row,
+          merchant: "Bright Horizons Daycare",
+          meta: "12/14/25 • DCFSA Account",
+        };
+      }
+    } else if (activeView === 3) {
+      if (row.meta.includes("LPFSA")) {
+        return { ...row, meta: row.meta.replace("LPFSA", "HSA") };
+      }
+    }
+    return row;
+  });
 
   return (
     <GlassCard>
@@ -145,148 +133,81 @@ export function TransactionsAndLinks() {
             actionHref="/account-overview"
           />
 
-          <div
-            className={`hidden md:grid ${ROW_GRID} text-sm font-medium tracking-normal text-muted-foreground px-5 py-0`}
-            aria-hidden
-          >
-            <span>Date</span>
-            <span>Status</span>
-            <span>Account</span>
-            <span>Description</span>
-            <span>Category</span>
-            <span>Member</span>
-            <span className="text-right">Amount</span>
-            <span />
-          </div>
-
-          <div className="space-y-3">
-            {lastThree.map((tx, index) => {
+          <div className="flex flex-col gap-[12px]">
+            {displayActivity.map((row, index) => {
               const isExpanded = expandedIndex === index;
-              const badge = STATUS_BADGE[tx.status];
-              const memberColor = getMemberColor(tx.member);
-              const memberInitial = getMemberInitial(tx.member);
+              const hasTimeline = row.timeline && row.timeline.length > 0;
 
               return (
-                <div
-                  key={index}
-                  className="animate-in fade-in slide-in-from-bottom-1 fill-mode-both duration-300"
-                  style={{ animationDelay: `${index * 75}ms` }}
+                <button
+                  key={`${row.merchant}-${row.meta}`}
+                  type="button"
+                  onClick={() => hasTimeline && setExpandedIndex(isExpanded ? null : index)}
+                  className={cn(
+                    "group relative flex w-full flex-col items-start overflow-hidden rounded-[16px] border border-white bg-white p-px text-left shadow-[0_3px_9px_rgba(43,49,78,0.04),0_6px_18px_rgba(43,49,78,0.06)] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                    hasTimeline ? "hover:border-[#3958c3]/20 hover:shadow-md cursor-pointer" : "cursor-default"
+                  )}
                 >
-                  <div className="rounded-xl border border-white/60 bg-white/60 backdrop-blur-md shadow-[0_2px_8px_rgb(0,0,0,0.04)] transition-all duration-200 hover:shadow-[0_4px_12px_rgb(0,0,0,0.06)]">
-
-                    <button
-                      type="button"
-                      onClick={() => setExpandedIndex(isExpanded ? null : index)}
-                      className={`hidden md:grid w-full ${ROW_GRID} gap-y-0 px-5 py-4 text-left rounded-xl transition-colors duration-150 hover:bg-slate-50/50`}
-                    >
-                      <div className="flex items-center gap-1.5 text-sm text-foreground min-w-0">
-                        <Calendar className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                        <span className="truncate">{formatDate(tx.date)}</span>
+                  <div className="relative w-full bg-white/40">
+                    <div className="flex w-full items-center justify-between p-[16px]">
+                      <div className="flex items-center gap-[16px]">
+                        <div className="flex h-[40px] w-[40px] shrink-0 items-center justify-center rounded-[12px] bg-[#eef2ff] text-[#3958c3]">
+                          <Clock className="h-[18px] w-[18px]" />
+                        </div>
+                        <div className="flex flex-col items-start">
+                          <p className="text-[14px] font-bold leading-[20px] text-[#14182c]">
+                            {row.merchant}
+                          </p>
+                          <p className="text-[12px] font-medium leading-[16px] text-[#5f6a94]">
+                            {row.meta}
+                          </p>
+                        </div>
                       </div>
-
-                      <div
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] font-semibold w-fit ${badge.bg} ${badge.text}`}
-                      >
-                        {badge.icon}
-                        {badge.label}
-                      </div>
-
-                      <span className="text-sm text-foreground truncate">{tx.account}</span>
-
-                      <span className="text-sm font-medium text-foreground truncate">
-                        {tx.merchant}
-                      </span>
-
-                      <span className="inline-flex w-fit rounded-full bg-muted/80 px-2.5 py-0.5 text-[11px] font-medium text-muted-foreground capitalize">
-                        {capitalizeCategory(tx.category)}
-                      </span>
-
-                      <div
-                        className={`h-7 w-7 rounded-full flex items-center justify-center text-[11px] font-semibold shrink-0 ${memberColor}`}
-                        title={tx.member}
-                      >
-                        {memberInitial}
-                      </div>
-
-                      <div
-                        className={`text-sm font-semibold tabular-nums text-right ${
-                          tx.amount.startsWith("-") ? "text-foreground" : "text-emerald-600"
-                        }`}
-                      >
-                        {tx.amount}
-                      </div>
-
-                      <ChevronDown
-                        className={`h-4 w-4 text-muted-foreground shrink-0 transition-transform duration-200 ${
-                          isExpanded ? "rotate-180" : ""
-                        }`}
-                      />
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setExpandedIndex(isExpanded ? null : index)}
-                      className="md:hidden w-full flex flex-col gap-2.5 p-4 text-left rounded-xl transition-colors duration-150 hover:bg-slate-50/50"
-                    >
-                      <div className="flex items-center justify-between gap-3">
-                        <span className="text-sm font-medium text-foreground truncate">
-                          {tx.merchant}
-                        </span>
-                        <div className="flex items-center gap-2 shrink-0">
-                          <span
-                            className={`text-sm font-semibold tabular-nums ${
-                              tx.amount.startsWith("-") ? "text-foreground" : "text-emerald-600"
-                            }`}
+                      
+                      <div className="flex items-center gap-[24px]">
+                        <div className="flex flex-col items-end">
+                          <p className="text-[14px] font-bold leading-[20px] text-[#14182c]">
+                            {row.amount}
+                          </p>
+                          <p
+                            className={cn(
+                              "text-[12px] font-bold uppercase tracking-[1.2px] leading-[16px]",
+                              statusStyles(row.status)
+                            )}
                           >
-                            {tx.amount}
-                          </span>
-                          <ChevronDown
-                            className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${
-                              isExpanded ? "rotate-180" : ""
-                            }`}
+                            {row.statusLabel}
+                          </p>
+                        </div>
+                        {hasTimeline ? (
+                          <ChevronDown 
+                            className={cn(
+                              "h-4 w-4 text-[#5f6a94] transition-transform duration-200",
+                              isExpanded ? "rotate-180" : "group-hover:translate-y-0.5"
+                            )} 
+                            aria-hidden 
                           />
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                        <Calendar className="h-3 w-3 shrink-0" />
-                        <span>{formatDate(tx.date)}</span>
-                        <span>·</span>
-                        <span>{tx.account}</span>
-                      </div>
-
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <div
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] font-semibold ${badge.bg} ${badge.text}`}
-                        >
-                          {badge.icon}
-                          {badge.label}
-                        </div>
-                        <span className="inline-flex rounded-full bg-muted/80 px-2.5 py-0.5 text-[11px] font-medium text-muted-foreground capitalize">
-                          {capitalizeCategory(tx.category)}
-                        </span>
-                        <div
-                          className={`h-6 w-6 rounded-full flex items-center justify-center text-[10px] font-semibold shrink-0 ${memberColor}`}
-                          title={tx.member}
-                        >
-                          {memberInitial}
-                        </div>
-                      </div>
-                    </button>
-
-                    <div
-                      className={`overflow-hidden transition-all duration-300 ease-out ${
-                        isExpanded ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
-                      }`}
-                    >
-                      <div className="px-4 pb-4 pt-0">
-                        <div className="rounded-xl border border-slate-100/80 bg-slate-50/80 p-4">
-                          <TimelineTracker steps={tx.timeline} />
-                        </div>
+                        ) : (
+                          <div className="w-4" />
+                        )}
                       </div>
                     </div>
+
+                    {hasTimeline && (
+                      <div
+                        className={cn(
+                          "overflow-hidden transition-all duration-300 ease-out",
+                          isExpanded ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
+                        )}
+                      >
+                        <div className="px-4 pb-4 pt-0">
+                          <div className="rounded-xl border border-slate-100/80 bg-slate-50/80 p-4">
+                            <TimelineTracker steps={row.timeline!} />
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </div>
+                </button>
               );
             })}
           </div>

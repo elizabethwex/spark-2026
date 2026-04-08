@@ -1,5 +1,7 @@
 import { Button, Card, CardContent } from "@wexinc-healthbenefits/ben-ui-kit";
 import { Smartphone } from "lucide-react";
+import { usePrototype } from "@/context/PrototypeContext";
+import { cn } from "@/lib/utils";
 
 /**
  * Promotional Banner Component
@@ -10,8 +12,17 @@ import { Smartphone } from "lucide-react";
  * - Call-to-action button
  */
 export function PromoBanner() {
+  const { homepageMode } = usePrototype();
+  const isPartnerSafe = homepageMode === "partner-safe";
+
   return (
-    <Card className="bg-gradient-to-r from-info/10 via-info/5 to-background overflow-hidden">
+    <Card 
+      className={cn(
+        "overflow-hidden rounded-[24px]",
+        isPartnerSafe ? "bg-card border-border shadow-sm" : "bg-gradient-to-r from-info/10 via-info/5 to-background"
+      )}
+      style={{ borderRadius: '24px' }}
+    >
       <CardContent className="p-0">
         <div className="flex flex-col md:flex-row items-center gap-6 md:gap-12 p-8">
           {/* Illustration Placeholder */}

@@ -1,11 +1,11 @@
 import * as React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground";
-import { ReimbursementProvider } from "@/pages/reimburse/ReimbursementContext";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { LightModeBoundary } from "@/components/LightModeBoundary";
 import { useAppModeHotkey } from "@/hooks/useAppModeHotkey";
+import { ReimburseWorkspaceHost } from "@/pages/reimburse/ReimburseWorkspaceHost";
 
 // iOS app mode shell
 const AppShell = React.lazy(() =>
@@ -16,11 +16,14 @@ const AppShell = React.lazy(() =>
 const AppHomePage           = React.lazy(() => import("@/pages/app/AppHome"));
 const AppAccountOverviewPage = React.lazy(() => import("@/pages/app/AppAccountOverview"));
 const AppAccountDetailPage  = React.lazy(() => import("@/pages/app/AppAccountDetail"));
+const AppLpfsaDetailPage    = React.lazy(() => import("@/pages/app/AppLpfsaDetail"));
 const AppClaimsOverviewPage = React.lazy(() => import("@/pages/app/AppClaimsOverview"));
 const AppClaimsDetailPage   = React.lazy(() => import("@/pages/app/AppClaimsDetail"));
 const AppMessageCenterPage  = React.lazy(() => import("@/pages/app/AppMessageCenter"));
 const AppMyAccountPage      = React.lazy(() => import("@/pages/app/AppMyAccount"));
 const AppAssistIQPage       = React.lazy(() => import("@/pages/app/AppAssistIQ"));
+const AppLockScreenPage     = React.lazy(() => import("@/pages/app/AppLockScreen"));
+const AppPennyFlowPage      = React.lazy(() => import("@/pages/app/AppPennyFlow"));
 
 // Consumer Experience page - standalone route
 const HomePage = React.lazy(() => import("@/pages/HomePage"));
@@ -43,12 +46,9 @@ const ClaimsPage = React.lazy(() => import("@/pages/Claims"));
 // Account Documents page - standalone route
 const AccountDocumentsPage = React.lazy(() => import("@/pages/AccountDocuments"));
 
-// Reimbursement flow pages - standalone routes
-const ReimburseMyselfPage = React.lazy(() => import("@/pages/reimburse/ReimburseMyself"));
-const ReimburseDocsPage = React.lazy(() => import("@/pages/reimburse/ReimburseDocs"));
-const ReimburseAnalyzePage = React.lazy(() => import("@/pages/reimburse/ReimburseAnalyze"));
-const ReimburseReviewPage = React.lazy(() => import("@/pages/reimburse/ReimburseReview"));
-const ReimburseConfirmPage = React.lazy(() => import("@/pages/reimburse/ReimburseConfirm"));
+const ReimburseWorkspaceRouteBridge = React.lazy(
+  () => import("@/pages/reimburse/ReimburseWorkspaceRouteBridge")
+);
 
 // Login page - standalone route
 const LoginPage = React.lazy(() => import("@/pages/Login"));
@@ -58,6 +58,18 @@ const ThemingEnginePage = React.lazy(() => import("@/pages/ThemingEnginePage"));
 
 // Modern documentation preview
 const ModernDocumentPage = React.lazy(() => import("@/pages/ModernDocument"));
+
+// Select an Account (authenticated; same UI as login step 5)
+const SelectProfilePage = React.lazy(() => import("@/pages/SelectProfilePage"));
+
+// Enrollment flow pages
+const EnrollmentHomePage = React.lazy(() => import("@/pages/enrollment/EnrollmentHomePage"));
+const EnrollmentStepRoute = React.lazy(() => import("@/pages/enrollment/EnrollmentStepRoute"));
+const DecisionSupportOptInPage = React.lazy(() => import("@/pages/enrollment/DecisionSupportOptInPage"));
+const PlansCheckpointPage = React.lazy(() => import("@/pages/enrollment/PlansCheckpointPage"));
+const SpendingAccountsCheckpointPage = React.lazy(() => import("@/pages/enrollment/SpendingAccountsCheckpointPage"));
+const EnrollmentSuccessPage = React.lazy(() => import("@/pages/enrollment/EnrollmentSuccessPage"));
+const EnrollmentStatementPage = React.lazy(() => import("@/pages/enrollment/EnrollmentStatementPage"));
 
 
 /**
@@ -128,21 +140,14 @@ export function AppRoutes() {
         {/* Account Documents */}
         <Route path="account-documents" element={withConsumerLight(<AccountDocumentsPage />)} />
 
-        {/* Reimbursement flow routes */}
+        {/* Select an Account (authenticated; login wizard step 5 remains on /login) */}
+        <Route path="select-profile" element={withConsumerLight(<SelectProfilePage />)} />
+
+        {/* Reimbursement route bridge (deep-link compatibility) */}
         <Route
           path="reimburse/*"
           element={
-            withConsumerLight(
-              <ReimbursementProvider>
-                <Routes>
-                  <Route index element={<ReimburseMyselfPage />} />
-                  <Route path="docs" element={<ReimburseDocsPage />} />
-                  <Route path="analyze" element={<ReimburseAnalyzePage />} />
-                  <Route path="review" element={<ReimburseReviewPage />} />
-                  <Route path="confirm" element={<ReimburseConfirmPage />} />
-                </Routes>
-              </ReimbursementProvider>
-            )
+            withConsumerLight(<ReimburseWorkspaceRouteBridge />)
           }
         />
         
@@ -156,17 +161,35 @@ export function AppRoutes() {
         <Route path="app" element={<AppShell />}>
           <Route index element={<AppHomePage />} />
           <Route path="account" element={<AppAccountOverviewPage />} />
+          <Route path="account/lpfsa" element={<AppLpfsaDetailPage />} />
+          <Route path="account/fsa" element={<AppLpfsaDetailPage />} />
+          <Route path="account/dcfsa" element={<AppLpfsaDetailPage />} />
           <Route path="account/:id" element={<AppAccountDetailPage />} />
           <Route path="claims" element={<AppClaimsOverviewPage />} />
           <Route path="claims/:id" element={<AppClaimsDetailPage />} />
           <Route path="messages" element={<AppMessageCenterPage />} />
           <Route path="my-account" element={<AppMyAccountPage />} />
           <Route path="assist-iq" element={<AppAssistIQPage />} />
+          <Route path="lock-screen" element={<AppLockScreenPage />} />
+          <Route path="penny" element={<AppPennyFlowPage />} />
+        </Route>
+
+        {/* Enrollment flow — /enrollment/* (standalone, no auth gate) */}
+        <Route path="enrollment">
+          <Route index element={<Navigate to="home" replace />} />
+          <Route path="home" element={withLightOnly(<EnrollmentHomePage />)} />
+          <Route path="decision-support-opt-in" element={withLightOnly(<DecisionSupportOptInPage />)} />
+          <Route path="plans-checkpoint" element={withLightOnly(<PlansCheckpointPage />)} />
+          <Route path="spending-accounts-checkpoint" element={withLightOnly(<SpendingAccountsCheckpointPage />)} />
+          <Route path="success" element={withLightOnly(<EnrollmentSuccessPage />)} />
+          <Route path="statement" element={withLightOnly(<EnrollmentStatementPage />)} />
+          <Route path=":stepId" element={withLightOnly(<EnrollmentStepRoute />)} />
         </Route>
 
         {/* Catch-all for 404 */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
+      <ReimburseWorkspaceHost />
     </React.Suspense>
   );
 }

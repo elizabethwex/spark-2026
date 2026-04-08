@@ -1,0 +1,15 @@
+/**
+ * @wex/design-tokens - Complete Theme Bundle
+ *
+ * This file imports all WEX design token layers:
+ * 1. design-tokens.css - Core design tokens (palette, semantics)
+ * 2. shadcn-bridge.css - shadcn/ui variable mappings
+ * 3. components-bridge.css - Component-specific slot tokens
+ *
+ * Usage:
+ *   import '@wex/design-tokens/css';
+ */
+
+@import './design-tokens.css';
+@import './shadcn-bridge.css';
+@import './components-bridge.css';

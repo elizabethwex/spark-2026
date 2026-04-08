@@ -1,4 +1,7 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import { motion } from "framer-motion";
+import { useAppChrome } from "@/context/AppChromeContext";
 
 /** Height consumed by the status bar inside the phone screen. */
 export const STATUS_BAR_HEIGHT = 54;
@@ -52,6 +55,8 @@ function BatteryIcon() {
  * center gap between time and icons.
  */
 export function AppStatusBar() {
+  const location = useLocation();
+  const { topChromeHidden } = useAppChrome();
   const [time, setTime] = useState(getFormattedTime);
 
   useEffect(() => {
@@ -59,9 +64,21 @@ export function AppStatusBar() {
     return () => clearInterval(id);
   }, []);
 
+  if (location.pathname === "/app/lock-screen") return null;
+
   return (
-    <div
+    <motion.div
+      initial={false}
+      animate={{ y: topChromeHidden ? -STATUS_BAR_HEIGHT : 0 }}
+      transition={{ type: "tween", duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
       style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        maxWidth: 430,
+        margin: "0 auto",
+        width: "100%",
         height: STATUS_BAR_HEIGHT,
         display: "flex",
         alignItems: "center",
@@ -70,10 +87,9 @@ export function AppStatusBar() {
         pointerEvents: "none",
         userSelect: "none",
         fontFamily: "var(--app-font)",
-        backdropFilter: "blur(20px) saturate(180%)",
-        WebkitBackdropFilter: "blur(20px) saturate(180%)",
-        background: "var(--app-glass-bg)",
-        borderBottom: "0.5px solid var(--app-glass-border)",
+        zIndex: 50,
+        background: "rgba(238, 243, 255, 1)",
+        transition: "background 0.2s ease",
       }}
     >
       {/* Time — left, uses flex-1 so it stops well before the DI */}
@@ -89,6 +105,6 @@ export function AppStatusBar() {
         <WifiIcon />
         <BatteryIcon />
       </div>
-    </div>
+    </motion.div>
   );
 }

@@ -8,7 +8,7 @@ import {
   DialogTitle,
   Separator
 } from "@wexinc-healthbenefits/ben-ui-kit";
-import { ChevronDown, FileText, Download, CheckCircle2, Inbox, ChevronRight } from "lucide-react";
+import { ChevronDown, FileText, Download, CheckCircle2, ChevronRight } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { 
@@ -193,7 +193,6 @@ export function MessageCenterWidget() {
   const INITIAL_VISIBLE_TASKS = 3;
   const actionableItems = toDoMessages.filter(m => m.isActionable);
   const readOnlyItems = toDoMessages.filter(m => !m.isActionable);
-  const totalTasks = actionableItems.length;
   const visibleActionItems = tasksExpanded ? actionableItems : actionableItems.slice(0, INITIAL_VISIBLE_TASKS);
   const hiddenTaskCount = actionableItems.length - INITIAL_VISIBLE_TASKS;
 
@@ -205,25 +204,7 @@ export function MessageCenterWidget() {
           <div className="mb-5">
             <SectionHeader
               title="Task Center"
-              actionLabel="View All"
-              actionHref="/message-center"
             />
-          </div>
-
-          <div className="bg-gradient-to-r from-blue-50/80 to-indigo-50/50 rounded-[16px] p-4 border border-blue-100/50 flex items-center gap-4">
-            <div className="bg-white p-2.5 rounded-full shadow-sm shrink-0">
-              <Inbox className="h-5 w-5 text-blue-500" />
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold text-blue-900 leading-tight">
-                {totalTasks > 0 
-                  ? `You're ${totalTasks} step${totalTasks > 1 ? 's' : ''} away from completing your tasks.` 
-                  : "You're all caught up!"}
-              </h3>
-              <p className="text-xs text-blue-700/80 mt-0.5 font-medium">
-                {readOnlyItems.length} administrative docs ready for review whenever you are.
-              </p>
-            </div>
           </div>
         </div>
 

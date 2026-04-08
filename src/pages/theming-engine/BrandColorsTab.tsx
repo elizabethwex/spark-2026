@@ -8,15 +8,14 @@ import {
 import { AlertTriangle } from "lucide-react";
 import type { BrandColors, ThemingEngineFormValues } from "./schema";
 import { useThemingEngineHighlight } from "./ThemingEngineHighlightContext";
-import { getContrastWarnings, getHeaderContrastWarning } from "@/lib/accessibility";
+import { getContrastWarnings } from "@/lib/accessibility";
 
-// These keys match the 6 user-configurable variables in src/requirements/theming-variables.md
+// C1–C6: the 6 user-configurable brand colors (see src/requirements/theming-variables.md)
 const COLOR_KEYS: (keyof BrandColors)[] = [
   "primary",
   "secondary",
   "pageBg",
   "headerBg",
-  "headerText",
   "illustration",
 ];
 
@@ -25,17 +24,17 @@ const COLOR_LABELS: Record<keyof BrandColors, string> = {
   secondary:    "Secondary color",
   pageBg:       "Page background",
   headerBg:     "Navigation background",
-  headerText:   "Navigation text & icons",
   illustration: "Illustration accent color",
+  aiColor:      "AI agent color",
 };
 
 const COLOR_HELPER_TEXT: Record<keyof BrandColors, string> = {
   primary:      "Primary buttons, active states, key data visualizations",
   secondary:    "Secondary buttons, floating action buttons, active tab underlines",
   pageBg:       "The wallpaper behind all content cards",
-  headerBg:     "Top navigation bar background",
-  headerText:   "Top navigation text and icon fills — must contrast with Header Background",
+  headerBg:     "Top navigation bar background — text color auto-computed for contrast",
   illustration: "Empty-state SVGs, hero graphics, decorative icons",
+  aiColor:      "AI assistant surfaces, chat bubbles, agent branding",
 };
 
 export function BrandColorsTab() {
@@ -46,11 +45,6 @@ export function BrandColorsTab() {
   const warnings = brandColors ? getContrastWarnings(brandColors) : [];
   const warningByField = new Map(warnings.map((w) => [w.field, w]));
 
-  const headerContrastWarning =
-    brandColors?.headerBg && brandColors?.headerText
-      ? getHeaderContrastWarning(brandColors.headerBg, brandColors.headerText)
-      : null;
-
   return (
     <div className="space-y-4">
       <p className="text-sm text-muted-foreground">
@@ -60,7 +54,6 @@ export function BrandColorsTab() {
         {COLOR_KEYS.map((key) => {
           const warning = warningByField.get(key);
           const value = watch(`brandColors.${key}`) ?? "";
-          const isHeaderTextRow = key === "headerText";
 
           return (
             <div key={key} className="space-y-1">
@@ -94,12 +87,6 @@ export function BrandColorsTab() {
                 <Alert intent="destructive" className="flex items-start gap-2 py-1.5">
                   <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
                   <AlertDescription className="text-sm">{warning.message}</AlertDescription>
-                </Alert>
-              )}
-              {isHeaderTextRow && headerContrastWarning && (
-                <Alert intent="destructive" className="flex items-start gap-2 py-1.5">
-                  <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
-                  <AlertDescription className="text-sm">{headerContrastWarning.message}</AlertDescription>
                 </Alert>
               )}
             </div>

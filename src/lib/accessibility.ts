@@ -46,14 +46,14 @@ export interface ContrastWarning {
   ratio: number;
 }
 
-/** Brand colors shape for contrast checks — matches the 6-field schema. */
+/** Brand colors shape for contrast checks — matches the 6-field schema (C1–C6). */
 export interface BrandColorsForContrast {
   primary:      string;
   secondary:    string;
   pageBg:       string;
   headerBg:     string;
-  headerText:   string;
   illustration: string;
+  aiColor:      string;
 }
 
 const REFERENCE_WHITE = "#FFFFFF";
