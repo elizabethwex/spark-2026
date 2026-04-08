@@ -102,7 +102,7 @@ export function SparkAccountsSection({
             "group/card flex h-full w-full flex-col overflow-hidden rounded-[24px] transition-shadow hover:shadow-md",
             variant === "partner-safe"
               ? "bg-card border border-border shadow-sm text-card-foreground"
-              : "border border-white/60 bg-white shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1),0_2px_4px_-2px_rgba(0,0,0,0.1)]"
+              : "border border-white/60 bg-white shadow-[0_3px_9px_rgba(43,49,78,0.04),0_6px_18px_rgba(43,49,78,0.06)]"
           )}
           style={{ borderRadius: '24px' }}
         >
