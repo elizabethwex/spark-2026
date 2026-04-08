@@ -227,7 +227,7 @@ export function AiChatInput() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="absolute left-0 right-0 top-full z-20 mt-2 overflow-hidden rounded-[24px] border border-[#e3e7f4] bg-white py-2 shadow-[0_4px_20px_rgba(43,49,78,0.08)]"
+            className="absolute left-0 right-0 top-full z-[60] mt-2 overflow-hidden rounded-[24px] border border-[#e3e7f4] bg-white py-2 shadow-[0_4px_20px_rgba(43,49,78,0.08)]"
           >
             {/* Recent Chat Item */}
             <button
