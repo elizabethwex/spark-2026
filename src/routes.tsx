@@ -24,6 +24,7 @@ const AppMyAccountPage      = React.lazy(() => import("@/pages/app/AppMyAccount"
 const AppAssistIQPage       = React.lazy(() => import("@/pages/app/AppAssistIQ"));
 const AppLockScreenPage     = React.lazy(() => import("@/pages/app/AppLockScreen"));
 const AppPennyFlowPage      = React.lazy(() => import("@/pages/app/AppPennyFlow"));
+const AppReimburseFlowPage  = React.lazy(() => import("@/pages/app/AppReimburseFlow"));
 
 // Consumer Experience page - standalone route
 const HomePage = React.lazy(() => import("@/pages/HomePage"));
@@ -180,6 +181,7 @@ export function AppRoutes() {
           <Route path="assist-iq" element={<AppAssistIQPage />} />
           <Route path="lock-screen" element={<AppLockScreenPage />} />
           <Route path="penny" element={<AppPennyFlowPage />} />
+          <Route path="reimburse" element={<AppReimburseFlowPage />} />
         </Route>
 
         {/* Enrollment flow — /enrollment/* (standalone, no auth gate) */}

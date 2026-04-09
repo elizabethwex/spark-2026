@@ -451,7 +451,7 @@ export default function AppHome() {
           >
             {/* Reimburse Myself */}
             <button
-              onClick={() => openReimburseWorkspace()}
+              onClick={() => navigate("/app/reimburse")}
               style={{
                 background: "#fff",
                 borderRadius: 24,
