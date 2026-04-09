@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { Button } from "@wexinc-healthbenefits/ben-ui-kit";
 import { CalendarCheck2, PiggyBank, TrendingUp, CircleDollarSign, Info, Lightbulb, ChevronRight, HeartPulse, Baby } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SectionHeader } from "@/components/ui/SectionHeader";
@@ -10,7 +9,6 @@ import {
   sparkFsaSummary,
   sparkDcfsaSummary,
 } from "@/data/sparkAiForwardMock";
-import { useReimburseWorkspace } from "@/context/ReimburseWorkspaceContext";
 
 function useInView(options?: IntersectionObserverInit) {
   const ref = useRef<HTMLDivElement | null>(null);
@@ -50,7 +48,6 @@ export function SparkAccountsSection({
   activeView?: 1 | 2 | 3;
 }) {
   const navigate = useNavigate();
-  const { openReimburseWorkspace } = useReimburseWorkspace();
   const h = sparkHsaSummary;
   const l = sparkLpfsaSummary;
   const fsa = sparkFsaSummary;
@@ -75,21 +72,12 @@ export function SparkAccountsSection({
       {variant === "partner-safe" ? (
         <SectionHeader
           title="Your Accounts"
-          actionLabel="View All Plans"
-          actionHref="/plans"
         />
       ) : (
         <div className="flex items-center justify-between w-full">
           <h2 id="spark-accounts-heading" className="text-[12px] font-black uppercase tracking-[3px] text-[#5f6a94] leading-[16px]">
             Your Accounts
           </h2>
-          <button 
-            type="button" 
-            className="text-[12px] font-bold uppercase tracking-[1.2px] text-[#1c6eff] leading-[16px] hover:underline"
-            onClick={() => navigate("/plans")}
-          >
-            View All Plans
-          </button>
         </div>
       )}
 
@@ -107,7 +95,7 @@ export function SparkAccountsSection({
           style={{ borderRadius: '24px' }}
         >
           {/* Header */}
-          <div className="flex items-start px-6 pt-6">
+          <div className="flex items-start justify-between px-6 pt-6">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-[#3958c3] transition-transform group-hover/card:scale-110">
                 <PiggyBank className="h-5 w-5 transition-transform group-hover/card:rotate-12" />
@@ -119,6 +107,14 @@ export function SparkAccountsSection({
                 </p>
               </div>
             </div>
+            <button
+              type="button"
+              onClick={() => navigate("/account/hsa")}
+              className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[#1c6eff] hover:underline transition-colors -mr-3"
+            >
+              View Details
+              <ChevronRight className="h-4 w-4" />
+            </button>
           </div>
 
           {/* Body */}
@@ -143,6 +139,22 @@ export function SparkAccountsSection({
                 <div className="flex flex-col gap-3 rounded-xl bg-[#f1f3fb] px-4 py-3">
                   <div className="flex h-[44px] items-center gap-3">
                     <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
+                      <CircleDollarSign className="h-5 w-5" />
+                    </div>
+                    <div className="flex flex-1 items-center justify-between">
+                      <p className="text-[16px] font-semibold leading-[24px] tracking-[-0.176px] text-[#14182c]">
+                        Cash Balance
+                      </p>
+                      <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#14182c]">
+                        {h.cashBalance}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="h-px w-full bg-[#d1d5db]" />
+                  
+                  <div className="flex h-[44px] items-center gap-3">
+                    <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
                       <TrendingUp className="h-5 w-5" />
                     </div>
                     <div className="flex flex-1 items-center justify-between">
@@ -157,22 +169,6 @@ export function SparkAccountsSection({
                           {h.investedAssets}
                         </p>
                       </div>
-                    </div>
-                  </div>
-                  
-                  <div className="h-px w-full bg-[#d1d5db]" />
-                  
-                  <div className="flex h-[44px] items-center gap-3">
-                    <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
-                      <CircleDollarSign className="h-5 w-5" />
-                    </div>
-                    <div className="flex flex-1 items-center justify-between">
-                      <p className="text-[16px] font-semibold leading-[24px] tracking-[-0.176px] text-[#14182c]">
-                        Cash Balance
-                      </p>
-                      <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#14182c]">
-                        {h.cashBalance}
-                      </p>
                     </div>
                   </div>
                 </div>
@@ -205,7 +201,7 @@ export function SparkAccountsSection({
                   </div>
                   <button
                     type="button"
-                    className="flex items-center gap-2 text-[14px] leading-[20px] text-[#3958c3] hover:underline"
+                    className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[#1c6eff] hover:underline transition-colors -mr-3"
                   >
                     Start Investing
                     <ChevronRight className="h-4 w-4" />
@@ -253,7 +249,7 @@ export function SparkAccountsSection({
           style={{ borderRadius: '24px' }}
         >
           {/* Header */}
-          <div className="flex items-start px-6 pt-6">
+          <div className="flex items-start justify-between px-6 pt-6">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-[#3958c3] transition-transform group-hover/card:scale-110">
                 <CalendarCheck2 className="h-5 w-5 transition-transform group-hover/card:rotate-12" />
@@ -268,6 +264,14 @@ export function SparkAccountsSection({
                 </p>
               </div>
             </div>
+            <button
+              type="button"
+              onClick={() => navigate("/account/lpfsa")}
+              className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[#1c6eff] hover:underline transition-colors -mr-3"
+            >
+              View Details
+              <ChevronRight className="h-4 w-4" />
+            </button>
           </div>
 
           {/* Body */}
@@ -349,7 +353,7 @@ export function SparkAccountsSection({
               </div>
               <button
                 type="button"
-                className="flex items-center gap-2 text-[14px] leading-[20px] text-[#3958c3] hover:underline"
+                className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[#1c6eff] hover:underline transition-colors -mr-3"
               >
                 View Eligible Expenses
                 <ChevronRight className="h-4 w-4" />
@@ -359,16 +363,6 @@ export function SparkAccountsSection({
 
           {/* Footer */}
           <div className="px-6 pb-6 mt-auto">
-            {variant === "modern" && (
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full rounded-xl border-[#3958c3] py-[9.75px] text-[15.75px] font-medium text-[#3958c3] hover:bg-[#3958c3]/5"
-                onClick={() => openReimburseWorkspace()}
-              >
-                Reimburse Myself
-              </Button>
-            )}
           </div>
         </div>
         )}
@@ -387,7 +381,7 @@ export function SparkAccountsSection({
               style={{ borderRadius: '24px' }}
             >
               {/* Header */}
-              <div className="flex items-start px-6 pt-6">
+              <div className="flex items-start justify-between px-6 pt-6">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-[#3958c3] transition-transform group-hover/card:scale-110">
                     <HeartPulse className="h-5 w-5 transition-transform group-hover/card:rotate-12" />
@@ -402,6 +396,14 @@ export function SparkAccountsSection({
                     </p>
                   </div>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => navigate("/account/fsa")}
+                  className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[#1c6eff] hover:underline transition-colors -mr-3"
+                >
+                  View Details
+                  <ChevronRight className="h-4 w-4" />
+                </button>
               </div>
 
               {/* Body */}
@@ -483,7 +485,7 @@ export function SparkAccountsSection({
                   </div>
                   <button
                     type="button"
-                    className="flex items-center gap-2 text-[14px] leading-[20px] text-[#3958c3] hover:underline"
+                    className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[#1c6eff] hover:underline transition-colors -mr-3"
                   >
                     View Eligible Expenses
                     <ChevronRight className="h-4 w-4" />
@@ -504,7 +506,7 @@ export function SparkAccountsSection({
               style={{ borderRadius: '24px' }}
             >
               {/* Header */}
-              <div className="flex items-start px-6 pt-6">
+              <div className="flex items-start justify-between px-6 pt-6">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-[#3958c3] transition-transform group-hover/card:scale-110">
                     <Baby className="h-5 w-5 transition-transform group-hover/card:rotate-12" />
@@ -519,6 +521,14 @@ export function SparkAccountsSection({
                     </p>
                   </div>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => navigate("/account/dcfsa")}
+                  className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[#1c6eff] hover:underline transition-colors -mr-3"
+                >
+                  View Details
+                  <ChevronRight className="h-4 w-4" />
+                </button>
               </div>
 
               {/* Body */}
@@ -600,7 +610,7 @@ export function SparkAccountsSection({
                   </div>
                   <button
                     type="button"
-                    className="flex items-center gap-2 text-[14px] leading-[20px] text-[#3958c3] hover:underline"
+                    className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[#1c6eff] hover:underline transition-colors -mr-3"
                   >
                     View Eligible Expenses
                     <ChevronRight className="h-4 w-4" />

@@ -185,13 +185,6 @@ export function EnrollmentAccountsSection({
         >
           Your Accounts
         </h2>
-        <button
-          type="button"
-          className="text-[12px] font-bold uppercase tracking-[1.2px] text-[#1c6eff] leading-[16px] hover:underline"
-          onClick={() => navigate("/plans")}
-        >
-          View All Plans
-        </button>
       </div>
 
       <div
