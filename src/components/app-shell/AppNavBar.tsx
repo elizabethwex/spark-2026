@@ -17,7 +17,7 @@ export type AppNavTopVariant = "main" | "title" | "sub-page" | "full-page";
 type BaseChrome = { solid?: boolean };
 
 export type AppNavBarProps =
-  | (BaseChrome & { variant: "main" })
+  | (BaseChrome & { variant: "main"; onLogoClick?: () => void })
   | (BaseChrome & { variant: "title"; title: string })
   | (BaseChrome & {
       variant: "sub-page";
@@ -172,7 +172,13 @@ export function AppNavBar(props: AppNavBarProps) {
           <img
             src={`${import.meta.env.BASE_URL}WEX_Logo_Red_Vector.svg`}
             alt="WEX"
-            style={{ height: 28, width: "auto", objectFit: "contain" }}
+            onClick={props.onLogoClick}
+            style={{ 
+              height: 28, 
+              width: "auto", 
+              objectFit: "contain",
+              cursor: props.onLogoClick ? "pointer" : "default"
+            }}
           />
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <ProfileButton onClick={() => navigate("/app/my-account")} />
