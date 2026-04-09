@@ -1,7 +1,7 @@
 import { ConsumerFooter } from "@/components/layout/Footer";
 import { ConsumerNavigation } from "@/components/layout/ConsumerNavigation";
 import { FadeInItem } from "@/components/layout/PageFadeIn";
-import { UnderConstruction } from "@/components/UnderConstruction";
+import { ClaimsPaymentsContent } from "@/components/claims/ClaimsPaymentsContent";
 import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground";
 // Original imports preserved for future restoration:
 // import { useState } from "react";
@@ -410,7 +410,7 @@ export default function Claims() {
       {/* Main Content */}
       <FadeInItem>
         <div className="mx-auto max-w-[1440px] px-8 py-8">
-          <UnderConstruction />
+          <ClaimsPaymentsContent />
         </div>
       </FadeInItem>
 

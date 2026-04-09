@@ -4,7 +4,6 @@ import {
   Badge,
   Button,
   ScrollArea,
-  Separator,
   Sheet,
   SheetContent,
   SheetHeader,
@@ -244,7 +243,6 @@ export function ClaimDetailSheet({
                   </Badge>
                 </div>
               </div>
-              <Separator />
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Date of service</p>
@@ -295,8 +293,6 @@ export function ClaimDetailSheet({
                   )}
                 </div>
 
-                <Separator />
-
                 {/* Claim Information Section */}
                 <div className="space-y-4">
                   <h3 className="text-base font-semibold text-foreground">Claim information</h3>
@@ -322,8 +318,6 @@ export function ClaimDetailSheet({
                     <DataRow label="Amount" value={claim.amount} />
                   </div>
                 </div>
-
-                <Separator />
 
                 {/* Uploaded Documentation Section */}
                 <div className="space-y-2">

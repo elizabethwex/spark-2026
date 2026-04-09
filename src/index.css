@@ -358,6 +358,15 @@ code[class*="language-"] {
    Placed at the end for highest specificity.
    ============================================================ */
 
+/*
+ * SheetContent renders the built-in DialogClose before children. ScrollArea
+ * (and similar full-bleed bodies) paint later in the tree and capture pointer
+ * events over the top-right control unless the close sits higher in the stack.
+ */
+[role="dialog"] > button[type="button"].absolute:first-of-type {
+  z-index: 50;
+}
+
 /* Tabs component - make tablist full width */
 [role="tablist"].inline-flex.h-10.items-center.gap-1.border-b.border-wex-tabs-divider {
   width: 100% !important;
