@@ -16,6 +16,7 @@ import { motion } from "framer-motion";
 import { AppNavBar } from "@/components/app-shell/AppNavBar";
 import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
 import { TaskCardStack } from "@/components/app-shell/TaskCardStack";
+import { PullToRefresh } from "@/components/app-shell/PullToRefresh";
 import { useDeviceMockup } from "@/hooks/useDeviceMockup";
 import { FsaStoreBrowser } from "@/components/app-shell/FsaStoreBrowser";
 import { useReimburseWorkspace } from "@/context/ReimburseWorkspaceContext";
@@ -73,16 +74,22 @@ const HOME_TRANSACTIONS: Record<AppVariant, HomeTxRow[]> = {
     { id: "c1", title: "Pharmacy", subtitle: "4/27/2026 · LPFSA", amount: "$42.50", txData: { merchant: "Pharmacy", date: "4/27/2026", account: "LPFSA", amount: "$42.50", processedDate: "04/27/2026", description: "Vision (New Frames)", planYear: "2026", availableBalance: "$785.00", runningBalance: "$742.50", status: "complete" } },
     { id: "c3", title: "Bigtown Dentistry", subtitle: "4/27/2026 · LPFSA", amount: "$210.00", txData: { merchant: "Bigtown Dentistry", date: "4/27/2026", account: "LPFSA", amount: "$210.00", processedDate: "04/27/2026", description: "Dental Care", planYear: "2026", availableBalance: "$445.00", runningBalance: "$402.50", status: "complete" } },
     { id: "c2", title: "Investment Buy", subtitle: "4/27/2026 · HSA", amount: "$500.00", txData: { merchant: "Investment Buy", date: "4/27/2026", account: "HSA", amount: "$500.00", processedDate: "04/27/2026", description: "Investment Transfer", planYear: "2026", availableBalance: "$15,400.00", runningBalance: "$14,900.00", status: "complete" } },
+    { id: "c4", title: "Target", subtitle: "4/20/2026 · HSA", amount: "$15.99", txData: { merchant: "Target", date: "4/20/2026", account: "HSA", amount: "$15.99", processedDate: "04/20/2026", description: "First Aid Supplies", planYear: "2026", availableBalance: "$15,415.99", runningBalance: "$15,400.00", status: "complete" } },
+    { id: "c5", title: "Dr. Smith Vision", subtitle: "4/15/2026 · LPFSA", amount: "$120.00", txData: { merchant: "Dr. Smith Vision", date: "4/15/2026", account: "LPFSA", amount: "$120.00", processedDate: "04/15/2026", description: "Eye Exam", planYear: "2026", availableBalance: "$905.00", runningBalance: "$785.00", status: "complete" } },
   ],
   2: [
     { id: "c1", title: "Pharmacy", subtitle: "4/27/2026 · FSA", amount: "$42.50", txData: { merchant: "Pharmacy", date: "4/27/2026", account: "FSA", amount: "$42.50", processedDate: "04/27/2026", description: "Prescription Medicine", planYear: "2026", availableBalance: "$807.50", runningBalance: "$765.00", status: "complete" } },
     { id: "c3", title: "Bright Horizons Daycare", subtitle: "4/27/2026 · DCFSA", amount: "$185.00", txData: { merchant: "Bright Horizons Daycare", date: "4/27/2026", account: "DCFSA", amount: "$185.00", processedDate: "04/27/2026", description: "Childcare", planYear: "2025", availableBalance: "$620.00", runningBalance: "$435.00", status: "complete" } },
     { id: "c2", title: "CVS Pharmacy", subtitle: "4/25/2026 · FSA", amount: "$28.10", txData: { merchant: "CVS Pharmacy", date: "4/25/2026", account: "FSA", amount: "$28.10", processedDate: "04/25/2026", description: "OTC Medicine", planYear: "2026", availableBalance: "$878.10", runningBalance: "$850.00", status: "complete" } },
+    { id: "c4", title: "Target", subtitle: "4/20/2026 · FSA", amount: "$15.99", txData: { merchant: "Target", date: "4/20/2026", account: "FSA", amount: "$15.99", processedDate: "04/20/2026", description: "First Aid Supplies", planYear: "2026", availableBalance: "$894.09", runningBalance: "$878.10", status: "complete" } },
+    { id: "c5", title: "Dr. Smith Vision", subtitle: "4/15/2026 · FSA", amount: "$120.00", txData: { merchant: "Dr. Smith Vision", date: "4/15/2026", account: "FSA", amount: "$120.00", processedDate: "04/15/2026", description: "Eye Exam", planYear: "2026", availableBalance: "$1,014.09", runningBalance: "$894.09", status: "complete" } },
   ],
   3: [
     { id: "c1", title: "Investment Buy", subtitle: "4/27/2026 · HSA", amount: "$500.00", txData: { merchant: "Investment Buy", date: "4/27/2026", account: "HSA", amount: "$500.00", processedDate: "04/27/2026", description: "Investment Transfer", planYear: "2026", availableBalance: "$15,400.00", runningBalance: "$14,900.00", status: "complete" } },
     { id: "c2", title: "Shell Gas Station", subtitle: "4/25/2026 · HSA", amount: "$54.12", txData: { merchant: "Shell Gas Station", date: "4/25/2026", account: "HSA", amount: "$54.12", processedDate: "04/25/2026", description: "Transportation", planYear: "2026", availableBalance: "$15,454.12", runningBalance: "$15,400.00", status: "complete" } },
     { id: "c3", title: "Quest Diagnostics", subtitle: "3/22/2026 · HSA", amount: "$95.10", txData: { merchant: "Quest Diagnostics", date: "3/22/2026", account: "HSA", amount: "$95.10", processedDate: "03/22/2026", description: "Lab Tests", planYear: "2026", availableBalance: "$15,549.22", runningBalance: "$15,454.12", status: "complete" } },
+    { id: "c4", title: "Target", subtitle: "3/15/2026 · HSA", amount: "$15.99", txData: { merchant: "Target", date: "3/15/2026", account: "HSA", amount: "$15.99", processedDate: "03/15/2026", description: "First Aid Supplies", planYear: "2026", availableBalance: "$15,565.21", runningBalance: "$15,549.22", status: "complete" } },
+    { id: "c5", title: "Dr. Smith Vision", subtitle: "3/10/2026 · HSA", amount: "$120.00", txData: { merchant: "Dr. Smith Vision", date: "3/10/2026", account: "HSA", amount: "$120.00", processedDate: "03/10/2026", description: "Eye Exam", planYear: "2026", availableBalance: "$15,685.21", runningBalance: "$15,565.21", status: "complete" } },
   ],
 };
 
@@ -282,10 +289,19 @@ export default function AppHome() {
   const { deviceOn } = useDeviceMockup();
   const [showFsaStore, setShowFsaStore] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<TransactionData | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
   const { openReimburseWorkspace } = useReimburseWorkspace();
   const { variant } = useAppVariant();
   const accounts = HOME_ACCOUNTS[variant];
   const transactions = HOME_TRANSACTIONS[variant];
+
+  const handleRefresh = async () => {
+    // Simulate a quick network request delay for the UI
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // Incrementing the key forces TaskCardStack to remount and reset!
+    setRefreshKey(prev => prev + 1);
+  };
 
   /** Device frame: tab bar is fixed over the scroll area — clear it. Mobile web: shell already reserves tab bar + safe area; add a small inner gap. */
   const contentPaddingBottom = deviceOn
@@ -302,10 +318,11 @@ export default function AppHome() {
       }}
     >
       <AppTopSpacer variant="home" />
-      <AppNavBar variant="main" />
-
-      {/* Scrollable content */}
-      <motion.div
+      <AppNavBar variant="main" onLogoClick={handleRefresh} />
+      
+      <PullToRefresh onRefresh={handleRefresh}>
+        {/* Scrollable content */}
+        <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, ease: "easeOut" }}
@@ -318,7 +335,7 @@ export default function AppHome() {
         }}
       >
         {/* ── Missing document (debit card / Bigtown Dentistry) ── */}
-        <TaskCardStack />
+        <TaskCardStack key={refreshKey} />
 
         {/* ── Your Accounts ── */}
         <div style={{ padding: "0 16px" }}>
@@ -666,6 +683,7 @@ export default function AppHome() {
         transaction={selectedTransaction}
         onClose={() => setSelectedTransaction(null)}
       />
+      </PullToRefresh>
     </div>
   );
 }

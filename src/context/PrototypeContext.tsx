@@ -79,6 +79,23 @@ export function PrototypeProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore keypresses if the user is typing in an input
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      
+      if (e.key === 'p' || e.key === 'P') {
+        setHomepageModeState("partner-safe");
+      }
+      if (e.key === 'm' || e.key === 'M') {
+        setHomepageModeState("ai-forward");
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const value = React.useMemo<PrototypeContextValue>(
     () => ({
       homepageMode,

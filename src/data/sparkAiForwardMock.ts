@@ -103,4 +103,28 @@ export const sparkRecentActivity: SparkActivityRow[] = [
       { label: "Complete", date: "Dec 16", completed: true, active: true },
     ],
   },
+  {
+    merchant: "Target",
+    meta: "11/20/25 • HSA Account",
+    amount: "$15.99",
+    status: "completed",
+    statusLabel: "COMPLETED",
+    timeline: [
+      { label: "Submitted", date: "Nov 20", completed: true, active: false },
+      { label: "Processing", date: "Nov 21", completed: true, active: false },
+      { label: "Complete", date: "Nov 22", completed: true, active: true },
+    ],
+  },
+  {
+    merchant: "Dr. Smith Vision",
+    meta: "11/15/25 • LPFSA Account",
+    amount: "$120.00",
+    status: "completed",
+    statusLabel: "COMPLETED",
+    timeline: [
+      { label: "Submitted", date: "Nov 15", completed: true, active: false },
+      { label: "Processing", date: "Nov 16", completed: true, active: false },
+      { label: "Complete", date: "Nov 17", completed: true, active: true },
+    ],
+  },
 ];

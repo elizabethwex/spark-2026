@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { ConsumerNavigation } from "@/components/layout/ConsumerNavigation";
-import { PrototypeFloatingControls } from "@/components/PrototypeFloatingControls";
 import { usePrototype } from "@/context/PrototypeContext";
 import HomePagePartnerSafe from "@/pages/HomePagePartnerSafe";
 import { ConsumerFooter } from "@/components/layout/Footer";
@@ -57,8 +56,6 @@ function HomePageAiForward() {
           )}
         </PageFadeIn>
       </main>
-
-      <PrototypeFloatingControls />
 
       <ConsumerFooter />
     </div>

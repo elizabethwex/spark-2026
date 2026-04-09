@@ -13,7 +13,7 @@ function hexToHsl(hex: string): string {
   const b = parseInt(h.slice(4, 6), 16) / 255;
   const max = Math.max(r, g, b);
   const min = Math.min(r, g, b);
-  let lightness = (max + min) / 2;
+  const lightness = (max + min) / 2;
   let s = 0;
   let h_deg = 0;
   if (max !== min) {

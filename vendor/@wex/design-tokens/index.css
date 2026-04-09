@@ -1,0 +1,12 @@
+/**
+ * @wex/design-tokens - Root Entry Point
+ *
+ * This file re-exports the CSS bundle from the css/ directory.
+ * Provides an additional entry point at the package root.
+ *
+ * Usage:
+ *   import '@wex/design-tokens';
+ *   import '@wex/design-tokens/index.css';
+ */
+
+@import './css/index.css';
