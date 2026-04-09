@@ -1,1 +1,0 @@
-import{r,j as s}from"./index-MKeqBufB.js";const i={1:"HSA + Limited Purpose FSA",2:"Health FSA + DC FSA",3:"HSA Only"},a=r.createContext(null);function u({children:t}){const[n,e]=r.useState(1);return s.jsx(a.Provider,{value:{variant:n,setVariant:e},children:t})}function A(){const t=r.useContext(a);return t||{variant:1,setVariant:()=>{}}}export{u as A,i as a,A as u};
