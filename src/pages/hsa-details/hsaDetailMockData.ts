@@ -1,5 +1,5 @@
 /**
- * Mock data for the HSA account details page (consumer /account-overview?account=hsa).
+ * Mock data for the HSA account details page (consumer /hsa-details).
  * Values align with the Consumer Experience Redesign HSA dashboard reference.
  */
 

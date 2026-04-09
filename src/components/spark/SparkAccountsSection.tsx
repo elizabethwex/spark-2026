@@ -85,28 +85,14 @@ export function SparkAccountsSection({
         {(activeView === 1 || activeView === 3) && (
           <>
             {/* HSA Card */}
-        <div 
+        <div
           className={cn(
-            "group/card flex h-full w-full cursor-pointer flex-col overflow-hidden rounded-[24px] transition-shadow hover:shadow-md",
+            "group/card flex h-full w-full flex-col overflow-hidden rounded-[24px] transition-shadow hover:shadow-md",
             variant === "partner-safe"
               ? "bg-card border border-border shadow-sm text-card-foreground"
               : "border border-white/60 bg-white shadow-[0_3px_9px_rgba(43,49,78,0.04),0_6px_18px_rgba(43,49,78,0.06)]"
           )}
-          style={{ borderRadius: '24px' }}
-          {...(showInvestments
-            ? ({
-                role: "button",
-                tabIndex: 0,
-                "aria-label": "View Health Savings Account details",
-                onKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    navigate("/account-overview?account=hsa");
-                  }
-                },
-              } as const)
-            : {})}
-          onClick={() => navigate("/account-overview?account=hsa")}
+          style={{ borderRadius: "24px" }}
         >
           {/* Header */}
           <div className="flex items-start justify-between px-6 pt-6">
@@ -123,10 +109,7 @@ export function SparkAccountsSection({
             </div>
             <button
               type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate("/account-overview?account=hsa");
-              }}
+              onClick={() => navigate("/hsa-details")}
               className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[#1c6eff] hover:underline transition-colors -mr-3"
             >
               View Details
@@ -219,7 +202,6 @@ export function SparkAccountsSection({
                   <button
                     type="button"
                     className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[#1c6eff] hover:underline transition-colors -mr-3"
-                    onClick={(e) => e.stopPropagation()}
                   >
                     Start Investing
                     <ChevronRight className="h-4 w-4" />

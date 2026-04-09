@@ -43,7 +43,7 @@ const RANGE_WEEKS: Record<(typeof INVESTMENT_RANGES)[number], number> = {
 };
 
 /**
- * Health Savings Account dashboard for /account-overview?account=hsa
+ * Health Savings Account dashboard for /hsa-details
  * (Consumer Experience Redesign reference).
  */
 export function HsaAccountDetails() {

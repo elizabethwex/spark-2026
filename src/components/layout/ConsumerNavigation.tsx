@@ -93,7 +93,7 @@ export function ConsumerNavigation({
     if (href === "/") {
       return location.pathname === "/" || location.pathname === "";
     }
-    // Query-aware links (e.g. /account-overview?account=hsa)
+    // Query-aware links (e.g. /my-profile?subPage=…)
     if (href.includes("?")) {
       const [path, query] = href.split("?");
       if (location.pathname !== path) return false;
