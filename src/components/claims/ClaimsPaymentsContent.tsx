@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react"
 import { Link } from "react-router-dom"
 import {
+  Badge,
   Button,
-  ButtonGroup,
   Card,
   CardContent,
   Input,
@@ -18,10 +18,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  ToggleGroup,
+  ToggleGroupItem,
 } from "@wexinc-healthbenefits/ben-ui-kit"
 import { cn } from "@/lib/utils"
 import {
   AlertTriangle,
+  ArrowDown,
+  ArrowUp,
   ArrowUpDown,
   Check,
   Clock,
@@ -30,22 +34,26 @@ import {
   Search,
   Upload,
 } from "lucide-react"
+import { ClaimExpenseDetailSheet } from "@/components/claims/ClaimExpenseDetailSheet"
+import { expenseStatusBadgeClass, type ExpenseRow } from "@/components/claims/expenseTypes"
 
 const ACTION_ITEMS = [
   {
     id: "doc-needed",
-    alertTitle: "Document Needed",
-    alertDescription: "Documentation is required to complete transaction.",
+    rowId: "8",
+    alertTitle: "Documentation Needed",
+    alertDescription: "Documentation is required to complete this claim.",
     deadlineLabel: "28 Days Remaining",
     provider: "Bigtown Dentistry",
     dateLine: "Jan 12, 2026",
     account: "Healthcare FSA",
     amount: "$210.00",
-    primaryAction: { label: "Upload Document", icon: "upload" as const },
-    secondaryAction: { label: "View Denial Details" },
+    primaryAction: { label: "Upload Documentation", icon: "upload" as const },
+    secondaryAction: { label: "View Details" },
   },
   {
     id: "repayment",
+    rowId: "5",
     alertTitle: "Repayment Due",
     alertDescription:
       "This expense is not eligible for reimbursement under a Dependent Care FSA.",
@@ -55,42 +63,36 @@ const ACTION_ITEMS = [
     account: "Dependent Care FSA",
     amount: "$180.00",
     primaryAction: { label: "Repay Expense", icon: "card" as const },
-    secondaryAction: { label: "View Denial Details" },
+    secondaryAction: { label: "View Details" },
   },
 ] as const
-
-type ExpenseRow = {
-  id: string
-  dateOfService: string
-  status: { label: string; tone: "blue" | "sky" | "green" | "orange" | "amber" | "red" | "gray"; icon?: boolean }
-  account: string
-  provider: string
-  recipient: string
-  category: string
-  attachments: string | null
-  amount: string
-}
 
 const EXPENSE_ROWS: ExpenseRow[] = [
   {
     id: "1",
     dateOfService: "Feb 14, 2026",
     status: { label: "Payment Processing", tone: "blue" },
+    origin: "manual",
     account: "Healthcare FSA",
     provider: "Dr. John Doe",
     recipient: "ES",
     category: "Medical",
+    categoryType: "Office Visit",
+    payTo: { cardholderName: "Emily Smith", last4: "4523" },
     attachments: "2 Documents",
     amount: "$150.00",
   },
   {
     id: "2",
     dateOfService: "Feb 14, 2026",
-    status: { label: "Document Review", tone: "sky" },
+    status: { label: "Documentation Review", tone: "blue" },
+    origin: "card",
     account: "Healthcare FSA",
     provider: "Dr. John Doe",
     recipient: "ES",
     category: "Medical",
+    categoryType: "Specialist Visit",
+    payTo: { cardholderName: "Emily Smith", last4: "4523" },
     attachments: "2 Documents",
     amount: "$60.00",
   },
@@ -98,32 +100,43 @@ const EXPENSE_ROWS: ExpenseRow[] = [
     id: "3",
     dateOfService: "Feb 14, 2026",
     status: { label: "Approved", tone: "green" },
+    origin: "manual",
     account: "Healthcare FSA",
     provider: "Dr. John Doe",
     recipient: "ES",
     category: "Medical",
+    categoryType: "Office Visit",
+    payTo: { cardholderName: "Emily Smith", last4: "4523" },
     attachments: "2 Documents",
     amount: "$88.00",
   },
   {
     id: "4",
     dateOfService: "Feb 14, 2026",
-    status: { label: "Denied", tone: "orange" },
+    status: { label: "Denied", tone: "amber" },
+    origin: "card",
+    denialReason: "Expense is not eligible under Healthcare FSA plan.",
     account: "Healthcare FSA",
     provider: "Walgreens",
     recipient: "ES",
     category: "Prescription",
+    categoryType: "OTC Item",
+    payTo: { cardholderName: "Emily Smith", last4: "4523" },
     attachments: "2 Documents",
     amount: "$16.00",
   },
   {
     id: "5",
-    dateOfService: "Feb 13-14, 2026",
+    dateOfService: "Feb 13–14, 2026",
     status: { label: "Repayment Due", tone: "red", icon: true },
-    account: "Dependent Care F...",
-    provider: "Buddy's Overnight...",
+    origin: "card",
+    denialReason: "Dependent care expense is not eligible under this plan.",
+    account: "Dependent Care FSA",
+    provider: "Buddy's Overnight Camp",
     recipient: "JS",
     category: "Dependent Care",
+    categoryType: "Overnight Camp",
+    payTo: { cardholderName: "Julia Smith", last4: "4523" },
     attachments: "1 Document",
     amount: "$210.00",
   },
@@ -131,10 +144,14 @@ const EXPENSE_ROWS: ExpenseRow[] = [
     id: "6",
     dateOfService: "Feb 14, 2026",
     status: { label: "Hold", tone: "amber" },
+    origin: "manual",
+    holdReason: "Additional review required for this expense category.",
     account: "Healthcare FSA",
-    provider: "Pharmacy",
+    provider: "Walgreens Pharmacy",
     recipient: "JS",
     category: "Prescription",
+    categoryType: "Generic Drug",
+    payTo: { cardholderName: "Julia Smith", last4: "4523" },
     attachments: "2 Documents",
     amount: "$150.00",
   },
@@ -142,21 +159,27 @@ const EXPENSE_ROWS: ExpenseRow[] = [
     id: "7",
     dateOfService: "Feb 14, 2026",
     status: { label: "Paid", tone: "green" },
+    origin: "card",
     account: "Healthcare FSA",
     provider: "Dr. John Doe",
     recipient: "JS",
     category: "Medical",
+    categoryType: "Office Visit",
+    payTo: { cardholderName: "Julia Smith", last4: "4523" },
     attachments: "2 Documents",
     amount: "$45.00",
   },
   {
     id: "8",
     dateOfService: "Jan 12, 2025",
-    status: { label: "Document Needed", tone: "red", icon: true },
+    status: { label: "Documentation Needed", tone: "red", icon: true },
+    origin: "manual",
     account: "Healthcare FSA",
     provider: "Bigtown Dentistry",
     recipient: "ES",
     category: "Dental",
+    categoryType: "Dental Exam",
+    payTo: { cardholderName: "Emily Smith", last4: "4523" },
     attachments: null,
     amount: "$85.00",
   },
@@ -164,10 +187,13 @@ const EXPENSE_ROWS: ExpenseRow[] = [
     id: "9",
     dateOfService: "Nov 11, 2025",
     status: { label: "Not Submitted", tone: "gray" },
+    origin: "manual",
     account: "Healthcare FSA",
     provider: "Target Optical",
     recipient: "ES",
     category: "Vision",
+    categoryType: "Eye Exam",
+    payTo: { cardholderName: "Emily Smith", last4: "4523" },
     attachments: "1 Document",
     amount: "$150.00",
   },
@@ -175,12 +201,29 @@ const EXPENSE_ROWS: ExpenseRow[] = [
     id: "10",
     dateOfService: "Sept 22, 2025",
     status: { label: "Paid", tone: "green" },
+    origin: "card",
     account: "Healthcare FSA",
-    provider: "Pharmacy",
+    provider: "CVS Pharmacy",
     recipient: "ES",
     category: "Prescription",
+    categoryType: "Brand Name Drug",
+    payTo: { cardholderName: "Emily Smith", last4: "4523" },
     attachments: "2 Documents",
     amount: "$36.00",
+  },
+  {
+    id: "11",
+    dateOfService: "Mar 15, 2026",
+    status: { label: "Submitted", tone: "blue" },
+    origin: "manual",
+    account: "Healthcare FSA",
+    provider: "City Medical Center",
+    recipient: "ES",
+    category: "Medical",
+    categoryType: "Urgent Care",
+    payTo: { cardholderName: "Emily Smith", last4: "4523" },
+    attachments: null,
+    amount: "$220.00",
   },
 ]
 
@@ -190,25 +233,34 @@ const DOCUMENT_CARDS = [
   { id: "3", title: "Bright Smiles Dental", date: "Dec 12, 2025", tag: "Attached", attached: true },
 ] as const
 
-/** Rows per page — set to 10 so “All Expenses” shows every row on one page. */
+/** SparkAccountsSection-aligned shell for main Claims section cards */
+const CLAIMS_SPARK_CARD_PROPS = {
+  variant: "outlined" as const,
+  className:
+    "group/card flex w-full flex-col overflow-hidden rounded-[24px] border border-white/60 bg-white text-foreground shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1),0_2px_4px_-2px_rgba(0,0,0,0.1)] transition-shadow hover:shadow-md",
+  style: { borderRadius: "24px" as const },
+}
+
+/** Rows per page — set to 10 so “All Claims” shows every row on one page. */
 const EXPENSE_PAGE_SIZE = 10
 
 type ExpenseFilterId = "all" | "drafts" | "progress" | "complete" | "actionRequired"
 
-/** Maps status label → filter bucket (single source of truth for the button group). */
+/** Maps status label → filter bucket (single source of truth for the toggle group). */
 function getExpenseBucket(statusLabel: string): Exclude<ExpenseFilterId, "all"> {
   switch (statusLabel) {
     case "Not Submitted":
       return "drafts"
+    case "Submitted":
     case "Payment Processing":
-    case "Document Review":
+    case "Documentation Review":
     case "Hold":
       return "progress"
     case "Approved":
     case "Paid":
     case "Denied":
       return "complete"
-    case "Document Needed":
+    case "Documentation Needed":
     case "Repayment Due":
       return "actionRequired"
     default:
@@ -225,31 +277,12 @@ const EXPENSE_BUCKET_COUNTS = EXPENSE_ROWS.reduce(
 )
 
 const EXPENSE_FILTER_OPTIONS: { id: ExpenseFilterId; label: string }[] = [
-  { id: "all", label: "All Expenses" },
+  { id: "all", label: "All Claims" },
   { id: "drafts", label: `Drafts (${EXPENSE_BUCKET_COUNTS.drafts})` },
   { id: "progress", label: `In Progress (${EXPENSE_BUCKET_COUNTS.progress})` },
   { id: "complete", label: `Complete (${EXPENSE_BUCKET_COUNTS.complete})` },
   { id: "actionRequired", label: `Action Required (${EXPENSE_BUCKET_COUNTS.actionRequired})` },
 ]
-
-function statusBadgeClass(tone: ExpenseRow["status"]["tone"]) {
-  switch (tone) {
-    case "blue":
-      return "bg-blue-100 text-blue-700 border-transparent"
-    case "sky":
-      return "bg-sky-100 text-sky-700 border-transparent"
-    case "green":
-      return "bg-green-100 text-green-700 border-transparent"
-    case "orange":
-      return "bg-orange-100 text-orange-700 border-transparent"
-    case "amber":
-      return "bg-amber-100 text-amber-700 border-transparent"
-    case "red":
-      return "bg-red-100 text-red-700 border-transparent"
-    default:
-      return "bg-gray-100 text-gray-600 border-transparent"
-  }
-}
 
 function matchesExpenseSearch(row: ExpenseRow, query: string) {
   const q = query.trim().toLowerCase()
@@ -269,10 +302,106 @@ function matchesExpenseSearch(row: ExpenseRow, query: string) {
   return haystack.includes(q)
 }
 
+/** Sortable claim table columns (aligned with header buttons). */
+type ExpenseSortKey =
+  | "dateOfService"
+  | "status"
+  | "account"
+  | "provider"
+  | "recipient"
+  | "category"
+  | "attachments"
+  | "amount"
+
+function parseDateOfServiceForSort(s: string): number {
+  let t = s.replace(/\bSept\b/g, "Sep")
+  const range = /^([\w\s]+?\d{1,2})[–—]\s*\d{1,2},\s*(\d{4})$/.exec(t)
+  if (range) {
+    t = `${range[1].trim()}, ${range[2]}`
+  }
+  const ms = Date.parse(t)
+  return Number.isNaN(ms) ? 0 : ms
+}
+
+function parseAmountForSort(amount: string): number {
+  const n = Number.parseFloat(amount.replace(/[$,]/g, ""))
+  return Number.isNaN(n) ? 0 : n
+}
+
+/** Ascending comparison only; caller applies direction and attachment empty-last rules. */
+function compareExpenseRowsAsc(a: ExpenseRow, b: ExpenseRow, key: ExpenseSortKey): number {
+  switch (key) {
+    case "dateOfService":
+      return parseDateOfServiceForSort(a.dateOfService) - parseDateOfServiceForSort(b.dateOfService)
+    case "status":
+      return a.status.label.localeCompare(b.status.label, undefined, { sensitivity: "base" })
+    case "account":
+      return a.account.localeCompare(b.account, undefined, { sensitivity: "base" })
+    case "provider":
+      return a.provider.localeCompare(b.provider, undefined, { sensitivity: "base" })
+    case "recipient":
+      return a.recipient.localeCompare(b.recipient, undefined, { sensitivity: "base" })
+    case "category":
+      return a.category.localeCompare(b.category, undefined, { sensitivity: "base" })
+    case "attachments": {
+      const as = a.attachments?.trim() ?? ""
+      const bs = b.attachments?.trim() ?? ""
+      return as.localeCompare(bs, undefined, { sensitivity: "base" })
+    }
+    case "amount":
+      return parseAmountForSort(a.amount) - parseAmountForSort(b.amount)
+    default:
+      return 0
+  }
+}
+
+function sortExpenseRows(
+  rows: ExpenseRow[],
+  key: ExpenseSortKey,
+  dir: "asc" | "desc"
+): ExpenseRow[] {
+  return [...rows].sort((a, b) => {
+    if (key === "attachments") {
+      const ae = !a.attachments?.trim()
+      const be = !b.attachments?.trim()
+      if (ae && be) return 0
+      if (ae) return 1
+      if (be) return -1
+    }
+    const cmp = compareExpenseRowsAsc(a, b, key)
+    return dir === "asc" ? cmp : -cmp
+  })
+}
+
+const EXPENSE_TABLE_COLUMNS: { key: ExpenseSortKey; label: string; align?: "right" }[] = [
+  { key: "dateOfService", label: "Date of Service" },
+  { key: "status", label: "Status" },
+  { key: "account", label: "Account" },
+  { key: "provider", label: "Provider/Service" },
+  { key: "recipient", label: "Recipient" },
+  { key: "category", label: "Category" },
+  { key: "attachments", label: "Attachments" },
+  { key: "amount", label: "Amount", align: "right" },
+]
+
+function expenseSortAriaSort(
+  activeKey: ExpenseSortKey,
+  columnKey: ExpenseSortKey,
+  dir: "asc" | "desc"
+): "none" | "ascending" | "descending" {
+  if (activeKey !== columnKey) return "none"
+  return dir === "asc" ? "ascending" : "descending"
+}
+
 export function ClaimsPaymentsContent() {
   const [expenseSearch, setExpenseSearch] = useState("")
   const [expenseFilter, setExpenseFilter] = useState<ExpenseFilterId>("all")
   const [currentPage, setCurrentPage] = useState(1)
+  const [expenseSort, setExpenseSort] = useState<{
+    key: ExpenseSortKey
+    dir: "asc" | "desc"
+  }>({ key: "dateOfService", dir: "desc" })
+  const [selectedClaimRow, setSelectedClaimRow] = useState<ExpenseRow | null>(null)
 
   const filteredExpenseRows = useMemo(() => {
     return EXPENSE_ROWS.filter((row) => {
@@ -283,14 +412,26 @@ export function ClaimsPaymentsContent() {
     })
   }, [expenseFilter, expenseSearch])
 
-  const totalPages = Math.max(1, Math.ceil(filteredExpenseRows.length / EXPENSE_PAGE_SIZE))
+  const sortedFilteredExpenseRows = useMemo(
+    () => sortExpenseRows(filteredExpenseRows, expenseSort.key, expenseSort.dir),
+    [filteredExpenseRows, expenseSort]
+  )
+
+  const totalPages = Math.max(1, Math.ceil(sortedFilteredExpenseRows.length / EXPENSE_PAGE_SIZE))
 
   const effectivePage = Math.min(currentPage, totalPages)
 
   const paginatedExpenseRows = useMemo(() => {
     const start = (effectivePage - 1) * EXPENSE_PAGE_SIZE
-    return filteredExpenseRows.slice(start, start + EXPENSE_PAGE_SIZE)
-  }, [filteredExpenseRows, effectivePage])
+    return sortedFilteredExpenseRows.slice(start, start + EXPENSE_PAGE_SIZE)
+  }, [sortedFilteredExpenseRows, effectivePage])
+
+  const handleExpenseSort = (key: ExpenseSortKey) => {
+    setExpenseSort((prev) =>
+      prev.key === key ? { key, dir: prev.dir === "asc" ? "desc" : "asc" } : { key, dir: "asc" }
+    )
+    setCurrentPage(1)
+  }
 
   return (
     <div className="mx-auto w-full max-w-[1376px] space-y-6">
@@ -298,7 +439,7 @@ export function ClaimsPaymentsContent() {
       {/* Page title + primary actions */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-3xl font-semibold tracking-tight text-foreground">
-          Expenses
+          Claims
         </h1>
         <div className="flex flex-wrap items-center gap-3">
           <Button
@@ -321,7 +462,7 @@ export function ClaimsPaymentsContent() {
       </div>
 
       {/* Action Required */}
-      <Card className="overflow-hidden rounded-2xl border-0 shadow-[0_0_1px_0_rgba(18,24,29,0.20),0_4px_8px_-2px_rgba(18,24,29,0.10),0_2px_4px_-2px_rgba(18,24,29,0.06)]">
+      <Card {...CLAIMS_SPARK_CARD_PROPS}>
         <CardContent className="border-0 p-0">
           {/* Section header */}
           <div className="flex items-center gap-2 px-6 pt-5 pb-4">
@@ -333,76 +474,112 @@ export function ClaimsPaymentsContent() {
 
           {/* Action items — nested cards inset to align with section title */}
           <div className="flex flex-col gap-4 px-6 pb-6 pt-0">
-            {ACTION_ITEMS.map((item) => (
-              <Card
-                key={item.id}
-                className="overflow-hidden bg-card shadow-[0_0_1px_0_rgba(18,24,29,0.20),0_4px_8px_-2px_rgba(18,24,29,0.10),0_2px_4px_-2px_rgba(18,24,29,0.06)]"
-              >
-                <CardContent className="p-0">
-                  {/* Alert banner */}
-                  <div className="flex items-center justify-between gap-4 bg-red-50 px-4 py-3 sm:px-5">
-                    <div className="flex min-w-0 items-start gap-3">
-                      <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-600" aria-hidden />
-                      <div className="min-w-0">
-                        <p className="text-sm font-semibold text-red-700">{item.alertTitle}</p>
-                        <p className="text-sm text-red-600/80">{item.alertDescription}</p>
+            {ACTION_ITEMS.map((item) => {
+              const actionRow = EXPENSE_ROWS.find((r) => r.id === item.rowId) ?? null
+              return (
+                <Card
+                  key={item.id}
+                  variant="outlined"
+                  className="cursor-pointer overflow-hidden border-border bg-card shadow-none transition-shadow hover:shadow-sm"
+                  tabIndex={0}
+                  aria-label={`Open details for ${item.provider}`}
+                  onClick={() => { if (actionRow) setSelectedClaimRow(actionRow) }}
+                  onKeyDown={(e) => {
+                    if ((e.key === "Enter" || e.key === " ") && actionRow) {
+                      e.preventDefault()
+                      setSelectedClaimRow(actionRow)
+                    }
+                  }}
+                >
+                  <CardContent className="p-0">
+                    {/* Alert banner */}
+                    <div className="flex items-center justify-between gap-4 bg-red-50 px-4 py-3 sm:px-5">
+                      <div className="flex min-w-0 items-start gap-3">
+                        <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-600" aria-hidden />
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-red-700">{item.alertTitle}</p>
+                          <p className="text-sm text-red-600/80">{item.alertDescription}</p>
+                        </div>
                       </div>
+                      <Badge
+                        intent="destructive"
+                        size="md"
+                        pill
+                        className="shrink-0 whitespace-nowrap"
+                      >
+                        <span className="inline-flex items-center gap-1.5">
+                          <Clock className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                          {item.deadlineLabel}
+                        </span>
+                      </Badge>
                     </div>
-                    <div className="flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-red-300 bg-white px-3 py-1 text-xs font-medium text-red-700">
-                      <Clock className="h-3.5 w-3.5" aria-hidden />
-                      {item.deadlineLabel}
-                    </div>
-                  </div>
 
-                  {/* Provider / amount */}
-                  <div className="px-4 py-4 sm:px-5">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="min-w-0">
-                        <p className="text-base font-semibold text-foreground">{item.provider}</p>
-                        <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm text-muted-foreground">
-                          <span>{item.dateLine}</span>
-                          <span className="h-1 w-1 shrink-0 rounded-full bg-muted-foreground/50" />
-                          <span>{item.account}</span>
+                    {/* Provider / amount */}
+                    <div className="px-4 py-4 sm:px-5">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="min-w-0">
+                          <p className="text-base font-semibold text-foreground">{item.provider}</p>
+                          <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm text-muted-foreground">
+                            <span>{item.dateLine}</span>
+                            <span className="h-1 w-1 shrink-0 rounded-full bg-muted-foreground/50" />
+                            <span>{item.account}</span>
+                          </p>
+                        </div>
+                        <p className="shrink-0 text-2xl font-bold tabular-nums text-foreground">
+                          {item.amount}
                         </p>
                       </div>
-                      <p className="shrink-0 text-2xl font-bold tabular-nums text-foreground">
-                        {item.amount}
-                      </p>
-                    </div>
 
-                    <div className="mt-4 flex flex-wrap gap-2 border-t border-border pt-4">
-                      <Button type="button" intent="primary" variant="outline" size="sm">
-                        {item.primaryAction.icon === "upload" && (
-                          <Upload className="mr-1.5 h-3.5 w-3.5" aria-hidden />
-                        )}
-                        {item.primaryAction.icon === "card" && (
-                          <CreditCard className="mr-1.5 h-3.5 w-3.5" aria-hidden />
-                        )}
-                        {item.primaryAction.label}
-                      </Button>
-                      <Button type="button" intent="primary" variant="outline" size="sm">
-                        {item.secondaryAction.label}
-                      </Button>
+                      <div className="mt-4 flex flex-wrap gap-2 border-t border-border pt-4">
+                        <Button
+                          type="button"
+                          intent="primary"
+                          variant="solid"
+                          size="sm"
+                          className="gap-1.5"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {item.primaryAction.icon === "upload" && (
+                            <Upload className="size-4 shrink-0" aria-hidden />
+                          )}
+                          {item.primaryAction.icon === "card" && (
+                            <CreditCard className="size-4 shrink-0" aria-hidden />
+                          )}
+                          {item.primaryAction.label}
+                        </Button>
+                        <Button
+                          type="button"
+                          intent="primary"
+                          variant="outline"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            if (actionRow) setSelectedClaimRow(actionRow)
+                          }}
+                        >
+                          {item.secondaryAction.label}
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              )
+            })}
           </div>
         </CardContent>
       </Card>
 
-      {/* All Expenses */}
-      <Card className="overflow-hidden">
+      {/* Claims */}
+      <Card {...CLAIMS_SPARK_CARD_PROPS}>
         <CardContent className="p-0">
           {/* Section header */}
           <div className="flex flex-col gap-3 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
-            <h2 className="text-xl font-semibold text-foreground">All Expenses</h2>
+            <h2 className="text-xl font-semibold text-foreground">Claims</h2>
             <div className="w-full max-w-[240px]">
               <Input
                 inputSize="md"
                 type="search"
-                placeholder="Find an expense..."
+                placeholder="Find a claim..."
                 leftIcon={<Search className="h-4 w-4" />}
                 value={expenseSearch}
                 onChange={(e) => {
@@ -416,31 +593,30 @@ export function ClaimsPaymentsContent() {
 
           {/* Expense filter */}
           <div className="px-6 pt-0 pb-4">
-            <ButtonGroup
-              aria-label="Filter expenses"
-              className="inline-flex rounded-md bg-muted/50 p-0.5"
+            <ToggleGroup
+              type="single"
+              value={expenseFilter}
+              onValueChange={(value) => {
+                if (value) {
+                  setExpenseFilter(value as ExpenseFilterId)
+                  setCurrentPage(1)
+                }
+              }}
+              variant="default"
+              size="sm"
+              aria-label="Filter claims"
+              className="inline-flex w-fit justify-start rounded-md bg-muted/50 p-0.5"
             >
-              {EXPENSE_FILTER_OPTIONS.map(({ id, label }) => {
-                const isActive = expenseFilter === id
-                return (
-                  <Button
-                    key={id}
-                    type="button"
-                    intent="primary"
-                    variant={isActive ? "solid" : "outline"}
-                    size="sm"
-                    className="h-8 rounded px-4 text-sm shadow-none"
-                    aria-pressed={isActive}
-                    onClick={() => {
-                      setExpenseFilter(id)
-                      setCurrentPage(1)
-                    }}
-                  >
-                    {label}
-                  </Button>
-                )
-              })}
-            </ButtonGroup>
+              {EXPENSE_FILTER_OPTIONS.map(({ id, label }) => (
+                <ToggleGroupItem
+                  key={id}
+                  value={id}
+                  className="px-4 text-sm shadow-none"
+                >
+                  {label}
+                </ToggleGroupItem>
+              ))}
+            </ToggleGroup>
           </div>
 
           {/* Table — padding on wrapper (not margin on table) avoids overflow; table-fixed + colgroup fits desktop width */}
@@ -458,54 +634,40 @@ export function ClaimsPaymentsContent() {
               </colgroup>
               <TableHeader>
                 <TableRow className="hover:bg-transparent border-y border-border bg-muted/30">
-                  <TableHead className="h-10 px-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                    <button type="button" className="inline-flex max-w-full items-center gap-1 truncate">
-                      Date of Service
-                      <ArrowUpDown className="h-3 w-3 shrink-0 opacity-60" aria-hidden />
-                    </button>
-                  </TableHead>
-                  <TableHead className="h-10 px-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                    <button type="button" className="inline-flex max-w-full items-center gap-1 truncate">
-                      Status
-                      <ArrowUpDown className="h-3 w-3 shrink-0 opacity-60" aria-hidden />
-                    </button>
-                  </TableHead>
-                  <TableHead className="h-10 px-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                    <button type="button" className="inline-flex max-w-full items-center gap-1 truncate">
-                      Account
-                      <ArrowUpDown className="h-3 w-3 shrink-0 opacity-60" aria-hidden />
-                    </button>
-                  </TableHead>
-                  <TableHead className="h-10 px-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                    <button type="button" className="inline-flex max-w-full items-center gap-1 truncate">
-                      Provider/Service
-                      <ArrowUpDown className="h-3 w-3 shrink-0 opacity-60" aria-hidden />
-                    </button>
-                  </TableHead>
-                  <TableHead className="h-10 px-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                    <button type="button" className="inline-flex max-w-full items-center gap-1 truncate">
-                      Recipient
-                      <ArrowUpDown className="h-3 w-3 shrink-0 opacity-60" aria-hidden />
-                    </button>
-                  </TableHead>
-                  <TableHead className="h-10 px-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                    <button type="button" className="inline-flex max-w-full items-center gap-1 truncate">
-                      Category
-                      <ArrowUpDown className="h-3 w-3 shrink-0 opacity-60" aria-hidden />
-                    </button>
-                  </TableHead>
-                  <TableHead className="h-10 px-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                    <button type="button" className="inline-flex max-w-full items-center gap-1 truncate">
-                      Attachments
-                      <ArrowUpDown className="h-3 w-3 shrink-0 opacity-60" aria-hidden />
-                    </button>
-                  </TableHead>
-                  <TableHead className="h-10 px-2 text-right text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                    <button type="button" className="inline-flex w-full max-w-full items-center justify-end gap-1 truncate">
-                      Amount
-                      <ArrowUpDown className="h-3 w-3 shrink-0 opacity-60" aria-hidden />
-                    </button>
-                  </TableHead>
+                  {EXPENSE_TABLE_COLUMNS.map(({ key, label, align }) => {
+                    const active = expenseSort.key === key
+                    const sortIcon =
+                      active && expenseSort.dir === "asc" ? (
+                        <ArrowUp className="h-3 w-3 shrink-0 text-foreground" aria-hidden />
+                      ) : active && expenseSort.dir === "desc" ? (
+                        <ArrowDown className="h-3 w-3 shrink-0 text-foreground" aria-hidden />
+                      ) : (
+                        <ArrowUpDown className="h-3 w-3 shrink-0 opacity-60" aria-hidden />
+                      )
+                    return (
+                      <TableHead
+                        key={key}
+                        aria-sort={expenseSortAriaSort(expenseSort.key, key, expenseSort.dir)}
+                        className={cn(
+                          "h-10 px-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground",
+                          align === "right" && "text-right"
+                        )}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => handleExpenseSort(key)}
+                          className={cn(
+                            "inline-flex max-w-full items-center gap-1 truncate rounded-sm hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-wex-input-focus-ring",
+                            align === "right" && "w-full justify-end"
+                          )}
+                          aria-label={`Sort by ${label}, ${active ? (expenseSort.dir === "asc" ? "ascending" : "descending") : "not sorted"}. Activate to change sort.`}
+                        >
+                          {label}
+                          {sortIcon}
+                        </button>
+                      </TableHead>
+                    )
+                  })}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -515,13 +677,25 @@ export function ClaimsPaymentsContent() {
                       colSpan={8}
                       className="py-10 text-center text-sm text-muted-foreground"
                     >
-                      No expenses match this filter
+                      No claims match this filter
                       {expenseSearch.trim() ? " and search" : ""}.
                     </TableCell>
                   </TableRow>
                 ) : (
                   paginatedExpenseRows.map((row) => (
-                    <TableRow key={row.id} className="cursor-pointer hover:bg-muted/30 border-b border-border/60">
+                    <TableRow
+                      key={row.id}
+                      className="cursor-pointer hover:bg-muted/30 border-b border-border/60"
+                      tabIndex={0}
+                      aria-label={`Open details for ${row.provider}, ${row.amount}`}
+                      onClick={() => setSelectedClaimRow(row)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault()
+                          setSelectedClaimRow(row)
+                        }
+                      }}
+                    >
                     <TableCell className="min-w-0 px-2 py-2.5 text-sm text-foreground">
                       <span className="line-clamp-2 break-words">{row.dateOfService}</span>
                     </TableCell>
@@ -529,7 +703,7 @@ export function ClaimsPaymentsContent() {
                       <span
                         className={cn(
                           "inline-flex max-w-full items-center gap-1 truncate rounded-full px-2 py-0.5 text-xs font-medium",
-                          statusBadgeClass(row.status.tone)
+                          expenseStatusBadgeClass(row.status.tone)
                         )}
                       >
                         {row.status.icon && <AlertTriangle className="h-3 w-3 shrink-0" aria-hidden />}
@@ -575,52 +749,54 @@ export function ClaimsPaymentsContent() {
             </Table>
           </div>
 
-          {/* Pagination */}
-          <div className="flex items-center justify-center border-t border-border px-6 py-4">
-            <Pagination className="mx-0 w-auto">
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      setCurrentPage((p) => Math.max(1, p - 1))
-                    }}
-                    className={cn(effectivePage === 1 && "pointer-events-none opacity-40")}
-                  />
-                </PaginationItem>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                  <PaginationItem key={p}>
-                    <PaginationLink
+          {/* Pagination — border inset to match table padding, not full card width */}
+          <div className="px-6 pb-4 pt-0">
+            <div className="flex items-center justify-center border-t border-border pt-4">
+              <Pagination className="mx-0 w-auto">
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
                       href="#"
-                      isActive={p === effectivePage}
                       onClick={(e) => {
                         e.preventDefault()
-                        setCurrentPage(p)
+                        setCurrentPage((p) => Math.max(1, p - 1))
                       }}
-                    >
-                      {p}
-                    </PaginationLink>
+                      className={cn(effectivePage === 1 && "pointer-events-none opacity-40")}
+                    />
                   </PaginationItem>
-                ))}
-                <PaginationItem>
-                  <PaginationNext
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      setCurrentPage((p) => Math.min(totalPages, p + 1))
-                    }}
-                    className={cn(effectivePage === totalPages && "pointer-events-none opacity-40")}
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                    <PaginationItem key={p}>
+                      <PaginationLink
+                        href="#"
+                        isActive={p === effectivePage}
+                        onClick={(e) => {
+                          e.preventDefault()
+                          setCurrentPage(p)
+                        }}
+                      >
+                        {p}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+                  <PaginationItem>
+                    <PaginationNext
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        setCurrentPage((p) => Math.min(totalPages, p + 1))
+                      }}
+                      className={cn(effectivePage === totalPages && "pointer-events-none opacity-40")}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Document Organizer */}
-      <Card className="overflow-hidden">
+      <Card {...CLAIMS_SPARK_CARD_PROPS}>
         <CardContent className="p-0">
           {/* Section header */}
           <div className="flex items-center justify-between px-6 py-4">
@@ -678,6 +854,15 @@ export function ClaimsPaymentsContent() {
           </div>
         </CardContent>
       </Card>
+
+      <ClaimExpenseDetailSheet
+        key={selectedClaimRow?.id ?? "closed"}
+        open={selectedClaimRow !== null}
+        onOpenChange={(next) => {
+          if (!next) setSelectedClaimRow(null)
+        }}
+        row={selectedClaimRow}
+      />
     </div>
   )
 }

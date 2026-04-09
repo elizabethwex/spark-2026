@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@wexinc-healthbenefits/ben-ui-kit";
 import { Button } from "@wexinc-healthbenefits/ben-ui-kit";
-import { Separator } from "@wexinc-healthbenefits/ben-ui-kit";
 import { ScrollArea } from "@wexinc-healthbenefits/ben-ui-kit";
 import { type Transaction, type TransactionDetail, transactionDetailData } from "./mockData";
 
@@ -102,18 +101,14 @@ export function TransactionDetailSheet({
             </div>
 
             {/* Claims Section */}
-            <div className="pt-8 space-y-2">
+            <div className="space-y-3 pt-8">
               <h3 className="text-[17px] font-semibold text-foreground pb-2">
                 Claims
               </h3>
               <ClaimRow label="Submitted" value={detail.claims.submitted} />
-              <Separator />
               <ClaimRow label="Paid" value={detail.claims.paid} />
-              <Separator />
               <ClaimRow label="Pending" value={detail.claims.pending} />
-              <Separator />
               <ClaimRow label="Denied" value={detail.claims.denied} />
-              <Separator />
             </div>
 
             {/* Action Buttons */}
