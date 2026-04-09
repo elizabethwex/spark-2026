@@ -1,8 +1,10 @@
+import { useSearchParams } from "react-router-dom";
 import { ConsumerNavigation } from "@/components/layout/ConsumerNavigation";
 import { ConsumerFooter } from "@/components/layout/Footer";
 import { UnderConstruction } from "@/components/UnderConstruction";
 import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground";
 import { FadeInItem } from "@/components/layout/PageFadeIn";
+import { HsaAccountDetails } from "@/pages/account-overview/HsaAccountDetails";
 // Original imports preserved for future restoration:
 // import { TitleBar } from "./account-overview/TitleBar";
 // import { AccountSummaryCards } from "./account-overview/AccountSummaryCards";
@@ -24,6 +26,13 @@ import { FadeInItem } from "@/components/layout/PageFadeIn";
  * All original content is preserved in comments below for easy restoration.
  */
 export default function AccountOverviewPage() {
+  const [searchParams] = useSearchParams();
+  const account = searchParams.get("account");
+
+  if (account === "hsa") {
+    return <HsaAccountDetails />;
+  }
+
   return (
     <div className="min-h-screen" style={consumerPageBackgroundStyle}>
       {/* Navigation Header */}

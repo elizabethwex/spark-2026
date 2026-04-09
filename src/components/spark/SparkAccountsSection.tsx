@@ -99,12 +99,26 @@ export function SparkAccountsSection({
             {/* HSA Card */}
         <div 
           className={cn(
-            "group/card flex h-full w-full flex-col overflow-hidden rounded-[24px] transition-shadow hover:shadow-md",
+            "group/card flex h-full w-full cursor-pointer flex-col overflow-hidden rounded-[24px] transition-shadow hover:shadow-md",
             variant === "partner-safe"
               ? "bg-card border border-border shadow-sm text-card-foreground"
               : "border border-white/60 bg-white shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1),0_2px_4px_-2px_rgba(0,0,0,0.1)]"
           )}
           style={{ borderRadius: '24px' }}
+          {...(showInvestments
+            ? ({
+                role: "button",
+                tabIndex: 0,
+                "aria-label": "View Health Savings Account details",
+                onKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    navigate("/account-overview?account=hsa");
+                  }
+                },
+              } as const)
+            : {})}
+          onClick={() => navigate("/account-overview?account=hsa")}
         >
           {/* Header */}
           <div className="flex items-start px-6 pt-6">
@@ -206,6 +220,7 @@ export function SparkAccountsSection({
                   <button
                     type="button"
                     className="flex items-center gap-2 text-[14px] leading-[20px] text-[#3958c3] hover:underline"
+                    onClick={(e) => e.stopPropagation()}
                   >
                     Start Investing
                     <ChevronRight className="h-4 w-4" />
