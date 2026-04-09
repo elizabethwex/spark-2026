@@ -16,6 +16,7 @@ import { motion } from "framer-motion";
 import { AppNavBar } from "@/components/app-shell/AppNavBar";
 import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
 import { TaskCardStack } from "@/components/app-shell/TaskCardStack";
+import { PullToRefresh } from "@/components/app-shell/PullToRefresh";
 import { useDeviceMockup } from "@/hooks/useDeviceMockup";
 import { FsaStoreBrowser } from "@/components/app-shell/FsaStoreBrowser";
 import { useReimburseWorkspace } from "@/context/ReimburseWorkspaceContext";
@@ -288,10 +289,19 @@ export default function AppHome() {
   const { deviceOn } = useDeviceMockup();
   const [showFsaStore, setShowFsaStore] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<TransactionData | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
   const { openReimburseWorkspace } = useReimburseWorkspace();
   const { variant } = useAppVariant();
   const accounts = HOME_ACCOUNTS[variant];
   const transactions = HOME_TRANSACTIONS[variant];
+
+  const handleRefresh = async () => {
+    // Simulate a quick network request delay for the UI
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // Incrementing the key forces TaskCardStack to remount and reset!
+    setRefreshKey(prev => prev + 1);
+  };
 
   /** Device frame: tab bar is fixed over the scroll area — clear it. Mobile web: shell already reserves tab bar + safe area; add a small inner gap. */
   const contentPaddingBottom = deviceOn
@@ -308,10 +318,11 @@ export default function AppHome() {
       }}
     >
       <AppTopSpacer variant="home" />
-      <AppNavBar variant="main" />
-
-      {/* Scrollable content */}
-      <motion.div
+      <AppNavBar variant="main" onLogoClick={handleRefresh} />
+      
+      <PullToRefresh onRefresh={handleRefresh}>
+        {/* Scrollable content */}
+        <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, ease: "easeOut" }}
@@ -324,7 +335,7 @@ export default function AppHome() {
         }}
       >
         {/* ── Missing document (debit card / Bigtown Dentistry) ── */}
-        <TaskCardStack />
+        <TaskCardStack key={refreshKey} />
 
         {/* ── Your Accounts ── */}
         <div style={{ padding: "0 16px" }}>
@@ -672,6 +683,7 @@ export default function AppHome() {
         transaction={selectedTransaction}
         onClose={() => setSelectedTransaction(null)}
       />
+      </PullToRefresh>
     </div>
   );
 }

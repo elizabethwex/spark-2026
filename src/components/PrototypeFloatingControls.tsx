@@ -8,8 +8,12 @@ import { usePrototype, HOME_LAYOUT_LABELS } from "@/context/PrototypeContext";
 export function PrototypeFloatingControls() {
   const location = useLocation();
   const isHome = location.pathname === "/" || location.pathname === "";
-  const { homepageMode, setHomepageMode, homeLayoutMode, cycleHomeLayout } = usePrototype();
+  const { homepageMode, homeLayoutMode, cycleHomeLayout } = usePrototype();
   const showLayoutOnHome = isHome && homepageMode === "partner-safe";
+
+  if (!showLayoutOnHome) {
+    return null;
+  }
 
   return (
     <div
@@ -21,40 +25,15 @@ export function PrototypeFloatingControls() {
         Prototype
       </p>
 
-      {showLayoutOnHome && (
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="h-auto min-h-8 w-full justify-center whitespace-normal px-2 py-1.5 text-center text-[11px] font-semibold leading-tight"
-          onClick={cycleHomeLayout}
-        >
-          Layout: {HOME_LAYOUT_LABELS[homeLayoutMode]}
-        </Button>
-      )}
-
-      <div className="grid grid-cols-2 gap-1">
-        <Button
-          type="button"
-          intent="primary"
-          variant={homepageMode === "ai-forward" ? "solid" : "outline"}
-          size="sm"
-          className="h-auto min-h-8 px-1 py-1.5 text-[10px] font-semibold leading-tight"
-          onClick={() => setHomepageMode("ai-forward")}
-        >
-          Modern
-        </Button>
-        <Button
-          type="button"
-          intent="primary"
-          variant={homepageMode === "partner-safe" ? "solid" : "outline"}
-          size="sm"
-          className="h-auto min-h-8 px-1 py-1.5 text-[10px] font-semibold leading-tight"
-          onClick={() => setHomepageMode("partner-safe")}
-        >
-          Partner safe
-        </Button>
-      </div>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        className="h-auto min-h-8 w-full justify-center whitespace-normal px-2 py-1.5 text-center text-[11px] font-semibold leading-tight"
+        onClick={cycleHomeLayout}
+      >
+        Layout: {HOME_LAYOUT_LABELS[homeLayoutMode]}
+      </Button>
     </div>
   );
 }

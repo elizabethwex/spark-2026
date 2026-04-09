@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import { Button } from "@wexinc-healthbenefits/ben-ui-kit";
 import { ChevronRight } from "lucide-react";
 
 interface SectionHeaderProps {
@@ -28,16 +27,14 @@ export function SectionHeader({
       </h2>
       {children}
       {actionLabel && handleAction && (
-        <Button
-          intent="primary"
-          variant="link"
-          size="md"
-          className="h-auto p-0"
+        <button
+          type="button"
+          className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[#1c6eff] hover:underline transition-colors -mr-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           onClick={handleAction}
         >
           {actionLabel}
           <ChevronRight className="h-4 w-4" />
-        </Button>
+        </button>
       )}
     </div>
   );

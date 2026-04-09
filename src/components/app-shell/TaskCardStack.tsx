@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, useMotionValue, useTransform, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Receipt } from "lucide-react";
+import { Receipt, Check } from "lucide-react";
 
 // Constants from AppHome
 const TEXT_PRIMARY = "#000";
@@ -46,7 +46,18 @@ const MOCK_TASKS: TaskCardData[] = [
 
 export function TaskCardStack() {
   const [cards, setCards] = useState<TaskCardData[]>(MOCK_TASKS);
+  const [showEmptyState, setShowEmptyState] = useState(true);
   const navigate = useNavigate();
+
+  // Auto-dismiss the empty state after a few seconds
+  useEffect(() => {
+    if (cards.length === 0) {
+      const timer = setTimeout(() => {
+        setShowEmptyState(false);
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [cards.length]);
 
   // Move top card to the back
   const handleSwipe = () => {
@@ -56,33 +67,111 @@ export function TaskCardStack() {
     });
   };
 
+  // Dismiss a card completely
+  const handleDismiss = (id: string) => {
+    setCards((prev) => prev.filter((card) => card.id !== id));
+  };
+
   return (
-    <div
-      style={{
-        position: "relative",
-        width: "100%",
-        // Give enough height so the stacked cards don't get cut off
-        height: 310,
-        display: "flex",
-        justifyContent: "center",
-      }}
-    >
-      <AnimatePresence mode="popLayout">
-        {cards.map((card, index) => {
-          const isTop = index === 0;
-          return (
-            <SwipeableCard
-              key={card.id}
-              card={card}
-              index={index}
-              isTop={isTop}
-              onSwipe={handleSwipe}
-              navigate={navigate}
-            />
-          );
-        })}
-      </AnimatePresence>
-    </div>
+    <AnimatePresence>
+      {(cards.length > 0 || showEmptyState) && (
+        <motion.div
+          className="no-pull"
+          initial={{ height: 310, opacity: 1 }}
+          animate={{ height: 310, opacity: 1 }}
+          exit={{ height: 0, opacity: 0, marginTop: 0, marginBottom: 0, overflow: "hidden" }}
+          transition={{ duration: 0.4, ease: "easeInOut" }}
+          style={{
+            position: "relative",
+            width: "100%",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <AnimatePresence mode="popLayout">
+            {cards.length === 0 && showEmptyState ? (
+              <motion.div
+                key="empty-state"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.3 }}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 16,
+                  right: 16,
+                  height: 260, // Match typical card height
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background: "rgba(255, 255, 255, 0.8)",
+                  backdropFilter: "blur(12px)",
+                  WebkitBackdropFilter: "blur(12px)",
+                  border: "1px solid rgba(255, 255, 255, 0.5)",
+                  borderRadius: 32,
+                  boxShadow: CARD_SHADOW,
+                  padding: 32,
+                  gap: 16,
+                }}
+              >
+                <div
+                  style={{
+                    width: 64,
+                    height: 64,
+                    borderRadius: 32,
+                    background: "#EEF2FF",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginBottom: 8,
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 28,
+                      height: 28,
+                      borderRadius: 14,
+                      background: "none",
+                      border: "2.5px solid #3958C3",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Check size={16} strokeWidth={3.5} color="#3958C3" />
+                  </div>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+                  <div style={{ fontSize: 20, fontWeight: 600, color: TEXT_PRIMARY }}>
+                    You're all caught up!
+                  </div>
+                  <div style={{ fontSize: 15, color: TEXT_SECONDARY }}>
+                    No pending tasks at the moment.
+                  </div>
+                </div>
+              </motion.div>
+            ) : (
+              cards.map((card, index) => {
+                const isTop = index === 0;
+                return (
+                  <SwipeableCard
+                    key={card.id}
+                    card={card}
+                    index={index}
+                    isTop={isTop}
+                    onSwipe={handleSwipe}
+                    onDismiss={() => handleDismiss(card.id)}
+                    navigate={navigate}
+                  />
+                );
+              })
+            )}
+          </AnimatePresence>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 
@@ -91,23 +180,36 @@ function SwipeableCard({
   index,
   isTop,
   onSwipe,
+  onDismiss,
   navigate,
 }: {
   card: TaskCardData;
   index: number;
   isTop: boolean;
   onSwipe: () => void;
+  onDismiss: () => void;
   navigate: (path: string) => void;
 }) {
   const x = useMotionValue(0);
-  // Rotate slightly as the card is dragged
+  const y = useMotionValue(0);
+  
+  // Rotate slightly as the card is dragged horizontally
   const rotate = useTransform(x, [-150, 150], [-10, 10]);
-  // Fade out slightly at the edges
-  const opacity = useTransform(x, [-150, 0, 150], [0.5, 1, 0.5]);
+  
+  // Fade out slightly at the edges (both X and Y)
+  const opacityX = useTransform(x, [-150, 0, 150], [0.5, 1, 0.5]);
+  const opacityY = useTransform(y, [-150, 0], [0.5, 1]); // Fade when dragging up
+  
+  // Combine opacities
+  const opacity = useTransform([opacityX, opacityY], ([ox, oy]) => Math.min(ox as number, oy as number));
 
   const handleDragEnd = (_event: any, info: any) => {
-    const threshold = 100;
-    if (info.offset.x > threshold || info.offset.x < -threshold) {
+    const xThreshold = 100;
+    const yThreshold = -80; // Drag up to dismiss
+
+    if (info.offset.y < yThreshold) {
+      onDismiss();
+    } else if (info.offset.x > xThreshold || info.offset.x < -xThreshold) {
       onSwipe();
     }
   };
@@ -120,8 +222,9 @@ function SwipeableCard({
   return (
     <motion.div
       layout
-      drag={isTop ? "x" : false}
-      dragConstraints={{ left: 0, right: 0 }}
+      drag={isTop}
+      dragDirectionLock
+      dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
       onDragEnd={handleDragEnd}
       initial={{ opacity: 0, scale: 0.8, y: 20 }}
       animate={{
@@ -130,10 +233,25 @@ function SwipeableCard({
         y: yOffset,
         zIndex,
       }}
-      exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
+      exit={{ 
+        opacity: 0, 
+        scale: 0.85,
+        y: -400, // Swipe up on exit
+        x: 60, // Arc slightly to the right
+        rotate: 8, // Tilt slightly as it flies away
+        zIndex: 50, // Force exiting card to the very front layer
+        transition: { 
+          y: { type: "spring", stiffness: 150, damping: 20, velocity: -200 },
+          x: { type: "spring", stiffness: 150, damping: 20 },
+          rotate: { duration: 0.4, ease: "easeOut" },
+          opacity: { duration: 0.3 },
+          scale: { duration: 0.4 }
+        } 
+      }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
       style={{
         x: isTop ? x : 0,
+        y: isTop ? y : yOffset,
         rotate: isTop ? rotate : 0,
         opacity: isTop ? opacity : 1,
         position: "absolute",
@@ -285,7 +403,7 @@ function SwipeableCard({
       {/* Remind me tomorrow */}
       <div style={{ textAlign: "center" }}>
         <button
-          onClick={() => onSwipe()}
+          onClick={() => onDismiss()}
           style={{
             background: "none",
             border: "none",

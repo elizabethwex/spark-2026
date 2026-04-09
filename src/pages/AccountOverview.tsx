@@ -1,13 +1,14 @@
+import { Navigate, useSearchParams } from "react-router-dom";
 import { ConsumerNavigation } from "@/components/layout/ConsumerNavigation";
 import { ConsumerFooter } from "@/components/layout/Footer";
 import { UnderConstruction } from "@/components/UnderConstruction";
 import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground";
 import { FadeInItem } from "@/components/layout/PageFadeIn";
 // Original imports preserved for future restoration:
-// import { TitleBar } from "./account-overview/TitleBar";
-// import { AccountSummaryCards } from "./account-overview/AccountSummaryCards";
-// import { RecentTransactionsTable } from "./account-overview/RecentTransactionsTable";
-// import { PreviousPlanYearTable } from "./account-overview/PreviousPlanYearTable";
+// import { TitleBar } from "./hsa-details/TitleBar";
+// import { AccountSummaryCards } from "./hsa-details/AccountSummaryCards";
+// import { RecentTransactionsTable } from "./hsa-details/RecentTransactionsTable";
+// import { PreviousPlanYearTable } from "./hsa-details/PreviousPlanYearTable";
 
 /**
  * Account Overview Page
@@ -24,6 +25,13 @@ import { FadeInItem } from "@/components/layout/PageFadeIn";
  * All original content is preserved in comments below for easy restoration.
  */
 export default function AccountOverviewPage() {
+  const [searchParams] = useSearchParams();
+  const account = searchParams.get("account");
+
+  if (account === "hsa") {
+    return <Navigate to="/hsa-details" replace />;
+  }
+
   return (
     <div className="min-h-screen" style={consumerPageBackgroundStyle}>
       {/* Navigation Header */}
