@@ -31,6 +31,11 @@ const HomePage = React.lazy(() => import("@/pages/HomePage"));
 // Account Overview page - standalone route
 const AccountOverviewPage = React.lazy(() => import("@/pages/AccountOverview"));
 
+// HSA account details — /hsa-details
+const HsaDetailsPage = React.lazy(() =>
+  import("@/pages/hsa-details/HsaAccountDetails").then((m) => ({ default: m.HsaAccountDetails }))
+);
+
 // Message Center page - standalone route
 const MessageCenterPage = React.lazy(() => import("@/pages/MessageCenter"));
 
@@ -124,6 +129,9 @@ export function AppRoutes() {
         
         {/* Account Overview */}
         <Route path="account-overview" element={withConsumerLight(<AccountOverviewPage />)} />
+
+        {/* HSA account details (consumer) */}
+        <Route path="hsa-details" element={withConsumerLight(<HsaDetailsPage />)} />
         
         {/* Message Center */}
         <Route path="message-center" element={withConsumerLight(<MessageCenterPage />)} />

@@ -93,7 +93,17 @@ export function ConsumerNavigation({
     if (href === "/") {
       return location.pathname === "/" || location.pathname === "";
     }
-    // Check if current path matches the nav item's href
+    // Query-aware links (e.g. /my-profile?subPage=…)
+    if (href.includes("?")) {
+      const [path, query] = href.split("?");
+      if (location.pathname !== path) return false;
+      const expected = new URLSearchParams(query);
+      const actual = new URLSearchParams(location.search);
+      for (const [key, value] of expected.entries()) {
+        if (actual.get(key) !== value) return false;
+      }
+      return true;
+    }
     return location.pathname === href;
   };
 

@@ -85,14 +85,14 @@ export function SparkAccountsSection({
         {(activeView === 1 || activeView === 3) && (
           <>
             {/* HSA Card */}
-        <div 
+        <div
           className={cn(
             "group/card flex h-full w-full flex-col overflow-hidden rounded-[24px] transition-shadow hover:shadow-md",
             variant === "partner-safe"
               ? "bg-card border border-border shadow-sm text-card-foreground"
               : "border border-white/60 bg-white shadow-[0_3px_9px_rgba(43,49,78,0.04),0_6px_18px_rgba(43,49,78,0.06)]"
           )}
-          style={{ borderRadius: '24px' }}
+          style={{ borderRadius: "24px" }}
         >
           {/* Header */}
           <div className="flex items-start justify-between px-6 pt-6">
@@ -109,7 +109,7 @@ export function SparkAccountsSection({
             </div>
             <button
               type="button"
-              onClick={() => navigate("/account/hsa")}
+              onClick={() => navigate("/hsa-details")}
               className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[#1c6eff] hover:underline transition-colors -mr-3"
             >
               View Details
