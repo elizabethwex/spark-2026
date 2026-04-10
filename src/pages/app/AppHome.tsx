@@ -19,7 +19,6 @@ import { TaskCardStack } from "@/components/app-shell/TaskCardStack";
 import { PullToRefresh } from "@/components/app-shell/PullToRefresh";
 import { useDeviceMockup } from "@/hooks/useDeviceMockup";
 import { FsaStoreBrowser } from "@/components/app-shell/FsaStoreBrowser";
-import { useReimburseWorkspace } from "@/context/ReimburseWorkspaceContext";
 import { useAppVariant, type AppVariant } from "@/context/AppVariantContext";
 import { TransactionDetailSheet, type TransactionRow as TransactionData } from "./AppAccountOverview";
 
@@ -290,7 +289,6 @@ export default function AppHome() {
   const [showFsaStore, setShowFsaStore] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<TransactionData | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
-  const { openReimburseWorkspace } = useReimburseWorkspace();
   const { variant } = useAppVariant();
   const accounts = HOME_ACCOUNTS[variant];
   const transactions = HOME_TRANSACTIONS[variant];
