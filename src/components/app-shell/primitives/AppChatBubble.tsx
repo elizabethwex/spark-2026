@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Sparkles } from "lucide-react";
+import { User } from "lucide-react";
 
 const ASSIST_IQ_GRADIENT = "linear-gradient(133.5deg, #25146f 2.5%, #c8102e 100%)";
 
@@ -94,6 +94,7 @@ export function AppChatBubble({ role, children, timestamp, variant = "bubble" }:
 
 /** Gradient avatar circle used in WEXly chat headers */
 export function AssistIQAvatar({ size = 28 }: { size?: number }) {
+  const iconSize = Math.round(size * 0.5);
   return (
     <div
       style={{
@@ -105,9 +106,13 @@ export function AssistIQAvatar({ size = 28 }: { size?: number }) {
         alignItems: "center",
         justifyContent: "center",
         flexShrink: 0,
+        letterSpacing: 0,
       }}
     >
-      <Sparkles size={Math.round(size * 0.5)} strokeWidth={2} color="#fff" />
+      <svg width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M13.913 13.9149L11.9997 24.0033L10.087 13.9149L0 12.0013L10.087 10.0884L12.0003 0L13.913 10.0884L24 12.0013L13.913 13.9149Z" fill="white"/>
+        <path d="M20.2758 19.7969L19.5994 23.3628L18.923 19.7969L15.3569 19.1204L18.923 18.4439L19.5994 14.8781L20.2752 18.4439L23.8412 19.1204L20.2758 19.7969Z" fill="white"/>
+      </svg>
     </div>
   );
 }
