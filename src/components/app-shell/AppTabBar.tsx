@@ -21,7 +21,8 @@ export function AppTabBar() {
   // WEXly takes over the full screen — hide the tab bar
   if (
     ["/app/assist-iq", "/app/penny", "/app/lock-screen"].includes(location.pathname) ||
-    location.pathname.startsWith("/app/my-account")
+    location.pathname.startsWith("/app/my-account") ||
+    location.pathname.startsWith("/app/reimburse")
   ) {
     return null;
   }

@@ -8,8 +8,8 @@ import {
   CalendarCheck2,
   HeartPulse,
   Baby,
-    RefreshCw,
-    Clock,
+  Receipt,
+  Clock,
   ChevronRight,
 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -451,7 +451,7 @@ export default function AppHome() {
           >
             {/* Reimburse Myself */}
             <button
-              onClick={() => openReimburseWorkspace()}
+              onClick={() => navigate("/app/reimburse")}
               style={{
                 background: "#fff",
                 borderRadius: 24,
@@ -477,7 +477,7 @@ export default function AppHome() {
                   justifyContent: "center",
                 }}
               >
-                <RefreshCw size={26} strokeWidth={1.75} style={{ color: TINT }} />
+                <Receipt size={26} strokeWidth={1.75} style={{ color: TINT }} />
               </div>
               <span
                 style={{

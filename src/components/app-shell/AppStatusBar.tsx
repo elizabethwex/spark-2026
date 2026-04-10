@@ -88,7 +88,7 @@ export function AppStatusBar() {
         userSelect: "none",
         fontFamily: "var(--app-font)",
         zIndex: 50,
-        background: "rgba(238, 243, 255, 1)",
+        background: location.pathname.startsWith("/app/reimburse") ? "#fff" : "rgba(238, 243, 255, 1)",
         transition: "background 0.2s ease",
       }}
     >

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   DollarSign,
   Receipt,
@@ -131,6 +131,7 @@ const ACCOUNT_META: Record<string, { name: string; totalBalance: string; availab
 
 export default function AppAccountDetail() {
   const { id = "hsa" } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"spending" | "investments">("spending");
   const meta = ACCOUNT_META[id] ?? ACCOUNT_META["hsa"];
 
@@ -363,47 +364,7 @@ export default function AppAccountDetail() {
         }}
       >
         <div
-          style={{
-            background: "white",
-            borderRadius: 24,
-            boxShadow: CARD_SHADOW,
-            padding: "20px 16px",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 12,
-            cursor: "pointer",
-          }}
-        >
-          <div
-            style={{
-              width: 56,
-              height: 56,
-              borderRadius: "50%",
-              background: TINT_50,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <DollarSign size={28} strokeWidth={2} style={{ color: TINT }} />
-          </div>
-          <div
-            style={{
-              fontSize: 15,
-              fontWeight: 600,
-              lineHeight: "20px",
-              letterSpacing: -0.23,
-              color: TEXT_PRIMARY,
-              textAlign: "center",
-            }}
-          >
-            Make a payment
-          </div>
-        </div>
-
-        <div
+          onClick={() => navigate("/app/reimburse")}
           style={{
             background: "white",
             borderRadius: 24,
@@ -441,6 +402,47 @@ export default function AppAccountDetail() {
             }}
           >
             Reimburse Myself
+          </div>
+        </div>
+
+        <div
+          style={{
+            background: "white",
+            borderRadius: 24,
+            boxShadow: CARD_SHADOW,
+            padding: "20px 16px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 12,
+            cursor: "pointer",
+          }}
+        >
+          <div
+            style={{
+              width: 56,
+              height: 56,
+              borderRadius: "50%",
+              background: TINT_50,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <DollarSign size={28} strokeWidth={2} style={{ color: TINT }} />
+          </div>
+          <div
+            style={{
+              fontSize: 15,
+              fontWeight: 600,
+              lineHeight: "20px",
+              letterSpacing: -0.23,
+              color: TEXT_PRIMARY,
+              textAlign: "center",
+            }}
+          >
+            Make a payment
           </div>
         </div>
       </div>
@@ -1035,7 +1037,6 @@ export default function AppAccountDetail() {
         paddingBottom: "calc(var(--app-tabbar-height, 95px) + env(safe-area-inset-bottom, 0px) + 64px)",
       }}
     >
-      <AppTopSpacer variant="page" />
       <AppNavBar variant="sub-page" title={meta.name} backTo="/app/account" />
 
       {/* Page content */}

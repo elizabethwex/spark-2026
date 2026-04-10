@@ -276,7 +276,7 @@ export function AppNavBar(props: AppNavBarProps) {
               transform: "translate(-50%, -50%)",
               fontSize: 17,
               fontWeight: 600,
-              letterSpacing: -0.43,
+              letterSpacing: 0,
               color: "var(--app-text)",
               whiteSpace: "nowrap",
               maxWidth: "46%",
