@@ -15,8 +15,6 @@ const PREVIEW_MAX_WIDTH = {
   mobile: 390,
 } as const;
 
-type PreviewDevice = keyof typeof PREVIEW_MAX_WIDTH;
-
 function getHighlightStyle(activeColorKey: keyof BrandColors): string {
   const selector = `[data-theming-preview] [data-theme-token="${activeColorKey}"]`;
   return `

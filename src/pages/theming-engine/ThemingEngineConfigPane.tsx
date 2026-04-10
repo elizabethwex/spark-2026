@@ -3,10 +3,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-  Button,
-  toast,
 } from "@wexinc-healthbenefits/ben-ui-kit";
-import { Sparkles } from "lucide-react";
 import { BrandColorsTab } from "./BrandColorsTab";
 import { LogoUploadsSection } from "./LogoUploadsSection";
 import { ChartCustomizationSection } from "./ChartCustomizationSection";
