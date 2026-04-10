@@ -15,7 +15,6 @@ import {
   Landmark,
 } from "lucide-react";
 import { AppNavBar } from "@/components/app-shell/AppNavBar";
-import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
 
 const CARD_SHADOW = "0px 3.017px 9.051px rgba(43,49,78,0.04), 0px 6.034px 18.101px rgba(43,49,78,0.06)";
 const INVESTMENT_SHADOW =
