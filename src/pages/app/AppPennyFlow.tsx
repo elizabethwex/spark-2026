@@ -20,7 +20,7 @@ const TEXT_SECONDARY = "var(--app-text-secondary)";
 const pennyAsset = (file: string) => `${import.meta.env.BASE_URL}app-ui/${file}`;
 
 const RECEIPT_IMG = pennyAsset("penny-receipt.svg");
-const DOC_ILLUSTRATION = pennyAsset("penny-doc-illustration.svg");
+const DOC_ILLUSTRATION = pennyAsset("doc-illustration.svg");
 
 // ─── Shared sub-components ────────────────────────────────────────────────────
 
@@ -35,6 +35,8 @@ function ProgressBar({ progress }: { progress: number }) {
         borderRadius: 9999,
         overflow: "hidden",
         flexShrink: 0,
+        display: "flex",
+        justifyContent: "flex-start",
       }}
     >
       <motion.div
@@ -291,7 +293,7 @@ function StepUploadMethod({ onSelect }: { onSelect: (method: string) => void }) 
       </div>
 
       {/* What documents work best? */}
-      <div style={{ padding: 16 }}>
+      <div style={{ padding: "16px 24px 24px" }}>
         <div
           style={{
             background: "#f9f9fb",
@@ -452,44 +454,54 @@ function StepCamera({ onCapture, onClose }: { onCapture: () => void; onClose: ()
 }
 
 // ─── Step 3 — Document preview ────────────────────────────────────────────────
-function StepDocPreview({ onContinue, onAddAnother }: { onContinue: () => void; onAddAnother: () => void }) {
+function StepDocPreview({ 
+  documents,
+  onRemove,
+  onContinue, 
+  onAddAnother 
+}: { 
+  documents: { id: number, name: string }[];
+  onRemove: (id: number) => void;
+  onContinue: () => void; 
+  onAddAnother: () => void; 
+}) {
   return (
     <div style={{ flex: 1, overflowY: "auto", background: BG_TINT, display: "flex", flexDirection: "column" }}>
       <ProgressBar progress={40} />
       <div style={{ padding: "24px 24px 0", display: "flex", flexDirection: "column", gap: 10 }}>
         <h2 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: TEXT_PRIMARY, textAlign: "center", lineHeight: "32px", letterSpacing: -0.48, fontFamily: "var(--app-font)" }}>
-          Submit or add document
+          Submit or add documents
         </h2>
 
-        {/* Document card */}
-        <div style={{ background: CARD_BG, borderRadius: 12, overflow: "hidden" }}>
-          {/* File row */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              padding: "12px 16px",
-              borderBottom: "1px solid var(--app-separator)",
-            }}
-          >
-            <FileText size={20} color="var(--app-text-secondary)" style={{ flexShrink: 0 }} />
-            <span style={{ flex: 1, fontSize: 16, fontWeight: 700, color: TEXT_PRIMARY, fontFamily: "var(--app-font)" }}>
-              IMG_21017.jpg
-            </span>
-            <button style={{ background: "none", border: "none", cursor: "pointer", padding: 4, display: "flex" }}>
-              <Trash2 size={20} color="var(--app-text-secondary)" />
-            </button>
-          </div>
-
-          {/* Receipt thumbnail */}
-          <div style={{ borderRadius: "0 0 12px 12px", overflow: "hidden", height: 280 }}>
-            <img src={RECEIPT_IMG} alt="Receipt" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-          </div>
+        {/* Document cards */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {documents.map((doc) => (
+            <div key={doc.id} style={{ background: CARD_BG, borderRadius: 12, overflow: "hidden", boxShadow: "0px 3px 9px rgba(43,49,78,0.04), 0px 6px 18px rgba(43,49,78,0.06)" }}>
+              {/* File row */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "16px",
+                }}
+              >
+                <div style={{ width: 48, height: 48, borderRadius: 8, overflow: "hidden", flexShrink: 0 }}>
+                  <img src={RECEIPT_IMG} alt="Receipt" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                </div>
+                <span style={{ flex: 1, fontSize: 16, fontWeight: 700, color: TEXT_PRIMARY, fontFamily: "var(--app-font)" }}>
+                  {doc.name}
+                </span>
+                <button onClick={() => onRemove(doc.id)} style={{ background: "none", border: "none", cursor: "pointer", padding: 12, display: "flex" }}>
+                  <Trash2 size={24} color="var(--app-text-secondary)" />
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
 
         {/* Actions */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 10, paddingTop: 6, paddingBottom: 32 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10, paddingTop: 16, paddingBottom: 32 }}>
           <PillButton label="Continue" onClick={onContinue} />
           <PillButton label="Add another document" variant="secondary" onClick={onAddAnother} />
         </div>
@@ -538,7 +550,7 @@ function StepAnalyzing({ onDone }: { onDone: () => void }) {
             animate={{ rotate: [0, -3, 3, -3, 0] }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           >
-            <FileText size={100} color="#b8c8f5" strokeWidth={1.2} />
+            <img src={DOC_ILLUSTRATION} alt="" style={{ width: 106, height: 139, objectFit: "contain" }} />
           </motion.div>
         </div>
 
@@ -819,6 +831,7 @@ export default function AppPennyFlow() {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(1);
+  const [documents, setDocuments] = useState<{ id: number; name: string }[]>([]);
 
   const goTo = useCallback((next: number) => {
     setDirection(next > step ? 1 : -1);
@@ -828,6 +841,19 @@ export default function AppPennyFlow() {
   const next = useCallback(() => goTo(step + 1), [goTo, step]);
 
   const handleClose = useCallback(() => navigate("/app"), [navigate]);
+
+  const handleCapture = () => {
+    setDocuments((prev) => [...prev, { id: Date.now(), name: `IMG_${Date.now().toString().slice(-5)}.jpg` }]);
+    goTo(3);
+  };
+
+  const handleRemoveDoc = (id: number) => {
+    const newDocs = documents.filter((d) => d.id !== id);
+    setDocuments(newDocs);
+    if (newDocs.length === 0) {
+      goTo(1);
+    }
+  };
 
   const navTitle = step === 0 ? "Recent transaction" : "Reimburse myself";
 
@@ -874,8 +900,8 @@ export default function AppPennyFlow() {
         >
           {step === 0 && <StepTransaction onNext={next} />}
           {step === 1 && <StepUploadMethod onSelect={(method) => { if (method === "Take a photo") goTo(2); else goTo(3); }} />}
-          {step === 2 && <StepCamera onCapture={() => goTo(3)} onClose={() => goTo(1)} />}
-          {step === 3 && <StepDocPreview onContinue={() => goTo(4)} onAddAnother={() => goTo(2)} />}
+          {step === 2 && <StepCamera onCapture={handleCapture} onClose={() => goTo(1)} />}
+          {step === 3 && <StepDocPreview documents={documents} onRemove={handleRemoveDoc} onContinue={() => goTo(4)} onAddAnother={() => goTo(2)} />}
           {step === 4 && <StepAnalyzing onDone={() => goTo(5)} />}
           {step === 5 && <StepReview onSubmit={() => goTo(6)} />}
           {step === 6 && <StepApproved onGoHome={() => navigate("/app")} />}

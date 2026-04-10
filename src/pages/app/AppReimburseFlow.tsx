@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Camera, Image as ImageIcon, Paperclip, Info, CheckCircle2, FileText, ChevronRight, Check, Search } from "lucide-react";
+import { Image as ImageIcon, Info, CheckCircle2, Check, Search, Trash2 } from "lucide-react";
+import confetti from "canvas-confetti";
 import { AppNavBar } from "@/components/app-shell/AppNavBar";
-import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const PRIMARY = "var(--app-primary)";
@@ -17,7 +17,8 @@ const TEXT_SECONDARY = "var(--app-text-secondary)";
 
 /** Static assets under `public/app-ui/` */
 const assetPath = (file: string) => `${import.meta.env.BASE_URL}app-ui/${file}`;
-const DOC_ILLUSTRATION = assetPath("penny-doc-illustration.svg");
+const DOC_ILLUSTRATION = assetPath("doc-illustration.svg");
+const RECEIPT_IMG = assetPath("penny-receipt.svg");
 
 // ─── Shared sub-components ────────────────────────────────────────────────────
 
@@ -31,6 +32,8 @@ function ProgressBar({ progress }: { progress: number }) {
         background: "var(--app-primary-100, #e0e7ff)",
         overflow: "hidden",
         flexShrink: 0,
+        display: "flex",
+        justifyContent: "flex-start",
       }}
     >
       <motion.div
@@ -77,7 +80,7 @@ function PillButton({
 }
 
 // ─── Step 1 — Upload Method ───────────────────────────────────────────────────
-function StepUploadMethod({ onNext }: { onNext: () => void }) {
+function StepUploadMethod({ onSelect }: { onSelect: (method: string) => void }) {
   return (
     <div style={{ flex: 1, overflowY: "auto", background: BG_TINT, display: "flex", flexDirection: "column" }}>
       <div style={{ padding: "24px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
@@ -95,7 +98,7 @@ function StepUploadMethod({ onNext }: { onNext: () => void }) {
             <motion.button
               key={label}
               whileTap={{ scale: 0.97 }}
-              onClick={onNext}
+              onClick={() => onSelect(label)}
               style={{
                 width: "100%",
                 height: 48,
@@ -114,7 +117,7 @@ function StepUploadMethod({ onNext }: { onNext: () => void }) {
             </motion.button>
           ))}
           <button
-            onClick={onNext}
+            onClick={() => onSelect("none")}
             style={{
               background: "none",
               border: "none",
@@ -132,7 +135,7 @@ function StepUploadMethod({ onNext }: { onNext: () => void }) {
       </div>
 
       {/* What documents work best? */}
-      <div style={{ padding: 16, marginTop: "auto" }}>
+      <div style={{ padding: "0 24px 24px" }}>
         <div
           style={{
             background: "#f9f9fb",
@@ -184,7 +187,7 @@ const CAMERA_ROLL_PHOTOS = [
 ];
 
 function StepCameraRoll({ onCancel, onUpload }: { onCancel: () => void; onUpload: () => void }) {
-  const [selected, setSelected] = useState<Set<number>>(new Set([0, 1, 2]));
+  const [selected, setSelected] = useState<Set<number>>(new Set());
 
   const toggleSelect = (index: number) => {
     const newSelected = new Set(selected);
@@ -268,6 +271,193 @@ function StepCameraRoll({ onCancel, onUpload }: { onCancel: () => void; onUpload
   );
 }
 
+// ─── Step 2.5 — Camera viewfinder ─────────────────────────────────────────────
+function StepCamera({ onCapture, onClose }: { onCapture: () => void; onClose: () => void }) {
+  const [isCapturing, setIsCapturing] = useState(false);
+
+  const handleShutter = () => {
+    setIsCapturing(true);
+    setTimeout(() => {
+      setIsCapturing(false);
+      onCapture();
+    }, 420);
+  };
+
+  return (
+    <div style={{ flex: 1, position: "relative", background: "#0a0a0a", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      {/* Top guidance bar */}
+      <div
+        style={{
+          background: "rgba(17,19,34,0.66)",
+          padding: "16px 32px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+          position: "relative",
+        }}
+      >
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close camera"
+          style={{
+            position: "absolute",
+            left: 16,
+            top: "50%",
+            transform: "translateY(-50%)",
+            border: "none",
+            background: "rgba(255,255,255,0.12)",
+            color: "#fff",
+            fontSize: 15,
+            fontWeight: 600,
+            fontFamily: "var(--app-font)",
+            padding: "8px 12px",
+            borderRadius: 12,
+            cursor: "pointer",
+          }}
+        >
+          Cancel
+        </button>
+        <p style={{ margin: 0, fontSize: 16, color: "#fff", textAlign: "center", lineHeight: "24px", fontFamily: "var(--app-font)" }}>
+          Hold your camera steady and make sure all the information is visible
+        </p>
+      </div>
+
+      {/* Viewfinder with receipt */}
+      <div style={{ flex: 1, position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <img
+          src={RECEIPT_IMG}
+          alt="Bigtown Dentistry receipt"
+          style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", inset: 0 }}
+        />
+      </div>
+
+      {/* Bottom controls */}
+      <div
+        style={{
+          flexShrink: 0,
+          height: 122,
+          position: "relative",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "0 32px",
+        }}
+      >
+        <div style={{ position: "absolute", inset: 0, background: "#111322", opacity: 0.5 }} />
+
+        {/* Select button */}
+        <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 2, width: 51 }}>
+          <div style={{ width: 51, height: 51, borderRadius: "50%", background: "#111322", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <ImageIcon size={22} color="#fff" />
+          </div>
+          <span style={{ color: "#fff", fontSize: 15, fontWeight: 500, fontFamily: "var(--app-font)" }}>Select</span>
+        </div>
+
+        {/* Shutter button */}
+        <motion.button
+          whileTap={{ scale: 0.93 }}
+          onClick={handleShutter}
+          style={{
+            position: "relative",
+            zIndex: 1,
+            width: 74,
+            height: 74,
+            borderRadius: "50%",
+            background: "#fff",
+            border: "4px solid rgba(220,223,234,0.8)",
+            outline: "3px solid rgba(255,255,255,0.5)",
+            cursor: "pointer",
+            padding: 0,
+          }}
+        />
+
+        {/* Flash button */}
+        <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 2, width: 51 }}>
+          <div style={{ width: 51, height: 51, borderRadius: "50%", background: "#111322", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path d="M13 2L4.5 13.5H11L10 22L20 10H13.5L13 2Z" stroke="#fff" strokeWidth="1.5" strokeLinejoin="round" />
+              <line x1="4" y1="4" x2="20" y2="20" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+          </div>
+          <span style={{ color: "#fff", fontSize: 15, fontWeight: 500, fontFamily: "var(--app-font)" }}>Flash off</span>
+        </div>
+      </div>
+
+      {/* Capture flash overlay */}
+      <AnimatePresence>
+        {isCapturing && (
+          <motion.div
+            key="flash"
+            initial={{ opacity: 0.9 }}
+            animate={{ opacity: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4 }}
+            style={{ position: "absolute", inset: 0, background: "#fff", pointerEvents: "none", zIndex: 10 }}
+          />
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// ─── Step 2.6 — Document preview ──────────────────────────────────────────────
+function StepDocPreview({ 
+  documents,
+  onRemove,
+  onContinue, 
+  onAddAnother 
+}: { 
+  documents: { id: number, name: string }[];
+  onRemove: (id: number) => void;
+  onContinue: () => void; 
+  onAddAnother: () => void; 
+}) {
+  return (
+    <div style={{ flex: 1, overflowY: "auto", background: BG_TINT, display: "flex", flexDirection: "column" }}>
+      <div style={{ padding: "24px 24px 0", display: "flex", flexDirection: "column", gap: 10 }}>
+        <h2 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: TEXT_PRIMARY, textAlign: "center", lineHeight: "32px", letterSpacing: -0.48, fontFamily: "var(--app-font)" }}>
+          Submit or add documents
+        </h2>
+
+        {/* Document cards */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {documents.map((doc) => (
+            <div key={doc.id} style={{ background: CARD_BG, borderRadius: 12, overflow: "hidden", boxShadow: "0px 3px 9px rgba(43,49,78,0.04), 0px 6px 18px rgba(43,49,78,0.06)" }}>
+              {/* File row */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "16px",
+                }}
+              >
+                <div style={{ width: 48, height: 48, borderRadius: 8, overflow: "hidden", flexShrink: 0 }}>
+                  <img src={RECEIPT_IMG} alt="Receipt" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                </div>
+                <span style={{ flex: 1, fontSize: 16, fontWeight: 700, color: TEXT_PRIMARY, fontFamily: "var(--app-font)" }}>
+                  {doc.name}
+                </span>
+                <button onClick={() => onRemove(doc.id)} style={{ background: "none", border: "none", cursor: "pointer", padding: 12, display: "flex" }}>
+                  <Trash2 size={24} color="var(--app-text-secondary)" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Actions */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 10, paddingTop: 16, paddingBottom: 32 }}>
+          <PillButton label="Continue" onClick={onContinue} />
+          <PillButton label="Add another document" variant="secondary" onClick={onAddAnother} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Step 3 — Analyzing ───────────────────────────────────────────────────────
 const ANALYSIS_STEPS = [
   "Uploading...",
@@ -291,7 +481,6 @@ function StepAnalyzing({ onNext }: { onNext: () => void }) {
 
   return (
     <div style={{ flex: 1, overflowY: "auto", background: BG_TINT, display: "flex", flexDirection: "column" }}>
-      <ProgressBar progress={16} />
       <div
         style={{
           flex: 1,
@@ -366,7 +555,6 @@ function StepAnalyzing({ onNext }: { onNext: () => void }) {
 function StepSelectAccount({ onNext }: { onNext: () => void }) {
   return (
     <div style={{ flex: 1, overflowY: "auto", background: BG_TINT, display: "flex", flexDirection: "column" }}>
-      <ProgressBar progress={33} />
       <div style={{ padding: "24px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
         <div>
           <h2 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: TEXT_PRIMARY, lineHeight: "32px", letterSpacing: -0.48, fontFamily: "var(--app-font)" }}>
@@ -427,9 +615,23 @@ function StepSelectAccount({ onNext }: { onNext: () => void }) {
 
 // ─── Step 5 — Review Details ──────────────────────────────────────────────────
 function StepReviewDetails({ onNext }: { onNext: () => void }) {
+  const [items, setItems] = useState([
+    { name: "Dental Exam", amount: 50.00, selected: true },
+    { name: "Teeth cleaning", amount: 90.00, selected: true },
+    { name: "X-rays", amount: 40.00, selected: true },
+    { name: "Fluoride Treatment", amount: 30.00, selected: true },
+  ]);
+
+  const toggleItem = (index: number) => {
+    const newItems = [...items];
+    newItems[index].selected = !newItems[index].selected;
+    setItems(newItems);
+  };
+
+  const totalAmount = items.reduce((sum, item) => item.selected ? sum + item.amount : sum, 0);
+
   return (
     <div style={{ flex: 1, overflowY: "auto", background: BG_TINT, display: "flex", flexDirection: "column" }}>
-      <ProgressBar progress={50} />
       <div style={{ padding: "24px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
         <div>
           <h2 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: TEXT_PRIMARY, lineHeight: "32px", letterSpacing: -0.48, fontFamily: "var(--app-font)" }}>
@@ -443,7 +645,7 @@ function StepReviewDetails({ onNext }: { onNext: () => void }) {
         {/* Form fields (mocked as styled divs for the prototype) */}
         <div style={{ background: CARD_BG, borderRadius: 12, border: "1px solid var(--app-border)", overflow: "hidden" }}>
           {[
-            { label: "Total amount", value: "210.00" },
+            { label: "Total amount", value: totalAmount.toFixed(2) },
             { label: "Start date of service", value: "Nov 24, 2026" },
             { label: "End date of service", value: "Nov 24, 2026" },
             { label: "Provider / merchant name", value: "Bigtown Dentistry" },
@@ -467,26 +669,31 @@ function StepReviewDetails({ onNext }: { onNext: () => void }) {
           </p>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {[
-              { name: "Dental Exam", amount: "$50.00" },
-              { name: "Teeth cleaning", amount: "$90.00" },
-              { name: "X-rays", amount: "$40.00" },
-              { name: "Fluoride Treatment", amount: "$30.00" },
-            ].map((item) => (
-              <div key={item.name} style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div style={{ width: 24, height: 24, borderRadius: 6, background: PRIMARY, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                  <Check size={16} color="#fff" />
+            {items.map((item, index) => (
+              <div key={item.name} style={{ display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }} onClick={() => toggleItem(index)}>
+                <div style={{ 
+                  width: 24, 
+                  height: 24, 
+                  borderRadius: 6, 
+                  background: item.selected ? PRIMARY : "transparent", 
+                  border: item.selected ? "none" : "2px solid var(--app-border)",
+                  display: "flex", 
+                  alignItems: "center", 
+                  justifyContent: "center", 
+                  flexShrink: 0 
+                }}>
+                  {item.selected && <Check size={16} color="#fff" />}
                 </div>
                 <div style={{ flex: 1, fontSize: 16, color: TEXT_PRIMARY, fontFamily: "var(--app-font)" }}>{item.name}</div>
                 <div style={{ background: "#dcfce7", color: "#008375", fontSize: 11, fontWeight: 600, padding: "2px 6px", borderRadius: 12, fontFamily: "var(--app-font)" }}>Eligible</div>
-                <div style={{ fontSize: 16, fontWeight: 600, color: TEXT_PRIMARY, fontFamily: "var(--app-font)", width: 60, textAlign: "right" }}>{item.amount}</div>
+                <div style={{ fontSize: 16, fontWeight: 600, color: TEXT_PRIMARY, fontFamily: "var(--app-font)", width: 60, textAlign: "right" }}>${item.amount.toFixed(2)}</div>
               </div>
             ))}
           </div>
 
           <div style={{ borderTop: "1px solid var(--app-separator)", marginTop: 16, paddingTop: 16, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontSize: 16, fontWeight: 700, color: TEXT_PRIMARY, fontFamily: "var(--app-font)" }}>Selected total:</span>
-            <span style={{ fontSize: 16, fontWeight: 700, color: TEXT_PRIMARY, fontFamily: "var(--app-font)" }}>$210.00</span>
+            <span style={{ fontSize: 16, fontWeight: 700, color: TEXT_PRIMARY, fontFamily: "var(--app-font)" }}>${totalAmount.toFixed(2)}</span>
           </div>
         </div>
 
@@ -502,7 +709,6 @@ function StepReviewDetails({ onNext }: { onNext: () => void }) {
 function StepTransferMethod({ onNext }: { onNext: () => void }) {
   return (
     <div style={{ flex: 1, overflowY: "auto", background: BG_TINT, display: "flex", flexDirection: "column" }}>
-      <ProgressBar progress={66} />
       <div style={{ padding: "24px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
         <div>
           <h2 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: TEXT_PRIMARY, lineHeight: "32px", letterSpacing: -0.48, fontFamily: "var(--app-font)" }}>
@@ -562,7 +768,6 @@ function StepTransferMethod({ onNext }: { onNext: () => void }) {
 function StepReadyToSubmit({ onNext }: { onNext: () => void }) {
   return (
     <div style={{ flex: 1, overflowY: "auto", background: BG_TINT, display: "flex", flexDirection: "column" }}>
-      <ProgressBar progress={83} />
       <div style={{ padding: "24px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
         <div>
           <h2 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: TEXT_PRIMARY, lineHeight: "32px", letterSpacing: -0.48, fontFamily: "var(--app-font)" }}>
@@ -598,8 +803,28 @@ function StepReadyToSubmit({ onNext }: { onNext: () => void }) {
 
 // ─── Step 8 — Success ─────────────────────────────────────────────────────────
 function StepSuccess({ onGoHome }: { onGoHome: () => void }) {
+  const [completedSteps, setCompletedSteps] = useState(0);
+
+  useEffect(() => {
+    const timers = [
+      setTimeout(() => setCompletedSteps(1), 800),
+      setTimeout(() => setCompletedSteps(2), 1600),
+      setTimeout(() => setCompletedSteps(3), 2400),
+    ];
+    
+    // Fire confetti!
+    confetti({
+      particleCount: 150,
+      spread: 80,
+      origin: { y: 0.4 },
+      colors: ["#34C759", "#007AFF", "#FF9500", "#FFCC00", "#FF3B30"]
+    });
+
+    return () => timers.forEach(clearTimeout);
+  }, []);
+
   return (
-    <div style={{ flex: 1, overflowY: "auto", background: CARD_BG, display: "flex", flexDirection: "column" }}>
+    <div style={{ flex: 1, overflowY: "auto", background: BG_TINT, display: "flex", flexDirection: "column" }}>
       <div style={{ padding: "48px 24px 24px", display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
         {/* Success Icon */}
         <motion.div
@@ -615,88 +840,174 @@ function StepSuccess({ onGoHome }: { onGoHome: () => void }) {
             alignItems: "center",
             justifyContent: "center",
             marginBottom: 8,
+            position: "relative",
           }}
         >
-          <CheckCircle2 size={40} color={SUCCESS_GREEN} />
+          <div
+            style={{
+              position: "absolute",
+              inset: -25,
+              borderRadius: "50%",
+              background: "radial-gradient(circle, rgba(52,199,89,0.15) 0%, transparent 70%)",
+            }}
+          />
+          <CheckCircle2 size={40} color={SUCCESS_GREEN} style={{ position: "relative", zIndex: 1 }} />
         </motion.div>
-
-        <motion.h2
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          style={{ margin: 0, fontSize: 32, fontWeight: 700, color: TEXT_PRIMARY, fontFamily: "var(--app-font)", letterSpacing: -0.64 }}
-        >
-          Claim approved!
-        </motion.h2>
 
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          style={{ fontSize: 48, fontWeight: 700, color: TEXT_PRIMARY, fontFamily: "var(--app-font)", letterSpacing: -1 }}
+          transition={{ delay: 0.2 }}
+          style={{ textAlign: "center", width: "100%" }}
         >
-          $210.00
+          <h2 style={{ margin: "0 0 8px", fontSize: 22, fontWeight: 600, color: "var(--app-text)", letterSpacing: -0.44, fontFamily: "var(--app-font)" }}>
+            Claim approved!
+          </h2>
+          <p style={{ margin: 0, fontSize: 16, color: TEXT_SECONDARY, lineHeight: "24px", fontFamily: "var(--app-font)" }}>
+            Your document has been verified and your claim is approved for reimbursement.
+          </p>
         </motion.div>
 
-        <motion.p
+        {/* Approved amount & Balance */}
+        <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          style={{ margin: 0, fontSize: 16, color: TEXT_SECONDARY, textAlign: "center", lineHeight: "24px", fontFamily: "var(--app-font)" }}
+          transition={{ delay: 0.35 }}
+          style={{ width: "100%", display: "flex", flexDirection: "column", gap: 16 }}
         >
-          Your claim has been approved and your funds are on the way.
-        </motion.p>
+          <div
+            style={{
+              background: SUCCESS_GREEN,
+              borderRadius: 12,
+              padding: 16,
+              textAlign: "center",
+            }}
+          >
+            <p style={{ margin: "0 0 4px", fontSize: 16, fontWeight: 500, color: "#f8f9fe", fontFamily: "var(--app-font)" }}>
+              Approved amount
+            </p>
+            <p style={{ margin: 0, fontSize: 28, fontWeight: 900, color: "#fff", letterSpacing: 0.56, fontFamily: "var(--app-font)" }}>
+              $210.00
+            </p>
+          </div>
+
+          {/* Balance card */}
+          <div
+            style={{
+              background: CARD_BG,
+              borderRadius: 12,
+              border: "1px solid var(--app-border)",
+              padding: "16px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <div>
+              <p style={{ margin: "0 0 4px", fontSize: 16, fontWeight: 600, color: "var(--app-text)", fontFamily: "var(--app-font)" }}>Current balance</p>
+              <p style={{ margin: 0, fontSize: 16, color: TEXT_SECONDARY, fontFamily: "var(--app-font)" }}>Limited Purpose FSA 2026</p>
+            </div>
+            <span style={{ fontSize: 16, fontWeight: 600, color: TEXT_PRIMARY, fontFamily: "var(--app-font)" }}>$849.00</span>
+          </div>
+        </motion.div>
 
         {/* Timeline */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.5 }}
-          style={{ width: "100%", marginTop: 24, display: "flex", flexDirection: "column", gap: 24 }}
+          style={{ width: "100%", marginTop: 8 }}
         >
-          {[
-            { label: "Claim submitted", status: "done" },
-            { label: "Claim approved", status: "done" },
-            { label: "Funds sent", status: "pending", subtext: "Estimated arrival: Nov 28" },
-          ].map((item, i) => (
-            <div key={item.label} style={{ display: "flex", gap: 16, position: "relative" }}>
-              {i < 2 && (
-                <div style={{ position: "absolute", left: 11, top: 24, bottom: -24, width: 2, background: item.status === "done" ? SUCCESS_GREEN : "var(--app-border)" }} />
-              )}
-              <div
-                style={{
-                  width: 24,
-                  height: 24,
-                  borderRadius: "50%",
-                  background: item.status === "done" ? SUCCESS_GREEN : "var(--app-neutral-100)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
-                  zIndex: 1,
-                }}
-              >
-                {item.status === "done" && <Check size={14} color="#fff" />}
-              </div>
-              <div style={{ paddingTop: 2 }}>
-                <div style={{ fontSize: 16, fontWeight: 600, color: item.status === "done" ? TEXT_PRIMARY : TEXT_SECONDARY, fontFamily: "var(--app-font)" }}>
-                  {item.label}
-                </div>
-                {item.subtext && (
-                  <div style={{ fontSize: 14, color: TEXT_SECONDARY, marginTop: 4, fontFamily: "var(--app-font)" }}>
-                    {item.subtext}
+          <div style={{ background: CARD_BG, borderRadius: 12, border: "1px solid var(--app-border)", padding: "24px 24px", boxShadow: "0px 3px 9px rgba(43,49,78,0.04), 0px 6px 18px rgba(43,49,78,0.06)" }}>
+            <p style={{ margin: "0 0 24px", fontSize: 14, fontWeight: 600, color: TEXT_PRIMARY, fontFamily: "var(--app-font)" }}>
+              What happens next
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+              {[
+                { label: "Submitted", isFinal: false },
+                { label: "Under review", isFinal: false },
+                { label: "Approved", isFinal: false },
+                { label: "Payment on it's way", isFinal: true },
+              ].map((item, i) => {
+                const isDone = completedSteps > i;
+                const isFinalPending = item.isFinal && completedSteps === 3;
+                const lineIsGreen = completedSteps > i + 1 || (i === 2 && completedSteps === 3);
+
+                return (
+                  <div key={item.label} style={{ display: "flex", gap: 16, position: "relative" }}>
+                    {i < 3 && (
+                      <motion.div
+                        initial={{ backgroundColor: "var(--app-border)" }}
+                        animate={{ backgroundColor: lineIsGreen ? SUCCESS_GREEN : "var(--app-border)" }}
+                        transition={{ duration: 0.4 }}
+                        style={{ position: "absolute", left: 11, top: 24, bottom: -24, width: 2 }}
+                      />
+                    )}
+                    <motion.div
+                      initial={{ borderColor: "var(--app-border)" }}
+                      animate={{ borderColor: isDone ? SUCCESS_GREEN : (isFinalPending ? PRIMARY : "var(--app-border)") }}
+                      transition={{ duration: 0.4 }}
+                      style={{
+                        width: 24,
+                        height: 24,
+                        borderRadius: "50%",
+                        background: CARD_BG,
+                        border: `1px solid var(--app-border)`,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0,
+                        zIndex: 1,
+                      }}
+                    >
+                      <AnimatePresence mode="wait">
+                        {isDone && !item.isFinal && (
+                          <motion.div
+                            key="check"
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                          >
+                            <Check size={14} color={SUCCESS_GREEN} strokeWidth={3} />
+                          </motion.div>
+                        )}
+                        {isFinalPending && (
+                          <motion.span
+                            key="dollar"
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                            style={{ color: PRIMARY, fontSize: 14, fontWeight: 600 }}
+                          >
+                            $
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
+                    <div style={{ paddingTop: 2 }}>
+                      <motion.div
+                        animate={{
+                          color: isDone || isFinalPending ? TEXT_PRIMARY : TEXT_SECONDARY,
+                          fontWeight: isDone || isFinalPending ? 600 : 500
+                        }}
+                        transition={{ duration: 0.4 }}
+                        style={{ fontSize: 14, fontFamily: "var(--app-font)" }}
+                      >
+                        {item.label}
+                      </motion.div>
+                    </div>
                   </div>
-                )}
-              </div>
+                );
+              })}
             </div>
-          ))}
+          </div>
         </motion.div>
 
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.6 }}
-          style={{ width: "100%", marginTop: 32 }}
+          style={{ width: "100%", marginTop: 16 }}
         >
           <PillButton label="Go to your homepage" onClick={onGoHome} />
         </motion.div>
@@ -710,6 +1021,7 @@ export default function AppReimburseFlow() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [direction, setDirection] = useState(1);
+  const [documents, setDocuments] = useState<{ id: number; name: string }[]>([]);
 
   const goTo = useCallback((next: number) => {
     setDirection(next > step ? 1 : -1);
@@ -720,13 +1032,39 @@ export default function AppReimburseFlow() {
 
   const handleClose = useCallback(() => navigate("/app"), [navigate]);
 
+  const handleCapture = () => {
+    setDocuments((prev) => [...prev, { id: Date.now(), name: `IMG_${Date.now().toString().slice(-5)}.jpg` }]);
+    goTo(2.6);
+  };
+
+  const handleRemoveDoc = (id: number) => {
+    const newDocs = documents.filter((d) => d.id !== id);
+    setDocuments(newDocs);
+    if (newDocs.length === 0) {
+      goTo(1);
+    }
+  };
+
   const navTitle = "Reimburse myself";
 
   const slideVariants = {
-    enter: (d: number) => ({ x: d > 0 ? 60 : -60, opacity: 0 }),
-    center: { x: 0, opacity: 1 },
-    exit: (d: number) => ({ x: d > 0 ? -60 : 60, opacity: 0 }),
+    enter: { y: 60, opacity: 0 },
+    center: { y: 0, opacity: 1 },
+    exit: { y: -20, opacity: 0 },
   };
+
+  const getProgress = (step: number) => {
+    switch (step) {
+      case 2.6: return 25;
+      case 3: return 16;
+      case 4: return 33;
+      case 5: return 50;
+      case 6: return 66;
+      case 7: return 83;
+      default: return 0;
+    }
+  };
+  const progress = getProgress(step);
 
   return (
     <motion.div
@@ -737,15 +1075,18 @@ export default function AppReimburseFlow() {
         height: "var(--app-screen-height, 100dvh)",
         display: "flex",
         flexDirection: "column",
-        background: step === 2 ? "#fff" : BG_TINT,
+        background: step === 2 ? "#fff" : step === 2.5 ? "#0a0a0a" : BG_TINT,
         fontFamily: "var(--app-font)",
         position: "relative",
         overflow: "hidden",
       }}
     >
-      <AppTopSpacer variant="home" />
-      {step !== 2 && (
-        <AppNavBar variant="full-page" title={navTitle} onClose={handleClose} />
+      {step !== 2.5 && step !== 2 && (
+        <>
+          <div aria-hidden style={{ height: 56, flexShrink: 0, pointerEvents: "none" }} />
+          <AppNavBar variant="full-page" solid title={navTitle} onClose={handleClose} />
+          {progress > 0 && <ProgressBar progress={progress} />}
+        </>
       )}
 
       {/* Step content */}
@@ -760,8 +1101,10 @@ export default function AppReimburseFlow() {
           transition={{ duration: 0.25, ease: "easeInOut" }}
           style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}
         >
-          {step === 1 && <StepUploadMethod onNext={next} />}
-          {step === 2 && <StepCameraRoll onCancel={() => goTo(1)} onUpload={next} />}
+          {step === 1 && <StepUploadMethod onSelect={(method) => { if (method === "Take a photo") goTo(2.5); else goTo(2); }} />}
+          {step === 2 && <StepCameraRoll onCancel={() => goTo(1)} onUpload={() => goTo(3)} />}
+          {step === 2.5 && <StepCamera onCapture={handleCapture} onClose={() => goTo(1)} />}
+          {step === 2.6 && <StepDocPreview documents={documents} onRemove={handleRemoveDoc} onContinue={() => goTo(3)} onAddAnother={() => goTo(2.5)} />}
           {step === 3 && <StepAnalyzing onNext={next} />}
           {step === 4 && <StepSelectAccount onNext={next} />}
           {step === 5 && <StepReviewDetails onNext={next} />}

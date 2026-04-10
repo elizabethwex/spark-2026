@@ -352,11 +352,12 @@ export default function AppAccountOverview() {
           }}
         >
           {[
-            { label: "Reimburse Myself", icon: Receipt },
+            { label: "Reimburse Myself", icon: Receipt, onClick: () => navigate("/app/reimburse") },
             { label: "Send a Payment", icon: Send },
-          ].map(({ label, icon: Icon }) => (
+          ].map(({ label, icon: Icon, onClick }) => (
             <div
               key={label}
+              onClick={onClick}
               style={{
                 background: "white",
                 borderRadius: 24,
