@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { User } from "lucide-react";
 
 const ASSIST_IQ_GRADIENT = "linear-gradient(133.5deg, #25146f 2.5%, #c8102e 100%)";
 
