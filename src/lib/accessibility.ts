@@ -123,3 +123,125 @@ export function getHeaderContrastWarning(
   }
   return null;
 }
+
+function rgbToHex(r: number, g: number, b: number): string {
+  return "#" + [r, g, b].map(x => {
+    const hex = Math.round(x).toString(16);
+    return hex.length === 1 ? "0" + hex : hex;
+  }).join("").toUpperCase();
+}
+
+const REFERENCE_BLACK = "#14182C";
+
+export interface AccessibilityResult {
+  status: 'pass' | 'warn';
+  ratio: number;
+  suggestedColor?: string;
+}
+
+/**
+ * Adjusts a color (lightens or darkens) to meet the target contrast ratio against a target color.
+ */
+export function suggestAccessibleColor(baseHex: string, targetHex: string, targetRatio: number = WCAG_AA_NORMAL_MIN_RATIO): string {
+  if (!/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(baseHex) || !/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(targetHex)) {
+    return baseHex;
+  }
+
+  let [r, g, b] = hexToRgb(baseHex);
+  const targetLuminance = hexToLuminance(targetHex);
+  
+  // Determine if we need to lighten or darken the base color
+  // If target is light, we need to darken base. If target is dark, we need to lighten base.
+  const shouldDarken = targetLuminance > 0.5;
+  
+  let step = 0;
+  const maxSteps = 100;
+  
+  while (step < maxSteps) {
+    const currentHex = rgbToHex(r, g, b);
+    const currentRatio = getContrastRatio(currentHex, targetHex);
+    
+    if (currentRatio >= targetRatio) {
+      return currentHex;
+    }
+    
+    if (shouldDarken) {
+      r = Math.max(0, r - 5);
+      g = Math.max(0, g - 5);
+      b = Math.max(0, b - 5);
+      if (r === 0 && g === 0 && b === 0) break;
+    } else {
+      r = Math.min(255, r + 5);
+      g = Math.min(255, g + 5);
+      b = Math.min(255, b + 5);
+      if (r === 255 && g === 255 && b === 255) break;
+    }
+    step++;
+  }
+  
+  return rgbToHex(r, g, b);
+}
+
+/**
+ * Context-aware accessibility checking for brand colors.
+ */
+export function getBrandColorAccessibility(colors: BrandColorsForContrast): Record<string, AccessibilityResult | null> {
+  const results: Record<string, AccessibilityResult | null> = {};
+  
+  for (const [key, hex] of Object.entries(colors)) {
+    if (!hex || !/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(hex)) {
+      results[key] = null;
+      continue;
+    }
+
+    if (key === 'illustration') {
+      results[key] = null;
+      continue;
+    }
+
+    let targetHex = REFERENCE_WHITE;
+    let secondaryTargetHex: string | null = null;
+    
+    if (key === 'pageBg') {
+      targetHex = REFERENCE_BLACK;
+      if (colors.primary && /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(colors.primary)) {
+        secondaryTargetHex = colors.primary;
+      }
+    } else if (key === 'headerBg') {
+      // Auto-calculated header text color logic (white or black based on contrast)
+      const ratioWithWhite = getContrastRatio(hex, REFERENCE_WHITE);
+      const ratioWithBlack = getContrastRatio(hex, REFERENCE_BLACK);
+      targetHex = ratioWithWhite > ratioWithBlack ? REFERENCE_WHITE : REFERENCE_BLACK;
+    }
+    
+    const ratio = getContrastRatio(hex, targetHex);
+    const secondaryRatio = secondaryTargetHex ? getContrastRatio(hex, secondaryTargetHex) : 99;
+    
+    const minRatio = Math.min(ratio, secondaryRatio);
+    
+    if (minRatio >= WCAG_AA_NORMAL_MIN_RATIO) {
+      results[key] = { status: 'pass', ratio: minRatio };
+    } else {
+      // Needs suggestion
+      let suggestedColor = hex;
+      
+      if (secondaryTargetHex && secondaryRatio < ratio) {
+        suggestedColor = suggestAccessibleColor(hex, secondaryTargetHex, WCAG_AA_NORMAL_MIN_RATIO);
+        // Verify it still passes primary target, if not, fallback to primary target suggestion
+        if (getContrastRatio(suggestedColor, targetHex) < WCAG_AA_NORMAL_MIN_RATIO) {
+           suggestedColor = suggestAccessibleColor(hex, targetHex, WCAG_AA_NORMAL_MIN_RATIO);
+        }
+      } else {
+        suggestedColor = suggestAccessibleColor(hex, targetHex, WCAG_AA_NORMAL_MIN_RATIO);
+      }
+      
+      results[key] = {
+        status: 'warn',
+        ratio: minRatio,
+        suggestedColor: suggestedColor !== hex ? suggestedColor : undefined
+      };
+    }
+  }
+  
+  return results;
+}

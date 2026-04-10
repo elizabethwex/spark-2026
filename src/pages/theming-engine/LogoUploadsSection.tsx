@@ -24,7 +24,7 @@ export function LogoUploadsSection() {
           control={control}
           render={({ field: { onChange, value: _v, ref } }) => (
             <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-input px-3 py-2 text-sm font-medium hover:bg-muted/50 w-fit">
-              <Upload className="h-4 w-4" />
+              <Upload className="h-4 w-4 text-icon-default" />
               Upload
               <input
                 ref={ref}
@@ -50,7 +50,7 @@ export function LogoUploadsSection() {
           control={control}
           render={({ field: { onChange, value: _v, ref } }) => (
             <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-input px-3 py-2 text-sm font-medium hover:bg-muted/50 w-fit">
-              <Upload className="h-4 w-4" />
+              <Upload className="h-4 w-4 text-icon-default" />
               Upload
               <input
                 ref={ref}

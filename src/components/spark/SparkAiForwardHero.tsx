@@ -278,7 +278,7 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
           </div>
 
           <div className="flex flex-col gap-[8px]">
-            <h2 className="text-[40px] font-semibold leading-[56px] tracking-[-0.88px] text-[#14182c]">
+            <h2 className="text-[40px] font-semibold leading-[56px] tracking-[-0.88px] text-foreground">
               Good morning, {SPARK_MEMBER_FIRST_NAME}
             </h2>
             <p className="text-[19px] leading-[32px] tracking-[-0.304px] text-[#5f6a94]">
@@ -426,7 +426,7 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
                   </p>
 
                   <div className="flex flex-col gap-[12px] rounded-[24px] bg-[#f8f9fe] border border-[#e3e7f4] p-[17px]">
-                    <p className="text-[13px] font-bold text-[#14182c]">
+                    <p className="text-[13px] font-bold text-foreground">
                       Make sure your document includes:
                     </p>
                     <ul className="flex flex-col gap-[8px]">
@@ -493,7 +493,7 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
                     <FileText className="h-[18px] w-[18px] text-[#3958c3]" />
                   </div>
                   <div className="flex flex-col">
-                    <p className="text-[14px] font-bold leading-[24px] text-[#14182c]">
+                    <p className="text-[14px] font-bold leading-[24px] text-foreground">
                       Bigtown Dentistry
                     </p>
                     <p className="text-[12px] font-medium leading-[20px] text-[#5f6a94]">
@@ -502,7 +502,7 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
                   </div>
                 </div>
                 <div className="flex flex-col items-end">
-                  <p className="text-[16px] font-extrabold leading-[28px] tracking-[-0.5px] text-[#14182c]">
+                  <p className="text-[16px] font-extrabold leading-[28px] tracking-[-0.5px] text-foreground">
                       $210.00
                   </p>
                 </div>
@@ -529,7 +529,7 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
                     }}
                     onClick={() => setUploadPhase("options")}
                   >
-                    <Camera className="h-[15.75px] w-[15.75px]" />
+                    <Camera className="h-[15.75px] w-[15.75px] text-white" />
                     Upload Document
                   </Button>
                   <button
@@ -625,7 +625,7 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
                           aria-hidden
                         />
                       </motion.button>
-                      <p className="text-[11px] font-bold leading-tight text-[#14182c] text-center">
+                      <p className="text-[11px] font-bold leading-tight text-foreground text-center">
                         Upload
                         <br />
                         Document
@@ -812,7 +812,7 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
                 <CheckCircle2 className="h-[24px] w-[24px] text-[#3958c3]" />
               </div>
               <div className="flex flex-col gap-[4px]">
-                <p className="text-[16px] font-semibold text-[#14182c]">
+                <p className="text-[16px] font-semibold text-foreground">
                   You're all caught up!
                 </p>
                 <p className="text-[14px] text-[#5f6a94]">
