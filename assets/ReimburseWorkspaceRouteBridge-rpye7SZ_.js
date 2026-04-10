@@ -1,1 +1,0 @@
-import{u as s,a as o,e as r,r as u}from"./index-CWYB8QLl.js";function c(){const e=s(),a=o(),{openReimburseWorkspaceFromPath:t}=r();return u.useEffect(()=>{t(e.pathname),a("/",{replace:!0})},[e.pathname,a,t]),null}export{c as default};
