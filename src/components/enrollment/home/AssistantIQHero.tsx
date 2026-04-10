@@ -232,18 +232,12 @@ export function AssistantIQHero({ memberName, showHsaInvestCta, simulationMode =
             <svg
               width="16.9"
               height="16.9"
-              viewBox="0 0 17 17"
+              viewBox="0 0 24 24"
               fill="none"
               className="shrink-0"
             >
-              <path
-                d="M8.5 0.5L9.65 5.35L14.5 6.5L9.65 7.65L8.5 12.5L7.35 7.65L2.5 6.5L7.35 5.35L8.5 0.5Z"
-                fill="white"
-              />
-              <path
-                d="M13.25 10.75L13.69 12.31L15.25 12.75L13.69 13.19L13.25 14.75L12.81 13.19L11.25 12.75L12.81 12.31L13.25 10.75Z"
-                fill="white"
-              />
+              <path d="M13.913 13.9149L11.9997 24.0033L10.087 13.9149L0 12.0013L10.087 10.0884L12.0003 0L13.913 10.0884L24 12.0013L13.913 13.9149Z" fill="white"/>
+              <path d="M20.2758 19.7969L19.5994 23.3628L18.923 19.7969L15.3569 19.1204L18.923 18.4439L19.5994 14.8781L20.2752 18.4439L23.8412 19.1204L20.2758 19.7969Z" fill="white"/>
             </svg>
           </div>
 
