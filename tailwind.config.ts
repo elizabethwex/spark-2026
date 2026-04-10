@@ -9,8 +9,8 @@ const designTokensPreset = require(
 ) as Config;
 
 // Remove the WEX component tokens from the preset so they don't clutter the Tailwind UI inspector
-if (designTokensPreset.theme?.extend?.colors?.wex) {
-  delete designTokensPreset.theme.extend.colors.wex;
+if ((designTokensPreset.theme?.extend?.colors as any)?.wex) {
+  delete (designTokensPreset.theme?.extend?.colors as any).wex;
 }
 
 const config: Config = {

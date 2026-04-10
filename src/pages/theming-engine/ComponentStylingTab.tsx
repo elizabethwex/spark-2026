@@ -28,7 +28,7 @@ const CARD_BORDER_OPTIONS: { value: CardBorderOption; label: string; icon: strin
 ];
 
 export function ComponentStylingTab() {
-  const { register, watch, setValue } = useFormContext<ThemingEngineFormValues>();
+  const { register, watch } = useFormContext<ThemingEngineFormValues>();
 
   return (
     <div className="space-y-6">
