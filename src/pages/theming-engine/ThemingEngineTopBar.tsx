@@ -1,6 +1,5 @@
 import { useRef } from "react";
 import { useFormContext } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
 import { Badge, Button, Separator, toast } from "@wexinc-healthbenefits/ben-ui-kit";
 import { RotateCcw, Download, FileUp } from "lucide-react";
 import type { ThemingEngineFormValues, ThemingEngineExportPayload } from "./schema";
@@ -12,7 +11,6 @@ const THEME_EXPORT_FILENAME = "theme-export.json";
 
 export function ThemingEngineTopBar() {
   const { handleSubmit, reset, getValues } = useFormContext<ThemingEngineFormValues>();
-  const navigate = useNavigate();
   const importInputRef = useRef<HTMLInputElement>(null);
 
   const onReset = () => {
@@ -75,7 +73,7 @@ export function ThemingEngineTopBar() {
   };
 
   return (
-    <header className="shrink-0 border-b border-border bg-background px-6 py-3">
+    <header className="shrink-0 bg-white px-8 pt-8 pb-2 my-0 mx-0 overflow-visible">
       <input
         ref={importInputRef}
         type="file"
@@ -84,12 +82,12 @@ export function ThemingEngineTopBar() {
         aria-hidden
         onChange={onImportFile}
       />
-      <div className="flex items-center gap-4">
-        <div className="flex flex-col gap-0.5">
-          <h1 className="text-xl font-display font-bold tracking-tight text-foreground">
+      <div className="flex items-start gap-4">
+        <div className="flex items-center gap-4">
+          <h1 className="text-3xl font-display font-bold tracking-normal text-foreground">
             Appearance
           </h1>
-          <Badge intent="default" className="w-fit text-xs font-medium text-muted-foreground">
+          <Badge intent="default" className="w-fit py-1.5 text-xs font-medium text-muted-foreground mt-1">
             Editing Theme for: {EDITING_THEME_FOR}
           </Badge>
         </div>
@@ -100,10 +98,10 @@ export function ThemingEngineTopBar() {
             variant="ghost"
             size="sm"
             onClick={onReset}
-            className="gap-1.5 text-muted-foreground"
+            className="gap-1.5 text-sm text-muted-foreground"
             title="Reset form to system default"
           >
-            <RotateCcw className="h-4 w-4" />
+            <RotateCcw className="h-4 w-4 text-icon-default" />
             Reset
           </Button>
           <Button
@@ -111,10 +109,10 @@ export function ThemingEngineTopBar() {
             variant="ghost"
             size="sm"
             onClick={() => importInputRef.current?.click()}
-            className="gap-1.5 text-muted-foreground"
+            className="gap-1.5 text-sm text-muted-foreground"
             title="Upload a theme JSON file"
           >
-            <FileUp className="h-4 w-4" />
+            <FileUp className="h-4 w-4 text-icon-default" />
             Upload theme
           </Button>
           <Button
@@ -125,15 +123,12 @@ export function ThemingEngineTopBar() {
             className="gap-1.5 text-muted-foreground"
             title="Download theme as JSON"
           >
-            <Download className="h-4 w-4" />
+            <Download className="h-4 w-4 text-icon-default" />
             Download theme
           </Button>
 
           <Separator orientation="vertical" className="mx-1 h-5" />
 
-          <Button type="button" variant="outline" size="sm" onClick={() => navigate(-1)}>
-            Cancel
-          </Button>
           <Button
             type="button"
             size="sm"

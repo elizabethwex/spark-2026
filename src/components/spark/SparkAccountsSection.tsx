@@ -97,11 +97,11 @@ export function SparkAccountsSection({
           {/* Header */}
           <div className="flex items-start justify-between px-6 pt-6">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-[#3958c3] transition-transform group-hover/card:scale-110">
-                <PiggyBank className="h-5 w-5 transition-transform group-hover/card:rotate-12" />
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--app-secondary-50)] text-[var(--theme-secondary)] transition-transform group-hover/card:scale-110">
+                <PiggyBank className="h-5 w-5 transition-transform group-hover/card:rotate-12 text-[var(--theme-secondary)]" />
               </div>
               <div className="flex flex-col">
-                <h3 className="text-[16px] font-bold leading-[24px] text-[#14182c]">Health Savings Account</h3>
+                <h3 className="text-[16px] font-bold leading-[24px] text-[var(--system-text-primary)]">Health Savings Account</h3>
                 <p className="text-[12px] font-bold uppercase leading-[16px] tracking-[0.6px] text-[#5f6a94]">
                   Health Savings
                 </p>
@@ -110,7 +110,7 @@ export function SparkAccountsSection({
             <button
               type="button"
               onClick={() => navigate("/hsa-details")}
-              className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[#1c6eff] hover:underline transition-colors -mr-3"
+              className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[color:var(--system-link,#1c6eff)] hover:underline transition-colors -mr-3"
             >
               View Details
               <ChevronRight className="h-4 w-4" />
@@ -130,7 +130,7 @@ export function SparkAccountsSection({
                       Cash + Invested Assets
                     </p>
                   </div>
-                  <p className="text-[40px] font-bold leading-[40px] tracking-[-0.9px] text-[#14182c]">
+                  <p className="text-[40px] font-bold leading-[40px] tracking-[-0.9px] text-[var(--system-text-primary)]">
                     {h.totalValue}
                   </p>
                 </div>
@@ -142,10 +142,10 @@ export function SparkAccountsSection({
                       <CircleDollarSign className="h-5 w-5" />
                     </div>
                     <div className="flex flex-1 items-center justify-between">
-                      <p className="text-[16px] font-semibold leading-[24px] tracking-[-0.176px] text-[#14182c]">
+                      <p className="text-[16px] font-semibold leading-[24px] tracking-[-0.176px] text-[var(--system-text-primary)]">
                         Cash Balance
                       </p>
-                      <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#14182c]">
+                      <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-foreground">
                         {h.cashBalance}
                       </p>
                     </div>
@@ -158,14 +158,14 @@ export function SparkAccountsSection({
                       <TrendingUp className="h-5 w-5" />
                     </div>
                     <div className="flex flex-1 items-center justify-between">
-                      <p className="text-[16px] font-semibold leading-[24px] tracking-[-0.176px] text-[#14182c]">
+                      <p className="text-[16px] font-semibold leading-[24px] tracking-[-0.176px] text-[var(--system-text-primary)]">
                         Invested assets
                       </p>
                       <div className="flex items-center gap-4">
                         <p className="text-[14px] font-semibold leading-[24px] tracking-[-0.084px] text-[#009966]">
                           {h.ytdReturnPct} YTD
                         </p>
-                        <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#14182c]">
+                        <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-foreground">
                           {h.investedAssets}
                         </p>
                       </div>
@@ -179,7 +179,7 @@ export function SparkAccountsSection({
                   <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#5f6a94]">
                     Cash Balance
                   </p>
-                  <p className="text-[40px] font-bold leading-[40px] tracking-[-0.9px] text-[#14182c]">
+                  <p className="text-[40px] font-bold leading-[40px] tracking-[-0.9px] text-[var(--system-text-primary)]">
                     {h.cashBalance}
                   </p>
                 </div>
@@ -191,7 +191,7 @@ export function SparkAccountsSection({
                       <TrendingUp className="h-5 w-5" />
                     </div>
                     <div className="flex flex-col gap-[2px]">
-                      <p className="text-[14px] font-bold leading-[20px] text-[#14182c]">
+                      <p className="text-[14px] font-bold leading-[20px] text-foreground">
                         Invest Your HSA
                       </p>
                       <p className="text-[12px] leading-[16px] text-[#5f6a94]">
@@ -201,7 +201,7 @@ export function SparkAccountsSection({
                   </div>
                   <button
                     type="button"
-                    className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[#1c6eff] hover:underline transition-colors -mr-3"
+                    className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[color:var(--system-link,#1c6eff)] hover:underline transition-colors -mr-3"
                   >
                     Start Investing
                     <ChevronRight className="h-4 w-4" />
@@ -216,7 +216,7 @@ export function SparkAccountsSection({
                 <p className="text-[12px] leading-[16px] text-[#5f6a94]">
                   {h.contributionPctUsed}% of {h.planYear} contribution limit used
                 </p>
-                <p className="text-[12px] leading-[16px] text-[#14182c]">
+                <p className="text-[12px] leading-[16px] text-foreground">
                   {h.remainingLimit} remaining
                 </p>
               </div>
@@ -251,12 +251,12 @@ export function SparkAccountsSection({
           {/* Header */}
           <div className="flex items-start justify-between px-6 pt-6">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-[#3958c3] transition-transform group-hover/card:scale-110">
-                <CalendarCheck2 className="h-5 w-5 transition-transform group-hover/card:rotate-12" />
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--app-secondary-50)] text-[var(--theme-secondary)] transition-transform group-hover/card:scale-110">
+                <CalendarCheck2 className="h-5 w-5 transition-transform group-hover/card:rotate-12 text-[var(--theme-secondary)]" />
               </div>
               <div className="flex flex-col">
                 <div className="flex items-center gap-2">
-                  <h3 className="text-[16px] font-bold leading-[24px] text-[#14182c]">Limited Purpose FSA</h3>
+                  <h3 className="text-[16px] font-bold leading-[24px] text-[var(--system-text-primary)]">Limited Purpose FSA</h3>
                   <Info className="h-4 w-4 text-[#5f6a94]" />
                 </div>
                 <p className="text-[12px] font-bold leading-[16px] tracking-[0.6px] text-[#5f6a94]">
@@ -267,7 +267,7 @@ export function SparkAccountsSection({
             <button
               type="button"
               onClick={() => navigate("/account/lpfsa")}
-              className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[#1c6eff] hover:underline transition-colors -mr-3"
+              className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[color:var(--system-link,#1c6eff)] hover:underline transition-colors -mr-3"
             >
               View Details
               <ChevronRight className="h-4 w-4" />
@@ -281,7 +281,7 @@ export function SparkAccountsSection({
                 <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#5f6a94]">
                   Available balance
                 </p>
-                <p className="text-[40px] font-bold leading-[36px] tracking-[-0.9px] text-[#14182c]">
+                <p className="text-[40px] font-bold leading-[36px] tracking-[-0.9px] text-[var(--system-text-primary)]">
                   {l.balance}
                 </p>
                 <div className="mt-1 flex flex-col items-start gap-2">
@@ -343,7 +343,7 @@ export function SparkAccountsSection({
                   <Lightbulb className="h-5 w-5" />
                 </div>
                 <div className="flex flex-col gap-[2px]">
-                  <p className="text-[14px] font-bold leading-[20px] text-[#14182c]">
+                  <p className="text-[14px] font-bold leading-[20px] text-foreground">
                     {l.eligibleLabel}
                   </p>
                   <p className="text-[12px] leading-[16px] text-[#5f6a94]">
@@ -353,7 +353,7 @@ export function SparkAccountsSection({
               </div>
               <button
                 type="button"
-                className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[#1c6eff] hover:underline transition-colors -mr-3"
+                className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[color:var(--system-link,#1c6eff)] hover:underline transition-colors -mr-3"
               >
                 View Eligible Expenses
                 <ChevronRight className="h-4 w-4" />
@@ -383,12 +383,12 @@ export function SparkAccountsSection({
               {/* Header */}
               <div className="flex items-start justify-between px-6 pt-6">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-[#3958c3] transition-transform group-hover/card:scale-110">
-                    <HeartPulse className="h-5 w-5 transition-transform group-hover/card:rotate-12" />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--app-secondary-50)] text-[var(--theme-secondary)] transition-transform group-hover/card:scale-110">
+                    <HeartPulse className="h-5 w-5 transition-transform group-hover/card:rotate-12 text-[var(--theme-secondary)]" />
                   </div>
                   <div className="flex flex-col">
                     <div className="flex items-center gap-2">
-                      <h3 className="text-[16px] font-bold leading-[24px] text-[#14182c]">Healthcare FSA</h3>
+                      <h3 className="text-[16px] font-bold leading-[24px] text-[var(--system-text-primary)]">Healthcare FSA</h3>
                       <Info className="h-4 w-4 text-[#5f6a94]" />
                     </div>
                     <p className="text-[12px] font-bold leading-[16px] tracking-[0.6px] text-[#5f6a94]">
@@ -399,7 +399,7 @@ export function SparkAccountsSection({
                 <button
                   type="button"
                   onClick={() => navigate("/account/fsa")}
-                  className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[#1c6eff] hover:underline transition-colors -mr-3"
+                  className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[color:var(--system-link,#1c6eff)] hover:underline transition-colors -mr-3"
                 >
                   View Details
                   <ChevronRight className="h-4 w-4" />
@@ -413,7 +413,7 @@ export function SparkAccountsSection({
                     <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#5f6a94]">
                       Available balance
                     </p>
-                    <p className="text-[40px] font-bold leading-[36px] tracking-[-0.9px] text-[#14182c]">
+                    <p className="text-[40px] font-bold leading-[36px] tracking-[-0.9px] text-[var(--system-text-primary)]">
                       {fsa.balance}
                     </p>
                     <div className="mt-1 flex flex-col items-start gap-2">
@@ -475,7 +475,7 @@ export function SparkAccountsSection({
                       <HeartPulse className="h-5 w-5" />
                     </div>
                     <div className="flex flex-col gap-[2px]">
-                      <p className="text-[14px] font-bold leading-[20px] text-[#14182c]">
+                      <p className="text-[14px] font-bold leading-[20px] text-foreground">
                         {fsa.eligibleLabel}
                       </p>
                       <p className="text-[12px] leading-[16px] text-[#5f6a94]">
@@ -485,7 +485,7 @@ export function SparkAccountsSection({
                   </div>
                   <button
                     type="button"
-                    className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[#1c6eff] hover:underline transition-colors -mr-3"
+                    className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[color:var(--system-link,#1c6eff)] hover:underline transition-colors -mr-3"
                   >
                     View Eligible Expenses
                     <ChevronRight className="h-4 w-4" />
@@ -508,12 +508,12 @@ export function SparkAccountsSection({
               {/* Header */}
               <div className="flex items-start justify-between px-6 pt-6">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-[#3958c3] transition-transform group-hover/card:scale-110">
-                    <Baby className="h-5 w-5 transition-transform group-hover/card:rotate-12" />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--app-secondary-50)] text-[var(--theme-secondary)] transition-transform group-hover/card:scale-110">
+                    <Baby className="h-5 w-5 transition-transform group-hover/card:rotate-12 text-[var(--theme-secondary)]" />
                   </div>
                   <div className="flex flex-col">
                     <div className="flex items-center gap-2">
-                      <h3 className="text-[16px] font-bold leading-[24px] text-[#14182c]">DCFSA</h3>
+                      <h3 className="text-[16px] font-bold leading-[24px] text-[var(--system-text-primary)]">DCFSA</h3>
                       <Info className="h-4 w-4 text-[#5f6a94]" />
                     </div>
                     <p className="text-[12px] font-bold leading-[16px] tracking-[0.6px] text-[#5f6a94]">
@@ -524,7 +524,7 @@ export function SparkAccountsSection({
                 <button
                   type="button"
                   onClick={() => navigate("/account/dcfsa")}
-                  className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[#1c6eff] hover:underline transition-colors -mr-3"
+                  className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[color:var(--system-link,#1c6eff)] hover:underline transition-colors -mr-3"
                 >
                   View Details
                   <ChevronRight className="h-4 w-4" />
@@ -538,7 +538,7 @@ export function SparkAccountsSection({
                     <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#5f6a94]">
                       Available balance
                     </p>
-                    <p className="text-[40px] font-bold leading-[36px] tracking-[-0.9px] text-[#14182c]">
+                    <p className="text-[40px] font-bold leading-[36px] tracking-[-0.9px] text-[var(--system-text-primary)]">
                       {dcfsa.balance}
                     </p>
                     <div className="mt-1 flex flex-col items-start gap-2">
@@ -600,7 +600,7 @@ export function SparkAccountsSection({
                       <Lightbulb className="h-5 w-5" />
                     </div>
                     <div className="flex flex-col gap-[2px]">
-                      <p className="text-[14px] font-bold leading-[20px] text-[#14182c]">
+                      <p className="text-[14px] font-bold leading-[20px] text-foreground">
                         {dcfsa.eligibleLabel}
                       </p>
                       <p className="text-[12px] leading-[16px] text-[#5f6a94]">
@@ -610,7 +610,7 @@ export function SparkAccountsSection({
                   </div>
                   <button
                     type="button"
-                    className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[#1c6eff] hover:underline transition-colors -mr-3"
+                    className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[color:var(--system-link,#1c6eff)] hover:underline transition-colors -mr-3"
                   >
                     View Eligible Expenses
                     <ChevronRight className="h-4 w-4" />

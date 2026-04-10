@@ -7,14 +7,99 @@
 @import "tailwindcss";
 @config "../tailwind.config.ts";
 
-@layer base {
-  :root {
-    color-scheme: light;
-  }
+/* ── TRUE PROJECT DEFAULTS (Overrides shadcn-bridge.css) ── */
+/* These must be outside @layer base to override unlayered vendor CSS */
+:root {
+  color-scheme: light;
 
+  --background: 0 0% 97%;         /* #F7F7F7 */
+  --foreground: 230 38% 13%;      /* #14182C (Neutral 900) */
+  
+  --card: 0 0% 100%;              /* #FFFFFF */
+  --card-foreground: 230 38% 13%; /* #14182C */
+  
+  --popover: 0 0% 100%;           /* #FFFFFF */
+  --popover-foreground: 230 38% 13%; 
+  
+  --primary: 204 100% 38%;        /* #0073C2 (Default Brand Blue) */
+  --primary-foreground: 0 0% 100%;/* #FFFFFF */
+  
+  --secondary: 218 14% 90%;       /* #E2E5EA */
+  --secondary-foreground: 230 38% 13%;
+  
+  --muted: 226 65% 97%;           /* #F1F3FB */
+  --muted-foreground: 228 22% 48%;/* #5F6A94 (Neutral 700) */
+  
+  --border: 226 36% 92%;          /* #E3E7F4 (Neutral 200) */
+  --input: 226 36% 92%;           /* #E3E7F4 */
+  --ring: 230 38% 13%;            /* #14182C */
+  
+  --success: 160 100% 30%;        /* #009966 */
+  --success-foreground: 0 0% 100%;
+  
+  --destructive: 0 72% 51%;       /* #DC2626 */
+  --destructive-foreground: 0 0% 100%;
+
+  --icon-default: var(--muted-foreground);
+  --radius: 0.5rem;
+
+  /* Neutral Color Ramp */
+  --neutral-00: #FFFFFF;
+  --neutral-50: #F8F9FE;
+  --neutral-100: #F1F3FB;
+  --neutral-200: #E3E7F4;
+  --neutral-300: #D0D6EA;
+  --neutral-400: #B7C0DA;
+  --neutral-500: #9CA7C7;
+  --neutral-600: #7A87B2;
+  --neutral-700: #5F6A94;
+  --neutral-800: #444C72;
+  --neutral-900: #2B314E;
+  --neutral-950: #14182C;
+}
+
+.dark {
+  color-scheme: dark;
+
+  --background: 222 47% 11%;      /* #0F172A */
+  --foreground: 0 0% 96%;         /* #F5F5F5 */
+  
+  --card: 217 33% 17%;            /* #1E293B */
+  --card-foreground: 0 0% 96%;    /* #F5F5F5 */
+  
+  --popover: 217 33% 17%;         /* #1E293B */
+  --popover-foreground: 0 0% 96%; 
+  
+  --primary: 204 100% 38%;        /* #0073C2 */
+  --primary-foreground: 0 0% 100%;
+  
+  --secondary: 217 33% 17%;
+  --secondary-foreground: 0 0% 96%;
+  
+  --muted: 217 33% 17%;
+  --muted-foreground: 215 25% 65%;/* #94A3B8 */
+  
+  --border: 226 36% 92%;          /* #E3E7F4 */
+  --input: 226 36% 92%;
+  --ring: 0 0% 100%;              /* #FFFFFF */
+  
+  --success: 160 100% 30%;        /* #009966 */
+  --success-foreground: 0 0% 100%;
+  
+  --destructive: 0 72% 51%;       /* #DC2626 */
+  --destructive-foreground: 0 0% 100%;
+  
+  --icon-default: var(--muted-foreground);
+}
+
+@layer base {
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
+  }
+
+  svg {
+    color: var(--system-link);
   }
 
   button,

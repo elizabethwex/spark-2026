@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Button } from "@wexinc-healthbenefits/ben-ui-kit";
-import { Monitor, Moon, Smartphone, Sun, Tablet } from "lucide-react";
+import { Moon, Sun } from "lucide-react";
 import type { BrandColors } from "./schema";
 import type { ThemingEngineFormValues } from "./schema";
 import { themeToCssVars } from "./themeToCssVars";
@@ -55,76 +55,39 @@ export function ThemingEnginePreviewPane() {
   const values = watch() as ThemingEngineFormValues | undefined;
   const { activeColorKey } = useThemingEngineHighlight();
   const [darkMode, setDarkMode] = useState(false);
-  const [previewDevice, setPreviewDevice] = useState<PreviewDevice>("desktop");
   const themeVars = values ? themeToCssVars(values, darkMode) : {};
   const style = { ...themeVars } as React.CSSProperties;
   const showHighlight = activeColorKey != null;
-  const maxW = PREVIEW_MAX_WIDTH[previewDevice];
+  const maxW = PREVIEW_MAX_WIDTH["desktop"];
 
   return (
     <div className="flex h-full flex-col overflow-hidden bg-background">
-      <div className="flex shrink-0 flex-wrap items-center justify-between gap-4 px-6 py-4">
-        <h2 className="text-lg font-display font-semibold text-foreground">Preview</h2>
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="flex items-center gap-1 rounded-md border border-border bg-muted/30 p-0.5">
-            <Button
-              type="button"
-              variant={previewDevice === "desktop" ? "solid" : "ghost"}
-              intent="primary"
-              size="sm"
-              className="h-8 w-9 px-0"
-              aria-label="Desktop preview width"
-              onClick={() => setPreviewDevice("desktop")}
-            >
-              <Monitor className="h-4 w-4" />
-            </Button>
-            <Button
-              type="button"
-              variant={previewDevice === "tablet" ? "solid" : "ghost"}
-              intent="primary"
-              size="sm"
-              className="h-8 w-9 px-0"
-              aria-label="Tablet preview width"
-              onClick={() => setPreviewDevice("tablet")}
-            >
-              <Tablet className="h-4 w-4" />
-            </Button>
-            <Button
-              type="button"
-              variant={previewDevice === "mobile" ? "solid" : "ghost"}
-              intent="primary"
-              size="sm"
-              className="h-8 w-9 px-0"
-              aria-label="Mobile preview width"
-              onClick={() => setPreviewDevice("mobile")}
-            >
-              <Smartphone className="h-4 w-4" />
-            </Button>
-          </div>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => setDarkMode((d) => !d)}
-            className="gap-2"
-            aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
-          >
-            {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            {darkMode ? "Light" : "Dark"}
-          </Button>
-        </div>
-      </div>
-      <div className="flex-1 overflow-hidden px-4 pb-4 min-[400px]:px-6 min-[400px]:pb-6 lg:px-8 lg:pb-8">
+      <div className="flex-1 overflow-hidden bg-white px-4 pb-4 min-[400px]:px-6 min-[400px]:pb-6 lg:px-8 lg:pb-8">
         <div
           className={cn(
-            "h-full w-full overflow-y-auto rounded-[24px] bg-[#F7F7F7] p-4 md:p-8 transition-colors",
+            "flex h-full w-full flex-col overflow-hidden rounded-[24px] bg-[#F7F7F7] transition-colors my-6",
             darkMode && "dark bg-zinc-900"
           )}
         >
-          <div
-            className="mx-auto min-h-full w-full transition-[max-width] duration-300 ease-out"
-            style={{ maxWidth: maxW }}
-          >
+          <div className="flex shrink-0 items-center justify-between border-b border-border/50 px-6 py-4 md:px-8 md:py-6">
+            <h2 className="text-2xl font-display font-semibold text-foreground">Preview</h2>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setDarkMode((d) => !d)}
+              className="gap-2"
+              aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+            >
+              {darkMode ? <Sun className="h-4 w-4 text-icon-default" /> : <Moon className="h-4 w-4 text-icon-default" />}
+              {darkMode ? "Light" : "Dark"}
+            </Button>
+          </div>
+          <div className="flex-1 overflow-y-auto p-4 md:p-8">
+            <div
+              className="mx-auto min-h-full w-full transition-[max-width] duration-300 ease-out"
+              style={{ maxWidth: maxW }}
+            >
             <div
               className={cn(
                 "relative overflow-hidden rounded-xl border border-border bg-background shadow-xl min-h-full text-foreground",
@@ -143,5 +106,6 @@ export function ThemingEnginePreviewPane() {
         </div>
       </div>
     </div>
-  );
+  </div>
+);
 }
