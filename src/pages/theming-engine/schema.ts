@@ -19,7 +19,7 @@ const aiIconPresetOptions = ["orb", "sparkle", "chat"] as const;
  */
 export const brandColorsSchema = z.object({
   primary:      z.string().regex(hexColorRegex).default("#3958C3"),
-  secondary:    z.string().regex(hexColorRegex).default("#E2E5EA"),
+  secondary:    z.string().regex(hexColorRegex).default("#3958C3"),
   pageBg:       z.string().regex(hexColorRegex).default("#F8F9FE"),
   headerBg:     z.string().regex(hexColorRegex).default("#FFFFFF"),
   illustration: z.string().regex(hexColorRegex).default("#1C6EFF"),
@@ -100,7 +100,7 @@ export const themingEngineSchema = z
 const brandColorsImportSchema = z
   .object({
     primary:      z.string().regex(hexColorRegex).default("#3958C3"),
-    secondary:    z.string().regex(hexColorRegex).default("#E2E5EA"),
+    secondary:    z.string().regex(hexColorRegex).default("#3958C3"),
     pageBg:       z.string().regex(hexColorRegex).default("#F8F9FE"),
     headerBg:     z.string().regex(hexColorRegex).default("#FFFFFF"),
     headerText:   z.string().regex(hexColorRegex).optional(),
@@ -164,7 +164,7 @@ export type AiIconPreset = (typeof aiIconPresetOptions)[number];
 
 const defaultBrandColors: BrandColors = {
   primary:      "#3958C3",
-  secondary:    "#E2E5EA",
+  secondary:    "#3958C3",
   pageBg:       "#F8F9FE",
   headerBg:     "#FFFFFF",
   illustration: "#1C6EFF",
