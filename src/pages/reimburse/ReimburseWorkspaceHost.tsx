@@ -128,23 +128,11 @@ function sumSelectedReceiptLines(lines: ReceiptLineItem[]): string {
 /** Mock extraction aligned with Health FSA rules: medical care eligible; supplements & parking not. */
 function createDefaultReceiptLineItems(): ReceiptLineItem[] {
   return [
-    { id: "line-copay", description: "Office visit copay", amount: 25, eligible: true, selected: true },
-    {
-      id: "line-pt",
-      description: "Physical therapy session",
-      amount: 45,
-      eligible: true,
-      selected: true,
-    },
-    { id: "line-sun", description: "Sunscreen", amount: 50, eligible: true, selected: true },
-    {
-      id: "line-protein",
-      description: "Protein powder",
-      amount: 25,
-      eligible: false,
-      selected: false,
-    },
-    { id: "line-parking", description: "Parking", amount: 25, eligible: false, selected: false },
+    { id: "line-1", description: "ATORVASTATIN 10MG", amount: 20.00, eligible: true, selected: true },
+    { id: "line-2", description: "LISINOPRIL 20MG", amount: 35.00, eligible: true, selected: true },
+    { id: "line-3", description: "RX AMORICIL 500MG", amount: 12.45, eligible: true, selected: true },
+    { id: "line-4", description: "ORBIT GUM 14PC", amount: 1.89, eligible: false, selected: false },
+    { id: "line-5", description: "DIET COKE 20OZ", amount: 2.39, eligible: false, selected: false },
   ];
 }
 
@@ -314,10 +302,10 @@ function ReimburseWorkspaceSession({
           claim: {
             ...prev.claim,
             amount: amountFromLines,
-            serviceDateStart: prev.claim.serviceDateStart || "2026-03-10",
-            serviceDateEnd: prev.claim.serviceDateEnd || "2026-03-10",
-            provider: prev.claim.provider || "ABC Physical Therapy",
-            category: prev.claim.category || "physical-therapy",
+            serviceDateStart: prev.claim.serviceDateStart || "2026-04-08",
+            serviceDateEnd: prev.claim.serviceDateEnd || "2026-04-08",
+            provider: prev.claim.provider || "CVS Pharmacy",
+            category: prev.claim.category || "pharmacy",
             patient: prev.claim.patient || "self",
           },
         };
@@ -594,7 +582,7 @@ function StartStep({
       entryMode: "upload",
       uploadedDocs: [
         ...prev.uploadedDocs,
-        { name: "ABC_Physical_Therapy_receipt.pdf", size: "84 KB", isDummy: true },
+        { name: "CVS_Pharmacy_receipt.jpg", size: "1.2 MB", isDummy: true },
       ],
     }));
 
@@ -635,16 +623,15 @@ function StartStep({
               </Button>
             </CardContent>
           ) : (
-            <CardContent className="p-5 flex flex-col gap-4">
-              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+            <CardContent className="p-6 flex flex-col gap-4">
+              <p className="text-[13px] font-semibold uppercase tracking-[0.5px] text-[#5e6a75] mb-1">
                 Uploaded document(s)
               </p>
               <div className="flex flex-col gap-3">
                 {state.uploadedDocs.map((doc, i) => (
                   <div
                     key={`${doc.name}-${i}`}
-                    className="relative rounded-lg overflow-hidden border bg-secondary/30"
-                    style={{ height: 140 }}
+                    className="relative rounded-lg overflow-hidden border border-[#e4e6e9] bg-white h-[180px]"
                   >
                     {doc.isDummy ? (
                       <DummyReceiptPreview />
@@ -659,19 +646,19 @@ function StartStep({
                     )}
                     <button
                       onClick={() => handleRemoveDoc(i)}
-                      className="absolute bottom-2 left-2 h-8 w-8 rounded border border-border bg-white shadow-sm flex items-center justify-center hover:bg-secondary transition-colors"
+                      className="absolute bottom-3 left-3 h-10 w-10 rounded-md border border-[#e4e6e9] bg-white shadow-sm flex items-center justify-center hover:bg-gray-50 transition-colors"
                       aria-label="Remove document"
                     >
-                      <Trash2 className="h-4 w-4 text-destructive" />
+                      <Trash2 className="h-[18px] w-[18px] text-[#c8102e]" />
                     </button>
                   </div>
                 ))}
               </div>
               <button
                 onClick={handleSimulateUpload}
-                className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline underline-offset-2"
+                className="flex items-center gap-1.5 text-[15px] font-semibold text-[#0055a5] hover:underline mt-2"
               >
-                <Plus className="h-3.5 w-3.5" />
+                <Plus className="h-4 w-4" strokeWidth={2.5} />
                 Add another document
               </button>
             </CardContent>
@@ -711,42 +698,8 @@ function StartStep({
 
 function DummyReceiptPreview() {
   return (
-    <div className="w-full h-full overflow-hidden bg-white">
-      <div
-        className="w-full origin-top"
-        style={{
-          transform: "scale(0.42)",
-          transformOrigin: "top center",
-          width: "238%",
-          marginLeft: "-69%",
-        }}
-      >
-        <div className="bg-white p-5">
-          <div className="text-center pb-3 border-b border-gray-100">
-            <div className="font-bold text-sm text-gray-800 uppercase tracking-wide">
-              ABC Physical Therapy
-            </div>
-            <div className="text-xs text-gray-400 mt-0.5">
-              1234 Health Ave, Suite 200 · Portland, OR 97201
-            </div>
-          </div>
-          <div className="flex justify-between pt-3 pb-2 text-xs text-gray-500">
-            <span>Date: March 10, 2026</span>
-            <span>Invoice #: 20260310</span>
-          </div>
-          <div className="pb-3 border-b border-gray-100">
-            <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">Patient</div>
-            <div className="text-sm text-gray-700">John Doe</div>
-            <div className="text-xs text-gray-400">DOB: 01/15/1985 · MRN: 00481920</div>
-          </div>
-          <div className="mt-3 pt-3 border-t border-gray-100">
-            <div className="flex justify-between text-sm font-bold text-gray-800">
-              <span>Patient Balance Due</span>
-              <span>$127.43</span>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="w-full h-full overflow-hidden bg-[#e4e6e9] flex items-center justify-center">
+      <img src="/reimburse-docs/cvs-receipt.png" alt="Receipt preview" className="object-cover w-full h-full" />
     </div>
   );
 }
@@ -1130,6 +1083,7 @@ function DetailsStep({
 
           <Card>
             <CardContent className="p-6 flex flex-col gap-5">
+              <h2 className="text-lg font-semibold text-foreground">Claim details</h2>
               <FloatLabel
                 label="Total amount"
                 type="number"
@@ -1220,28 +1174,49 @@ function DetailsStep({
                       <Checkbox
                         checkboxSize="md"
                         checked={item.selected}
+                        disabled={!item.eligible}
                         onCheckedChange={(c) => {
                           if (c === "indeterminate") return;
                           setReceiptLineSelected(item.id, c === true);
                         }}
                         aria-label={`Include ${item.description}`}
                       />
-                      <span className="flex-1 min-w-0 text-sm font-medium text-foreground">
+                      <span className={`flex-1 min-w-0 text-sm font-medium ${!item.eligible ? "text-muted-foreground" : "text-foreground"}`}>
                         {item.description}
                       </span>
                       <div
                         className={`inline-flex items-center gap-[3.5px] px-[7px] py-[3.5px] rounded-[12px] shrink-0 ${
                           item.eligible
                             ? "bg-[#dcfce7] text-[#008375]"
-                            : "bg-[#ffecc7] text-[#b37a2b]"
+                            : "bg-[#ffecc7] text-[#b37a2b] opacity-75"
                         }`}
                       >
-                        <Info className="h-[10.5px] w-[10.5px] text-current" strokeWidth={2.5} aria-hidden />
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span
+                              role="button"
+                              tabIndex={0}
+                              className="cursor-help flex items-center outline-none"
+                              onClick={(e) => e.stopPropagation()}
+                              onPointerDown={(e) => e.stopPropagation()}
+                              onKeyDown={(e) => e.stopPropagation()}
+                            >
+                              <Info className="h-[10.5px] w-[10.5px] text-current" strokeWidth={2.5} aria-hidden />
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent side="top" className="max-w-xs text-left">
+                            <p className="text-sm">
+                              {item.eligible
+                                ? "This item is considered an eligible expense under your current plan."
+                                : "This item is not covered by your current plan and cannot be reimbursed."}
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
                         <span className="text-[11px] font-semibold leading-none whitespace-nowrap">
-                          {item.eligible ? "Eligible" : "Ineligible*"}
+                          {item.eligible ? "Eligible" : "Ineligible"}
                         </span>
                       </div>
-                      <span className="shrink-0 text-sm font-semibold tabular-nums text-foreground w-[4.5rem] text-right">
+                      <span className={`shrink-0 text-sm font-semibold tabular-nums w-[4.5rem] text-right ${!item.eligible ? "text-muted-foreground" : "text-foreground"}`}>
                         {usd(String(item.amount))}
                       </span>
                     </div>
@@ -1266,7 +1241,7 @@ function DetailsStep({
           <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border bg-background/80 flex-shrink-0">
             <FileText className="h-3.5 w-3.5 text-muted-foreground" />
             <span className="text-xs font-medium text-foreground truncate">
-              {state.uploadedDocs[0]?.name ?? "Receipt.pdf"}
+              {state.uploadedDocs[0]?.name ?? "Receipt.jpg"}
             </span>
           </div>
           <div className="flex-1 overflow-y-auto px-6 py-6">
@@ -1280,50 +1255,8 @@ function DetailsStep({
 
 function ReceiptPreviewFull() {
   return (
-    <div className="w-full bg-white rounded-lg shadow-sm border border-border/50 p-7">
-      <div className="text-center pb-5 border-b border-gray-100 space-y-0.5">
-        <div className="font-bold text-sm text-gray-800 tracking-wide uppercase">
-          ABC Physical Therapy
-        </div>
-        <div className="text-xs text-gray-400">1234 Health Ave, Suite 200 · Portland, OR 97201</div>
-        <div className="text-xs text-gray-400">Tel: (503) 555-0182</div>
-      </div>
-      <div className="flex justify-between pt-4 pb-3 text-xs text-gray-500">
-        <span>Date: March 10, 2026</span>
-        <span>Invoice #: 20260310</span>
-      </div>
-      <div className="pb-4 border-b border-gray-100">
-        <div className="text-[10px] uppercase tracking-wider text-gray-400 font-medium mb-1">Patient</div>
-        <div className="text-sm text-gray-700">John Doe</div>
-        <div className="text-xs text-gray-400">DOB: 01/15/1985 · MRN: 00481920</div>
-      </div>
-      <table className="w-full mt-4 text-xs">
-        <thead>
-          <tr className="border-b border-gray-100">
-            <th className="text-left text-gray-400 font-medium pb-2 pr-2">Description</th>
-            <th className="text-right text-gray-400 font-medium pb-2">Amount</th>
-          </tr>
-        </thead>
-        <tbody>
-          {[
-            { desc: "Office visit copay",             amt: "$25.00" },
-            { desc: "Physical therapy session (60 min)", amt: "$90.00" },
-            { desc: "Cold pack / ice therapy",        amt: "$5.00" },
-            { desc: "Protein powder (supplement)",    amt: "$12.43" },
-          ].map((row) => (
-            <tr key={row.desc} className="border-b border-gray-50 last:border-0">
-              <td className="py-2 pr-2 text-gray-700">{row.desc}</td>
-              <td className="py-2 text-right tabular-nums text-gray-700">{row.amt}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <div className="mt-4 pt-3 border-t border-gray-200">
-        <div className="flex justify-between text-sm font-semibold text-gray-800">
-          <span>Total due</span>
-          <span className="tabular-nums">$132.43</span>
-        </div>
-      </div>
+    <div className="w-full bg-white rounded-lg shadow-sm border border-border/50 p-4 flex items-center justify-center">
+      <img src="/reimburse-docs/cvs-receipt.png" alt="Receipt preview" className="object-contain w-full h-full max-h-[70vh]" />
     </div>
   );
 }
