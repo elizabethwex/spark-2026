@@ -736,7 +736,7 @@ function DummyReceiptPreview() {
           </div>
           <div className="pb-3 border-b border-gray-100">
             <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">Patient</div>
-            <div className="text-sm text-gray-700">John Doe</div>
+            <div className="text-sm text-gray-700">Penny Smith</div>
             <div className="text-xs text-gray-400">DOB: 01/15/1985 · MRN: 00481920</div>
           </div>
           <div className="mt-3 pt-3 border-t border-gray-100">
@@ -1294,7 +1294,7 @@ function ReceiptPreviewFull() {
       </div>
       <div className="pb-4 border-b border-gray-100">
         <div className="text-[10px] uppercase tracking-wider text-gray-400 font-medium mb-1">Patient</div>
-        <div className="text-sm text-gray-700">John Doe</div>
+        <div className="text-sm text-gray-700">Penny Smith</div>
         <div className="text-xs text-gray-400">DOB: 01/15/1985 · MRN: 00481920</div>
       </div>
       <table className="w-full mt-4 text-xs">

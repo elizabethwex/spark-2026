@@ -191,7 +191,7 @@ export const transactionsData: Transaction[] = [
     amount: "- $146.00",
     status: "processing",
     category: "childcare",
-    member: "Emma D.",
+    member: "James S.",
     timeline: [
       { label: "Submitted", date: "01/14/2025", completed: true, active: false },
       { label: "Processing", date: "01/15/2025", completed: false, active: true },

@@ -16,21 +16,21 @@ const OPTIONS: {
   tagVariant: "info" | "purple"
 }[] = [
   {
-    id: "ux-nicole",
-    username: "ux-nicole",
+    id: "pennysmith",
+    username: "pennysmith",
     productLabel: "Spending Account(s)",
     tagVariant: "info",
   },
   {
-    id: "n.jackson",
-    username: "n.jackson",
+    id: "p.smith",
+    username: "p.smith",
     productLabel: "COBRA & Direct Bill",
     tagVariant: "purple",
   },
 ]
 
 export interface SelectPrimaryAccountProps {
-  /** Username from the current login session; shown when the primary option is ux-nicole. */
+  /** Username from the current login session; shown when the primary option is pennysmith. */
   sessionUsername: string
   onMakePrimary: (selectedId: PrimaryOptionId) => void
   onCancel: () => void
@@ -46,7 +46,7 @@ export function SelectPrimaryAccount({
   onCancel,
   makePrimaryRef,
 }: SelectPrimaryAccountProps) {
-  const [selected, setSelected] = useState<PrimaryOptionId>("ux-nicole")
+  const [selected, setSelected] = useState<PrimaryOptionId>("pennysmith")
 
   const { username: displayUsername, passwordMasked: displayPasswordMasked } =
     getPrimaryCredentialsDisplay(selected, sessionUsername)
