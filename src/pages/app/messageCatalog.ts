@@ -1,6 +1,9 @@
+import type { AppVariant } from "@/context/AppVariantContext";
+
 /**
- * Message types and "Attention Needed" (urgent) flags from product mapping:
- * Mapping Sheet — Bucketing / Categorization (Money Activity, Account & Security, Tax & Statements).
+ * Message types, category tags, and "Attention Needed" flags follow the product source:
+ * **Mapping Sheet — Bucketing / Categorization** (Money Activity, Account & Security, Tax & Statements).
+ * Each row maps `Message` title → category tag + whether it belongs in the Attention Needed bucket.
  */
 export type MessageTag = "account-security" | "money-activity" | "tax-statements";
 
@@ -14,6 +17,12 @@ export interface CatalogEntry {
   /** When set, overrides default PDF badge in the Messages prototype */
   pdfAttached?: boolean;
 }
+
+/** Body copy for catalog rows that include an attachment (app + desktop message center). */
+export const MESSAGE_BODY_WITH_ATTACHMENT = "Please see attachment.";
+
+/** Max rows that show the Attention Needed stripe in FSA/HSA prototype inboxes (story stays readable). */
+export const MAX_PROTOTYPE_ATTENTION_STRIPES = 4;
 
 /** 💰 Money Activity */
 const MONEY: CatalogEntry[] = [
@@ -110,6 +119,18 @@ const TAX: CatalogEntry[] = [
 export const MESSAGE_CATALOG: CatalogEntry[] = [...MONEY, ...ACCOUNT, ...TAX];
 
 /**
+ * Whether a message subject should show as "Attention Needed" (desktop / table UI), per the mapping sheet.
+ * Uses exact title match against {@link MESSAGE_CATALOG} (case-insensitive fallback).
+ */
+export function isAttentionNeededForMessageSubject(subject: string): boolean {
+  const t = subject.trim();
+  const entry = MESSAGE_CATALOG.find(
+    (e) => e.title === t || e.title.toLowerCase() === t.toLowerCase()
+  );
+  return entry?.attentionNeeded ?? false;
+}
+
+/**
  * 20 inbox rows — one cohesive Health FSA participant story (top ≈ newest / most urgent).
  *
  * Arc (read downward): run-out deadline → claim friction (receipts → RMI → denial → reminder) →
@@ -179,7 +200,7 @@ const FSA_PROTOTYPE_INBOX: CatalogEntry[] = [
   },
   {
     title: "Debit Card Suspend Notification",
-    attentionNeeded: true,
+    attentionNeeded: false,
     pdfAttached: false,
     tag: "account-security",
     previewBody:
@@ -285,7 +306,175 @@ const FSA_PROTOTYPE_INBOX: CatalogEntry[] = [
   },
 ];
 
-/** 20 rows: FSA-realistic mix; filter chips stay populated across categories. */
-export function getPrototypeInboxEntries(): CatalogEntry[] {
-  return FSA_PROTOTYPE_INBOX;
+/**
+ * 20 inbox rows — HSA / HDHP participant story (variants 1 and 3).
+ * Same row shape as FSA list; Attention Needed capped like {@link FSA_PROTOTYPE_INBOX}.
+ */
+const HSA_PROTOTYPE_INBOX: CatalogEntry[] = [
+  {
+    title: "HSA Contribution Maximum Warning",
+    attentionNeeded: true,
+    pdfAttached: true,
+    tag: "money-activity",
+    previewBody:
+      "You’re approaching the IRS annual contribution limit. Review payroll deductions and one-time contributions before year-end.",
+  },
+  {
+    title: "Plan Change Letter",
+    attentionNeeded: false,
+    pdfAttached: true,
+    tag: "account-security",
+    previewBody:
+      "Your employer updated HDHP eligibility and HSA contribution rules for the next plan year. Review the summary attached.",
+  },
+  {
+    title: "Request for More Information (RMI)",
+    attentionNeeded: false,
+    pdfAttached: true,
+    tag: "money-activity",
+    previewBody:
+      "Your HSA reimbursement is on hold. Reply with an itemized receipt or explanation of benefits so we can finish review.",
+  },
+  {
+    title: "Denial Letter",
+    attentionNeeded: true,
+    pdfAttached: true,
+    tag: "money-activity",
+    previewBody:
+      "This expense isn’t eligible for HSA reimbursement under current plan rules. See the denial reason and your appeal options in the attached letter.",
+  },
+  {
+    title: "Notional Account Statement",
+    attentionNeeded: false,
+    pdfAttached: true,
+    tag: "tax-statements",
+    previewBody:
+      "Notional balance snapshot for employer reporting. Personal use is informational only.",
+  },
+  {
+    title: "Hold Claim Requiring Attestation Notification",
+    attentionNeeded: true,
+    pdfAttached: true,
+    tag: "money-activity",
+    previewBody:
+      "Confirm that this recurring physical therapy charge is still an eligible medical expense so we can release payment from your HSA.",
+  },
+  {
+    title: "Recurring Claim Coverage Attestation",
+    attentionNeeded: false,
+    pdfAttached: true,
+    tag: "money-activity",
+    previewBody:
+      "Annual attestation is due for your recurring eligible expenses paid from your HSA. Confirm amounts and provider information.",
+  },
+  {
+    title: "Debit Card Suspend Notification",
+    attentionNeeded: false,
+    pdfAttached: false,
+    tag: "account-security",
+    previewBody:
+      "Your HSA debit card was temporarily suspended after multiple declined receipt requests. Upload documents to restore card use.",
+  },
+  {
+    title: "Enrollment Reminder",
+    attentionNeeded: false,
+    pdfAttached: false,
+    tag: "account-security",
+    previewBody:
+      "Open enrollment ends Friday. Confirm your HDHP election and HSA contribution amount so you don’t miss pretax savings.",
+  },
+  {
+    title: "Claim Applied to Repayment Alert",
+    attentionNeeded: true,
+    pdfAttached: true,
+    tag: "money-activity",
+    previewBody:
+      "This claim was applied to an outstanding overpayment balance on your HSA. Review the breakdown and contact us if you have questions.",
+  },
+  {
+    title: "Claim Confirmation",
+    attentionNeeded: false,
+    pdfAttached: true,
+    tag: "money-activity",
+    previewBody:
+      "We received your claim for vision expenses. You can track status under Claims — most reimbursements post within a few business days.",
+  },
+  {
+    title: "Payment Issued (Payment Notification)",
+    attentionNeeded: false,
+    pdfAttached: true,
+    tag: "money-activity",
+    previewBody:
+      "$142.18 was sent to your linked bank account for your recent HSA reimbursement.",
+  },
+  {
+    title: "Advice of Deposit (for Claim Reimbursement)",
+    attentionNeeded: false,
+    pdfAttached: true,
+    tag: "money-activity",
+    previewBody:
+      "Your employer notified us of a payroll contribution to your HSA. Funds are available per your plan’s schedule.",
+  },
+  {
+    title: "Activity Account Statement Report",
+    attentionNeeded: false,
+    pdfAttached: true,
+    tag: "tax-statements",
+    previewBody:
+      "Detailed transaction listing for your HSA for the statement period, including card and manual claims.",
+  },
+  {
+    title: "Recurring Claim Confirmation",
+    attentionNeeded: false,
+    pdfAttached: false,
+    tag: "money-activity",
+    previewBody:
+      "Your recurring orthodontia installment was processed for this plan year. Next auto-pay date is listed in your claim details.",
+  },
+  {
+    title: "Repayment Processed",
+    attentionNeeded: false,
+    pdfAttached: false,
+    tag: "money-activity",
+    previewBody:
+      "We received your repayment for a prior ineligible reimbursement. Your HSA balance has been updated.",
+  },
+  {
+    title: "Claim to Repayment",
+    attentionNeeded: false,
+    pdfAttached: false,
+    tag: "money-activity",
+    previewBody:
+      "Summary of how your latest claim was applied to your repayment arrangement.",
+  },
+  {
+    title: "Claim Applied to Repayment",
+    attentionNeeded: false,
+    pdfAttached: false,
+    tag: "money-activity",
+    previewBody:
+      "Your approved claim was offset by a small prior balance. Net payment details are inside.",
+  },
+  {
+    title: "Debit Card Mailed Notification",
+    attentionNeeded: false,
+    pdfAttached: false,
+    tag: "account-security",
+    previewBody:
+      "Your new HSA debit card should arrive within 7–10 business days. Activate it before first use.",
+  },
+  {
+    title: "HSA Tax Documents",
+    attentionNeeded: false,
+    pdfAttached: false,
+    tag: "tax-statements",
+    previewBody:
+      "Year-end tax documents and contribution summaries will post here when available.",
+  },
+];
+
+/** FSA-style when variant 2; HSA-style for variants 1 (HSA + LPFSA) and 3 (HSA only). */
+export function getPrototypeInboxEntries(variant: AppVariant): CatalogEntry[] {
+  if (variant === 2) return FSA_PROTOTYPE_INBOX;
+  return HSA_PROTOTYPE_INBOX;
 }
