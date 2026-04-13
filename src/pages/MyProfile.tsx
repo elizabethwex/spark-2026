@@ -21,9 +21,10 @@ import {
 import { ConsumerFooter } from "@/components/layout/Footer";
 import { ConsumerNavigation } from "@/components/layout/ConsumerNavigation";
 import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground";
-import { Pencil, Info, Plus, Calendar, X, Trash2, MoreVertical, Eye, EyeOff, RefreshCw, AlertCircle, User, Users, HeartPlus, ShieldCheck, Landmark, CreditCard, Bell, UserLock, Lock, SquareArrowRight } from "lucide-react";
+import { Pencil, Info, Plus, Calendar, X, Trash2, MoreVertical, Eye, EyeOff, RefreshCw, AlertCircle, User, Users, HeartPlus, ShieldCheck, Landmark, CreditCard, Bell, UserLock, Lock, SquareArrowRight, DollarSign } from "lucide-react";
+import { ReimbursementMethodsContent } from "@/pages/ReimbursementMethodsContent";
 
-type SubPage = "my-profile" | "dependents" | "beneficiaries" | "authorized-signers" | "banking" | "debit-card" | "login-security" | "communication" | "report-lost-stolen" | "order-replacement-card";
+type SubPage = "my-profile" | "dependents" | "beneficiaries" | "authorized-signers" | "banking" | "reimbursement-method" | "debit-card" | "login-security" | "communication" | "report-lost-stolen" | "order-replacement-card";
 
 type Dependent = {
   id: string;
@@ -668,7 +669,7 @@ export default function MyProfile() {
 
   const [activeSubPage, setActiveSubPage] = useState<SubPage>(() => {
     const subPage = searchParams.get("subPage");
-    const validSubPages: SubPage[] = ["my-profile", "dependents", "beneficiaries", "authorized-signers", "banking", "debit-card", "login-security", "communication", "report-lost-stolen", "order-replacement-card"];
+    const validSubPages: SubPage[] = ["my-profile", "dependents", "beneficiaries", "authorized-signers", "banking", "reimbursement-method", "debit-card", "login-security", "communication", "report-lost-stolen", "order-replacement-card"];
     if (subPage && validSubPages.includes(subPage as SubPage)) {
       return subPage as SubPage;
     }
@@ -678,7 +679,7 @@ export default function MyProfile() {
   // Sync activeSubPage with URL params
   useEffect(() => {
     const subPage = searchParams.get("subPage");
-    const validSubPages: SubPage[] = ["my-profile", "dependents", "beneficiaries", "authorized-signers", "banking", "debit-card", "login-security", "communication", "report-lost-stolen", "order-replacement-card"];
+    const validSubPages: SubPage[] = ["my-profile", "dependents", "beneficiaries", "authorized-signers", "banking", "reimbursement-method", "debit-card", "login-security", "communication", "report-lost-stolen", "order-replacement-card"];
     queueMicrotask(() => {
       if (subPage && validSubPages.includes(subPage as SubPage)) {
         setActiveSubPage(subPage as SubPage);
@@ -1735,6 +1736,7 @@ export default function MyProfile() {
       title: "PAYMENTS",
       items: [
         { label: "Bank Accounts", key: "banking", icon: Landmark },
+        { label: "Reimbursement Methods", key: "reimbursement-method", icon: DollarSign },
         { label: "Debit Card", key: "debit-card", icon: CreditCard },
       ],
     },
@@ -2324,6 +2326,9 @@ export default function MyProfile() {
             )}
           </>
         );
+
+      case "reimbursement-method":
+        return <ReimbursementMethodsContent />;
 
       case "banking":
         return (
