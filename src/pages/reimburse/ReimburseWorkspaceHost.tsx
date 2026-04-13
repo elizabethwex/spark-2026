@@ -609,8 +609,8 @@ function StartStep({
         <Card className="overflow-hidden">
           {!hasDocs ? (
             <CardContent className="flex flex-col items-center gap-4 py-10 px-8 text-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-secondary">
-                <Upload className="h-6 w-6 text-foreground" strokeWidth={1.5} />
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-neutral-50">
+                <Upload className="h-6 w-6 text-neutral-700" strokeWidth={1.5} />
               </div>
               <div className="flex flex-col gap-1">
                 <p className="font-semibold text-foreground">Upload a receipt</p>
@@ -699,7 +699,7 @@ function StartStep({
 function DummyReceiptPreview() {
   return (
     <div className="w-full h-full overflow-hidden bg-[#e4e6e9] flex items-center justify-center">
-      <img src="/reimburse-docs/cvs-receipt.png" alt="Receipt preview" className="object-cover w-full h-full" />
+      <img src={`${import.meta.env.BASE_URL}reimburse-docs/cvs-receipt.png`} alt="Receipt preview" className="object-cover w-full h-full" />
     </div>
   );
 }
@@ -827,7 +827,7 @@ function AccountStep({
         </div>
 
         {/* Claim amount pill */}
-        <div className="inline-flex items-center gap-2 text-sm text-muted-foreground bg-secondary/50 rounded-lg px-3 py-2 w-fit">
+        <div className="inline-flex items-center gap-2 text-sm text-neutral-700 bg-neutral-100 rounded-lg px-3 py-2 w-fit">
           <Tooltip>
             <TooltipTrigger asChild>
               <button
@@ -835,7 +835,7 @@ function AccountStep({
                 className="shrink-0 rounded-full text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 aria-label="About claim amount"
               >
-                <Info className="h-3.5 w-3.5" aria-hidden />
+                <Info className="h-3.5 w-3.5 text-current" aria-hidden />
               </button>
             </TooltipTrigger>
             <TooltipContent side="top" className="max-w-sm text-left">
@@ -931,7 +931,7 @@ function AccountStep({
                             if (e.key === "Enter" || e.key === " ") e.stopPropagation();
                           }}
                         >
-                          <Info className="h-3.5 w-3.5" aria-hidden />
+                          <Info className="h-3.5 w-3.5 text-current" aria-hidden />
                         </span>
                       </TooltipTrigger>
                       <TooltipContent side="top" className="max-w-sm text-left">
@@ -961,7 +961,7 @@ function AccountStep({
                             if (e.key === "Enter" || e.key === " ") e.stopPropagation();
                           }}
                         >
-                          <Info className="h-3.5 w-3.5" aria-hidden />
+                          <Info className="h-3.5 w-3.5 text-current" aria-hidden />
                         </span>
                       </TooltipTrigger>
                       <TooltipContent side="top" className="max-w-sm text-left">
@@ -1201,7 +1201,7 @@ function DetailsStep({
                               onPointerDown={(e) => e.stopPropagation()}
                               onKeyDown={(e) => e.stopPropagation()}
                             >
-                              <Info className="h-[10.5px] w-[10.5px]" strokeWidth={2.5} aria-hidden />
+                              <Info className="h-[10.5px] w-[10.5px] text-current" strokeWidth={2.5} aria-hidden />
                             </span>
                           </TooltipTrigger>
                           <TooltipContent side="top" className="max-w-xs text-left">
@@ -1256,7 +1256,7 @@ function DetailsStep({
 function ReceiptPreviewFull() {
   return (
     <div className="w-full bg-white rounded-lg shadow-sm border border-border/50 p-4 flex items-center justify-center">
-      <img src="/reimburse-docs/cvs-receipt.png" alt="Receipt preview" className="object-contain w-full h-full max-h-[70vh]" />
+      <img src={`${import.meta.env.BASE_URL}reimburse-docs/cvs-receipt.png`} alt="Receipt preview" className="object-contain w-full h-full max-h-[70vh]" />
     </div>
   );
 }
@@ -1343,7 +1343,7 @@ function DestinationStep({
                 <div className="flex items-start gap-4">
                   <div
                     className={`mt-0.5 flex-shrink-0 ${
-                      isSelected ? "text-[#0055a5]" : "text-[#515f6b]"
+                      isSelected ? "text-neutral-700" : "text-[#515f6b]"
                     }`}
                   >
                     {opt.icon}
@@ -1352,7 +1352,7 @@ function DestinationStep({
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="text-[16px] font-bold text-[#1d2c38]">{opt.label}</p>
                       {opt.badge && (
-                        <span className="inline-flex items-center px-[8px] py-[3px] rounded-[12px] bg-[#eef2ff] text-[#3958c3] text-[12px] font-medium leading-none whitespace-nowrap">
+                        <span className="inline-flex items-center px-[8px] py-[3px] rounded-[12px] bg-[var(--theme-secondary-ramp-50)] text-[var(--theme-secondary)] text-[12px] font-medium leading-none whitespace-nowrap">
                           {opt.badge}
                         </span>
                       )}
@@ -1452,7 +1452,7 @@ function ValidationStep({
                       viewBox="0 0 15 15"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
-                      className="shrink-0"
+                      className="shrink-0 text-neutral-700"
                     >
                       <path
                         d="M1.98958 5.32292C1.63596 5.32292 1.29682 5.46339 1.04677 5.71344C0.796726 5.96349 0.65625 6.30263 0.65625 6.65625V7.98958C0.65625 8.3432 0.796726 8.68234 1.04677 8.93239C1.29682 9.18244 1.63596 9.32292 1.98958 9.32292H4.65625C4.83306 9.32292 5.00263 9.39315 5.12765 9.51818C5.25268 9.6432 5.32292 9.81277 5.32292 9.98958V12.6562C5.32292 13.0099 5.46339 13.349 5.71344 13.5991C5.96349 13.8491 6.30263 13.9896 6.65625 13.9896H7.98958C8.3432 13.9896 8.68234 13.8491 8.93239 13.5991C9.18244 13.349 9.32292 13.0099 9.32292 12.6562V9.98958C9.32292 9.81277 9.39315 9.6432 9.51818 9.51818C9.6432 9.39315 9.81277 9.32292 9.98958 9.32292H12.6562C13.0099 9.32292 13.349 9.18244 13.5991 8.93239C13.8491 8.68234 13.9896 8.3432 13.9896 7.98958V6.65625C13.9896 6.30263 13.8491 5.96349 13.5991 5.71344C13.349 5.46339 13.0099 5.32292 12.6562 5.32292H9.98958C9.81277 5.32292 9.6432 5.25268 9.51818 5.12765C9.39315 5.00263 9.32292 4.83306 9.32292 4.65625V1.98958C9.32292 1.63596 9.18244 1.29682 8.93239 1.04677C8.68234 0.796726 8.3432 0.65625 7.98958 0.65625H6.65625C6.30263 0.65625 5.96349 0.796726 5.71344 1.04677C5.46339 1.29682 5.32292 1.63596 5.32292 1.98958V4.65625C5.32292 4.83306 5.25268 5.00263 5.12765 5.12765C5.00263 5.25268 4.83306 5.32292 4.65625 5.32292H1.98958Z"
@@ -1491,7 +1491,7 @@ function ValidationStep({
                       viewBox="0 0 14 15"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
-                      className="shrink-0 text-[#0055a5]"
+                      className="shrink-0 text-neutral-700"
                     >
                       <path
                         d="M5.34118 11.3249V6.6582M8.00785 11.3249V6.6582M10.6745 11.3249V6.6582M0.674518 13.9915H12.6745M2.67452 11.3249V6.6582M6.08792 0.790262C6.27085 0.701401 6.47168 0.655565 6.67505 0.656258C6.87842 0.656951 7.07893 0.704156 7.26125 0.794262L12.5053 3.35893C12.8226 3.51426 12.7119 3.99159 12.3586 3.99159H0.990586C0.637252 3.99159 0.527252 3.51426 0.843919 3.35893L6.08792 0.790262Z"
@@ -1623,11 +1623,11 @@ function ConfirmationStep({
                     <div className="flex flex-col items-center">
                       <div
                         className={`flex h-[24px] w-[24px] items-center justify-center rounded-full flex-shrink-0 mt-0.5 ${
-                          isActive ? "border border-[#0058a3] text-[#0058a3] bg-white" : ""
+                          isActive ? "border border-[var(--theme-primary)] text-[var(--neutral-700)] bg-white" : ""
                         } ${
                           isCompleted ? "border border-[#009b89] text-[#009b89] bg-white" : ""
                         } ${
-                          isPending ? "bg-[#e4e6e9] text-[#7c858e]" : ""
+                          isPending ? "bg-[var(--neutral-100)] text-[var(--neutral-700)]" : ""
                         }`}
                       >
                         {isCompleted ? (
@@ -1642,24 +1642,24 @@ function ConfirmationStep({
                       <div className="flex items-center gap-2">
                         <p
                           className={`text-[14px] tracking-[-0.084px] leading-tight ${
-                            isActive ? "font-semibold text-[#243746]" : "font-medium text-[#7c858e]"
+                            isActive ? "font-semibold text-[#243746]" : "font-medium text-[var(--neutral-700)]"
                           }`}
                         >
                           {event.label}
                         </p>
                         {isActive && (
-                          <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-[12px] bg-[#eef2ff] text-[#3958c3] text-[11px] font-semibold leading-none whitespace-nowrap">
+                          <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-[12px] bg-[var(--theme-secondary-ramp-50)] text-[var(--theme-secondary)] text-[11px] font-semibold leading-none whitespace-nowrap">
                             Now
                           </span>
                         )}
                       </div>
-                      <p className="text-[13px] text-[#7c858e] mt-1">{event.description}</p>
+                      <p className="text-[13px] text-[var(--neutral-700)] mt-1">{event.description}</p>
                     </div>
                   </div>
                 );
               })}
             </div>
-            <p className="text-xs text-muted-foreground mt-4">
+            <p className="text-xs text-[var(--neutral-700)] mt-4">
               Final amount and timing depend on approval.
             </p>
           </CardContent>
@@ -1686,7 +1686,7 @@ function ConfirmationStep({
             intent="primary"
             className="flex-1 flex items-center justify-center gap-2"
           >
-            <Clock className="h-4 w-4" />
+            <Clock className="h-4 w-4 text-white" />
             View claim status
           </Button>
         </div>

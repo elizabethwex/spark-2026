@@ -10,7 +10,7 @@ export function MobileAppBanner() {
         alt=""
         aria-hidden="true"
         className="absolute inset-0 h-full w-full object-cover pointer-events-none scale-105"
-        src="/ps-banner.png"
+        src={`${import.meta.env.BASE_URL}ps-banner.png`}
       />
 
       <div className="relative flex items-center px-[60px] py-8">

@@ -1884,14 +1884,14 @@ export default function MyProfile() {
                   intent="primary"
                   variant="outline"
                   size="sm"
-                  className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50"
+                  className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50 [&_svg]:text-current"
                   onClick={() => {
                     resetForm();
                     setEditingDependentId(null);
                     setIsAddDependentModalOpen(true);
                   }}
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-4 w-4 text-current" />
                   <span className="sm:ml-2">Add Dependent</span>
                 </Button>
               </div>
@@ -1922,7 +1922,7 @@ export default function MyProfile() {
                         setIsAddDependentModalOpen(true);
                       }}
                     >
-                      <Plus className="h-4 w-4" />
+                      <Plus className="h-4 w-4 text-current" />
                       <span>Add Dependent</span>
                     </Button>
                   </EmptyContent>
@@ -2043,7 +2043,7 @@ export default function MyProfile() {
                     intent="primary"
                     variant="outline"
                     size="sm"
-                    className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50"
+                    className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50 [&_svg]:text-current"
                     onClick={() => {
                       resetBeneficiaryForm();
                       setEditingBeneficiaryId(null);
@@ -2051,7 +2051,7 @@ export default function MyProfile() {
                       setIsAddBeneficiaryWorkspaceOpen(true);
                     }}
                   >
-                    <Plus className="h-4 w-4" />
+                    <Plus className="h-4 w-4 text-current" />
                     <span>Add Beneficiary</span>
                   </Button>
                 </div>
@@ -2084,7 +2084,7 @@ export default function MyProfile() {
                         setIsAddBeneficiaryWorkspaceOpen(true);
                       }}
                     >
-                      <Plus className="h-4 w-4" />
+                      <Plus className="h-4 w-4 text-current" />
                       <span>Add Beneficiary</span>
                     </Button>
                   </EmptyContent>
@@ -2221,14 +2221,14 @@ export default function MyProfile() {
                   intent="primary"
                   variant="outline"
                   size="sm"
-                  className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50"
+                  className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50 [&_svg]:text-current"
                   onClick={() => {
                     resetAuthorizedSignerForm();
                     setEditingAuthorizedSignerId(null);
                     setIsAddAuthorizedSignerModalOpen(true);
                   }}
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-4 w-4 text-current" />
                   <span className="sm:ml-2">Add Authorized Signer</span>
                 </Button>
               </div>
@@ -2259,7 +2259,7 @@ export default function MyProfile() {
                         setIsAddAuthorizedSignerModalOpen(true);
                       }}
                     >
-                      <Plus className="h-4 w-4" />
+                      <Plus className="h-4 w-4 text-current" />
                       <span>Add Authorized Signer</span>
                     </Button>
                   </EmptyContent>
@@ -2335,7 +2335,7 @@ export default function MyProfile() {
                   intent="primary"
                   variant="outline"
                   size="sm"
-                  className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50"
+                  className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50 [&_svg]:text-current"
                   onClick={() => {
                     setBankAccountFormData({
                       verificationMethod: "",
@@ -2357,7 +2357,7 @@ export default function MyProfile() {
                     setIsAddBankAccountModalOpen(true);
                   }}
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-4 w-4 text-current" />
                   <span className="sm:ml-2">Add Bank Account</span>
                 </Button>
               </div>
@@ -2403,7 +2403,7 @@ export default function MyProfile() {
                         setIsAddBankAccountModalOpen(true);
                       }}
                     >
-                      <Plus className="h-4 w-4" />
+                      <Plus className="h-4 w-4 text-current" />
                       <span>Add Bank Account</span>
                     </Button>
                   </EmptyContent>
@@ -3250,7 +3250,7 @@ export default function MyProfile() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-primary hover:text-primary active:text-primary [&>svg]:text-primary"
+                      className="text-[color:var(--system-link)] hover:text-[color:var(--system-link)] active:text-[color:var(--system-link)] [&>svg]:text-[color:var(--system-link)]"
                     >
                       <Pencil />
                       Update Username
@@ -3267,7 +3267,7 @@ export default function MyProfile() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-primary hover:text-primary active:text-primary [&>svg]:text-primary"
+                      className="text-[color:var(--system-link)] hover:text-[color:var(--system-link)] active:text-[color:var(--system-link)] [&>svg]:text-[color:var(--system-link)]"
                     >
                       <Pencil />
                       Change Password
@@ -3357,10 +3357,10 @@ export default function MyProfile() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="flex items-center gap-1.5 px-3 py-1 text-sm font-medium text-primary hover:bg-gray-100"
+                  className="flex items-center gap-1.5 px-3 py-1 text-sm font-medium text-[color:var(--system-link)] hover:bg-gray-100"
                   onClick={() => setIsContactInfoModalOpen(true)}
                 >
-                  <Pencil className="h-4 w-4 text-primary" />
+                  <Pencil className="h-4 w-4 text-[color:var(--system-link)]" />
                   Edit
                 </Button>
               </div>
@@ -6679,7 +6679,7 @@ export default function MyProfile() {
                 setIsAddBeneficiaryModalOpen(true);
               }}
             >
-              <Plus className="h-4 w-4" />
+              <Plus className="h-4 w-4 text-current" />
               <span>Add Beneficiary</span>
             </Button>
 

@@ -120,7 +120,7 @@ export function ThemingEngineTopBar() {
             variant="ghost"
             size="sm"
             onClick={onExport}
-            className="gap-1.5 text-muted-foreground"
+            className="gap-1.5 text-sm text-muted-foreground"
             title="Download theme as JSON"
           >
             <Download className="h-4 w-4 text-icon-default" />
