@@ -1884,7 +1884,7 @@ export default function MyProfile() {
                   intent="primary"
                   variant="outline"
                   size="sm"
-                  className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50"
+                  className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50 [&_svg]:text-current"
                   onClick={() => {
                     resetForm();
                     setEditingDependentId(null);
@@ -2043,7 +2043,7 @@ export default function MyProfile() {
                     intent="primary"
                     variant="outline"
                     size="sm"
-                    className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50"
+                    className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50 [&_svg]:text-current"
                     onClick={() => {
                       resetBeneficiaryForm();
                       setEditingBeneficiaryId(null);
@@ -2221,7 +2221,7 @@ export default function MyProfile() {
                   intent="primary"
                   variant="outline"
                   size="sm"
-                  className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50"
+                  className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50 [&_svg]:text-current"
                   onClick={() => {
                     resetAuthorizedSignerForm();
                     setEditingAuthorizedSignerId(null);
@@ -2335,7 +2335,7 @@ export default function MyProfile() {
                   intent="primary"
                   variant="outline"
                   size="sm"
-                  className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50"
+                  className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50 [&_svg]:text-current"
                   onClick={() => {
                     setBankAccountFormData({
                       verificationMethod: "",
@@ -3250,7 +3250,7 @@ export default function MyProfile() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-primary hover:text-primary active:text-primary [&>svg]:text-primary"
+                      className="text-[color:var(--system-link)] hover:text-[color:var(--system-link)] active:text-[color:var(--system-link)] [&>svg]:text-[color:var(--system-link)]"
                     >
                       <Pencil />
                       Update Username
@@ -3267,7 +3267,7 @@ export default function MyProfile() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-primary hover:text-primary active:text-primary [&>svg]:text-primary"
+                      className="text-[color:var(--system-link)] hover:text-[color:var(--system-link)] active:text-[color:var(--system-link)] [&>svg]:text-[color:var(--system-link)]"
                     >
                       <Pencil />
                       Change Password
@@ -3357,10 +3357,10 @@ export default function MyProfile() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="flex items-center gap-1.5 px-3 py-1 text-sm font-medium text-primary hover:bg-gray-100"
+                  className="flex items-center gap-1.5 px-3 py-1 text-sm font-medium text-[color:var(--system-link)] hover:bg-gray-100"
                   onClick={() => setIsContactInfoModalOpen(true)}
                 >
-                  <Pencil className="h-4 w-4 text-primary" />
+                  <Pencil className="h-4 w-4 text-[color:var(--system-link)]" />
                   Edit
                 </Button>
               </div>

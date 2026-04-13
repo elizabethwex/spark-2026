@@ -89,7 +89,7 @@ function InfoTip({ label, children }: { label: string; children: React.ReactNode
           className="inline-flex text-[#5f6a94] hover:text-[#14182c] focus-visible:outline focus-visible:ring-2 focus-visible:ring-primary"
           aria-label={label}
         >
-          <Info className="h-4 w-4" aria-hidden />
+          <Info className="h-4 w-4 text-current" aria-hidden />
         </button>
       </TooltipTrigger>
       <TooltipContent side="right" className="max-w-[220px] text-left text-sm">
@@ -153,8 +153,8 @@ export default function FsaAccountPage() {
               {/* Left: available balance */}
               <div className="min-w-0 flex-1 space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-[#3958c3]">
-                    <Landmark className="h-5 w-5" aria-hidden />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--theme-secondary-ramp-50)] text-[var(--theme-secondary)]">
+                    <Landmark className="h-5 w-5 text-current" aria-hidden />
                   </div>
                   <h2 className="text-[20px] font-bold leading-8 text-[#14182c] md:text-2xl">
                     Account Overview
@@ -197,7 +197,7 @@ export default function FsaAccountPage() {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between gap-4 text-base">
                       <div className="flex min-w-0 items-center gap-3 text-[#5f6a94]">
-                        <CalendarDays className="h-4 w-4 shrink-0" aria-hidden />
+                        <CalendarDays className="h-4 w-4 shrink-0 text-current" aria-hidden />
                         <span className="font-medium">Plan Year</span>
                       </div>
                       <span className="shrink-0 font-semibold text-[#14182c]">
@@ -207,7 +207,7 @@ export default function FsaAccountPage() {
                     <div className="h-px w-full bg-[#b7c0da]" />
                     <div className="flex items-center justify-between gap-4 text-base">
                       <div className="flex min-w-0 items-center gap-3 text-[#5f6a94]">
-                        <CircleDollarSign className="h-4 w-4 shrink-0" aria-hidden />
+                        <CircleDollarSign className="h-4 w-4 shrink-0 text-current" aria-hidden />
                         <span className="font-medium">Eligible Amount</span>
                       </div>
                       <span className="shrink-0 font-semibold text-[#14182c]">$2,500.00</span>
@@ -215,7 +215,7 @@ export default function FsaAccountPage() {
                     <div className="h-px w-full bg-[#b7c0da]" />
                     <div className="flex items-center justify-between gap-4 text-base">
                       <div className="flex min-w-0 items-center gap-2 text-[#5f6a94]">
-                        <DollarSign className="h-4 w-4 shrink-0" aria-hidden />
+                        <DollarSign className="h-4 w-4 shrink-0 text-current" aria-hidden />
                         <span className="font-medium">Plan Year Balance</span>
                         <InfoTip label="About plan year balance">
                           Your plan year balance reflects the total funds currently available for
@@ -324,8 +324,8 @@ export default function FsaAccountPage() {
             <SectionCard>
               <div className="space-y-6">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-[#3958c3]">
-                    <ReceiptText className="h-5 w-5" aria-hidden />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--theme-secondary-ramp-50)] text-[var(--theme-secondary)]">
+                    <ReceiptText className="h-5 w-5 text-current" aria-hidden />
                   </div>
                   <h2 className="text-[20px] font-bold leading-8 text-[#14182c] md:text-2xl">
                     Claim Summary
@@ -342,8 +342,8 @@ export default function FsaAccountPage() {
             <SectionCard>
               <div className="space-y-6">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-[#3958c3]">
-                    <WalletCards className="h-5 w-5" aria-hidden />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--theme-secondary-ramp-50)] text-[var(--theme-secondary)]">
+                    <WalletCards className="h-5 w-5 text-current" aria-hidden />
                   </div>
                   <h2 className="text-[20px] font-bold leading-8 text-[#14182c] md:text-2xl">
                     Elections
@@ -377,7 +377,7 @@ export default function FsaAccountPage() {
                       inputSize="md"
                       type="search"
                       placeholder="Search"
-                      leftIcon={<Search className="h-4 w-4" />}
+                      leftIcon={<Search className="h-4 w-4 text-current" />}
                       value={searchQuery}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         setSearchQuery(e.target.value);
@@ -391,7 +391,7 @@ export default function FsaAccountPage() {
                     type="button"
                     className="shrink-0 text-[#5f6a94] hover:text-[#14182c]"
                   >
-                    <Download className="mr-2 h-4 w-4" aria-hidden />
+                    <Download className="mr-2 h-4 w-4 text-current" aria-hidden />
                     Export
                   </Button>
                 </div>
@@ -404,7 +404,7 @@ export default function FsaAccountPage() {
                       <TableHead>
                         <div className="flex items-center gap-1 whitespace-nowrap">
                           Date
-                          <ArrowDown className="h-3 w-3" aria-hidden />
+                          <ArrowDown className="h-3 w-3 text-current" aria-hidden />
                         </div>
                       </TableHead>
                       <TableHead>Status</TableHead>
@@ -414,7 +414,7 @@ export default function FsaAccountPage() {
                       <TableHead className="text-right">
                         <div className="flex items-center justify-end gap-1">
                           Amount
-                          <ArrowDown className="h-3 w-3" aria-hidden />
+                          <ArrowDown className="h-3 w-3 text-current" aria-hidden />
                         </div>
                       </TableHead>
                       <TableHead className="text-right">Running Balance</TableHead>
@@ -441,7 +441,7 @@ export default function FsaAccountPage() {
                         }}
                         aria-disabled={currentPage <= 1}
                       >
-                        <ChevronsLeft className="h-4 w-4" />
+                        <ChevronsLeft className="h-4 w-4 text-current" />
                       </PaginationLink>
                     </PaginationItem>
                     <PaginationItem>
@@ -489,7 +489,7 @@ export default function FsaAccountPage() {
                         }}
                         aria-disabled={currentPage >= totalPages}
                       >
-                        <ChevronsRight className="h-4 w-4" />
+                        <ChevronsRight className="h-4 w-4 text-current" />
                       </PaginationLink>
                     </PaginationItem>
                   </PaginationContent>
@@ -675,14 +675,14 @@ function ElectionRows() {
     <div className="space-y-0">
       <div className="relative flex items-center justify-between border-b border-[#b7c0da] py-3 text-sm">
         <div className="flex items-center gap-2 text-[#5f6a94]">
-          <UserRound className="h-4 w-4" aria-hidden />
+          <UserRound className="h-4 w-4 text-current" aria-hidden />
           <span>My Contribution to Date</span>
         </div>
         <span className="font-medium text-[#14182c]">$378.80</span>
       </div>
       <div className="relative flex items-center justify-between border-b border-[#b7c0da] py-3 text-sm">
         <div className="flex items-center gap-2 text-[#5f6a94]">
-          <Banknote className="h-4 w-4" aria-hidden />
+          <Banknote className="h-4 w-4 text-current" aria-hidden />
           <span>Estimated Payroll Deduction</span>
         </div>
         <span className="font-medium text-[#14182c]">$75.76</span>
@@ -690,7 +690,7 @@ function ElectionRows() {
       <div className="h-px w-full bg-[#b7c0da]" />
       <div className="relative flex items-center justify-between py-3 text-sm">
         <div className="flex items-center gap-2 text-[#5f6a94]">
-          <CalendarDays className="h-4 w-4" aria-hidden />
+          <CalendarDays className="h-4 w-4 text-current" aria-hidden />
           <span>Effective Date</span>
         </div>
         <span className="font-medium text-[#14182c]">01/01/2026</span>
@@ -711,7 +711,7 @@ function PlanDeadlineRows() {
           intent="success"
           className="gap-1 rounded-md bg-[#ecfdf5] px-2 py-1 text-xs font-bold text-[#002c22]"
         >
-          <CircleCheck className="h-3.5 w-3.5" aria-hidden />
+          <CircleCheck className="h-3.5 w-3.5 text-current" aria-hidden />
           Active
         </Badge>
       </div>
