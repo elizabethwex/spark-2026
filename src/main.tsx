@@ -2,9 +2,9 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { AppProviders } from '@wexinc-healthbenefits/ben-ui-kit'
-// Kit styles first; local tokens last so design-tokens.json output wins for :root / .dark variables.
-import './index.css'
+// Base design tokens first, then our local index.css overrides them to establish true project defaults.
 import '@wex/design-tokens'
+import './index.css'
 import App from './App.tsx'
 
 createRoot(document.getElementById('root')!).render(
