@@ -699,7 +699,7 @@ function StartStep({
 function DummyReceiptPreview() {
   return (
     <div className="w-full h-full overflow-hidden bg-[#e4e6e9] flex items-center justify-center">
-      <img src="/reimburse-docs/cvs-receipt.png" alt="Receipt preview" className="object-cover w-full h-full" />
+      <img src={`${import.meta.env.BASE_URL}reimburse-docs/cvs-receipt.png`} alt="Receipt preview" className="object-cover w-full h-full" />
     </div>
   );
 }
@@ -1256,7 +1256,7 @@ function DetailsStep({
 function ReceiptPreviewFull() {
   return (
     <div className="w-full bg-white rounded-lg shadow-sm border border-border/50 p-4 flex items-center justify-center">
-      <img src="/reimburse-docs/cvs-receipt.png" alt="Receipt preview" className="object-contain w-full h-full max-h-[70vh]" />
+      <img src={`${import.meta.env.BASE_URL}reimburse-docs/cvs-receipt.png`} alt="Receipt preview" className="object-contain w-full h-full max-h-[70vh]" />
     </div>
   );
 }
