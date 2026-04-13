@@ -1,9 +1,12 @@
+import { lazy, Suspense } from "react";
 import { Navigate, useSearchParams } from "react-router-dom";
 import { ConsumerNavigation } from "@/components/layout/ConsumerNavigation";
 import { ConsumerFooter } from "@/components/layout/Footer";
 import { UnderConstruction } from "@/components/UnderConstruction";
 import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground";
 import { FadeInItem } from "@/components/layout/PageFadeIn";
+
+const FsaAccountPage = lazy(() => import("@/pages/fsa-account/FsaAccountPage"));
 // Original imports preserved for future restoration:
 // import { TitleBar } from "./hsa-details/TitleBar";
 // import { AccountSummaryCards } from "./hsa-details/AccountSummaryCards";
@@ -30,6 +33,20 @@ export default function AccountOverviewPage() {
 
   if (account === "hsa") {
     return <Navigate to="/hsa-details" replace />;
+  }
+
+  if (account === "fsa") {
+    return (
+      <Suspense
+        fallback={
+          <div className="flex min-h-[40vh] items-center justify-center text-muted-foreground">
+            Loading…
+          </div>
+        }
+      >
+        <FsaAccountPage />
+      </Suspense>
+    );
   }
 
   return (
