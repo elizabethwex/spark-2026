@@ -1891,7 +1891,7 @@ export default function MyProfile() {
                     setIsAddDependentModalOpen(true);
                   }}
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-4 w-4 text-current" />
                   <span className="sm:ml-2">Add Dependent</span>
                 </Button>
               </div>
@@ -1922,7 +1922,7 @@ export default function MyProfile() {
                         setIsAddDependentModalOpen(true);
                       }}
                     >
-                      <Plus className="h-4 w-4" />
+                      <Plus className="h-4 w-4 text-current" />
                       <span>Add Dependent</span>
                     </Button>
                   </EmptyContent>
@@ -2051,7 +2051,7 @@ export default function MyProfile() {
                       setIsAddBeneficiaryWorkspaceOpen(true);
                     }}
                   >
-                    <Plus className="h-4 w-4" />
+                    <Plus className="h-4 w-4 text-current" />
                     <span>Add Beneficiary</span>
                   </Button>
                 </div>
@@ -2084,7 +2084,7 @@ export default function MyProfile() {
                         setIsAddBeneficiaryWorkspaceOpen(true);
                       }}
                     >
-                      <Plus className="h-4 w-4" />
+                      <Plus className="h-4 w-4 text-current" />
                       <span>Add Beneficiary</span>
                     </Button>
                   </EmptyContent>
@@ -2228,7 +2228,7 @@ export default function MyProfile() {
                     setIsAddAuthorizedSignerModalOpen(true);
                   }}
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-4 w-4 text-current" />
                   <span className="sm:ml-2">Add Authorized Signer</span>
                 </Button>
               </div>
@@ -2259,7 +2259,7 @@ export default function MyProfile() {
                         setIsAddAuthorizedSignerModalOpen(true);
                       }}
                     >
-                      <Plus className="h-4 w-4" />
+                      <Plus className="h-4 w-4 text-current" />
                       <span>Add Authorized Signer</span>
                     </Button>
                   </EmptyContent>
@@ -2357,7 +2357,7 @@ export default function MyProfile() {
                     setIsAddBankAccountModalOpen(true);
                   }}
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-4 w-4 text-current" />
                   <span className="sm:ml-2">Add Bank Account</span>
                 </Button>
               </div>
@@ -2403,7 +2403,7 @@ export default function MyProfile() {
                         setIsAddBankAccountModalOpen(true);
                       }}
                     >
-                      <Plus className="h-4 w-4" />
+                      <Plus className="h-4 w-4 text-current" />
                       <span>Add Bank Account</span>
                     </Button>
                   </EmptyContent>
@@ -6679,7 +6679,7 @@ export default function MyProfile() {
                 setIsAddBeneficiaryModalOpen(true);
               }}
             >
-              <Plus className="h-4 w-4" />
+              <Plus className="h-4 w-4 text-current" />
               <span>Add Beneficiary</span>
             </Button>
 
