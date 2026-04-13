@@ -168,7 +168,7 @@ export function ConsumerNavigation({
               <Button
                 variant="ghost"
                 size="icon"
-                className="lg:hidden"
+                className="lg:hidden text-[var(--system-text-primary)] [&_svg]:text-[var(--system-text-primary)]"
                 aria-label={isMenuOpen ? "Close navigation" : "Open navigation"}
               >
                 {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -315,7 +315,7 @@ export function ConsumerNavigation({
                           active ? "text-primary font-semibold" : "text-foreground font-normal"
                         }`}
                       >
-                        {Icon && <Icon className="h-4 w-4" />}
+                        {Icon && <Icon className={`h-4 w-4 ${active ? "text-primary" : "text-[#5F6A94]"}`} />}
                         <span className="text-[14px] leading-[24px] tracking-[-0.084px]">{item.label}</span>
                         <ChevronDown className="ml-0.5 h-3 w-3" />
                       </button>
@@ -351,7 +351,7 @@ export function ConsumerNavigation({
                     {/* Icon wrapper — badge sits on top of icon for Messages */}
                     {Icon && (
                       <div className="relative">
-                        <Icon className={`h-4 w-4 ${active ? "text-primary" : "text-foreground"}`} />
+                        <Icon className={`h-4 w-4 ${active ? "text-primary" : "text-[#5F6A94]"}`} />
                         {isMessages && unreadCount > 0 && (
                           <div className="absolute -top-[8px] -right-[8px] flex h-[16px] min-w-[16px] items-center justify-center rounded-full bg-[#d24159] px-[3px] shadow-[0_1px_3px_rgba(0,0,0,0.2)]">
                             <span className="text-[10px] font-bold leading-none text-white">
@@ -382,7 +382,7 @@ export function ConsumerNavigation({
                 className="hidden lg:flex h-[44px] w-[44px] items-center justify-center rounded-[6px] hover:bg-black/5 transition-colors"
                 aria-label="Language"
               >
-                <Languages className="h-4 w-4 text-foreground" />
+                <Languages className="h-4 w-4 text-[#5F6A94]" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
@@ -408,7 +408,7 @@ export function ConsumerNavigation({
                 aria-label="User profile"
               >
                 <div className="flex h-[40px] w-[40px] items-center justify-center rounded-full border border-[#d0d6ea] bg-[#e3e7f4]">
-                  <User className="h-4 w-4 text-foreground" />
+                  <User className="h-4 w-4 text-[#5F6A94]" />
                 </div>
               </button>
             </DropdownMenuTrigger>

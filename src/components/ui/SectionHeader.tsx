@@ -29,7 +29,7 @@ export function SectionHeader({
       {actionLabel && handleAction && (
         <button
           type="button"
-          className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[#1c6eff] hover:underline transition-colors -mr-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[color:var(--system-link,#1c6eff)] hover:underline transition-colors -mr-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           onClick={handleAction}
         >
           {actionLabel}

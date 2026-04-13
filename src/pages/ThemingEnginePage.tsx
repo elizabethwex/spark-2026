@@ -24,7 +24,7 @@ export default function ThemingEnginePage() {
         <ConsumerNavigation hideNav />
         <ThemingEngineTopBar />
         <div className="flex flex-1 min-h-0">
-          <aside className="w-96 shrink-0 border-r border-border bg-background flex flex-col overflow-hidden">
+          <aside className="min-w-[443px] w-[443px] shrink-0 border-r border-border bg-background flex flex-col overflow-hidden">
             <ThemingEngineConfigPane />
           </aside>
           <main className="flex-1 min-w-0 flex flex-col overflow-hidden bg-background">

@@ -1768,7 +1768,7 @@ export default function MyProfile() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-primary hover:text-primary active:text-primary [&>svg]:text-primary"
+                    className="text-[color:var(--system-link)] hover:text-[color:var(--system-link)] active:text-[color:var(--system-link)] [&>svg]:text-[color:var(--system-link)]"
                   >
                     <Pencil />
                     Edit
@@ -1802,7 +1802,7 @@ export default function MyProfile() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-primary hover:text-primary active:text-primary [&>svg]:text-primary"
+                    className="text-[color:var(--system-link)] hover:text-[color:var(--system-link)] active:text-[color:var(--system-link)] [&>svg]:text-[color:var(--system-link)]"
                   >
                     <Pencil />
                     Edit
@@ -1837,7 +1837,7 @@ export default function MyProfile() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-primary hover:text-primary active:text-primary [&>svg]:text-primary"
+                    className="text-[color:var(--system-link)] hover:text-[color:var(--system-link)] active:text-[color:var(--system-link)] [&>svg]:text-[color:var(--system-link)]"
                   >
                     <Pencil />
                     Edit
@@ -3285,7 +3285,7 @@ export default function MyProfile() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-primary hover:text-primary active:text-primary [&>svg]:text-primary"
+                    className="text-[color:var(--system-link)] hover:text-[color:var(--system-link)] active:text-[color:var(--system-link)] [&>svg]:text-[color:var(--system-link)]"
                   >
                     <Pencil />
                     Update
@@ -3300,7 +3300,7 @@ export default function MyProfile() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-primary hover:text-primary active:text-primary [&>svg]:text-primary"
+                    className="text-[color:var(--system-link)] hover:text-[color:var(--system-link)] active:text-[color:var(--system-link)] [&>svg]:text-[color:var(--system-link)]"
                   >
                     <Pencil />
                     Update
@@ -3315,7 +3315,7 @@ export default function MyProfile() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-primary hover:text-primary active:text-primary [&>svg]:text-primary"
+                    className="text-[color:var(--system-link)] hover:text-[color:var(--system-link)] active:text-[color:var(--system-link)] [&>svg]:text-[color:var(--system-link)]"
                   >
                     <Pencil />
                     Setup Now
@@ -4273,7 +4273,7 @@ export default function MyProfile() {
                           {menuSections.map((section, sectionIndex) => (
                             <div key={section.title}>
                               <SidebarGroupLabel className="px-3 py-[7px]">
-                                <span className="text-xs font-medium text-sidebar-foreground/70 uppercase tracking-[0.24px]">
+                                <span className="text-xs font-medium text-muted-foreground uppercase tracking-[0.24px]">
                                   {section.title}
                                 </span>
                               </SidebarGroupLabel>
@@ -4286,10 +4286,10 @@ export default function MyProfile() {
                                       <SidebarMenuButton
                                         isActive={isActive}
                                         onClick={() => handleSubPageChange(item.key)}
-                                        className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-accent data-[active=true]:text-[hsl(var(--wex-info))] data-[active=false]:text-foreground hover:bg-muted"
+                                        className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-[var(--theme-secondary-ramp-50)] data-[active=true]:text-[var(--theme-secondary)] data-[active=false]:text-foreground hover:bg-muted"
                                       >
                                         <div className="flex items-center gap-2 w-full">
-                                          <Icon className={`h-[14px] w-[14px] shrink-0 ${isActive ? 'text-primary' : 'text-foreground'}`} />
+                                          <Icon className={`h-[14px] w-[14px] shrink-0 ${isActive ? 'text-[var(--theme-secondary)]' : 'text-[var(--icon-default)]'}`} />
                                           <span className="text-sm tracking-[-0.084px]">{item.label}</span>
                                         </div>
                                       </SidebarMenuButton>
@@ -7156,7 +7156,7 @@ export default function MyProfile() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-auto p-0 gap-1"
+                    className="h-auto p-0 gap-1 text-[color:var(--system-link)] hover:text-[color:var(--system-link)] active:text-[color:var(--system-link)] [&>svg]:text-[color:var(--system-link)]"
                     onClick={() => {
                       setMailingAddressForm({
                         street: mailingAddress.street,
@@ -7169,8 +7169,8 @@ export default function MyProfile() {
                       setIsMailingAddressModalOpen(true);
                     }}
                   >
-                    <Pencil className="h-3.5 w-3.5 text-primary" />
-                    <span className="text-sm font-medium text-primary">Edit</span>
+                    <Pencil className="h-3.5 w-3.5 text-[color:var(--system-link)]" />
+                    <span className="text-sm font-medium text-[color:var(--system-link)]">Edit</span>
                   </Button>
                 </div>
                 <div className="flex flex-col text-[14px] text-foreground leading-6">
@@ -7410,7 +7410,7 @@ export default function MyProfile() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-auto p-0 gap-1"
+                    className="h-auto p-0 gap-1 text-[color:var(--system-link)] hover:text-[color:var(--system-link)] active:text-[color:var(--system-link)] [&>svg]:text-[color:var(--system-link)]"
                     onClick={() => {
                       setMailingAddressForm({
                         street: mailingAddress.street,
@@ -7423,8 +7423,8 @@ export default function MyProfile() {
                       setIsMailingAddressModalOpen(true);
                     }}
                   >
-                    <Pencil className="h-3.5 w-3.5 text-primary" />
-                    <span className="text-sm font-medium text-primary">Edit</span>
+                    <Pencil className="h-3.5 w-3.5 text-[color:var(--system-link)]" />
+                    <span className="text-sm font-medium text-[color:var(--system-link)]">Edit</span>
                   </Button>
                 </div>
                 <div className="flex flex-col text-[14px] text-foreground leading-6">
