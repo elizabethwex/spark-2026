@@ -76,7 +76,7 @@ export function RecentTransactionsTable() {
                   inputSize="md"
                   type="text"
                   placeholder="Search"
-                  leftIcon={<Search className="h-4 w-4" />}
+                  leftIcon={<Search className="h-4 w-4 text-current" />}
                   value={searchQuery}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
                 />

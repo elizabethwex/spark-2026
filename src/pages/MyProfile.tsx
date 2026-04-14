@@ -130,17 +130,42 @@ type DebitCard = {
   purseStatuses?: PurseStatus[]; // Purse status information
 };
 
-const SESSION_STORAGE_DEPENDENTS_KEY = "wex_profile_dependents";
+const SESSION_STORAGE_DEPENDENTS_KEY = "wex_profile_dependents_v2";
 const SESSION_STORAGE_BENEFICIARIES_KEY = "wex_profile_beneficiaries";
 const SESSION_STORAGE_BANK_ACCOUNTS_KEY = "wex_profile_bank_accounts";
 
+const DEFAULT_DEPENDENTS: Dependent[] = [
+  {
+    id: "dep-1",
+    firstName: "Ben",
+    lastName: "Smith",
+    ssn: "***-**-1234",
+    birthDate: "03/14/1986",
+    gender: "Male",
+    isFullTimeStudent: false,
+    relationship: "Spouse",
+  },
+  {
+    id: "dep-2",
+    firstName: "James",
+    lastName: "Smith",
+    ssn: "***-**-5678",
+    birthDate: "07/22/2012",
+    gender: "Male",
+    isFullTimeStudent: false,
+    relationship: "Child",
+  },
+];
+
 function loadDependentsFromStorage(): Dependent[] {
-  if (typeof window === "undefined") return [];
+  if (typeof window === "undefined") return DEFAULT_DEPENDENTS;
   try {
     const stored = sessionStorage.getItem(SESSION_STORAGE_DEPENDENTS_KEY);
-    return stored ? JSON.parse(stored) : [];
+    if (!stored) return DEFAULT_DEPENDENTS;
+    const parsed: Dependent[] = JSON.parse(stored);
+    return parsed.length > 0 ? parsed : DEFAULT_DEPENDENTS;
   } catch {
-    return [];
+    return DEFAULT_DEPENDENTS;
   }
 }
 
@@ -199,7 +224,7 @@ function saveBankAccountsToStorage(bankAccounts: BankAccount[]): void {
 }
 
 export default function MyProfile() {
-  const personalName = "Emily Rose Smith";
+  const personalName = "Penny Smith";
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
   
@@ -214,7 +239,7 @@ export default function MyProfile() {
   // Contact information state
   const [isContactInfoModalOpen, setIsContactInfoModalOpen] = useState(false);
   const [mobileNumber, setMobileNumber] = useState("123-456-7890");
-  const [emailAddress, setEmailAddress] = useState("emily.smith@exampleemail.com");
+  const [emailAddress, setEmailAddress] = useState("penny.smith@wexinc.com");
   
   // Contributions preferences state
   const [contributionPostedEmail, setContributionPostedEmail] = useState(true);
@@ -407,7 +432,7 @@ export default function MyProfile() {
   const [debitCards, setDebitCards] = useState<DebitCard[]>([
     {
       id: "1",
-      cardholderName: "John Johnson",
+      cardholderName: "Ben Smith",
       cardNumber: "3522",
       fullCardNumber: "1234 5678 9012 3522",
       status: "ready-to-activate",
@@ -421,30 +446,29 @@ export default function MyProfile() {
     },
     {
       id: "2",
-      cardholderName: "Emily Johnson",
+      cardholderName: "Penny Smith",
       cardNumber: "7741",
       fullCardNumber: "1234 5678 9012 7741",
+      status: "active",
+      expirationDate: "12/31/2027",
+      effectiveDate: "01/01/2024",
+      purseStatuses: [
+        { accountName: "FSA 2024", status: "Active" },
+        { accountName: "HRA 2024", status: "Active" },
+        { accountName: "FSA 2022", status: "Suspended" },
+      ],
+    },
+    {
+      id: "3",
+      cardholderName: "James Smith",
+      cardNumber: "8412",
+      fullCardNumber: "1234 5678 9012 8412",
       status: "deactivated",
       expirationDate: "03/31/2026",
       effectiveDate: "04/01/2022",
       purseStatuses: [
         { accountName: "FSA 2022", status: "Suspended" },
         { accountName: "HRA 2022", status: "Suspended" },
-      ],
-    },
-    {
-      id: "3",
-      cardholderName: "Michael Johnson",
-      cardNumber: "8412",
-      fullCardNumber: "1234 5678 9012 8412",
-      status: "active",
-      expirationDate: "12/31/2026",
-      effectiveDate: "01/01/2023",
-      purseStatuses: [
-        { accountName: "FSA 2023", status: "Active" },
-        { accountName: "HRA 2023", status: "Active" },
-        { accountName: "FSA 2021", status: "Suspended" },
-        { accountName: "FSA 2018-2026", status: "Suspended" },
       ],
     },
   ]);
@@ -480,7 +504,7 @@ export default function MyProfile() {
   // Report Lost/Stolen page state
   const [confirmationAnswer, setConfirmationAnswer] = useState<"yes" | "no" | "">("");
   const [mailingAddress, setMailingAddress] = useState({
-    name: "John Johnson",
+    name: "Ben Smith",
     street: "5050 Lincoln Dr",
     addressLine2: "",
     city: "Edina",
@@ -1790,7 +1814,7 @@ export default function MyProfile() {
                   </div>
                   <div className="flex gap-1.5 text-sm">
                     <span className="text-gray-500">Marital Status:</span>
-                    <span className="text-gray-800">Single</span>
+                    <span className="text-gray-800">Married</span>
                   </div>
                 </div>
               </div>
@@ -1813,11 +1837,11 @@ export default function MyProfile() {
                 <div className="space-y-2 text-sm">
                   <div className="flex gap-1.5">
                     <span className="text-gray-500">Primary email address:</span>
-                    <span className="text-gray-800">emily.grace@email.com</span>
+                    <span className="text-gray-800">penny.smith@wexinc.com</span>
                   </div>
                   <div className="flex gap-1.5">
                     <span className="text-gray-500">Secondary email address:</span>
-                    <span className="text-gray-800">emily.grace2@email.com</span>
+                    <span className="text-gray-800">pennysmith@gmail.com</span>
                   </div>
                   <div className="flex gap-1.5">
                     <span className="text-gray-500">Mobile Number:</span>
@@ -1845,30 +1869,16 @@ export default function MyProfile() {
                     Edit
                   </Button>
                 </div>
-                <div className="space-y-2 text-sm">
-                  <div className="flex gap-1.5">
+                <div className="space-y-3 text-sm">
+                  <div className="space-y-0.5">
                     <span className="text-gray-500">Home Address:</span>
-                    <span className="text-gray-800">123 Main Street</span>
+                    <div className="text-gray-800">123 Main Street</div>
+                    <div className="text-gray-800">Anytown, NY 12345</div>
+                    <div className="text-gray-800">United States</div>
                   </div>
-                  <div className="flex gap-1.5">
-                    <span className="text-gray-500">City:</span>
-                    <span className="text-gray-800">Anytown</span>
-                  </div>
-                  <div className="flex gap-1.5">
-                    <span className="text-gray-500">Province/State:</span>
-                    <span className="text-gray-800">NY</span>
-                  </div>
-                  <div className="flex gap-1.5">
-                    <span className="text-gray-500">Zip Code:</span>
-                    <span className="text-gray-800">123456</span>
-                  </div>
-                  <div className="flex gap-1.5">
-                    <span className="text-gray-500">Country:</span>
-                    <span className="text-gray-800">United States</span>
-                  </div>
-                  <div className="flex gap-1.5">
+                  <div className="space-y-0.5">
                     <span className="text-gray-500">Mailing Address:</span>
-                    <span className="text-gray-800">The same as my home address</span>
+                    <div className="text-gray-800">Same as home address</div>
                   </div>
                 </div>
               </div>
@@ -1886,14 +1896,14 @@ export default function MyProfile() {
                   intent="primary"
                   variant="outline"
                   size="sm"
-                  className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50"
+                  className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50 [&_svg]:text-current"
                   onClick={() => {
                     resetForm();
                     setEditingDependentId(null);
                     setIsAddDependentModalOpen(true);
                   }}
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-4 w-4 text-current" />
                   <span className="sm:ml-2">Add Dependent</span>
                 </Button>
               </div>
@@ -1924,7 +1934,7 @@ export default function MyProfile() {
                         setIsAddDependentModalOpen(true);
                       }}
                     >
-                      <Plus className="h-4 w-4" />
+                      <Plus className="h-4 w-4 text-current" />
                       <span>Add Dependent</span>
                     </Button>
                   </EmptyContent>
@@ -2045,7 +2055,7 @@ export default function MyProfile() {
                     intent="primary"
                     variant="outline"
                     size="sm"
-                    className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50"
+                    className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50 [&_svg]:text-current"
                     onClick={() => {
                       resetBeneficiaryForm();
                       setEditingBeneficiaryId(null);
@@ -2053,7 +2063,7 @@ export default function MyProfile() {
                       setIsAddBeneficiaryWorkspaceOpen(true);
                     }}
                   >
-                    <Plus className="h-4 w-4" />
+                    <Plus className="h-4 w-4 text-current" />
                     <span>Add Beneficiary</span>
                   </Button>
                 </div>
@@ -2086,7 +2096,7 @@ export default function MyProfile() {
                         setIsAddBeneficiaryWorkspaceOpen(true);
                       }}
                     >
-                      <Plus className="h-4 w-4" />
+                      <Plus className="h-4 w-4 text-current" />
                       <span>Add Beneficiary</span>
                     </Button>
                   </EmptyContent>
@@ -2223,14 +2233,14 @@ export default function MyProfile() {
                   intent="primary"
                   variant="outline"
                   size="sm"
-                  className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50"
+                  className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50 [&_svg]:text-current"
                   onClick={() => {
                     resetAuthorizedSignerForm();
                     setEditingAuthorizedSignerId(null);
                     setIsAddAuthorizedSignerModalOpen(true);
                   }}
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-4 w-4 text-current" />
                   <span className="sm:ml-2">Add Authorized Signer</span>
                 </Button>
               </div>
@@ -2261,7 +2271,7 @@ export default function MyProfile() {
                         setIsAddAuthorizedSignerModalOpen(true);
                       }}
                     >
-                      <Plus className="h-4 w-4" />
+                      <Plus className="h-4 w-4 text-current" />
                       <span>Add Authorized Signer</span>
                     </Button>
                   </EmptyContent>
@@ -2340,7 +2350,7 @@ export default function MyProfile() {
                   intent="primary"
                   variant="outline"
                   size="sm"
-                  className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50"
+                  className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50 [&_svg]:text-current"
                   onClick={() => {
                     setBankAccountFormData({
                       verificationMethod: "",
@@ -2362,7 +2372,7 @@ export default function MyProfile() {
                     setIsAddBankAccountModalOpen(true);
                   }}
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-4 w-4 text-current" />
                   <span className="sm:ml-2">Add Bank Account</span>
                 </Button>
               </div>
@@ -2408,7 +2418,7 @@ export default function MyProfile() {
                         setIsAddBankAccountModalOpen(true);
                       }}
                     >
-                      <Plus className="h-4 w-4" />
+                      <Plus className="h-4 w-4 text-current" />
                       <span>Add Bank Account</span>
                     </Button>
                   </EmptyContent>
@@ -3250,12 +3260,12 @@ export default function MyProfile() {
                   <div className="flex items-center gap-4">
                     <div className="flex gap-1.5 text-sm">
                       <span className="text-gray-500">Username:</span>
-                      <span className="text-gray-800">ux@wex</span>
+                      <span className="text-gray-800">pennysmith</span>
                     </div>
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-primary hover:text-primary active:text-primary [&>svg]:text-primary"
+                      className="text-[color:var(--system-link)] hover:text-[color:var(--system-link)] active:text-[color:var(--system-link)] [&>svg]:text-[color:var(--system-link)]"
                     >
                       <Pencil />
                       Update Username
@@ -3272,7 +3282,7 @@ export default function MyProfile() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-primary hover:text-primary active:text-primary [&>svg]:text-primary"
+                      className="text-[color:var(--system-link)] hover:text-[color:var(--system-link)] active:text-[color:var(--system-link)] [&>svg]:text-[color:var(--system-link)]"
                     >
                       <Pencil />
                       Change Password
@@ -3297,7 +3307,7 @@ export default function MyProfile() {
                   </Button>
                 </div>
                 <div className="space-y-1 mb-4">
-                  <p className="text-sm text-gray-800">emily.grace@email.com</p>
+                  <p className="text-sm text-gray-800">penny.smith@wexinc.com</p>
                   <p className="text-xs text-gray-600">Last Used: Today</p>
                 </div>
                 <div className="flex items-center gap-4 mb-2">
@@ -3362,10 +3372,10 @@ export default function MyProfile() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="flex items-center gap-1.5 px-3 py-1 text-sm font-medium text-primary hover:bg-gray-100"
+                  className="flex items-center gap-1.5 px-3 py-1 text-sm font-medium text-[color:var(--system-link)] hover:bg-gray-100"
                   onClick={() => setIsContactInfoModalOpen(true)}
                 >
-                  <Pencil className="h-4 w-4 text-primary" />
+                  <Pencil className="h-4 w-4 text-[color:var(--system-link)]" />
                   Edit
                 </Button>
               </div>
@@ -6684,7 +6694,7 @@ export default function MyProfile() {
                 setIsAddBeneficiaryModalOpen(true);
               }}
             >
-              <Plus className="h-4 w-4" />
+              <Plus className="h-4 w-4 text-current" />
               <span>Add Beneficiary</span>
             </Button>
 

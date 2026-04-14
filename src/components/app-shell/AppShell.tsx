@@ -5,7 +5,6 @@ import { IPhoneMockup, SCREEN_HEIGHT } from "./IPhoneMockup";
 import { AppStatusBar, STATUS_BAR_HEIGHT } from "./AppStatusBar";
 import { useDeviceMockup } from "@/hooks/useDeviceMockup";
 import { AppChromeProvider } from "@/context/AppChromeContext";
-import { AppVariantProvider } from "@/context/AppVariantContext";
 
 // Height available to route-level screens below the status bar
 const CONTENT_HEIGHT = SCREEN_HEIGHT - STATUS_BAR_HEIGHT; // 790px
@@ -74,7 +73,6 @@ export function AppShell() {
   // ── Device ON ────────────────────────────────────────────────────────────────
   if (deviceOn) {
     return (
-      <AppVariantProvider>
       <div
         style={{
           minHeight: "100dvh",
@@ -179,13 +177,11 @@ export function AppShell() {
           </span>
         </div>
       </div>
-      </AppVariantProvider>
     );
   }
 
   // ── Device OFF — original layout ─────────────────────────────────────────────
   return (
-    <AppVariantProvider>
     <div
       style={{
         minHeight: "100dvh",
@@ -261,6 +257,5 @@ export function AppShell() {
         </div>
       )}
     </div>
-    </AppVariantProvider>
   );
 }

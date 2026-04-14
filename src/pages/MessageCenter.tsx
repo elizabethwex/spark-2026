@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { FadeInItem } from "@/components/layout/PageFadeIn";
 import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -83,797 +84,26 @@ import {
   saveReadStatus,
   saveArchiveStatus,
 } from "@/data/messageCenterUtils";
-
-const getInitialMessages = (): Message[] => {
-  const initialMessages: Message[] = [
-    {
-      id: "1",
-      subject: "HSA Contribution Maximum Warning",
-      hasAttachment: true,
-      category: "Contributions & Investments",
-      categoryColor: "#ffbca7",
-      categoryTextColor: "#66230e",
-      deliveryDate: "11/23/25 11:05AM",
-      isStarred: false,
-      isBold: true,
-      isRead: false,
-      isArchived: false,
-      body: "Your HSA contribution is approaching the annual maximum limit. Please review your contribution settings.",
-      attachmentFileName: "HSA_Contribution_Warning_11_23.pdf",
-    },
-    {
-      id: "2",
-      subject: "HSA Contribution Notification",
-      hasAttachment: true,
-      category: "Contributions & Investments",
-      categoryColor: "#ffbca7",
-      categoryTextColor: "#66230e",
-      deliveryDate: "11/23/25 11:05AM",
-      isStarred: false,
-      isBold: true,
-      isRead: false,
-      isArchived: false,
-      body: "A new contribution has been processed to your HSA account.",
-      attachmentFileName: "Contribution_Notification_11_23.pdf",
-    },
-    {
-      id: "3",
-      subject: "HSA Account Summary (11/01/2025-11/30/2025)",
-      hasAttachment: true,
-      category: "Statements & Tax Documents",
-      categoryColor: "#fff7b1",
-      categoryTextColor: "#665e18",
-      deliveryDate: "11/23/25 11:05AM",
-      isStarred: false,
-      isBold: true,
-      isRead: false,
-      isArchived: false,
-      body: "Your monthly account summary is now available.",
-      attachmentFileName: "Account_Summary_11_2025.pdf",
-    },
-    {
-      id: "4",
-      subject: "Tax Form Available: 1099-SA",
-      hasAttachment: true,
-      category: "Statements & Tax Documents",
-      categoryColor: "#fff7b1",
-      categoryTextColor: "#665e18",
-      deliveryDate: "11/23/25 11:05AM",
-      isStarred: false,
-      isBold: false,
-      isRead: false,
-      isArchived: false,
-      body: "Your 1099-SA tax form is now available for download.",
-      attachmentFileName: "1099-SA_2025.pdf",
-    },
-    {
-      id: "5",
-      subject: "HSA Withdrawal Notification",
-      hasAttachment: false,
-      category: "Distributions",
-      categoryColor: "#9ddcfb",
-      categoryTextColor: "#044362",
-      deliveryDate: "11/23/25 11:05AM",
-      isStarred: false,
-      isBold: false,
-      isRead: false,
-      isArchived: false,
-      body: "A withdrawal has been processed from your HSA account. The funds have been transferred to your linked bank account.",
-    },
-    {
-      id: "6",
-      subject: "HSA Payment Issued",
-      hasAttachment: false,
-      category: "Distributions",
-      categoryColor: "#9ddcfb",
-      categoryTextColor: "#044362",
-      deliveryDate: "11/23/25 11:05AM",
-      isStarred: false,
-      isBold: true,
-      isRead: false,
-      isArchived: false,
-      body: "Your HSA payment has been issued successfully. You should receive the payment within 3-5 business days.",
-    },
-    {
-      id: "7",
-      subject: "Purchase Alert",
-      hasAttachment: true,
-      category: "Cards & Security",
-      categoryColor: "#e8a6cc",
-      categoryTextColor: "#4f0d33",
-      deliveryDate: "11/23/25 11:05AM",
-      isStarred: false,
-      isBold: false,
-      isRead: false,
-      isArchived: false,
-      body: "A purchase was made using your HSA card. Please review the transaction details.",
-      attachmentFileName: "Purchase_Alert_11_23.pdf",
-    },
-    {
-      id: "8",
-      subject: "HSA Account Summary (10/01/2025-10/31/2025)",
-      hasAttachment: true,
-      category: "Statements & Tax Documents",
-      categoryColor: "#fff7b1",
-      categoryTextColor: "#665e18",
-      deliveryDate: "11/23/25 11:05AM",
-      isStarred: false,
-      isBold: false,
-      isRead: false,
-      isArchived: false,
-      body: "Your monthly account summary is now available.",
-      attachmentFileName: "Account_Summary_10_2025.pdf",
-    },
-    {
-      id: "9",
-      subject: "HSA Account Summary (09/01/2025-09/30/2025)",
-      hasAttachment: true,
-      category: "Statements & Tax Documents",
-      categoryColor: "#fff7b1",
-      categoryTextColor: "#665e18",
-      deliveryDate: "11/23/25 11:05AM",
-      isStarred: false,
-      isBold: true,
-      isRead: false,
-      isArchived: false,
-      body: "Your monthly account summary is now available.",
-      attachmentFileName: "Account_Summary_09_2025.pdf",
-    },
-    {
-      id: "10",
-      subject: "Password Successfully Changed",
-      hasAttachment: false,
-      category: "Cards & Security",
-      categoryColor: "#e8a6cc",
-      categoryTextColor: "#4f0d33",
-      deliveryDate: "11/23/25 11:05AM",
-      isStarred: false,
-      isBold: true,
-      isRead: false,
-      isArchived: false,
-      body: "Your password has been successfully changed. If you did not make this change, please contact support immediately.",
-    },
-    {
-      id: "11",
-      subject: "Monthly Investment Performance Report",
-      hasAttachment: true,
-      category: "Contributions & Investments",
-      categoryColor: "#ffbca7",
-      categoryTextColor: "#66230e",
-      deliveryDate: "11/22/25 10:30AM",
-      isStarred: false,
-      isBold: true,
-      isRead: false,
-      isArchived: false,
-      body: "Your monthly investment performance report is now available. Review your portfolio performance and allocations.",
-      attachmentFileName: "Investment_Report_11_2025.pdf",
-    },
-    {
-      id: "12",
-      subject: "Account Statement Available",
-      hasAttachment: true,
-      category: "Statements & Tax Documents",
-      categoryColor: "#fff7b1",
-      categoryTextColor: "#665e18",
-      deliveryDate: "11/22/25 09:15AM",
-      isStarred: false,
-      isBold: false,
-      isRead: false,
-      isArchived: false,
-      body: "Your account statement for the previous month is now available for download.",
-      attachmentFileName: "Statement_11_2025.pdf",
-    },
-    {
-      id: "13",
-      subject: "Withdrawal Processed Successfully",
-      hasAttachment: false,
-      category: "Distributions",
-      categoryColor: "#9ddcfb",
-      categoryTextColor: "#044362",
-      deliveryDate: "11/21/25 03:45PM",
-      isStarred: false,
-      isBold: true,
-      isRead: false,
-      isArchived: false,
-      body: "Your HSA withdrawal request has been processed. Funds will be available in your linked account within 2-3 business days.",
-    },
-    {
-      id: "14",
-      subject: "Card Transaction Notification",
-      hasAttachment: false,
-      category: "Cards & Security",
-      categoryColor: "#e8a6cc",
-      categoryTextColor: "#4f0d33",
-      deliveryDate: "11/21/25 02:20PM",
-      isStarred: false,
-      isBold: true,
-      isRead: false,
-      isArchived: false,
-      body: "A transaction was made using your HSA card. Please verify this transaction is authorized.",
-    },
-    {
-      id: "15",
-      subject: "Investment Allocation Update",
-      hasAttachment: true,
-      category: "Contributions & Investments",
-      categoryColor: "#ffbca7",
-      categoryTextColor: "#66230e",
-      deliveryDate: "11/21/25 11:00AM",
-      isStarred: false,
-      isBold: false,
-      isRead: false,
-      isArchived: false,
-      body: "Your investment allocation has been updated. Review the changes in your account.",
-      attachmentFileName: "Allocation_Update_11_21.pdf",
-    },
-    {
-      id: "16",
-      subject: "HSA Account Summary (08/01/2025-08/31/2025)",
-      hasAttachment: true,
-      category: "Statements & Tax Documents",
-      categoryColor: "#fff7b1",
-      categoryTextColor: "#665e18",
-      deliveryDate: "11/20/25 04:30PM",
-      isStarred: false,
-      isBold: false,
-      isRead: false,
-      isArchived: false,
-      body: "Your monthly account summary is now available.",
-      attachmentFileName: "Account_Summary_08_2025.pdf",
-    },
-    {
-      id: "17",
-      subject: "Payment Confirmation",
-      hasAttachment: false,
-      category: "Distributions",
-      categoryColor: "#9ddcfb",
-      categoryTextColor: "#044362",
-      deliveryDate: "11/20/25 01:15PM",
-      isStarred: false,
-      isBold: true,
-      isRead: false,
-      isArchived: false,
-      body: "Your HSA payment has been confirmed and processed. The payment will be sent to the specified recipient.",
-    },
-    {
-      id: "18",
-      subject: "Security Alert: New Login Detected",
-      hasAttachment: false,
-      category: "Cards & Security",
-      categoryColor: "#e8a6cc",
-      categoryTextColor: "#4f0d33",
-      deliveryDate: "11/19/25 10:45AM",
-      isStarred: false,
-      isBold: true,
-      isRead: false,
-      isArchived: false,
-      body: "A new login was detected from an unrecognized device. If this was not you, please secure your account immediately.",
-    },
-    {
-      id: "19",
-      subject: "Quarterly Investment Summary",
-      hasAttachment: true,
-      category: "Contributions & Investments",
-      categoryColor: "#ffbca7",
-      categoryTextColor: "#66230e",
-      deliveryDate: "11/19/25 09:30AM",
-      isStarred: false,
-      isBold: false,
-      isRead: false,
-      isArchived: false,
-      body: "Your quarterly investment summary is now available. Review your portfolio performance for Q3 2025.",
-      attachmentFileName: "Q3_Investment_Summary_2025.pdf",
-    },
-    {
-      id: "20",
-      subject: "Tax Document: Form 1099-SA Available",
-      hasAttachment: true,
-      category: "Statements & Tax Documents",
-      categoryColor: "#fff7b1",
-      categoryTextColor: "#665e18",
-      deliveryDate: "11/18/25 02:00PM",
-      isStarred: false,
-      isBold: true,
-      isRead: false,
-      isArchived: false,
-      body: "Your 1099-SA tax form for the current tax year is now available for download.",
-      attachmentFileName: "1099-SA_2025.pdf",
-    },
-    {
-      id: "21",
-      subject: "HSA Contribution Received",
-      hasAttachment: false,
-      category: "Contributions & Investments",
-      categoryColor: "#ffbca7",
-      categoryTextColor: "#66230e",
-      deliveryDate: "11/18/25 11:20AM",
-      isStarred: false,
-      isBold: true,
-      isRead: false,
-      isArchived: false,
-      body: "A new contribution has been received and deposited into your HSA account. The funds are now available for use.",
-    },
-    {
-      id: "22",
-      subject: "Account Summary (07/01/2025-07/31/2025)",
-      hasAttachment: true,
-      category: "Statements & Tax Documents",
-      categoryColor: "#fff7b1",
-      categoryTextColor: "#665e18",
-      deliveryDate: "11/17/25 03:10PM",
-      isStarred: false,
-      isBold: false,
-      isRead: false,
-      isArchived: false,
-      body: "Your monthly account summary is now available.",
-      attachmentFileName: "Account_Summary_07_2025.pdf",
-    },
-    {
-      id: "23",
-      subject: "Withdrawal Request Approved",
-      hasAttachment: false,
-      category: "Distributions",
-      categoryColor: "#9ddcfb",
-      categoryTextColor: "#044362",
-      deliveryDate: "11/17/25 12:45PM",
-      isStarred: false,
-      isBold: true,
-      isRead: false,
-      isArchived: false,
-      body: "Your withdrawal request has been approved. The funds will be transferred to your linked bank account.",
-    },
-    {
-      id: "24",
-      subject: "Card Replacement Shipped",
-      hasAttachment: false,
-      category: "Cards & Security",
-      categoryColor: "#e8a6cc",
-      categoryTextColor: "#4f0d33",
-      deliveryDate: "11/16/25 10:00AM",
-      isStarred: false,
-      isBold: false,
-      isRead: false,
-      isArchived: false,
-      body: "Your replacement HSA card has been shipped. You should receive it within 7-10 business days.",
-    },
-    {
-      id: "25",
-      subject: "Investment Options Updated",
-      hasAttachment: true,
-      category: "Contributions & Investments",
-      categoryColor: "#ffbca7",
-      categoryTextColor: "#66230e",
-      deliveryDate: "11/16/25 09:15AM",
-      isStarred: false,
-      isBold: false,
-      isRead: false,
-      isArchived: false,
-      body: "New investment options have been added to your HSA account. Review the available options and update your allocations.",
-      attachmentFileName: "Investment_Options_Update_11_16.pdf",
-    },
-    {
-      id: "26",
-      subject: "Monthly Statement Ready",
-      hasAttachment: true,
-      category: "Statements & Tax Documents",
-      categoryColor: "#fff7b1",
-      categoryTextColor: "#665e18",
-      deliveryDate: "11/15/25 04:20PM",
-      isStarred: false,
-      isBold: true,
-      isRead: false,
-      isArchived: false,
-      body: "Your monthly statement is now ready for review and download.",
-      attachmentFileName: "Statement_11_15_2025.pdf",
-    },
-    {
-      id: "27",
-      subject: "HSA Payment Processed",
-      hasAttachment: false,
-      category: "Distributions",
-      categoryColor: "#9ddcfb",
-      categoryTextColor: "#044362",
-      deliveryDate: "11/15/25 01:30PM",
-      isStarred: false,
-      isBold: true,
-      isRead: false,
-      isArchived: false,
-      body: "Your HSA payment has been processed successfully. The payment will be sent to the healthcare provider.",
-    },
-    {
-      id: "28",
-      subject: "PIN Change Confirmation",
-      hasAttachment: false,
-      category: "Cards & Security",
-      categoryColor: "#e8a6cc",
-      categoryTextColor: "#4f0d33",
-      deliveryDate: "11/14/25 11:45AM",
-      isStarred: false,
-      isBold: false,
-      isRead: false,
-      isArchived: false,
-      body: "Your card PIN has been successfully changed. Please keep your new PIN secure and do not share it with anyone.",
-    },
-    {
-      id: "29",
-      subject: "Contribution Limit Reminder",
-      hasAttachment: true,
-      category: "Contributions & Investments",
-      categoryColor: "#ffbca7",
-      categoryTextColor: "#66230e",
-      deliveryDate: "11/14/25 10:10AM",
-      isStarred: false,
-      isBold: true,
-      isRead: false,
-      isArchived: false,
-      body: "You are approaching your annual HSA contribution limit. Please review your contribution amounts to avoid exceeding the limit.",
-      attachmentFileName: "Contribution_Limit_Reminder_11_14.pdf",
-    },
-    {
-      id: "30",
-      subject: "Annual Tax Summary Available",
-      hasAttachment: true,
-      category: "Statements & Tax Documents",
-      categoryColor: "#fff7b1",
-      categoryTextColor: "#665e18",
-      deliveryDate: "11/13/25 02:50PM",
-      isStarred: false,
-      isBold: true,
-      isRead: false,
-      isArchived: false,
-      body: "Your annual tax summary for 2025 is now available. This document contains important information for your tax filing.",
-      attachmentFileName: "Annual_Tax_Summary_2025.pdf",
-    },
-    {
-      id: "31",
-      subject: "Distribution Request Submitted",
-      hasAttachment: false,
-      category: "Distributions",
-      categoryColor: "#9ddcfb",
-      categoryTextColor: "#044362",
-      deliveryDate: "11/13/25 12:00PM",
-      isStarred: false,
-      isBold: false,
-      isRead: false,
-      isArchived: false,
-      body: "Your distribution request has been submitted and is being processed. You will receive a confirmation once it's complete.",
-    },
-    {
-      id: "32",
-      subject: "Fraud Alert: Suspicious Activity",
-      hasAttachment: false,
-      category: "Cards & Security",
-      categoryColor: "#e8a6cc",
-      categoryTextColor: "#4f0d33",
-      deliveryDate: "11/12/25 03:30PM",
-      isStarred: false,
-      isBold: true,
-      isRead: false,
-      isArchived: false,
-      body: "We detected suspicious activity on your account. Please verify your recent transactions and contact us if you notice any unauthorized activity.",
-    },
-    {
-      id: "33",
-      subject: "Investment Performance Update",
-      hasAttachment: true,
-      category: "Contributions & Investments",
-      categoryColor: "#ffbca7",
-      categoryTextColor: "#66230e",
-      deliveryDate: "11/12/25 09:45AM",
-      isStarred: false,
-      isBold: false,
-      isRead: false,
-      isArchived: false,
-      body: "Your investment performance has been updated. Review your portfolio gains and losses for the current period.",
-      attachmentFileName: "Performance_Update_11_12.pdf",
-    },
-    {
-      id: "34",
-      subject: "Account Summary (06/01/2025-06/30/2025)",
-      hasAttachment: true,
-      category: "Statements & Tax Documents",
-      categoryColor: "#fff7b1",
-      categoryTextColor: "#665e18",
-      deliveryDate: "11/11/25 01:20PM",
-      isStarred: false,
-      isBold: false,
-      isRead: false,
-      isArchived: false,
-      body: "Your monthly account summary is now available.",
-      attachmentFileName: "Account_Summary_06_2025.pdf",
-    },
-    {
-      id: "35",
-      subject: "Withdrawal Completed",
-      hasAttachment: false,
-      category: "Distributions",
-      categoryColor: "#9ddcfb",
-      categoryTextColor: "#044362",
-      deliveryDate: "11/11/25 10:30AM",
-      isStarred: false,
-      isBold: true,
-      isRead: false,
-      isArchived: false,
-      body: "Your withdrawal has been completed. The funds have been transferred to your linked account.",
-    },
-    {
-      id: "36",
-      subject: "Card Activation Required",
-      hasAttachment: false,
-      category: "Cards & Security",
-      categoryColor: "#e8a6cc",
-      categoryTextColor: "#4f0d33",
-      deliveryDate: "11/10/25 02:15PM",
-      isStarred: false,
-      isBold: true,
-      isRead: false,
-      isArchived: false,
-      body: "Your new HSA card requires activation. Please activate your card before first use to ensure it's ready for transactions.",
-    },
-    {
-      id: "37",
-      subject: "HSA Contribution Limit Reached",
-      hasAttachment: true,
-      category: "Contributions & Investments",
-      categoryColor: "#ffbca7",
-      categoryTextColor: "#66230e",
-      deliveryDate: "11/10/25 11:00AM",
-      isStarred: false,
-      isBold: true,
-      isRead: false,
-      isArchived: false,
-      body: "You have reached your annual HSA contribution limit. No further contributions will be accepted for this tax year.",
-      attachmentFileName: "Contribution_Limit_Reached_11_10.pdf",
-    },
-    {
-      id: "38",
-      subject: "Tax Form 1099-SA Ready for Download",
-      hasAttachment: true,
-      category: "Statements & Tax Documents",
-      categoryColor: "#fff7b1",
-      categoryTextColor: "#665e18",
-      deliveryDate: "11/09/25 03:45PM",
-      isStarred: false,
-      isBold: false,
-      isRead: false,
-      isArchived: false,
-      body: "Your 1099-SA tax form is ready for download. This form is required for your tax filing.",
-      attachmentFileName: "1099-SA_2025.pdf",
-    },
-    {
-      id: "39",
-      subject: "Payment Authorization Confirmed",
-      hasAttachment: false,
-      category: "Distributions",
-      categoryColor: "#9ddcfb",
-      categoryTextColor: "#044362",
-      deliveryDate: "11/09/25 12:30PM",
-      isStarred: false,
-      isBold: false,
-      isRead: false,
-      isArchived: false,
-      body: "Your payment authorization has been confirmed. The payment will be processed according to your instructions.",
-    },
-    {
-      id: "40",
-      subject: "Account Security Settings Updated",
-      hasAttachment: false,
-      category: "Cards & Security",
-      categoryColor: "#e8a6cc",
-      categoryTextColor: "#4f0d33",
-      deliveryDate: "11/08/25 10:15AM",
-      isStarred: false,
-      isBold: false,
-      isRead: false,
-      isArchived: false,
-      body: "Your account security settings have been updated. Review the changes to ensure they match your preferences.",
-    },
-    {
-      id: "41",
-      subject: "Investment Rebalancing Notice",
-      hasAttachment: true,
-      category: "Contributions & Investments",
-      categoryColor: "#ffbca7",
-      categoryTextColor: "#66230e",
-      deliveryDate: "11/07/25 02:00PM",
-      isStarred: false,
-      isBold: false,
-      isRead: false,
-      isArchived: false,
-      body: "Your investment portfolio has been automatically rebalanced to maintain your target allocation percentages.",
-      attachmentFileName: "Rebalancing_Notice_11_07.pdf",
-    },
-    {
-      id: "42",
-      subject: "Account Summary (05/01/2025-05/31/2025)",
-      hasAttachment: true,
-      category: "Statements & Tax Documents",
-      categoryColor: "#fff7b1",
-      categoryTextColor: "#665e18",
-      deliveryDate: "11/06/25 01:45PM",
-      isStarred: false,
-      isBold: false,
-      isRead: false,
-      isArchived: false,
-      body: "Your monthly account summary is now available.",
-      attachmentFileName: "Account_Summary_05_2025.pdf",
-    },
-    {
-      id: "43",
-      subject: "Distribution Processing",
-      hasAttachment: false,
-      category: "Distributions",
-      categoryColor: "#9ddcfb",
-      categoryTextColor: "#044362",
-      deliveryDate: "11/05/25 11:20AM",
-      isStarred: false,
-      isBold: true,
-      isRead: false,
-      isArchived: false,
-      body: "Your distribution request is currently being processed. You will receive a notification once it's complete.",
-    },
-    {
-      id: "44",
-      subject: "Two-Factor Authentication Enabled",
-      hasAttachment: false,
-      category: "Cards & Security",
-      categoryColor: "#e8a6cc",
-      categoryTextColor: "#4f0d33",
-      deliveryDate: "11/04/25 03:00PM",
-      isStarred: false,
-      isBold: false,
-      isRead: false,
-      isArchived: false,
-      body: "Two-factor authentication has been enabled on your account for enhanced security.",
-    },
-    {
-      id: "45",
-      subject: "Contribution Schedule Updated",
-      hasAttachment: true,
-      category: "Contributions & Investments",
-      categoryColor: "#ffbca7",
-      categoryTextColor: "#66230e",
-      deliveryDate: "11/03/25 10:30AM",
-      isStarred: false,
-      isBold: false,
-      isRead: false,
-      isArchived: false,
-      body: "Your contribution schedule has been updated. Review the new schedule to ensure it meets your needs.",
-      attachmentFileName: "Contribution_Schedule_Update_11_03.pdf",
-    },
-    {
-      id: "46",
-      subject: "Quarterly Statement Available",
-      hasAttachment: true,
-      category: "Statements & Tax Documents",
-      categoryColor: "#fff7b1",
-      categoryTextColor: "#665e18",
-      deliveryDate: "11/02/25 09:15AM",
-      isStarred: false,
-      isBold: true,
-      isRead: false,
-      isArchived: false,
-      body: "Your quarterly statement for Q3 2025 is now available for download.",
-      attachmentFileName: "Q3_Statement_2025.pdf",
-    },
-    {
-      id: "47",
-      subject: "Payment Reversal Notice",
-      hasAttachment: false,
-      category: "Distributions",
-      categoryColor: "#9ddcfb",
-      categoryTextColor: "#044362",
-      deliveryDate: "11/01/25 02:45PM",
-      isStarred: false,
-      isBold: true,
-      isRead: false,
-      isArchived: false,
-      body: "A payment has been reversed and the funds have been returned to your HSA account.",
-    },
-    {
-      id: "48",
-      subject: "Card Expiration Reminder",
-      hasAttachment: false,
-      category: "Cards & Security",
-      categoryColor: "#e8a6cc",
-      categoryTextColor: "#4f0d33",
-      deliveryDate: "10/31/25 01:00PM",
-      isStarred: false,
-      isBold: false,
-      isRead: false,
-      isArchived: false,
-      body: "Your HSA card will expire soon. A replacement card will be automatically sent to your registered address.",
-    },
-    {
-      id: "49",
-      subject: "Investment Fee Schedule Update",
-      hasAttachment: true,
-      category: "Contributions & Investments",
-      categoryColor: "#ffbca7",
-      categoryTextColor: "#66230e",
-      deliveryDate: "10/30/25 11:30AM",
-      isStarred: false,
-      isBold: false,
-      isRead: false,
-      isArchived: false,
-      body: "The investment fee schedule has been updated. Review the new fee structure for your investment options.",
-      attachmentFileName: "Fee_Schedule_Update_10_30.pdf",
-    },
-    {
-      id: "50",
-      subject: "Year-End Tax Preparation Guide",
-      hasAttachment: true,
-      category: "Statements & Tax Documents",
-      categoryColor: "#fff7b1",
-      categoryTextColor: "#665e18",
-      deliveryDate: "10/29/25 10:00AM",
-      isStarred: false,
-      isBold: true,
-      isRead: false,
-      isArchived: false,
-      body: "Your year-end tax preparation guide is now available. This guide will help you prepare for tax filing season.",
-      attachmentFileName: "Tax_Prep_Guide_2025.pdf",
-    },
-  ];
-
-  return getInitialMessagesUtil(initialMessages);
-};
-
-/**
- * Message type titles that require attention (from product spec).
- * A message is "Attention Needed" if its subject contains one of these (case-insensitive).
- */
-const ATTENTION_NEEDED_MESSAGE_TYPES: string[] = [
-  // Money Activity
-  "HSA Excess Contribution Notification",
-  "FSA Final Filing Date and Remaining Balance Notification",
-  "Hold Claim Requiring Attestation Notification",
-  "Recurring Claim Coverage Attestation",
-  "Recurring Claim Coverage Attestation Alert",
-  "Smart Commute Order Not Processed",
-  "Smart Commute Order Recurrence Schedule Expiration",
-  "Denial Letter",
-  "Denial Letter With Repayment",
-  "Medicare Advantage Denial Letter",
-  "Claim Applied to Repayment Alert",
-  "Documentation Reminder",
-  "Documentation Needed for Debit Card Transaction",
-  "Request for More Information (RMI)",
-  "HSA Excess Distribution Notification",
-  "HSA Cash Balance Warning",
-  "HSA Contribution Maximum Warning",
-  "HSA Recurring Contribution Cancelled",
-  "Enhanced First Letter",
-  "Enhanced Second Letter",
-  "Enhanced Overdue Letter",
-  "Enhanced Ineligible Letter",
-  "Enhanced RMI Letter",
-  "Hold Claim Attestation Required Alert",
-  // Account & Security
-  "Password Successfully Changed",
-  "HSA Account Closure Notification",
-  "Debit Card Suspend Notification",
-  "Debit Card Purse Suspend Notification",
-  "Account Locked",
-  "Red Flags Notification",
-  "Missing Custodial Agreements Acceptance",
-  "Missing Identity Verification Documentation",
-  "Enrollment Reminder",
-];
+import { buildDesktopMessagesFromVariant } from "@/data/messageCenterFromCatalog";
+import { useAppVariant } from "@/context/AppVariantContext";
+import { isAttentionNeededForMessageSubject } from "@/pages/app/messageCatalog";
 
 function isMessageAttentionNeeded(message: Message): boolean {
-  const subjectLower = message.subject.toLowerCase();
-  return ATTENTION_NEEDED_MESSAGE_TYPES.some((title) =>
-    subjectLower.includes(title.toLowerCase())
-  );
+  if (message.needsAttention !== undefined) {
+    return message.needsAttention;
+  }
+  return isAttentionNeededForMessageSubject(message.subject);
 }
 
 export default function MessageCenter() {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { variant } = useAppVariant();
+
   const [messages, setMessages] = useState<Message[]>(() => {
-    const initial = getInitialMessages();
-    // Initialize unread count on mount
+    const initial = getInitialMessagesUtil(
+      buildDesktopMessagesFromVariant(variant)
+    );
     const initialUnreadCount = calculateUnreadCount(initial);
     updateUnreadCount(initialUnreadCount);
     return initial;
@@ -885,6 +115,18 @@ export default function MessageCenter() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [selectedMessageIds, setSelectedMessageIds] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    const next = getInitialMessagesUtil(
+      buildDesktopMessagesFromVariant(variant)
+    );
+    setMessages(next);
+    updateUnreadCount(calculateUnreadCount(next));
+    setSelectedMessage(null);
+    setIsModalOpen(false);
+    setCurrentPage(1);
+    setSelectedMessageIds(new Set());
+  }, [variant]);
 
   const updateMessage = (id: string, updates: Partial<Message>) => {
     setMessages((prev) => {
@@ -1182,10 +424,10 @@ export default function MessageCenter() {
                               <SidebarMenuButton
                                 isActive={selectedCategory === null}
                                 onClick={() => setSelectedCategory(null)}
-                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-[var(--theme-secondary-ramp-50)] data-[active=true]:text-secondary data-[active=false]:text-foreground hover:bg-muted"
+                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-primary/10 data-[active=true]:text-primary data-[active=false]:text-foreground hover:bg-muted data-[active=true]:hover:bg-primary/15"
                               >
                                 <div className="flex items-center gap-2 w-full">
-                                  <Mails className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === null ? 'text-secondary' : 'text-foreground'}`} />
+                                  <Mails className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === null ? 'text-primary' : 'text-foreground'}`} />
                                   <span className="text-sm tracking-[-0.084px]">All Messages</span>
                                 </div>
                               </SidebarMenuButton>
@@ -1194,10 +436,10 @@ export default function MessageCenter() {
                               <SidebarMenuButton
                                 isActive={selectedCategory === "action-required"}
                                 onClick={() => setSelectedCategory("action-required")}
-                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-[var(--theme-secondary-ramp-50)] data-[active=true]:text-secondary data-[active=false]:text-foreground hover:bg-muted"
+                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-primary/10 data-[active=true]:text-primary data-[active=false]:text-foreground hover:bg-muted data-[active=true]:hover:bg-primary/15"
                               >
                                 <div className="flex items-center gap-2 w-full">
-                                  <AlertTriangle className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === "action-required" ? 'text-secondary' : 'text-foreground'}`} />
+                                  <AlertTriangle className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === "action-required" ? 'text-primary' : 'text-foreground'}`} />
                                   <span className="text-sm tracking-[0.07px]">Attention Needed</span>
                                 </div>
                               </SidebarMenuButton>
@@ -1206,10 +448,10 @@ export default function MessageCenter() {
                               <SidebarMenuButton
                                 isActive={selectedCategory === "unread"}
                                 onClick={() => setSelectedCategory("unread")}
-                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-[var(--theme-secondary-ramp-50)] data-[active=true]:text-secondary data-[active=false]:text-foreground hover:bg-muted"
+                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-primary/10 data-[active=true]:text-primary data-[active=false]:text-foreground hover:bg-muted data-[active=true]:hover:bg-primary/15"
                               >
                                 <div className="flex items-center gap-2 w-full">
-                                  <Mail className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === "unread" ? 'text-secondary' : 'text-foreground'}`} />
+                                  <Mail className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === "unread" ? 'text-primary' : 'text-foreground'}`} />
                                   <span className="text-sm tracking-[0.07px]">Unread ({unreadCount})</span>
                                 </div>
                               </SidebarMenuButton>
@@ -1218,10 +460,10 @@ export default function MessageCenter() {
                               <SidebarMenuButton
                                 isActive={selectedCategory === "starred"}
                                 onClick={() => setSelectedCategory("starred")}
-                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-[var(--theme-secondary-ramp-50)] data-[active=true]:text-secondary data-[active=false]:text-foreground hover:bg-muted"
+                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-primary/10 data-[active=true]:text-primary data-[active=false]:text-foreground hover:bg-muted data-[active=true]:hover:bg-primary/15"
                               >
                                 <div className="flex items-center gap-2 w-full">
-                                  <Star className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === "starred" ? 'text-secondary' : 'text-foreground'}`} />
+                                  <Star className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === "starred" ? 'text-primary' : 'text-foreground'}`} />
                                   <span className="text-sm tracking-[0.07px]">Starred</span>
                                 </div>
                               </SidebarMenuButton>
@@ -1230,10 +472,10 @@ export default function MessageCenter() {
                               <SidebarMenuButton
                                 isActive={selectedCategory === "archive"}
                                 onClick={() => setSelectedCategory("archive")}
-                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-[var(--theme-secondary-ramp-50)] data-[active=true]:text-secondary data-[active=false]:text-foreground hover:bg-muted"
+                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-primary/10 data-[active=true]:text-primary data-[active=false]:text-foreground hover:bg-muted data-[active=true]:hover:bg-primary/15"
                               >
                                 <div className="flex items-center gap-2 w-full">
-                                  <Archive className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === "archive" ? 'text-secondary' : 'text-foreground'}`} />
+                                  <Archive className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === "archive" ? 'text-primary' : 'text-foreground'}`} />
                                   <span className="text-sm tracking-[0.07px]">Archived</span>
                                 </div>
                               </SidebarMenuButton>
@@ -1250,10 +492,10 @@ export default function MessageCenter() {
                               <SidebarMenuButton
                                 isActive={selectedCategory === "Account & Security"}
                                 onClick={() => setSelectedCategory("Account & Security")}
-                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-[var(--theme-secondary-ramp-50)] data-[active=true]:text-secondary data-[active=false]:text-foreground hover:bg-muted"
+                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-primary/10 data-[active=true]:text-primary data-[active=false]:text-foreground hover:bg-muted data-[active=true]:hover:bg-primary/15"
                               >
                                 <div className="flex items-center gap-2 w-full">
-                                  <Shield className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === "Account & Security" ? 'text-secondary' : 'text-foreground'}`} />
+                                  <Shield className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === "Account & Security" ? 'text-primary' : 'text-foreground'}`} />
                                   <span className="text-sm tracking-[0.07px]">Account & Security</span>
                                 </div>
                               </SidebarMenuButton>
@@ -1262,10 +504,10 @@ export default function MessageCenter() {
                               <SidebarMenuButton
                                 isActive={selectedCategory === "Money Activity"}
                                 onClick={() => setSelectedCategory("Money Activity")}
-                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-[var(--theme-secondary-ramp-50)] data-[active=true]:text-secondary data-[active=false]:text-foreground hover:bg-muted"
+                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-primary/10 data-[active=true]:text-primary data-[active=false]:text-foreground hover:bg-muted data-[active=true]:hover:bg-primary/15"
                               >
                                 <div className="flex items-center gap-2 w-full">
-                                  <DollarSign className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === "Money Activity" ? 'text-secondary' : 'text-foreground'}`} />
+                                  <DollarSign className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === "Money Activity" ? 'text-primary' : 'text-foreground'}`} />
                                   <span className="text-sm tracking-[0.07px]">Money Activity</span>
                                 </div>
                               </SidebarMenuButton>
@@ -1274,10 +516,10 @@ export default function MessageCenter() {
                               <SidebarMenuButton
                                 isActive={selectedCategory === "Tax & Statements"}
                                 onClick={() => setSelectedCategory("Tax & Statements")}
-                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-[var(--theme-secondary-ramp-50)] data-[active=true]:text-secondary data-[active=false]:text-foreground hover:bg-muted"
+                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-primary/10 data-[active=true]:text-primary data-[active=false]:text-foreground hover:bg-muted data-[active=true]:hover:bg-primary/15"
                               >
                                 <div className="flex items-center gap-2 w-full">
-                                  <FileSpreadsheet className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === "Tax & Statements" ? 'text-secondary' : 'text-foreground'}`} />
+                                  <FileSpreadsheet className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === "Tax & Statements" ? 'text-primary' : 'text-foreground'}`} />
                                   <span className="text-sm tracking-[0.07px]">Tax & Statements</span>
                                 </div>
                               </SidebarMenuButton>
@@ -1292,7 +534,7 @@ export default function MessageCenter() {
                 {/* Main Content Area - Flex container ready for two-panel design */}
                 <SidebarInset className="flex-1 min-w-0 bg-wex-card-bg md:peer-data-[variant=inset]:m-0 md:peer-data-[variant=inset]:rounded-none md:peer-data-[variant=inset]:shadow-none md:peer-data-[variant=inset]:ml-0 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-0">
                   {/* Flex wrapper for two-panel layout (table + detail panel) */}
-                  <div className="flex h-full w-full">
+                  <div className="flex h-full w-full min-h-0 overflow-hidden">
                     {/* Table Container - Full width when no message selected, shrinks when detail panel is visible */}
                     <div className="flex-1 min-w-0 flex flex-col">
                       <div className="p-4 sm:p-6 flex-1 flex flex-col">
@@ -1762,9 +1004,20 @@ export default function MessageCenter() {
                       </div>
                     </div>
                     {/* Right Panel - Detail View - Desktop Only */}
-                    {selectedMessage && !isMobile && (
-                      <div className="w-[400px] shrink-0 border-l border-wex-card-border bg-white rounded-br-2xl rounded-tr-2xl flex flex-col h-full">
-                        <div className="flex flex-col gap-3 p-6 flex-1">
+                    <AnimatePresence mode="sync">
+                      {selectedMessage && !isMobile && (
+                        <motion.div
+                          key={selectedMessage.id}
+                          initial={{ width: 0, opacity: 0 }}
+                          animate={{ width: 400, opacity: 1 }}
+                          exit={{ width: 0, opacity: 0 }}
+                          transition={{
+                            duration: 0.28,
+                            ease: [0.32, 0.72, 0, 1],
+                          }}
+                          className="shrink-0 overflow-hidden border-l border-wex-card-border bg-white rounded-br-2xl rounded-tr-2xl flex flex-col h-full min-h-0"
+                        >
+                        <div className="flex w-[400px] min-w-[400px] flex-col gap-3 p-6 flex-1 min-h-0 overflow-y-auto">
                           {/* Header with alert icon, subject, and close button */}
                           <div className="flex items-center justify-between gap-3">
                             <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -1824,8 +1077,9 @@ export default function MessageCenter() {
                             {selectedMessage.body || "Please see attachment."}
                           </div>
                         </div>
-                      </div>
-                    )}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 </SidebarInset>
               </div>
@@ -1842,7 +1096,7 @@ export default function MessageCenter() {
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
           <DialogContent 
             position="bottom"
-            className="min-[400px]:hidden w-[375px] max-w-[375px] p-6 rounded-2xl border border-border overflow-hidden flex flex-col max-h-[90vh]"
+            className="min-[400px]:hidden w-[375px] max-w-[375px] p-6 rounded-2xl border border-border overflow-hidden flex flex-col max-h-[90vh] data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-full data-[state=open]:duration-300 data-[state=open]:ease-out data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom-full data-[state=closed]:duration-200"
           >
             <div className="flex flex-col flex-1 min-h-0 overflow-y-hidden">
               {/* Header */}

@@ -11,12 +11,14 @@ import {
 import { ChevronDown, FileText, Download, CheckCircle2, ChevronRight } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { SectionHeader } from "@/components/ui/SectionHeader";
-import { 
-  getInitialMessages, 
+import {
+  getInitialMessages,
   saveReadStatus,
   UNREAD_COUNT_CHANGED_EVENT,
-  type Message 
+  type Message,
 } from "@/data/messageCenterUtils";
+import { buildDesktopMessagesFromVariant } from "@/data/messageCenterFromCatalog";
+import { useAppVariant, type AppVariant } from "@/context/AppVariantContext";
 import { tasksData } from "@/data/mockData";
 
 interface MessageItem {
@@ -34,57 +36,9 @@ interface MessageItem {
   isActionable: boolean;
 }
 
-const getMessageData = (): Message[] => {
-  const initialMessages: Message[] = [
-    {
-      id: "1",
-      subject: "HSA Contribution Maximum Warning",
-      hasAttachment: true,
-      category: "Contributions & Investments",
-      categoryColor: "bg-purple-50",
-      categoryTextColor: "text-purple-700",
-      deliveryDate: "11/23/25 11:05AM",
-      isStarred: false,
-      isBold: true,
-      isRead: false,
-      isArchived: false,
-      body: "Your HSA contribution is approaching the annual maximum limit. Please review your contribution settings.",
-      attachmentFileName: "HSA_Contribution_Warning_11_23.pdf",
-    },
-    {
-      id: "3",
-      subject: "HSA Account Summary (11/01/2025-11/30/2025)",
-      hasAttachment: true,
-      category: "Statements & Tax Documents",
-      categoryColor: "bg-blue-50",
-      categoryTextColor: "text-blue-700",
-      deliveryDate: "11/23/25 11:05AM",
-      isStarred: false,
-      isBold: true,
-      isRead: false,
-      isArchived: false,
-      body: "Your monthly account summary is now available.",
-      attachmentFileName: "Account_Summary_11_2025.pdf",
-    },
-    {
-      id: "4",
-      subject: "Tax Form Available: 1099-SA",
-      hasAttachment: true,
-      category: "Statements & Tax Documents",
-      categoryColor: "bg-blue-50",
-      categoryTextColor: "text-blue-700",
-      deliveryDate: "11/23/25 11:05AM",
-      isStarred: false,
-      isBold: true,
-      isRead: false,
-      isArchived: false,
-      body: "Your 1099-SA tax form is now available for download.",
-      attachmentFileName: "1099-SA_2025.pdf",
-    },
-  ];
-
-  return getInitialMessages(initialMessages);
-};
+function getMessageData(variant: AppVariant): Message[] {
+  return getInitialMessages(buildDesktopMessagesFromVariant(variant).slice(0, 3));
+}
 
 const getActionDescription = (subject: string, _category: string): string => {
   if (subject.toLowerCase().includes("contribution maximum") || subject.toLowerCase().includes("contribution warning")) {
@@ -133,27 +87,33 @@ const getToDoMessages = (messages: Message[]): MessageItem[] => {
 };
 
 export function MessageCenterWidget() {
-  const [messages, setMessages] = useState<Message[]>(() => getMessageData());
+  const { variant } = useAppVariant();
+  const [messages, setMessages] = useState<Message[]>(() =>
+    getMessageData(variant)
+  );
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tasksExpanded, setTasksExpanded] = useState(false);
 
   useEffect(() => {
+    setMessages(getMessageData(variant));
+  }, [variant]);
+
+  useEffect(() => {
     const handleUnreadCountChange = () => {};
     window.addEventListener(UNREAD_COUNT_CHANGED_EVENT as any, handleUnreadCountChange);
-    
+
     const refreshMessages = () => {
-      const updated = getMessageData();
-      setMessages(updated);
+      setMessages(getMessageData(variant));
     };
 
-    window.addEventListener('focus', refreshMessages);
+    window.addEventListener("focus", refreshMessages);
 
     return () => {
       window.removeEventListener(UNREAD_COUNT_CHANGED_EVENT as any, handleUnreadCountChange);
-      window.removeEventListener('focus', refreshMessages);
+      window.removeEventListener("focus", refreshMessages);
     };
-  }, []);
+  }, [variant]);
 
   const getIcon = (_iconType: string, isActionable: boolean) => {
     if (isActionable) {
@@ -175,7 +135,7 @@ export function MessageCenterWidget() {
         setIsModalOpen(true);
         if (!message.isRead) {
           saveReadStatus(actualMessageId, true);
-          setMessages(getMessageData());
+          setMessages(getMessageData(variant));
         }
       }
     } else {
