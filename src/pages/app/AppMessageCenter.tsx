@@ -26,7 +26,12 @@ import { useAppChrome } from "@/context/AppChromeContext";
 import { APP_NAV_HOME_INNER_H } from "@/components/app-shell/appChromeLayout";
 import { STATUS_BAR_HEIGHT } from "@/components/app-shell/AppStatusBar";
 import { AppCard } from "@/components/app-shell/primitives/AppCard";
-import { getPrototypeInboxEntries, type MessageTag } from "./messageCatalog";
+import {
+  getPrototypeInboxEntries,
+  MESSAGE_BODY_WITH_ATTACHMENT,
+  type MessageTag,
+} from "./messageCatalog";
+import { useAppVariant, type AppVariant } from "@/context/AppVariantContext";
 
 type FilterId =
   | "all"
@@ -103,8 +108,8 @@ function swipeOffsetFromState(
 /**
  * Seed inbox from the prototype catalog (20 max). Last row is archived for the Archive filter.
  */
-function buildInboxRows(): MessageRow[] {
-  const entries = getPrototypeInboxEntries();
+function buildInboxRows(variant: AppVariant): MessageRow[] {
+  const entries = getPrototypeInboxEntries(variant);
   return entries.map((entry, i) => {
     const archived = i === MAX_MESSAGES - 1;
     const day = Math.max(1, 28 - (i % 20));
@@ -118,9 +123,10 @@ function buildInboxRows(): MessageRow[] {
       starred: i === 4,
       archived,
       tags: [entry.tag],
-      body:
-        entry.previewBody ??
-        `Open this message to review details for ${entry.title}.`,
+      body: entry.pdfAttached
+        ? MESSAGE_BODY_WITH_ATTACHMENT
+        : entry.previewBody ??
+          `Open this message to review details for ${entry.title}.`,
     };
   });
 }
@@ -421,8 +427,9 @@ function MessageSwipeRow({
 }
 
 export default function AppMessageCenter() {
+  const { variant } = useAppVariant();
   const [filter, setFilter] = useState<FilterId>("all");
-  const [rows, setRows] = useState<MessageRow[]>(() => buildInboxRows());
+  const [rows, setRows] = useState<MessageRow[]>(() => buildInboxRows(variant));
   const [visibleLimit, setVisibleLimit] = useState(PAGE_SIZE);
   const [selected, setSelected] = useState<MessageRow | null>(null);
   const [swipe, setSwipe] = useState<SwipeGestureState>({ kind: "idle" });
@@ -459,6 +466,22 @@ export default function AppMessageCenter() {
   const firstRowIdForIntroRef = useRef<string | undefined>(undefined);
   const firstDisplayedIdRef = useRef<string | undefined>(undefined);
   firstDisplayedIdRef.current = firstDisplayedId;
+
+  useEffect(() => {
+    setRows(buildInboxRows(variant));
+    setFilter("all");
+    setVisibleLimit(PAGE_SIZE);
+    setSelected(null);
+    setSwipe({ kind: "idle" });
+    firstRowIntroDoneRef.current = false;
+    firstRowIdForIntroRef.current = undefined;
+    setFirstRowIntroPeekPx(0);
+    setFirstRowIntroMotion(false);
+    queueMicrotask(() => {
+      const scrollContainer = document.getElementById("app-scroll-container");
+      if (scrollContainer) scrollContainer.scrollTo({ top: 0 });
+    });
+  }, [variant]);
 
   useEffect(() => {
     if (firstRowIntroDoneRef.current) return;
@@ -1004,44 +1027,55 @@ export default function AppMessageCenter() {
 
       <AnimatePresence>
         {selected && (
-          <>
-            <motion.button
-              key={`message-detail-backdrop-${selected.id}`}
-              type="button"
-              aria-label="Close message"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.22, ease: "easeOut" }}
-              onClick={closeSheet}
-              style={{
-                position: "fixed",
-                inset: 0,
-                width: "100%",
-                maxWidth: 430,
-                marginLeft: "auto",
-                marginRight: "auto",
-                zIndex: 100,
-                padding: 0,
-                border: "none",
-                background: "rgba(18, 24, 29, 0.3)",
-                cursor: "pointer",
-              }}
-            />
-            <motion.div
-              key={`message-detail-sheet-${selected.id}`}
-              className="message-detail-sheet-panel"
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="message-detail-title"
-              initial={{ y: "100%" }}
-              animate={{ y: 0 }}
-              exit={{ y: "100%" }}
-              transition={{
-                duration: 0.38,
-                ease: [0.32, 0.72, 0, 1],
-              }}
-              style={{
+          <motion.button
+            key="message-detail-backdrop"
+            type="button"
+            aria-label="Close message"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{
+              opacity: 0,
+              transition: { duration: 0.26, ease: [0.4, 0, 1, 1] },
+            }}
+            transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
+            onClick={closeSheet}
+            style={{
+              position: "fixed",
+              inset: 0,
+              width: "100%",
+              maxWidth: 430,
+              marginLeft: "auto",
+              marginRight: "auto",
+              zIndex: 100,
+              padding: 0,
+              border: "none",
+              background: "rgba(18, 24, 29, 0.3)",
+              cursor: "pointer",
+            }}
+          />
+        )}
+        {selected && (
+          <motion.div
+            key={selected.id}
+            className="message-detail-sheet-panel"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="message-detail-title"
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{
+              y: "100%",
+              transition: { duration: 0.26, ease: [0.4, 0, 1, 1] },
+            }}
+            transition={{
+              y: {
+                type: "spring",
+                damping: 32,
+                stiffness: 380,
+                mass: 0.85,
+              },
+            }}
+            style={{
                 position: "fixed",
                 left: 0,
                 right: 0,
@@ -1064,8 +1098,8 @@ export default function AppMessageCenter() {
                 boxSizing: "border-box",
                 touchAction: "pan-y",
               }}
-              onClick={(e) => e.stopPropagation()}
-            >
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
               type="button"
               aria-label="Close message"
@@ -1234,7 +1268,6 @@ export default function AppMessageCenter() {
               )}
             </div>
           </motion.div>
-          </>
         )}
       </AnimatePresence>
 

@@ -128,23 +128,11 @@ function sumSelectedReceiptLines(lines: ReceiptLineItem[]): string {
 /** Mock extraction aligned with Health FSA rules: medical care eligible; supplements & parking not. */
 function createDefaultReceiptLineItems(): ReceiptLineItem[] {
   return [
-    { id: "line-copay", description: "Office visit copay", amount: 25, eligible: true, selected: true },
-    {
-      id: "line-pt",
-      description: "Physical therapy session",
-      amount: 45,
-      eligible: true,
-      selected: true,
-    },
-    { id: "line-sun", description: "Sunscreen", amount: 50, eligible: true, selected: true },
-    {
-      id: "line-protein",
-      description: "Protein powder",
-      amount: 25,
-      eligible: false,
-      selected: false,
-    },
-    { id: "line-parking", description: "Parking", amount: 25, eligible: false, selected: false },
+    { id: "line-1", description: "ATORVASTATIN 10MG", amount: 20.00, eligible: true, selected: true },
+    { id: "line-2", description: "LISINOPRIL 20MG", amount: 35.00, eligible: true, selected: true },
+    { id: "line-3", description: "RX AMORICIL 500MG", amount: 12.45, eligible: true, selected: true },
+    { id: "line-4", description: "ORBIT GUM 14PC", amount: 1.89, eligible: false, selected: false },
+    { id: "line-5", description: "DIET COKE 20OZ", amount: 2.39, eligible: false, selected: false },
   ];
 }
 
@@ -314,10 +302,10 @@ function ReimburseWorkspaceSession({
           claim: {
             ...prev.claim,
             amount: amountFromLines,
-            serviceDateStart: prev.claim.serviceDateStart || "2026-03-10",
-            serviceDateEnd: prev.claim.serviceDateEnd || "2026-03-10",
-            provider: prev.claim.provider || "ABC Physical Therapy",
-            category: prev.claim.category || "physical-therapy",
+            serviceDateStart: prev.claim.serviceDateStart || "2026-04-08",
+            serviceDateEnd: prev.claim.serviceDateEnd || "2026-04-08",
+            provider: prev.claim.provider || "CVS Pharmacy",
+            category: prev.claim.category || "pharmacy",
             patient: prev.claim.patient || "self",
           },
         };
@@ -594,7 +582,7 @@ function StartStep({
       entryMode: "upload",
       uploadedDocs: [
         ...prev.uploadedDocs,
-        { name: "ABC_Physical_Therapy_receipt.pdf", size: "84 KB", isDummy: true },
+        { name: "CVS_Pharmacy_receipt.jpg", size: "1.2 MB", isDummy: true },
       ],
     }));
 
@@ -621,8 +609,8 @@ function StartStep({
         <Card className="overflow-hidden">
           {!hasDocs ? (
             <CardContent className="flex flex-col items-center gap-4 py-10 px-8 text-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-secondary">
-                <Upload className="h-6 w-6 text-foreground" strokeWidth={1.5} />
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-neutral-50">
+                <Upload className="h-6 w-6 text-neutral-700" strokeWidth={1.5} />
               </div>
               <div className="flex flex-col gap-1">
                 <p className="font-semibold text-foreground">Upload a receipt</p>
@@ -635,16 +623,15 @@ function StartStep({
               </Button>
             </CardContent>
           ) : (
-            <CardContent className="p-5 flex flex-col gap-4">
-              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+            <CardContent className="p-6 flex flex-col gap-4">
+              <p className="text-[13px] font-semibold uppercase tracking-[0.5px] text-[#5e6a75] mb-1">
                 Uploaded document(s)
               </p>
               <div className="flex flex-col gap-3">
                 {state.uploadedDocs.map((doc, i) => (
                   <div
                     key={`${doc.name}-${i}`}
-                    className="relative rounded-lg overflow-hidden border bg-secondary/30"
-                    style={{ height: 140 }}
+                    className="relative rounded-lg overflow-hidden border border-[#e4e6e9] bg-white h-[180px]"
                   >
                     {doc.isDummy ? (
                       <DummyReceiptPreview />
@@ -659,19 +646,19 @@ function StartStep({
                     )}
                     <button
                       onClick={() => handleRemoveDoc(i)}
-                      className="absolute bottom-2 left-2 h-8 w-8 rounded border border-border bg-white shadow-sm flex items-center justify-center hover:bg-secondary transition-colors"
+                      className="absolute bottom-3 left-3 h-10 w-10 rounded-md border border-[#e4e6e9] bg-white shadow-sm flex items-center justify-center hover:bg-gray-50 transition-colors"
                       aria-label="Remove document"
                     >
-                      <Trash2 className="h-4 w-4 text-destructive" />
+                      <Trash2 className="h-[18px] w-[18px] text-[#c8102e]" />
                     </button>
                   </div>
                 ))}
               </div>
               <button
                 onClick={handleSimulateUpload}
-                className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline underline-offset-2"
+                className="flex items-center gap-1.5 text-[15px] font-semibold text-[#0055a5] hover:underline mt-2"
               >
-                <Plus className="h-3.5 w-3.5" />
+                <Plus className="h-4 w-4" strokeWidth={2.5} />
                 Add another document
               </button>
             </CardContent>
@@ -711,42 +698,8 @@ function StartStep({
 
 function DummyReceiptPreview() {
   return (
-    <div className="w-full h-full overflow-hidden bg-white">
-      <div
-        className="w-full origin-top"
-        style={{
-          transform: "scale(0.42)",
-          transformOrigin: "top center",
-          width: "238%",
-          marginLeft: "-69%",
-        }}
-      >
-        <div className="bg-white p-5">
-          <div className="text-center pb-3 border-b border-gray-100">
-            <div className="font-bold text-sm text-gray-800 uppercase tracking-wide">
-              ABC Physical Therapy
-            </div>
-            <div className="text-xs text-gray-400 mt-0.5">
-              1234 Health Ave, Suite 200 · Portland, OR 97201
-            </div>
-          </div>
-          <div className="flex justify-between pt-3 pb-2 text-xs text-gray-500">
-            <span>Date: March 10, 2026</span>
-            <span>Invoice #: 20260310</span>
-          </div>
-          <div className="pb-3 border-b border-gray-100">
-            <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">Patient</div>
-            <div className="text-sm text-gray-700">John Doe</div>
-            <div className="text-xs text-gray-400">DOB: 01/15/1985 · MRN: 00481920</div>
-          </div>
-          <div className="mt-3 pt-3 border-t border-gray-100">
-            <div className="flex justify-between text-sm font-bold text-gray-800">
-              <span>Patient Balance Due</span>
-              <span>$127.43</span>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="w-full h-full overflow-hidden bg-[#e4e6e9] flex items-center justify-center">
+      <img src={`${import.meta.env.BASE_URL}reimburse-docs/cvs-receipt.png`} alt="Receipt preview" className="object-cover w-full h-full" />
     </div>
   );
 }
@@ -874,7 +827,7 @@ function AccountStep({
         </div>
 
         {/* Claim amount pill */}
-        <div className="inline-flex items-center gap-2 text-sm text-muted-foreground bg-secondary/50 rounded-lg px-3 py-2 w-fit">
+        <div className="inline-flex items-center gap-2 text-sm text-neutral-700 bg-neutral-100 rounded-lg px-3 py-2 w-fit">
           <Tooltip>
             <TooltipTrigger asChild>
               <button
@@ -882,7 +835,7 @@ function AccountStep({
                 className="shrink-0 rounded-full text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 aria-label="About claim amount"
               >
-                <Info className="h-3.5 w-3.5" aria-hidden />
+                <Info className="h-3.5 w-3.5 text-current" aria-hidden />
               </button>
             </TooltipTrigger>
             <TooltipContent side="top" className="max-w-sm text-left">
@@ -978,7 +931,7 @@ function AccountStep({
                             if (e.key === "Enter" || e.key === " ") e.stopPropagation();
                           }}
                         >
-                          <Info className="h-3.5 w-3.5" aria-hidden />
+                          <Info className="h-3.5 w-3.5 text-current" aria-hidden />
                         </span>
                       </TooltipTrigger>
                       <TooltipContent side="top" className="max-w-sm text-left">
@@ -1008,7 +961,7 @@ function AccountStep({
                             if (e.key === "Enter" || e.key === " ") e.stopPropagation();
                           }}
                         >
-                          <Info className="h-3.5 w-3.5" aria-hidden />
+                          <Info className="h-3.5 w-3.5 text-current" aria-hidden />
                         </span>
                       </TooltipTrigger>
                       <TooltipContent side="top" className="max-w-sm text-left">
@@ -1130,6 +1083,7 @@ function DetailsStep({
 
           <Card>
             <CardContent className="p-6 flex flex-col gap-5">
+              <h2 className="text-lg font-semibold text-foreground">Claim details</h2>
               <FloatLabel
                 label="Total amount"
                 type="number"
@@ -1220,28 +1174,49 @@ function DetailsStep({
                       <Checkbox
                         checkboxSize="md"
                         checked={item.selected}
+                        disabled={!item.eligible}
                         onCheckedChange={(c) => {
                           if (c === "indeterminate") return;
                           setReceiptLineSelected(item.id, c === true);
                         }}
                         aria-label={`Include ${item.description}`}
                       />
-                      <span className="flex-1 min-w-0 text-sm font-medium text-foreground">
+                      <span className={`flex-1 min-w-0 text-sm font-medium ${!item.eligible ? "text-muted-foreground" : "text-foreground"}`}>
                         {item.description}
                       </span>
                       <div
                         className={`inline-flex items-center gap-[3.5px] px-[7px] py-[3.5px] rounded-[12px] shrink-0 ${
                           item.eligible
                             ? "bg-[#dcfce7] text-[#008375]"
-                            : "bg-[#ffecc7] text-[#b37a2b]"
+                            : "bg-[#ffecc7] text-[#b37a2b] opacity-75"
                         }`}
                       >
-                        <Info className="h-[10.5px] w-[10.5px]" strokeWidth={2.5} aria-hidden />
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span
+                              role="button"
+                              tabIndex={0}
+                              className="cursor-help flex items-center outline-none"
+                              onClick={(e) => e.stopPropagation()}
+                              onPointerDown={(e) => e.stopPropagation()}
+                              onKeyDown={(e) => e.stopPropagation()}
+                            >
+                              <Info className="h-[10.5px] w-[10.5px] text-current" strokeWidth={2.5} aria-hidden />
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent side="top" className="max-w-xs text-left">
+                            <p className="text-sm">
+                              {item.eligible
+                                ? "This item is considered an eligible expense under your current plan."
+                                : "This item is not covered by your current plan and cannot be reimbursed."}
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
                         <span className="text-[11px] font-semibold leading-none whitespace-nowrap">
-                          {item.eligible ? "Eligible" : "Ineligible*"}
+                          {item.eligible ? "Eligible" : "Ineligible"}
                         </span>
                       </div>
-                      <span className="shrink-0 text-sm font-semibold tabular-nums text-foreground w-[4.5rem] text-right">
+                      <span className={`shrink-0 text-sm font-semibold tabular-nums w-[4.5rem] text-right ${!item.eligible ? "text-muted-foreground" : "text-foreground"}`}>
                         {usd(String(item.amount))}
                       </span>
                     </div>
@@ -1266,7 +1241,7 @@ function DetailsStep({
           <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border bg-background/80 flex-shrink-0">
             <FileText className="h-3.5 w-3.5 text-muted-foreground" />
             <span className="text-xs font-medium text-foreground truncate">
-              {state.uploadedDocs[0]?.name ?? "Receipt.pdf"}
+              {state.uploadedDocs[0]?.name ?? "Receipt.jpg"}
             </span>
           </div>
           <div className="flex-1 overflow-y-auto px-6 py-6">
@@ -1280,50 +1255,8 @@ function DetailsStep({
 
 function ReceiptPreviewFull() {
   return (
-    <div className="w-full bg-white rounded-lg shadow-sm border border-border/50 p-7">
-      <div className="text-center pb-5 border-b border-gray-100 space-y-0.5">
-        <div className="font-bold text-sm text-gray-800 tracking-wide uppercase">
-          ABC Physical Therapy
-        </div>
-        <div className="text-xs text-gray-400">1234 Health Ave, Suite 200 · Portland, OR 97201</div>
-        <div className="text-xs text-gray-400">Tel: (503) 555-0182</div>
-      </div>
-      <div className="flex justify-between pt-4 pb-3 text-xs text-gray-500">
-        <span>Date: March 10, 2026</span>
-        <span>Invoice #: 20260310</span>
-      </div>
-      <div className="pb-4 border-b border-gray-100">
-        <div className="text-[10px] uppercase tracking-wider text-gray-400 font-medium mb-1">Patient</div>
-        <div className="text-sm text-gray-700">John Doe</div>
-        <div className="text-xs text-gray-400">DOB: 01/15/1985 · MRN: 00481920</div>
-      </div>
-      <table className="w-full mt-4 text-xs">
-        <thead>
-          <tr className="border-b border-gray-100">
-            <th className="text-left text-gray-400 font-medium pb-2 pr-2">Description</th>
-            <th className="text-right text-gray-400 font-medium pb-2">Amount</th>
-          </tr>
-        </thead>
-        <tbody>
-          {[
-            { desc: "Office visit copay",             amt: "$25.00" },
-            { desc: "Physical therapy session (60 min)", amt: "$90.00" },
-            { desc: "Cold pack / ice therapy",        amt: "$5.00" },
-            { desc: "Protein powder (supplement)",    amt: "$12.43" },
-          ].map((row) => (
-            <tr key={row.desc} className="border-b border-gray-50 last:border-0">
-              <td className="py-2 pr-2 text-gray-700">{row.desc}</td>
-              <td className="py-2 text-right tabular-nums text-gray-700">{row.amt}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <div className="mt-4 pt-3 border-t border-gray-200">
-        <div className="flex justify-between text-sm font-semibold text-gray-800">
-          <span>Total due</span>
-          <span className="tabular-nums">$132.43</span>
-        </div>
-      </div>
+    <div className="w-full bg-white rounded-lg shadow-sm border border-border/50 p-4 flex items-center justify-center">
+      <img src={`${import.meta.env.BASE_URL}reimburse-docs/cvs-receipt.png`} alt="Receipt preview" className="object-contain w-full h-full max-h-[70vh]" />
     </div>
   );
 }
@@ -1410,7 +1343,7 @@ function DestinationStep({
                 <div className="flex items-start gap-4">
                   <div
                     className={`mt-0.5 flex-shrink-0 ${
-                      isSelected ? "text-[#0055a5]" : "text-[#515f6b]"
+                      isSelected ? "text-neutral-700" : "text-[#515f6b]"
                     }`}
                   >
                     {opt.icon}
@@ -1419,7 +1352,7 @@ function DestinationStep({
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="text-[16px] font-bold text-[#1d2c38]">{opt.label}</p>
                       {opt.badge && (
-                        <span className="inline-flex items-center px-[8px] py-[3px] rounded-[12px] bg-[#eef2ff] text-[#3958c3] text-[12px] font-medium leading-none whitespace-nowrap">
+                        <span className="inline-flex items-center px-[8px] py-[3px] rounded-[12px] bg-[var(--theme-secondary-ramp-50)] text-[var(--theme-secondary)] text-[12px] font-medium leading-none whitespace-nowrap">
                           {opt.badge}
                         </span>
                       )}
@@ -1519,7 +1452,7 @@ function ValidationStep({
                       viewBox="0 0 15 15"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
-                      className="shrink-0"
+                      className="shrink-0 text-neutral-700"
                     >
                       <path
                         d="M1.98958 5.32292C1.63596 5.32292 1.29682 5.46339 1.04677 5.71344C0.796726 5.96349 0.65625 6.30263 0.65625 6.65625V7.98958C0.65625 8.3432 0.796726 8.68234 1.04677 8.93239C1.29682 9.18244 1.63596 9.32292 1.98958 9.32292H4.65625C4.83306 9.32292 5.00263 9.39315 5.12765 9.51818C5.25268 9.6432 5.32292 9.81277 5.32292 9.98958V12.6562C5.32292 13.0099 5.46339 13.349 5.71344 13.5991C5.96349 13.8491 6.30263 13.9896 6.65625 13.9896H7.98958C8.3432 13.9896 8.68234 13.8491 8.93239 13.5991C9.18244 13.349 9.32292 13.0099 9.32292 12.6562V9.98958C9.32292 9.81277 9.39315 9.6432 9.51818 9.51818C9.6432 9.39315 9.81277 9.32292 9.98958 9.32292H12.6562C13.0099 9.32292 13.349 9.18244 13.5991 8.93239C13.8491 8.68234 13.9896 8.3432 13.9896 7.98958V6.65625C13.9896 6.30263 13.8491 5.96349 13.5991 5.71344C13.349 5.46339 13.0099 5.32292 12.6562 5.32292H9.98958C9.81277 5.32292 9.6432 5.25268 9.51818 5.12765C9.39315 5.00263 9.32292 4.83306 9.32292 4.65625V1.98958C9.32292 1.63596 9.18244 1.29682 8.93239 1.04677C8.68234 0.796726 8.3432 0.65625 7.98958 0.65625H6.65625C6.30263 0.65625 5.96349 0.796726 5.71344 1.04677C5.46339 1.29682 5.32292 1.63596 5.32292 1.98958V4.65625C5.32292 4.83306 5.25268 5.00263 5.12765 5.12765C5.00263 5.25268 4.83306 5.32292 4.65625 5.32292H1.98958Z"
@@ -1558,7 +1491,7 @@ function ValidationStep({
                       viewBox="0 0 14 15"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
-                      className="shrink-0 text-[#0055a5]"
+                      className="shrink-0 text-neutral-700"
                     >
                       <path
                         d="M5.34118 11.3249V6.6582M8.00785 11.3249V6.6582M10.6745 11.3249V6.6582M0.674518 13.9915H12.6745M2.67452 11.3249V6.6582M6.08792 0.790262C6.27085 0.701401 6.47168 0.655565 6.67505 0.656258C6.87842 0.656951 7.07893 0.704156 7.26125 0.794262L12.5053 3.35893C12.8226 3.51426 12.7119 3.99159 12.3586 3.99159H0.990586C0.637252 3.99159 0.527252 3.51426 0.843919 3.35893L6.08792 0.790262Z"
@@ -1690,11 +1623,11 @@ function ConfirmationStep({
                     <div className="flex flex-col items-center">
                       <div
                         className={`flex h-[24px] w-[24px] items-center justify-center rounded-full flex-shrink-0 mt-0.5 ${
-                          isActive ? "border border-[#0058a3] text-[#0058a3] bg-white" : ""
+                          isActive ? "border border-[var(--theme-primary)] text-[var(--neutral-700)] bg-white" : ""
                         } ${
                           isCompleted ? "border border-[#009b89] text-[#009b89] bg-white" : ""
                         } ${
-                          isPending ? "bg-[#e4e6e9] text-[#7c858e]" : ""
+                          isPending ? "bg-[var(--neutral-100)] text-[var(--neutral-700)]" : ""
                         }`}
                       >
                         {isCompleted ? (
@@ -1709,24 +1642,24 @@ function ConfirmationStep({
                       <div className="flex items-center gap-2">
                         <p
                           className={`text-[14px] tracking-[-0.084px] leading-tight ${
-                            isActive ? "font-semibold text-[#243746]" : "font-medium text-[#7c858e]"
+                            isActive ? "font-semibold text-[#243746]" : "font-medium text-[var(--neutral-700)]"
                           }`}
                         >
                           {event.label}
                         </p>
                         {isActive && (
-                          <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-[12px] bg-[#eef2ff] text-[#3958c3] text-[11px] font-semibold leading-none whitespace-nowrap">
+                          <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-[12px] bg-[var(--theme-secondary-ramp-50)] text-[var(--theme-secondary)] text-[11px] font-semibold leading-none whitespace-nowrap">
                             Now
                           </span>
                         )}
                       </div>
-                      <p className="text-[13px] text-[#7c858e] mt-1">{event.description}</p>
+                      <p className="text-[13px] text-[var(--neutral-700)] mt-1">{event.description}</p>
                     </div>
                   </div>
                 );
               })}
             </div>
-            <p className="text-xs text-muted-foreground mt-4">
+            <p className="text-xs text-[var(--neutral-700)] mt-4">
               Final amount and timing depend on approval.
             </p>
           </CardContent>
@@ -1753,7 +1686,7 @@ function ConfirmationStep({
             intent="primary"
             className="flex-1 flex items-center justify-center gap-2"
           >
-            <Clock className="h-4 w-4" />
+            <Clock className="h-4 w-4 text-white" />
             View claim status
           </Button>
         </div>

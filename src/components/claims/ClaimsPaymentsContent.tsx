@@ -533,7 +533,7 @@ export function ClaimsPaymentsContent() {
                         className="shrink-0 whitespace-nowrap"
                       >
                         <span className="inline-flex items-center gap-1.5">
-                          <Clock className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                          <Clock className="h-3.5 w-3.5 shrink-0 text-current" aria-hidden />
                           {item.deadlineLabel}
                         </span>
                       </Badge>
@@ -565,10 +565,10 @@ export function ClaimsPaymentsContent() {
                           onClick={(e) => e.stopPropagation()}
                         >
                           {item.primaryAction.icon === "upload" && (
-                            <Upload className="size-4 shrink-0" aria-hidden />
+                            <Upload className="size-4 shrink-0 text-current" aria-hidden />
                           )}
                           {item.primaryAction.icon === "card" && (
-                            <CreditCard className="size-4 shrink-0" aria-hidden />
+                            <CreditCard className="size-4 shrink-0 text-current" aria-hidden />
                           )}
                           {item.primaryAction.label}
                         </Button>
@@ -605,7 +605,7 @@ export function ClaimsPaymentsContent() {
                 inputSize="md"
                 type="search"
                 placeholder="Find a claim..."
-                leftIcon={<Search className="h-4 w-4" />}
+                leftIcon={<Search className="h-4 w-4 text-current" />}
                 value={expenseSearch}
                 onChange={(e) => {
                   setExpenseSearch(e.target.value)
@@ -731,7 +731,7 @@ export function ClaimsPaymentsContent() {
                           expenseStatusBadgeClass(row.status.tone)
                         )}
                       >
-                        {row.status.icon && <AlertTriangle className="h-3 w-3 shrink-0" aria-hidden />}
+                        {row.status.icon && <AlertTriangle className="h-3 w-3 shrink-0 text-current" aria-hidden />}
                         <span className="min-w-0 truncate">{row.status.label}</span>
                       </span>
                     </TableCell>
@@ -757,7 +757,7 @@ export function ClaimsPaymentsContent() {
                     <TableCell className="min-w-0 px-2 py-2.5 text-sm text-muted-foreground">
                       {row.attachments ? (
                         <span className="inline-flex min-w-0 max-w-full items-center gap-1.5 truncate">
-                          <Paperclip className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                          <Paperclip className="h-3.5 w-3.5 shrink-0 text-current" aria-hidden />
                           <span className="min-w-0 truncate">{row.attachments}</span>
                         </span>
                       ) : (
@@ -910,7 +910,7 @@ export function ClaimsPaymentsContent() {
                     <span className="text-xs text-muted-foreground">{doc.date}</span>
                     {doc.attached ? (
                       <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">
-                        <Check className="h-3 w-3" aria-hidden />
+                        <Check className="h-3 w-3 text-current" aria-hidden />
                         {doc.tag}
                       </span>
                     ) : (

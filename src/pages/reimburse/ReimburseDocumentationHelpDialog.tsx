@@ -85,7 +85,7 @@ export function ReimburseDocumentationHelpDialog({
             onClick={() => setPageIndex((p) => Math.max(0, p - 1))}
             className="gap-1.5 text-[#515f6b] border-[#e4e6e9] disabled:opacity-40"
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-4 w-4 text-current" />
             Previous
           </Button>
 
@@ -110,7 +110,7 @@ export function ReimburseDocumentationHelpDialog({
             className="gap-1.5 border-[#3958c3] text-[#3958c3] hover:bg-[#3958c3]/5 disabled:opacity-40"
           >
             Next
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-4 w-4 text-current" />
           </Button>
         </div>
       </DialogContent>
