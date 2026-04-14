@@ -463,7 +463,7 @@ export default function FsaAccountPage() {
               <div className="mt-6 overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow>
+                    <TableRow className="hover:bg-transparent border-y border-border bg-muted/30">
                       <TableHead>
                         <div className="flex items-center gap-1 whitespace-nowrap">
                           Date
