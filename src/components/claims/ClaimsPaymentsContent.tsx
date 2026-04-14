@@ -12,6 +12,11 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Table,
   TableBody,
   TableCell,
@@ -28,6 +33,8 @@ import {
   ArrowUp,
   ArrowUpDown,
   Check,
+  ChevronsLeft,
+  ChevronsRight,
   Clock,
   CreditCard,
   Paperclip,
@@ -45,7 +52,7 @@ const ACTION_ITEMS = [
     alertDescription: "Documentation is required to complete this claim.",
     deadlineLabel: "28 Days Remaining",
     provider: "Bigtown Dentistry",
-    dateLine: "Jan 12, 2026",
+    dateLine: "Jan 22, 2026",
     account: "Healthcare FSA",
     amount: "$210.00",
     primaryAction: { label: "Upload Documentation", icon: "upload" as const },
@@ -59,7 +66,7 @@ const ACTION_ITEMS = [
       "This expense is not eligible for reimbursement under a Dependent Care FSA.",
     deadlineLabel: "14 Days Remaining",
     provider: "Buddy's Overnight Camp",
-    dateLine: "Feb 13-14, 2026",
+    dateLine: "Feb 20-21, 2026",
     account: "Dependent Care FSA",
     amount: "$180.00",
     primaryAction: { label: "Repay Expense", icon: "card" as const },
@@ -70,7 +77,7 @@ const ACTION_ITEMS = [
 const EXPENSE_ROWS: ExpenseRow[] = [
   {
     id: "1",
-    dateOfService: "Feb 14, 2026",
+    dateOfService: "Mar 5, 2026",
     status: { label: "Payment Processing", tone: "blue" },
     origin: "manual",
     account: "Healthcare FSA",
@@ -84,7 +91,7 @@ const EXPENSE_ROWS: ExpenseRow[] = [
   },
   {
     id: "2",
-    dateOfService: "Feb 14, 2026",
+    dateOfService: "Feb 28, 2026",
     status: { label: "Documentation Review", tone: "blue" },
     origin: "card",
     account: "Healthcare FSA",
@@ -98,7 +105,7 @@ const EXPENSE_ROWS: ExpenseRow[] = [
   },
   {
     id: "3",
-    dateOfService: "Feb 14, 2026",
+    dateOfService: "Feb 7, 2026",
     status: { label: "Approved", tone: "green" },
     origin: "manual",
     account: "Healthcare FSA",
@@ -112,7 +119,7 @@ const EXPENSE_ROWS: ExpenseRow[] = [
   },
   {
     id: "4",
-    dateOfService: "Feb 14, 2026",
+    dateOfService: "Jan 31, 2026",
     status: { label: "Denied", tone: "amber" },
     origin: "card",
     denialReason: "Expense is not eligible under Healthcare FSA plan.",
@@ -127,7 +134,7 @@ const EXPENSE_ROWS: ExpenseRow[] = [
   },
   {
     id: "5",
-    dateOfService: "Feb 13–14, 2026",
+    dateOfService: "Feb 20–21, 2026",
     status: { label: "Repayment Due", tone: "red", icon: true },
     origin: "card",
     denialReason: "Dependent care expense is not eligible under this plan.",
@@ -142,7 +149,7 @@ const EXPENSE_ROWS: ExpenseRow[] = [
   },
   {
     id: "6",
-    dateOfService: "Feb 14, 2026",
+    dateOfService: "Feb 10, 2026",
     status: { label: "Hold", tone: "amber" },
     origin: "manual",
     holdReason: "Additional review required for this expense category.",
@@ -157,7 +164,7 @@ const EXPENSE_ROWS: ExpenseRow[] = [
   },
   {
     id: "7",
-    dateOfService: "Feb 14, 2026",
+    dateOfService: "Jan 18, 2026",
     status: { label: "Paid", tone: "green" },
     origin: "card",
     account: "Healthcare FSA",
@@ -171,7 +178,7 @@ const EXPENSE_ROWS: ExpenseRow[] = [
   },
   {
     id: "8",
-    dateOfService: "Jan 12, 2025",
+    dateOfService: "Jan 22, 2026",
     status: { label: "Documentation Needed", tone: "red", icon: true },
     origin: "manual",
     account: "Healthcare FSA",
@@ -185,7 +192,7 @@ const EXPENSE_ROWS: ExpenseRow[] = [
   },
   {
     id: "9",
-    dateOfService: "Nov 11, 2025",
+    dateOfService: "Jan 10, 2026",
     status: { label: "Not Submitted", tone: "gray" },
     origin: "manual",
     account: "Healthcare FSA",
@@ -199,7 +206,7 @@ const EXPENSE_ROWS: ExpenseRow[] = [
   },
   {
     id: "10",
-    dateOfService: "Sept 22, 2025",
+    dateOfService: "Jan 4, 2026",
     status: { label: "Paid", tone: "green" },
     origin: "card",
     account: "Healthcare FSA",
@@ -213,7 +220,7 @@ const EXPENSE_ROWS: ExpenseRow[] = [
   },
   {
     id: "11",
-    dateOfService: "Mar 15, 2026",
+    dateOfService: "Mar 12, 2026",
     status: { label: "Submitted", tone: "blue" },
     origin: "manual",
     account: "Healthcare FSA",
@@ -228,9 +235,9 @@ const EXPENSE_ROWS: ExpenseRow[] = [
 ]
 
 const DOCUMENT_CARDS = [
-  { id: "1", title: "EOB", date: "Dec 12, 2025", tag: "Unattached", attached: false },
-  { id: "2", title: "Walgreens", date: "Dec 12, 2025", tag: "Attached", attached: true },
-  { id: "3", title: "Bright Smiles Dental", date: "Dec 12, 2025", tag: "Attached", attached: true },
+  { id: "1", title: "EOB", date: "Feb 28, 2026", tag: "Unattached", attached: false },
+  { id: "2", title: "Walgreens", date: "Jan 31, 2026", tag: "Attached", attached: true },
+  { id: "3", title: "Bright Smiles Dental", date: "Jan 22, 2026", tag: "Attached", attached: true },
 ] as const
 
 /** SparkAccountsSection-aligned shell for main Claims section cards */
@@ -323,6 +330,23 @@ function parseDateOfServiceForSort(s: string): number {
   return Number.isNaN(ms) ? 0 : ms
 }
 
+function formatDateOfService(s: string): string {
+  const pad = (n: number) => String(n).padStart(2, "0")
+  const fmt = (d: Date) => `${pad(d.getMonth() + 1)}/${pad(d.getDate())}/${d.getFullYear()}`
+  let t = s.replace(/\bSept\b/g, "Sep")
+  const rangeMatch = /^(\w+)\s+(\d{1,2})[–—](\d{1,2}),\s*(\d{4})$/.exec(t)
+  if (rangeMatch) {
+    const [, month, d1, d2, year] = rangeMatch
+    const start = new Date(`${month} ${d1}, ${year}`)
+    const end = new Date(`${month} ${d2}, ${year}`)
+    if (!Number.isNaN(start.getTime()) && !Number.isNaN(end.getTime())) {
+      return `${fmt(start)}–${fmt(end)}`
+    }
+  }
+  const d = new Date(t)
+  return Number.isNaN(d.getTime()) ? s : fmt(d)
+}
+
 function parseAmountForSort(amount: string): number {
   const n = Number.parseFloat(amount.replace(/[$,]/g, ""))
   return Number.isNaN(n) ? 0 : n
@@ -397,6 +421,7 @@ export function ClaimsPaymentsContent() {
   const [expenseSearch, setExpenseSearch] = useState("")
   const [expenseFilter, setExpenseFilter] = useState<ExpenseFilterId>("all")
   const [currentPage, setCurrentPage] = useState(1)
+  const [rowsPerPage, setRowsPerPage] = useState(10)
   const [expenseSort, setExpenseSort] = useState<{
     key: ExpenseSortKey
     dir: "asc" | "desc"
@@ -417,14 +442,14 @@ export function ClaimsPaymentsContent() {
     [filteredExpenseRows, expenseSort]
   )
 
-  const totalPages = Math.max(1, Math.ceil(sortedFilteredExpenseRows.length / EXPENSE_PAGE_SIZE))
+  const totalPages = Math.max(1, Math.ceil(sortedFilteredExpenseRows.length / rowsPerPage))
 
   const effectivePage = Math.min(currentPage, totalPages)
 
   const paginatedExpenseRows = useMemo(() => {
-    const start = (effectivePage - 1) * EXPENSE_PAGE_SIZE
-    return sortedFilteredExpenseRows.slice(start, start + EXPENSE_PAGE_SIZE)
-  }, [sortedFilteredExpenseRows, effectivePage])
+    const start = (effectivePage - 1) * rowsPerPage
+    return sortedFilteredExpenseRows.slice(start, start + rowsPerPage)
+  }, [sortedFilteredExpenseRows, effectivePage, rowsPerPage])
 
   const handleExpenseSort = (key: ExpenseSortKey) => {
     setExpenseSort((prev) =>
@@ -625,12 +650,12 @@ export function ClaimsPaymentsContent() {
               <colgroup>
                 <col className="w-[12%]" />
                 <col className="w-[16%]" />
-                <col className="w-[11%]" />
+                <col className="w-[15%]" />
                 <col className="w-[18%]" />
                 <col className="w-[7%]" />
                 <col className="w-[11%]" />
                 <col className="w-[13%]" />
-                <col className="w-[12%]" />
+                <col className="w-[8%]" />
               </colgroup>
               <TableHeader>
                 <TableRow className="hover:bg-transparent border-y border-border bg-muted/30">
@@ -649,7 +674,7 @@ export function ClaimsPaymentsContent() {
                         key={key}
                         aria-sort={expenseSortAriaSort(expenseSort.key, key, expenseSort.dir)}
                         className={cn(
-                          "h-10 px-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground",
+                          "px-2 py-4 text-xs font-semibold uppercase tracking-wide text-muted-foreground",
                           align === "right" && "text-right"
                         )}
                       >
@@ -696,8 +721,8 @@ export function ClaimsPaymentsContent() {
                         }
                       }}
                     >
-                    <TableCell className="min-w-0 px-2 py-2.5 text-sm text-foreground">
-                      <span className="line-clamp-2 break-words">{row.dateOfService}</span>
+                    <TableCell className="min-w-0 px-2 py-4 text-sm text-foreground">
+                      <span className="line-clamp-2 break-words">{formatDateOfService(row.dateOfService)}</span>
                     </TableCell>
                     <TableCell className="min-w-0 px-2 py-2.5">
                       <span
@@ -710,10 +735,10 @@ export function ClaimsPaymentsContent() {
                         <span className="min-w-0 truncate">{row.status.label}</span>
                       </span>
                     </TableCell>
-                    <TableCell className="min-w-0 px-2 py-2.5 text-sm text-foreground">
-                      <span className="line-clamp-2 break-words">{row.account}</span>
+                    <TableCell className="min-w-0 px-2 py-4 text-sm text-foreground">
+                      <span className="block truncate">{row.account}</span>
                     </TableCell>
-                    <TableCell className="min-w-0 px-2 py-2.5 text-sm text-foreground">
+                    <TableCell className="min-w-0 px-2 py-4 text-sm text-foreground">
                       <span className="line-clamp-2 break-words">{row.provider}</span>
                     </TableCell>
                     <TableCell className="min-w-0 px-2 py-2.5">
@@ -752,44 +777,90 @@ export function ClaimsPaymentsContent() {
           {/* Pagination — border inset to match table padding, not full card width */}
           <div className="px-6 pb-4 pt-0">
             <div className="flex items-center justify-center border-t border-border pt-4">
-              <Pagination className="mx-0 w-auto">
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        setCurrentPage((p) => Math.max(1, p - 1))
-                      }}
-                      className={cn(effectivePage === 1 && "pointer-events-none opacity-40")}
-                    />
-                  </PaginationItem>
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                    <PaginationItem key={p}>
+              <div className="flex w-fit flex-col gap-0 sm:flex-row sm:items-center sm:justify-start sm:gap-[4px]">
+                <Pagination className="flex w-fit items-center justify-start">
+                  <PaginationContent>
+                    <PaginationItem>
                       <PaginationLink
                         href="#"
-                        isActive={p === effectivePage}
+                        className="gap-0 px-2"
                         onClick={(e) => {
                           e.preventDefault()
-                          setCurrentPage(p)
+                          setCurrentPage(1)
                         }}
+                        aria-disabled={effectivePage <= 1}
+                        aria-label="First page"
                       >
-                        {p}
+                        <ChevronsLeft className="h-4 w-4" />
                       </PaginationLink>
                     </PaginationItem>
-                  ))}
-                  <PaginationItem>
-                    <PaginationNext
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        setCurrentPage((p) => Math.min(totalPages, p + 1))
-                      }}
-                      className={cn(effectivePage === totalPages && "pointer-events-none opacity-40")}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
+                    <PaginationItem>
+                      <PaginationPrevious
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          setCurrentPage((p) => Math.max(1, p - 1))
+                        }}
+                      />
+                    </PaginationItem>
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => i + 1).map((p) => (
+                      <PaginationItem key={p}>
+                        <PaginationLink
+                          href="#"
+                          isActive={p === effectivePage}
+                          onClick={(e) => {
+                            e.preventDefault()
+                            setCurrentPage(p)
+                          }}
+                        >
+                          {p}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+                    <PaginationItem>
+                      <PaginationNext
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          setCurrentPage((p) => Math.min(totalPages, p + 1))
+                        }}
+                      />
+                    </PaginationItem>
+                    <PaginationItem>
+                      <PaginationLink
+                        href="#"
+                        className="gap-0 px-2"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          setCurrentPage(totalPages)
+                        }}
+                        aria-disabled={effectivePage >= totalPages}
+                        aria-label="Last page"
+                      >
+                        <ChevronsRight className="h-4 w-4" />
+                      </PaginationLink>
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+                <div className="flex shrink-0 items-center">
+                  <Select
+                    value={String(rowsPerPage)}
+                    onValueChange={(value) => {
+                      setRowsPerPage(Number(value))
+                      setCurrentPage(1)
+                    }}
+                  >
+                    <SelectTrigger className="h-8 w-[70px]" aria-label="Select rows per page">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="5">5</SelectItem>
+                      <SelectItem value="10">10</SelectItem>
+                      <SelectItem value="25">25</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
             </div>
           </div>
         </CardContent>
