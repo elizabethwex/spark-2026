@@ -24,7 +24,7 @@ function H4TextSm() {
   return (
     <div className="content-stretch flex flex-col items-start overflow-clip relative shrink-0 w-[244px]" data-name="h4.text-sm">
       <div className="flex flex-col font-['Inter:Bold',sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#253341] text-[24px] tracking-[-0.456px] w-full">
-        <p className="leading-[32px]">Good morning, Nicole</p>
+        <p className="leading-[32px]">Good morning, Penny</p>
       </div>
     </div>
   );

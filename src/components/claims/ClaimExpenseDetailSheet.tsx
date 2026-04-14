@@ -48,8 +48,8 @@ export interface ClaimExpenseDetailSheetProps {
 
 function recipientFullName(initials: string): string {
   switch (initials.toUpperCase()) {
-    case "ES": return "Emily Smith"
-    case "JS": return "Julia Smith"
+    case "BS": return "Ben Smith"
+    case "JS": return "James Smith"
     default: return initials
   }
 }

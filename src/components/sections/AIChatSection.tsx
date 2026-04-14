@@ -37,7 +37,7 @@ export function AIChatSection() {
             />
             <div className="flex flex-col flex-1">
               <span className="text-sm font-semibold text-foreground flex items-center gap-1.5">
-                Good morning, Crystal. 
+                Good morning, Penny. 
               </span>
               <span className="text-sm text-muted-foreground line-clamp-1">
                 You have <strong className="text-foreground">49 days</strong> left to use your $250 FSA balance. Upload documentation?
