@@ -447,7 +447,7 @@ export function ConsumerNavigation({
                   { label: "Dependents", subPage: "dependents" },
                   { label: "Beneficiaries", subPage: "beneficiaries" },
                   { label: "Bank Accounts", subPage: "banking" },
-                  { label: "Reimbursement Method", subPage: "reimbursement-method" },
+                  { label: "Reimbursement Methods", subPage: "reimbursement-method" },
                   { label: "Debit Card", subPage: "debit-card" },
                   { label: "Login and Security", subPage: "login-security" },
                   { label: "Communication Preferences", subPage: "communication" },
