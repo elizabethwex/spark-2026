@@ -4,6 +4,8 @@ import { TooltipProvider } from '@wexinc-healthbenefits/ben-ui-kit'
 import { AuthProvider } from '@/context/AuthContext'
 import { PrototypeProvider } from '@/context/PrototypeContext'
 import { ReimburseWorkspaceProvider } from '@/context/ReimburseWorkspaceContext'
+import { AppVariantProvider } from '@/context/AppVariantContext'
+import { AppVariantHotkeys } from '@/components/AppVariantHotkeys'
 import { applyPortalThemeToDocument } from '@/lib/portalTheme'
 
 /**
@@ -85,9 +87,12 @@ function App() {
       <AuthProvider>
         <PrototypeProvider>
           <ReimburseWorkspaceProvider>
-            <TooltipProvider>
-              <AppRoutes />
-            </TooltipProvider>
+            <AppVariantProvider>
+              <AppVariantHotkeys />
+              <TooltipProvider>
+                <AppRoutes />
+              </TooltipProvider>
+            </AppVariantProvider>
           </ReimburseWorkspaceProvider>
         </PrototypeProvider>
       </AuthProvider>

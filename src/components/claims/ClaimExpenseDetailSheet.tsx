@@ -239,7 +239,7 @@ export function ClaimExpenseDetailSheet({
                     )}
                   >
                     {row.status.icon && (
-                      <AlertTriangle className="h-3 w-3 shrink-0" aria-hidden />
+                      <AlertTriangle className="h-3 w-3 shrink-0 text-current" aria-hidden />
                     )}
                     <span className="min-w-0 truncate">{row.status.label}</span>
                   </span>
@@ -286,7 +286,7 @@ export function ClaimExpenseDetailSheet({
                         className="uppercase"
                       >
                         <span className="inline-flex items-center gap-1">
-                          <Clock className="h-3 w-3 shrink-0" aria-hidden />
+                          <Clock className="h-3 w-3 shrink-0 text-current" aria-hidden />
                           {toast.tag}
                         </span>
                       </Badge>
@@ -407,7 +407,7 @@ export function ClaimExpenseDetailSheet({
                                       {step.title}
                                     </p>
                                     <Badge
-                                      intent="success"
+                                      intent="info"
                                       size="sm"
                                       pill
                                       className="text-[11px]"
@@ -437,7 +437,10 @@ export function ClaimExpenseDetailSheet({
                     Documents
                   </h3>
                   {row.attachments ? (
-                    <div className="flex items-center justify-between gap-3 rounded-lg border border-border bg-muted/30 px-2 py-2">
+                    <button
+                      type="button"
+                      className="flex w-full items-center justify-between gap-3 rounded-lg border border-border bg-muted/30 px-2 py-2 transition-colors hover:border-border/80 hover:bg-muted/60 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    >
                       <div className="flex min-w-0 items-center gap-2">
                         <Paperclip className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                         <span className="truncate text-sm font-medium text-foreground">
@@ -449,7 +452,7 @@ export function ClaimExpenseDetailSheet({
                       <span className="shrink-0 text-[10px] text-muted-foreground">
                         {row.dateOfService}
                       </span>
-                    </div>
+                    </button>
                   ) : (
                     <p className="text-sm text-muted-foreground">No documents uploaded.</p>
                   )}
@@ -518,7 +521,7 @@ export function ClaimExpenseDetailSheet({
               size="sm"
               className="gap-1.5"
             >
-              <Upload className="h-3.5 w-3.5" aria-hidden />
+              <Upload className="h-3.5 w-3.5 text-current" aria-hidden />
               Upload Documentation
             </Button>
           </div>

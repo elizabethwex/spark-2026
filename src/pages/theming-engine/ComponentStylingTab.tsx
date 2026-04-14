@@ -60,7 +60,7 @@ export function ComponentStylingTab() {
                 className="sr-only"
                 {...register("globalCornerRadius")}
               />
-              <img src={`/theming-icons/${opt.icon}`} alt="" className="h-8 w-8 shrink-0" />
+              <img src={`${import.meta.env.BASE_URL}theming-icons/${opt.icon}`} alt="" className="h-8 w-8 shrink-0" />
               <span style={{ color: "var(--system-text-primary)" }}>{opt.label}</span>
             </label>
           ))}
@@ -87,7 +87,7 @@ export function ComponentStylingTab() {
                 className="sr-only"
                 {...register("cardShadow")}
               />
-              <img src={`/theming-icons/${opt.icon}`} alt="" className="h-8 w-8 shrink-0" />
+              <img src={`${import.meta.env.BASE_URL}theming-icons/${opt.icon}`} alt="" className="h-8 w-8 shrink-0" />
               <span style={{ color: "var(--system-text-primary)" }}>{opt.label}</span>
             </label>
           ))}
@@ -114,7 +114,7 @@ export function ComponentStylingTab() {
                 className="sr-only"
                 {...register("cardBorder")}
               />
-              <img src={`/theming-icons/${opt.icon}`} alt="" className="h-8 w-8 shrink-0" />
+              <img src={`${import.meta.env.BASE_URL}theming-icons/${opt.icon}`} alt="" className="h-8 w-8 shrink-0" />
               <span style={{ color: "var(--system-text-primary)" }}>{opt.label}</span>
             </label>
           ))}

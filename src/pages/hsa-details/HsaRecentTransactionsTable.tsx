@@ -72,7 +72,7 @@ export function HsaRecentTransactionsTable({ transactions }: HsaRecentTransactio
                   inputSize="md"
                   type="text"
                   placeholder="Search"
-                  leftIcon={<Search className="h-4 w-4" />}
+                  leftIcon={<Search className="h-4 w-4 text-current" />}
                   value={searchQuery}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     setSearchQuery(e.target.value);
@@ -86,7 +86,7 @@ export function HsaRecentTransactionsTable({ transactions }: HsaRecentTransactio
                 className="shrink-0 border-primary text-primary rounded-xl"
                 type="button"
               >
-                <Upload className="mr-2 h-4 w-4" aria-hidden />
+                <Upload className="mr-2 h-4 w-4 text-current" aria-hidden />
                 Export
               </Button>
             </div>
@@ -153,7 +153,7 @@ export function HsaRecentTransactionsTable({ transactions }: HsaRecentTransactio
                     }}
                     aria-disabled={currentPage <= 1}
                   >
-                    <ChevronsLeft className="h-4 w-4" />
+                    <ChevronsLeft className="h-4 w-4 text-current" />
                   </PaginationLink>
                 </PaginationItem>
                 <PaginationItem>
@@ -201,7 +201,7 @@ export function HsaRecentTransactionsTable({ transactions }: HsaRecentTransactio
                     }}
                     aria-disabled={currentPage >= totalPages}
                   >
-                    <ChevronsRight className="h-4 w-4" />
+                    <ChevronsRight className="h-4 w-4 text-current" />
                   </PaginationLink>
                 </PaginationItem>
               </PaginationContent>
