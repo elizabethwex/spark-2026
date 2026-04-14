@@ -421,7 +421,7 @@ export function ClaimsPaymentsContent() {
   const [expenseSearch, setExpenseSearch] = useState("")
   const [expenseFilter, setExpenseFilter] = useState<ExpenseFilterId>("all")
   const [currentPage, setCurrentPage] = useState(1)
-  const [rowsPerPage, setRowsPerPage] = useState(10)
+  const [rowsPerPage, setRowsPerPage] = useState(EXPENSE_PAGE_SIZE)
   const [expenseSort, setExpenseSort] = useState<{
     key: ExpenseSortKey
     dir: "asc" | "desc"
