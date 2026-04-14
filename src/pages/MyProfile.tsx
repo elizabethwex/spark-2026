@@ -27,12 +27,6 @@ import {
 } from "@/lib/profileBankAccountsSession";
 import { ReimbursementMethodsContent } from "@/pages/ReimbursementMethodsContent";
 import {
-  mergeSessionSeedPennyBankIfMissing,
-  SESSION_SEED_PENNY_BANK_FIELDS,
-  SESSION_SEED_PENNY_BANK_ID,
-  withoutSessionSeedBankForStorage,
-} from "@/data/sessionSeedPennyBank";
-import {
   Pencil,
   Info,
   Plus,
@@ -245,45 +239,30 @@ function saveBeneficiariesToStorage(beneficiaries: Beneficiary[]): void {
   }
 }
 
-const SESSION_SEED_PENNY_BANK_ACCOUNT: BankAccount = {
-  ...SESSION_SEED_PENNY_BANK_FIELDS,
-  verificationMethod: "text",
-  selectedDirectDepositOptions: [],
-  activationStatus: "active",
-};
-
 function loadBankAccountsFromStorage(): BankAccount[] {
   if (typeof window === "undefined") return DEFAULT_BANK_ACCOUNTS;
   try {
     const stored = sessionStorage.getItem(WEX_PROFILE_BANK_ACCOUNTS_KEY);
-    if (!stored) {
-      return mergeSessionSeedPennyBankIfMissing(SESSION_SEED_PENNY_BANK_ACCOUNT, []);
-    }
+    if (!stored) return DEFAULT_BANK_ACCOUNTS;
     const parsed: unknown = JSON.parse(stored);
-    if (!Array.isArray(parsed)) {
-      return mergeSessionSeedPennyBankIfMissing(SESSION_SEED_PENNY_BANK_ACCOUNT, []);
-    }
-    if (parsed.length === 0) {
-      return mergeSessionSeedPennyBankIfMissing(SESSION_SEED_PENNY_BANK_ACCOUNT, []);
-    }
-    const normalized: BankAccount[] = parsed.map((raw: BankAccount) => ({
+    if (!Array.isArray(parsed)) return DEFAULT_BANK_ACCOUNTS;
+    if (parsed.length === 0) return DEFAULT_BANK_ACCOUNTS;
+    return parsed.map((raw: BankAccount) => ({
       ...raw,
       accountNickname: migrateLegacyEllaBankLabel(raw.accountNickname) ?? raw.accountNickname,
       bankName: migrateLegacyEllaBankLabel(raw.bankName) ?? raw.bankName,
       activationStatus:
         raw.activationStatus === "pending_deposit" ? ("pending_deposit" as const) : ("active" as const),
     }));
-    return mergeSessionSeedPennyBankIfMissing(SESSION_SEED_PENNY_BANK_ACCOUNT, normalized);
   } catch {
-    return mergeSessionSeedPennyBankIfMissing(SESSION_SEED_PENNY_BANK_ACCOUNT, []);
+    return DEFAULT_BANK_ACCOUNTS;
   }
 }
 
 function saveBankAccountsToStorage(bankAccounts: BankAccount[]): void {
   if (typeof window === "undefined") return;
   try {
-    const persistable = withoutSessionSeedBankForStorage(bankAccounts);
-    sessionStorage.setItem(WEX_PROFILE_BANK_ACCOUNTS_KEY, JSON.stringify(persistable));
+    sessionStorage.setItem(WEX_PROFILE_BANK_ACCOUNTS_KEY, JSON.stringify(bankAccounts));
   } catch (e) {
     console.warn("Failed to save bank accounts to sessionStorage:", e);
   }
@@ -1632,8 +1611,6 @@ export default function MyProfile() {
         bankAccount.bankName?.trim() ||
         `${bankAccount.accountType.charAt(0).toUpperCase() + bankAccount.accountType.slice(1)} Account`
       : "Bank account";
-    const wasDemoPenny = id === SESSION_SEED_PENNY_BANK_ID;
-
     setBankAccounts((prev) => prev.filter((acc) => acc.id !== id));
     setIsRemoveBankAccountConfirmOpen(false);
     setIsRemoveBankAccountAuthModalOpen(false);
@@ -1648,9 +1625,7 @@ export default function MyProfile() {
     setSearchParams({ subPage: "banking" });
 
     toast.success("Bank account removed", {
-      description: wasDemoPenny
-        ? "Penny bank will appear again after you refresh the page."
-        : `${displayName} has been removed from your Bank Accounts.`,
+      description: `${displayName} has been removed from your Bank Accounts.`,
       duration: 5000,
     });
   };

@@ -38,16 +38,9 @@ import {
 } from "lucide-react";
 import { HSA_2026_CONTRIBUTION_MOCK } from "@/data/hsaSharedContributions";
 import { sparkHsaSummary } from "@/data/sparkAiForwardMock";
-import {
-  mergeSessionSeedPennyBankIfMissing,
-  SESSION_SEED_PENNY_BANK_FIELDS,
-  withoutSessionSeedBankForStorage,
-} from "@/data/sessionSeedPennyBank";
+import { WEX_PROFILE_BANK_ACCOUNTS_KEY, migrateLegacyEllaBankLabel } from "@/lib/profileBankAccountsSession";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
-
-/** Same key as MyProfile — user-added banks persist here; seed is merged at read time only. */
-const SESSION_STORAGE_BANK_ACCOUNTS_KEY = "wex_profile_bank_accounts";
 
 export type ContributeBankAccount = {
   id: string;
@@ -55,42 +48,80 @@ export type ContributeBankAccount = {
   accountNumber: string;
   confirmAccountNumber: string;
   accountNickname: string;
+  /** Matches My Profile bank list (e.g. Wells Fargo Bank). */
+  bankName?: string;
   accountType: "checking" | "saving";
   verificationMethod?: "text" | "email";
   selectedDirectDepositOptions?: string[];
   activationStatus?: "pending_deposit" | "active";
 };
 
-const SEED_BANK_ACCOUNT: ContributeBankAccount = {
-  ...SESSION_SEED_PENNY_BANK_FIELDS,
-  verificationMethod: "text",
-  selectedDirectDepositOptions: [],
-  activationStatus: "active",
-};
+function normalizeStoredRowToContribute(raw: unknown): ContributeBankAccount | null {
+  if (!raw || typeof raw !== "object") return null;
+  const r = raw as Record<string, unknown>;
+  const id = typeof r.id === "string" ? r.id : "";
+  if (!id) return null;
+  const nicknameRaw = typeof r.accountNickname === "string" ? r.accountNickname : "";
+  const accountNickname = migrateLegacyEllaBankLabel(nicknameRaw) ?? nicknameRaw;
+  const bankNameRaw = typeof r.bankName === "string" ? r.bankName.trim() : "";
+  const bankNameResolved = bankNameRaw
+    ? migrateLegacyEllaBankLabel(bankNameRaw) ?? bankNameRaw
+    : undefined;
+  return {
+    id,
+    routingNumber: String(r.routingNumber ?? ""),
+    accountNumber: String(r.accountNumber ?? ""),
+    confirmAccountNumber: String(r.confirmAccountNumber ?? r.accountNumber ?? ""),
+    accountNickname,
+    ...(bankNameResolved ? { bankName: bankNameResolved } : {}),
+    accountType: r.accountType === "saving" ? "saving" : "checking",
+    verificationMethod: r.verificationMethod === "email" ? "email" : "text",
+    selectedDirectDepositOptions: Array.isArray(r.selectedDirectDepositOptions)
+      ? (r.selectedDirectDepositOptions as string[])
+      : [],
+    activationStatus: r.activationStatus === "pending_deposit" ? "pending_deposit" : "active",
+  };
+}
 
-function parseStoredBankAccounts(): ContributeBankAccount[] {
+function loadBankAccountsForContribute(): ContributeBankAccount[] {
   if (typeof window === "undefined") return [];
   try {
-    const stored = sessionStorage.getItem(SESSION_STORAGE_BANK_ACCOUNTS_KEY);
+    const stored = sessionStorage.getItem(WEX_PROFILE_BANK_ACCOUNTS_KEY);
     if (!stored) return [];
     const parsed: unknown = JSON.parse(stored);
     if (!Array.isArray(parsed)) return [];
-    return parsed as ContributeBankAccount[];
+    return parsed
+      .map(normalizeStoredRowToContribute)
+      .filter((b): b is ContributeBankAccount => b !== null);
   } catch {
     return [];
   }
 }
 
-function loadBankAccountsForContribute(): ContributeBankAccount[] {
-  const stored = parseStoredBankAccounts();
-  return mergeSessionSeedPennyBankIfMissing(SEED_BANK_ACCOUNT, stored);
-}
-
 function saveUserBankAccountsOnly(accounts: ContributeBankAccount[]): void {
   if (typeof window === "undefined") return;
   try {
-    const persistable = withoutSessionSeedBankForStorage(accounts);
-    sessionStorage.setItem(SESSION_STORAGE_BANK_ACCOUNTS_KEY, JSON.stringify(persistable));
+    let previous: unknown[] = [];
+    try {
+      const raw = sessionStorage.getItem(WEX_PROFILE_BANK_ACCOUNTS_KEY);
+      if (raw) {
+        const p: unknown = JSON.parse(raw);
+        if (Array.isArray(p)) previous = p;
+      }
+    } catch {
+      /* ignore */
+    }
+    const prevById = new Map<string, Record<string, unknown>>(
+      previous
+        .filter((o): o is Record<string, unknown> => !!o && typeof o === "object")
+        .filter((o) => typeof o.id === "string")
+        .map((o) => [o.id as string, o])
+    );
+    const merged = accounts.map((acc) => {
+      const old = prevById.get(acc.id);
+      return old ? ({ ...old, ...acc } as ContributeBankAccount) : acc;
+    });
+    sessionStorage.setItem(WEX_PROFILE_BANK_ACCOUNTS_KEY, JSON.stringify(merged));
   } catch (e) {
     console.warn("Failed to save bank accounts:", e);
   }
@@ -99,6 +130,25 @@ function saveUserBankAccountsOnly(accounts: ContributeBankAccount[]): void {
 function accountLast4(accountNumber: string): string {
   const digits = accountNumber.replace(/\D/g, "");
   return digits.length >= 4 ? digits.slice(-4) : digits || "—";
+}
+
+/** Same rules as My Profile → Banking bank cards. */
+function profileBankDisplayTitle(bank: ContributeBankAccount): string {
+  const nick = bank.accountNickname?.trim() ?? "";
+  if (nick) return nick;
+  const bn = bank.bankName?.trim() ?? "";
+  if (bn) return bn;
+  const word = bank.accountType === "checking" ? "Checking" : "Saving";
+  return `${word} Account`;
+}
+
+/** Same as My Profile `accountTypeLine` (e.g. "Checking Account | Wells Fargo Bank"). */
+function profileBankAccountTypeLine(bank: ContributeBankAccount): string {
+  const accountTypeWord = bank.accountType === "checking" ? "Checking" : "Saving";
+  const bankNameForTypeLine = bank.bankName?.trim() ?? "";
+  return bankNameForTypeLine
+    ? `${accountTypeWord} Account | ${bankNameForTypeLine}`
+    : `${accountTypeWord} Account`;
 }
 
 type ContributeStep = "payment" | "contribution" | "review" | "success";
@@ -489,8 +539,6 @@ function PaymentDetailsStep({
   onSelectBank: (id: string) => void;
   onAddBankClick: () => void;
 }) {
-  const typeLabel = (t: "checking" | "saving") => (t === "checking" ? "Checking Account" : "Savings Account");
-
   return (
     <div className="flex w-full flex-col gap-6">
       <div>
@@ -519,8 +567,10 @@ function PaymentDetailsStep({
               <div className="absolute right-4 top-4">
                 <RadioGroupItem value={bank.id} id={`hsa-bank-${bank.id}`} className="border-muted-foreground" />
               </div>
-              <span className="pr-10 text-base font-semibold text-foreground">{bank.accountNickname}</span>
-              <span className="text-sm text-muted-foreground">{typeLabel(bank.accountType)}</span>
+              <span className="pr-10 text-base font-semibold text-foreground">
+                {profileBankDisplayTitle(bank)}
+              </span>
+              <span className="text-sm text-muted-foreground">{profileBankAccountTypeLine(bank)}</span>
               <span className="text-sm text-muted-foreground">•••• {accountLast4(bank.accountNumber)}</span>
             </label>
           );
@@ -593,9 +643,16 @@ function ContributionDetailsStep({
 }) {
   const mock = HSA_2026_CONTRIBUTION_MOCK;
   const totalYtd = mock.yourContrib + mock.employerContrib;
-  const progressPct = Math.min(100, (totalYtd / mock.contributionLimit) * 100);
   const thisContribution = parseContributeAmountUsd(amount);
   const availableAfter = Math.max(0, mock.leftToContribute - thisContribution);
+  const limit = mock.contributionLimit;
+  const rawYtdBarPct = (totalYtd / limit) * 100;
+  const rawThisBarPct = (thisContribution / limit) * 100;
+  const sumBarPct = rawYtdBarPct + rawThisBarPct;
+  /** Stacked bar: primary = YTD, teal = this contribution; scale if sum exceeds 100%. */
+  const ytdBarPct = sumBarPct > 100 ? (rawYtdBarPct / sumBarPct) * 100 : rawYtdBarPct;
+  const thisBarPct = sumBarPct > 100 ? (rawThisBarPct / sumBarPct) * 100 : rawThisBarPct;
+  const pctTowardLimit = Math.min(100, sumBarPct);
   const maxContribFmt = mock.contributionLimit.toLocaleString("en-US", {
     style: "currency",
     currency: "USD",
@@ -677,15 +734,23 @@ function ContributionDetailsStep({
         <h3 className="text-sm font-semibold text-foreground">
           {mock.planYear} Contributions
         </h3>
-        <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-muted">
+        <div
+          className="mt-4 flex h-2 w-full overflow-hidden rounded-full bg-muted"
+          role="progressbar"
+          aria-valuenow={Math.round(pctTowardLimit)}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label="Contribution progress toward IRS limit: YTD and this contribution"
+        >
           <div
-            className="h-full rounded-full bg-primary transition-[width] duration-200"
-            style={{ width: `${progressPct}%` }}
-            role="progressbar"
-            aria-valuenow={Math.round(progressPct)}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-label="Contribution progress toward IRS limit"
+            className="h-full shrink-0 bg-primary transition-[width] duration-200"
+            style={{ width: `${ytdBarPct}%` }}
+            title={`Total contributions toward limit: ${fmtUsd(totalYtd)}`}
+          />
+          <div
+            className="h-full shrink-0 bg-[#009b89] transition-[width] duration-200"
+            style={{ width: `${thisBarPct}%` }}
+            title={`This contribution: ${fmtUsd(thisContribution)}`}
           />
         </div>
         <ul className="mt-4 flex flex-col gap-3 text-sm">
@@ -718,10 +783,6 @@ function ContributionDetailsStep({
       </div>
     </div>
   );
-}
-
-function bankAccountTypeLabel(t: ContributeBankAccount["accountType"]): string {
-  return t === "checking" ? "Checking Account" : "Savings Account";
 }
 
 function frequencyReviewLabel(value: string): string {
@@ -768,8 +829,8 @@ function ReviewStep({
             <Building2 className="h-5 w-5" aria-hidden />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="font-semibold text-foreground">{bank.accountNickname}</p>
-            <p className="text-sm text-muted-foreground">{bankAccountTypeLabel(bank.accountType)}</p>
+            <p className="font-semibold text-foreground">{profileBankDisplayTitle(bank)}</p>
+            <p className="text-sm text-muted-foreground">{profileBankAccountTypeLine(bank)}</p>
             <p className="text-sm text-muted-foreground">•••• {accountLast4(bank.accountNumber)}</p>
           </div>
         </div>
