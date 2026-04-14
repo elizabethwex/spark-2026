@@ -1406,7 +1406,7 @@ function ValidationStep({
 }: {
   state:       ReimburseFlowState;
   summaryRows: { label: string; value: string }[];
-  onNav:       (step: string) => void;
+  onNav:       (_step: string) => void;
 }) {
   const planLabel = PLAN_LABELS[state.selectedPlan] ?? state.selectedPlan;
   const destLabel = DEST_LABELS[state.destination]   ?? state.destination;
@@ -1446,14 +1446,14 @@ function ValidationStep({
                   Change
                 </button>
                 <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-2 text-[#0055a5] font-bold text-[15px]">
+                  <div className="flex items-center gap-2 text-[var(--system-text-primary)] font-bold text-[15px]">
                     <svg
                       width="20"
                       height="20"
                       viewBox="0 0 15 15"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
-                      className="shrink-0 text-neutral-700"
+                      className="shrink-0 text-[var(--neutral-700)]"
                     >
                       <path
                         d="M1.98958 5.32292C1.63596 5.32292 1.29682 5.46339 1.04677 5.71344C0.796726 5.96349 0.65625 6.30263 0.65625 6.65625V7.98958C0.65625 8.3432 0.796726 8.68234 1.04677 8.93239C1.29682 9.18244 1.63596 9.32292 1.98958 9.32292H4.65625C4.83306 9.32292 5.00263 9.39315 5.12765 9.51818C5.25268 9.6432 5.32292 9.81277 5.32292 9.98958V12.6562C5.32292 13.0099 5.46339 13.349 5.71344 13.5991C5.96349 13.8491 6.30263 13.9896 6.65625 13.9896H7.98958C8.3432 13.9896 8.68234 13.8491 8.93239 13.5991C9.18244 13.349 9.32292 13.0099 9.32292 12.6562V9.98958C9.32292 9.81277 9.39315 9.6432 9.51818 9.51818C9.6432 9.39315 9.81277 9.32292 9.98958 9.32292H12.6562C13.0099 9.32292 13.349 9.18244 13.5991 8.93239C13.8491 8.68234 13.9896 8.3432 13.9896 7.98958V6.65625C13.9896 6.30263 13.8491 5.96349 13.5991 5.71344C13.349 5.46339 13.0099 5.32292 12.6562 5.32292H9.98958C9.81277 5.32292 9.6432 5.25268 9.51818 5.12765C9.39315 5.00263 9.32292 4.83306 9.32292 4.65625V1.98958C9.32292 1.63596 9.18244 1.29682 8.93239 1.04677C8.68234 0.796726 8.3432 0.65625 7.98958 0.65625H6.65625C6.30263 0.65625 5.96349 0.796726 5.71344 1.04677C5.46339 1.29682 5.32292 1.63596 5.32292 1.98958V4.65625C5.32292 4.83306 5.25268 5.00263 5.12765 5.12765C5.00263 5.25268 4.83306 5.32292 4.65625 5.32292H1.98958Z"
@@ -1492,7 +1492,7 @@ function ValidationStep({
                       viewBox="0 0 14 15"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
-                      className="shrink-0 text-neutral-700"
+                      className="shrink-0 text-[var(--neutral-700)]"
                     >
                       <path
                         d="M5.34118 11.3249V6.6582M8.00785 11.3249V6.6582M10.6745 11.3249V6.6582M0.674518 13.9915H12.6745M2.67452 11.3249V6.6582M6.08792 0.790262C6.27085 0.701401 6.47168 0.655565 6.67505 0.656258C6.87842 0.656951 7.07893 0.704156 7.26125 0.794262L12.5053 3.35893C12.8226 3.51426 12.7119 3.99159 12.3586 3.99159H0.990586C0.637252 3.99159 0.527252 3.51426 0.843919 3.35893L6.08792 0.790262Z"
@@ -1529,7 +1529,7 @@ function ValidationStep({
           <button
             type="button"
             onClick={() => onNav(state.entryMode === "upload" ? "review" : "manual")}
-            className="absolute top-6 right-6 text-[14px] font-semibold text-[#0055a5] hover:underline"
+            className="absolute top-6 right-6 text-[14px] font-semibold text-[var(--system-link)] hover:underline"
           >
             Edit
           </button>

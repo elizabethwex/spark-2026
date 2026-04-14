@@ -457,7 +457,7 @@ export function HsaAccountDetails() {
                     Plus use DirectPay™ and check out instantly!
                   </p>
                   <div>
-                    <Button intent="primary" size="md" className="rounded-xl" type="button">
+                    <Button intent="primary" size="md" className="rounded-xl" type="button" onClick={() => window.open("https://hsastore.com", "_blank")}>
                       Shop HSA Store
                     </Button>
                   </div>

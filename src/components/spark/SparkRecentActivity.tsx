@@ -51,7 +51,7 @@ function TimelineTracker({ steps }: { steps: NonNullable<SparkActivityRow["timel
               style={{ animationDelay: `${i * 150}ms`, animationDuration: step.active ? "3s" : undefined }}
             >
               {step.completed ? (
-                <Check className="h-3 w-3" strokeWidth={3} />
+                <Check className="h-3 w-3 text-white" strokeWidth={3} />
               ) : step.active ? (
                 <div className="h-1.5 w-1.5 rounded-full bg-white" />
               ) : null}

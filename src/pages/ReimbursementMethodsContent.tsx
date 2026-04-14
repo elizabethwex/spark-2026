@@ -190,8 +190,8 @@ function ReimbursementMethodEditModal({
 }: {
   plan: PlanYearReimbursement | null;
   open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onSave: (planId: string, choice: ReimbursementModalChoice) => void;
+  onOpenChange: (_open: boolean) => void;
+  onSave: (_planId: string, _choice: ReimbursementModalChoice) => void;
 }) {
   const navigate = useNavigate();
   const [choice, setChoice] = useState<ReimbursementModalChoice>("direct-deposit");

@@ -38,7 +38,7 @@ import {
 
 export interface ClaimExpenseDetailSheetProps {
   open: boolean
-  onOpenChange: (open: boolean) => void
+  onOpenChange: (_open: boolean) => void
   row: ExpenseRow | null
 }
 

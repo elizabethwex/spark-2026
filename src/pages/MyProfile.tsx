@@ -3454,8 +3454,8 @@ export default function MyProfile() {
                       </h3>
                       <p className="text-sm font-normal leading-6 tracking-[-0.084px] text-foreground max-w-[1094px]">
                         Set how you want to receive your account documents. Select either Paper, Email, and/or Text for each statement type. Standard text message rates may apply. Disable text alerts by unchecking the boxes below. By opting into our text alerts, you agree to our{" "}
-                        <a href="#" className="text-primary hover:underline">terms of service</a>. Please review our{" "}
-                        <a href="#" className="text-primary hover:underline">privacy policy</a> for more information.
+                        <a href="#" className="text-[color:var(--system-link)] hover:underline">terms of service</a>. Please review our{" "}
+                        <a href="#" className="text-[color:var(--system-link)] hover:underline">privacy policy</a> for more information.
                       </p>
                       <div className="flex items-center justify-end gap-2 mt-2">
                         <span className="text-sm font-normal text-foreground">Go paperless</span>
@@ -3627,8 +3627,8 @@ export default function MyProfile() {
                       </h3>
                       <p className="text-sm font-normal leading-6 tracking-[-0.084px] text-foreground max-w-[1094px]">
                         Manage how you receive real-time alerts for account activity. You can enable Email and/or Text for each notification. Standard text message rates may apply. Disable text alerts by unchecking the boxes below. By opting into our text alerts, you agree to our{" "}
-                        <a href="#" className="text-primary hover:underline">terms of service</a>. Please review our{" "}
-                        <a href="#" className="text-primary hover:underline">privacy policy</a> for more information.
+                        <a href="#" className="text-[color:var(--system-link)] hover:underline">terms of service</a>. Please review our{" "}
+                        <a href="#" className="text-[color:var(--system-link)] hover:underline">privacy policy</a> for more information.
                       </p>
                       <div className="flex items-center justify-end gap-2 mt-2">
                         <span className="text-sm font-normal text-foreground">Go paperless</span>
@@ -3828,8 +3828,8 @@ export default function MyProfile() {
                       </h3>
                       <p className="text-sm font-normal leading-6 tracking-[-0.084px] text-foreground max-w-[1094px]">
                         Manage how you receive real-time alerts for account activity. You can enable Email and/or Text for each notification. Standard text message rates may apply. Disable text alerts by unchecking the boxes below. By opting into our text alerts, you agree to our{" "}
-                        <a href="#" className="text-primary hover:underline">terms of service</a>. Please review our{" "}
-                        <a href="#" className="text-primary hover:underline">privacy policy</a> for more information.
+                        <a href="#" className="text-[color:var(--system-link)] hover:underline">terms of service</a>. Please review our{" "}
+                        <a href="#" className="text-[color:var(--system-link)] hover:underline">privacy policy</a> for more information.
                       </p>
                       <div className="flex items-center justify-end gap-2 mt-2">
                         <span className="text-sm font-normal text-foreground">Go paperless</span>
@@ -3994,8 +3994,8 @@ export default function MyProfile() {
                       </h3>
                       <p className="text-sm font-normal leading-6 tracking-[-0.084px] text-foreground max-w-[1094px]">
                         Manage how you receive real-time alerts for account activity. You can enable Email and/or Text for each notification. Standard text message rates may apply. Disable text alerts by unchecking the boxes below. By opting into our text alerts, you agree to our{" "}
-                        <a href="#" className="text-primary hover:underline">terms of service</a>. Please review our{" "}
-                        <a href="#" className="text-primary hover:underline">privacy policy</a> for more information.
+                        <a href="#" className="text-[color:var(--system-link)] hover:underline">terms of service</a>. Please review our{" "}
+                        <a href="#" className="text-[color:var(--system-link)] hover:underline">privacy policy</a> for more information.
                       </p>
                       <div className="flex items-center justify-end gap-2 mt-2">
                         <span className="text-sm font-normal text-foreground">Go paperless</span>
@@ -4308,7 +4308,7 @@ export default function MyProfile() {
                   collapsible="none"
                   className="hidden md:flex w-[264px] border-r border-wex-card-border bg-wex-card-bg flex-col h-auto"
                 >
-                  <SidebarContent className="flex-1 h-full px-2 py-4">
+                  <SidebarContent className="flex-1 h-full px-2 py-4 w-[267px]">
                     <SidebarGroup className="flex-1 h-full">
                       <SidebarGroupContent className="flex-1 h-full">
                         <SidebarMenu className="flex-1 h-full">

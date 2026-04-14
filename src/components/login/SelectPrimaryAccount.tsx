@@ -32,7 +32,7 @@ const OPTIONS: {
 export interface SelectPrimaryAccountProps {
   /** Username from the current login session; shown when the primary option is pennysmith. */
   sessionUsername: string
-  onMakePrimary: (selectedId: PrimaryOptionId) => void
+  onMakePrimary: (_selectedId: PrimaryOptionId) => void
   onCancel: () => void
   makePrimaryRef: RefObject<HTMLButtonElement | null>
 }

@@ -309,11 +309,17 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
                   variants={pillVariants}
                   key={action.label}
                   type="button"
-                  onClick={() =>
-                    action.href === "/reimburse"
-                      ? openReimburseWorkspace()
-                      : navigate(action.href)
-                  }
+                  onClick={() => {
+                    if (action.label === "HSA Store") {
+                      window.open("https://hsastore.com", "_blank");
+                    } else if (action.label === "FSA Store") {
+                      window.open("https://fsastore.com", "_blank");
+                    } else if (action.href === "/reimburse") {
+                      openReimburseWorkspace();
+                    } else {
+                      navigate(action.href);
+                    }
+                  }}
                   className="flex h-[38.5px] items-center gap-[7px] rounded-[28px] border border-[#b7c0da] bg-[#f8f9fe] px-[13.25px] transition-colors hover:border-[#5f6a94] hover:bg-[#eef2ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3958c3] focus-visible:ring-offset-2"
                 >
                   <Icon className="h-[15.75px] w-[15.75px] shrink-0 text-[#5f6a94]" />
