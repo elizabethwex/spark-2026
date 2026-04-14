@@ -34,7 +34,7 @@ const CLAIM_DATA: Record<string, ClaimDetail> = {
     displayDate: "February 24, 2026",
     account: "Flexible Spending 2025 (FSA)",
     transactionAmount: "$24.99",
-    careRecipient: "Nicole Moretti",
+    careRecipient: "Penny Smith",
     claimNumber: "01SMA251117P0000301",
     status: "approved",
     reimbursedAmount: "$24.99",

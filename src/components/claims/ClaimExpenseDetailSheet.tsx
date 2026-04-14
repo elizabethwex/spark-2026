@@ -48,8 +48,8 @@ export interface ClaimExpenseDetailSheetProps {
 
 function recipientFullName(initials: string): string {
   switch (initials.toUpperCase()) {
-    case "ES": return "Emily Smith"
-    case "JS": return "Julia Smith"
+    case "BS": return "Ben Smith"
+    case "JS": return "James Smith"
     default: return initials
   }
 }
@@ -407,7 +407,7 @@ export function ClaimExpenseDetailSheet({
                                       {step.title}
                                     </p>
                                     <Badge
-                                      intent="success"
+                                      intent="info"
                                       size="sm"
                                       pill
                                       className="text-[11px]"
@@ -437,7 +437,10 @@ export function ClaimExpenseDetailSheet({
                     Documents
                   </h3>
                   {row.attachments ? (
-                    <div className="flex items-center justify-between gap-3 rounded-lg border border-border bg-muted/30 px-2 py-2">
+                    <button
+                      type="button"
+                      className="flex w-full items-center justify-between gap-3 rounded-lg border border-border bg-muted/30 px-2 py-2 transition-colors hover:border-border/80 hover:bg-muted/60 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    >
                       <div className="flex min-w-0 items-center gap-2">
                         <Paperclip className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                         <span className="truncate text-sm font-medium text-foreground">
@@ -449,7 +452,7 @@ export function ClaimExpenseDetailSheet({
                       <span className="shrink-0 text-[10px] text-muted-foreground">
                         {row.dateOfService}
                       </span>
-                    </div>
+                    </button>
                   ) : (
                     <p className="text-sm text-muted-foreground">No documents uploaded.</p>
                   )}

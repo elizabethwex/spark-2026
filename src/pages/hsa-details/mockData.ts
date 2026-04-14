@@ -157,7 +157,7 @@ export const transactionsData: Transaction[] = [
     date: "01/01/2026",
     status: "Complete",
     account: "HSA",
-    description: "Crystal Lastname",
+    description: "Penny Smith",
     subtext: "Claim 123456",
     category: "Distribution",
     amount: "- $250.00",
