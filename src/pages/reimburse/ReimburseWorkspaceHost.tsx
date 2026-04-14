@@ -197,7 +197,7 @@ function CustomStepper({ steps, currentStepId }: { steps: Step[], currentStepId:
   const currentIndex = steps.findIndex(s => s.id === currentStepId);
 
   return (
-    <div className="flex flex-col gap-[24px] p-[24px] w-[240px] bg-[#f7f7f7] h-full shrink-0">
+    <div className="flex flex-col gap-[24px] px-[32px] py-[40px] w-[calc(100%+48px)] bg-[#f7f7f7] min-h-[calc(100%+48px)] -m-6 shrink-0">
       {steps.map((step, index) => {
         const isCompleted = index < currentIndex;
         const isActive = index === currentIndex;
@@ -482,6 +482,7 @@ function ReimburseWorkspaceSession({
     <>
       <Workspace
         open
+        className="max-w-[1920px]"
         onOpenChange={handleOpenChange}
         title="Reimburse myself"
         stepperContent={state.step === "confirmation" ? undefined : stepperContent}
