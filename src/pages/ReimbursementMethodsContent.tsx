@@ -11,6 +11,7 @@ import {
 } from "@wexinc-healthbenefits/ben-ui-kit";
 import { CreditCard, Landmark, Lock, Pencil, ScrollText, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getDirectDepositModalBankDisplayFromSession } from "@/lib/profileBankAccountsSession";
 
 type MethodKind = "benefits-card" | "direct-deposit" | "check";
 
@@ -42,11 +43,6 @@ const DIRECT_DEPOSIT_COPY =
 
 const CHECK_COPY =
   "Your reimbursement check will be sent to your home within 2-4 business days from the date we receive substantiation of your claims.";
-
-const MODAL_BANK = {
-  bankName: "Ella's Bank",
-  accountLine: "•••• 5423 Checking",
-};
 
 /** Light-blue chip behind payment method icons (Figma: 7px L/R, 3.5px T/B padding). */
 function MethodIconChip({ children, className }: { children: ReactNode; className?: string }) {
@@ -128,7 +124,7 @@ function PlanYearCard({
             </span>
             {plan.primary.status === "locked" ? (
               <span className="inline-flex shrink-0 items-center gap-[3.5px] rounded-md bg-[#ffecc7] px-[7px] py-[3.5px] text-[12.25px] font-bold leading-none text-[#b37a2b]">
-                <Lock className="h-[10.5px] w-[10.5px] shrink-0" aria-hidden />
+                <Lock className="h-[10.5px] w-[10.5px] shrink-0 text-[#b37a2b]" aria-hidden />
                 Locked
               </span>
             ) : (
@@ -199,12 +195,21 @@ function ReimbursementMethodEditModal({
 }) {
   const navigate = useNavigate();
   const [choice, setChoice] = useState<ReimbursementModalChoice>("direct-deposit");
+  const [modalBankDisplay, setModalBankDisplay] = useState(() =>
+    getDirectDepositModalBankDisplayFromSession()
+  );
 
   useEffect(() => {
     if (plan) {
       setChoice(kindToModalValue(plan.alternate.kind));
     }
   }, [plan]);
+
+  useEffect(() => {
+    if (open) {
+      setModalBankDisplay(getDirectDepositModalBankDisplayFromSession());
+    }
+  }, [open]);
 
   const handleSave = () => {
     if (!plan) return;
@@ -259,7 +264,7 @@ function ReimbursementMethodEditModal({
                   </div>
                   {plan.primary.status === "locked" ? (
                     <span className="inline-flex shrink-0 items-center gap-[3.5px] rounded-md bg-[#ffecc7] px-[7px] py-[3.5px] text-[12.25px] font-bold leading-none text-[#b37a2b]">
-                      <Lock className="h-[10.5px] w-[10.5px]" aria-hidden />
+                      <Lock className="h-[10.5px] w-[10.5px] shrink-0 text-[#b37a2b]" aria-hidden />
                       Locked
                     </span>
                   ) : null}
@@ -317,8 +322,8 @@ function ReimbursementMethodEditModal({
                       </div>
                       {choice === "direct-deposit" ? (
                         <div className="text-sm leading-6 tracking-[-0.084px] text-[#7c858e]">
-                          <p className="font-bold text-[#7c858e]">{MODAL_BANK.bankName}</p>
-                          <p className="font-normal">{MODAL_BANK.accountLine}</p>
+                          <p className="font-bold text-[#7c858e]">{modalBankDisplay.bankName}</p>
+                          <p className="font-normal">{modalBankDisplay.accountLine}</p>
                         </div>
                       ) : null}
                       <div>

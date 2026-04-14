@@ -1294,7 +1294,7 @@ function DestinationStep({
       label: "Direct Deposit",
       sublabel: "1-2 business days after approval.",
       badge: "Default" as string | undefined,
-      bankName: "Penny's Bank",
+      bankName: "Wells Fargo Bank",
       accountMask: "•••• 5423 Checking",
     },
     {
@@ -1510,7 +1510,7 @@ function ValidationStep({
                 </div>
                 {state.destination === "bank" && (
                   <div className="mt-1 ml-7 space-y-0.5">
-                    <p className="text-[14px] font-medium text-[#515f6b]">Ella's Bank</p>
+                    <p className="text-[14px] font-medium text-[#515f6b]">Wells Fargo Bank</p>
                     <p className="text-[14px] text-[#7c858e]">•••• 5423 Checking</p>
                   </div>
                 )}
