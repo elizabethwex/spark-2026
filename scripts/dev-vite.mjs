@@ -10,6 +10,11 @@ import { dirname, join } from "node:path";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const viteCli = join(root, "node_modules", "vite", "bin", "vite.js");
 
+console.log(`
+  SPARK dev server — this app uses port 5175 by default (not Vite’s 5173).
+  If the port is busy, Vite picks the next free port; use the “Local” URL printed below.
+`);
+
 if (!existsSync(viteCli)) {
   console.error(`
 Cannot start dev server: dependencies are not installed (vite is missing).

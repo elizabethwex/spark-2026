@@ -16,7 +16,8 @@ interface AppVariantContextValue {
 const AppVariantContext = createContext<AppVariantContextValue | null>(null);
 
 export function AppVariantProvider({ children }: { children: ReactNode }) {
-  const [variant, setVariant] = useState<AppVariant>(1);
+  /** Default 3 = HSA-only style accounts/messages; use 2 for FSA-style (e.g. keyboard “2”). */
+  const [variant, setVariant] = useState<AppVariant>(3);
   return (
     <AppVariantContext.Provider value={{ variant, setVariant }}>
       {children}
@@ -26,6 +27,6 @@ export function AppVariantProvider({ children }: { children: ReactNode }) {
 
 export function useAppVariant(): AppVariantContextValue {
   const ctx = useContext(AppVariantContext);
-  if (!ctx) return { variant: 1, setVariant: () => {} };
+  if (!ctx) return { variant: 3, setVariant: () => {} };
   return ctx;
 }

@@ -239,7 +239,7 @@ export function ClaimExpenseDetailSheet({
                     )}
                   >
                     {row.status.icon && (
-                      <AlertTriangle className="h-3 w-3 shrink-0" aria-hidden />
+                      <AlertTriangle className="h-3 w-3 shrink-0 text-current" aria-hidden />
                     )}
                     <span className="min-w-0 truncate">{row.status.label}</span>
                   </span>
@@ -286,7 +286,7 @@ export function ClaimExpenseDetailSheet({
                         className="uppercase"
                       >
                         <span className="inline-flex items-center gap-1">
-                          <Clock className="h-3 w-3 shrink-0" aria-hidden />
+                          <Clock className="h-3 w-3 shrink-0 text-current" aria-hidden />
                           {toast.tag}
                         </span>
                       </Badge>
@@ -518,7 +518,7 @@ export function ClaimExpenseDetailSheet({
               size="sm"
               className="gap-1.5"
             >
-              <Upload className="h-3.5 w-3.5" aria-hidden />
+              <Upload className="h-3.5 w-3.5 text-current" aria-hidden />
               Upload Documentation
             </Button>
           </div>
