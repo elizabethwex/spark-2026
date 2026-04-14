@@ -51,7 +51,7 @@ import {
 import { ConsumerNavigation } from "@/components/layout/ConsumerNavigation";
 import { ConsumerFooter } from "@/components/layout/Footer";
 import { FadeInItem } from "@/components/layout/PageFadeIn";
-import { MobileAppBanner } from "@/components/sections/MobileAppBanner";
+import { HsaStorePromoBanner } from "@/components/sections/HsaStorePromoBanner";
 import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground";
 import { usePrototype } from "@/context/PrototypeContext";
 import { useReimburseWorkspace } from "@/context/ReimburseWorkspaceContext";
@@ -726,7 +726,7 @@ export default function FsaAccountPage() {
             </SectionCard>
           </div>
 
-          <MobileAppBanner />
+          <HsaStorePromoBanner />
         </main>
       </FadeInItem>
 

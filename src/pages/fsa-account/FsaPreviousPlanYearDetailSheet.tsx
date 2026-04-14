@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Badge,
@@ -83,6 +84,11 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
 /**
  * Previous Plan Year “View more details” slideout (Consumer Experience Redesign — Figma 29641:15455).
  */
+/** $2,500.00 in cents for count-up animation */
+const ELIGIBLE_CENTS = 250000;
+const BAR_ANIM_MS = 1100;
+const AMOUNT_ANIM_MS = 950;
+
 export function FsaPreviousPlanYearDetailSheet({
   open,
   onOpenChange,
@@ -93,6 +99,63 @@ export function FsaPreviousPlanYearDetailSheet({
   /** Display string under the title, e.g. from plan period control */
   planYearRange?: string;
 }) {
+  const [barPct, setBarPct] = useState(0);
+  const [eligibleCents, setEligibleCents] = useState(0);
+  const [usedBadgePct, setUsedBadgePct] = useState(0);
+  const amountRafRef = useRef<number | null>(null);
+
+  useLayoutEffect(() => {
+    if (!open) {
+      setBarPct(0);
+      setEligibleCents(0);
+      setUsedBadgePct(0);
+      return;
+    }
+    if (typeof window === "undefined") return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setBarPct(100);
+      setEligibleCents(ELIGIBLE_CENTS);
+      setUsedBadgePct(100);
+    }
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    if (typeof window === "undefined") return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    let start: number | null = null;
+    const easeOutQuad = (t: number) => 1 - (1 - t) * (1 - t);
+
+    const step = (now: number) => {
+      if (start === null) start = now;
+      const elapsed = now - start;
+      const tBar = Math.min(1, elapsed / BAR_ANIM_MS);
+      const tAmt = Math.min(1, elapsed / AMOUNT_ANIM_MS);
+      setBarPct(easeOutQuad(tBar) * 100);
+      const eAmt = easeOutQuad(tAmt);
+      setEligibleCents(Math.round(eAmt * ELIGIBLE_CENTS));
+      setUsedBadgePct(Math.round(eAmt * 100));
+      if (tBar < 1 || tAmt < 1) {
+        amountRafRef.current = requestAnimationFrame(step);
+      } else {
+        setBarPct(100);
+        setEligibleCents(ELIGIBLE_CENTS);
+        setUsedBadgePct(100);
+      }
+    };
+
+    amountRafRef.current = requestAnimationFrame(step);
+    return () => {
+      if (amountRafRef.current != null) cancelAnimationFrame(amountRafRef.current);
+    };
+  }, [open]);
+
+  const eligibleFormatted = `$${(eligibleCents / 100).toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
@@ -124,46 +187,48 @@ export function FsaPreviousPlanYearDetailSheet({
                     </SheetInfoTip>
                   </div>
                   <div className="mt-2 flex flex-wrap items-center gap-2">
-                    <span className="text-2xl font-semibold tracking-tight text-[#14182c]">$2,500.00</span>
+                    <span className="text-2xl font-semibold tabular-nums tracking-tight text-[#14182c]">
+                      {eligibleFormatted}
+                    </span>
                     <Badge
                       intent="success"
-                      className="rounded-2xl bg-[#dcfce7] px-2 py-1 text-xs font-bold text-[#008375]"
+                      className="rounded-2xl bg-[#dcfce7] px-2 py-1 text-xs font-bold text-[#008375] tabular-nums"
                     >
-                      100% used
+                      {usedBadgePct}% used
                     </Badge>
                   </div>
                 </div>
                 <div className="h-5 overflow-hidden rounded-full bg-[#edeff0]">
-                  <div className="h-full w-full rounded-full bg-[#3958c3]" aria-hidden />
+                  <div className="h-full rounded-full bg-[#3958c3]" style={{ width: `${barPct}%` }} aria-hidden />
                 </div>
                 <div className="flex flex-col">
                   <div className="flex items-center justify-between gap-4 border-b border-[#b7c0da] py-3">
                     <div className="min-w-0">
-                      <div className="flex items-center gap-2 text-sm font-medium text-emerald-800">
+                      <div className="flex items-center gap-2 text-sm font-medium text-[#14182c]">
                         <CircleCheck className="h-4 w-4 shrink-0 text-emerald-700" aria-hidden />
                         <span>Used</span>
                       </div>
-                      <p className="mt-0.5 text-xs text-emerald-700">Spent on claims</p>
+                      <p className="mt-0.5 text-xs text-[#5f6a94]">Spent on claims</p>
                     </div>
                     <span className="shrink-0 text-sm text-[#14182c]">$2,500.00</span>
                   </div>
                   <div className="flex items-center justify-between gap-4 border-b border-[#b7c0da] py-3">
                     <div className="min-w-0">
-                      <div className="flex items-center gap-2 text-sm font-medium text-[#3958c3]">
+                      <div className="flex items-center gap-2 text-sm font-medium text-[#14182c]">
                         <RefreshCw className="h-4 w-4 shrink-0 text-[#3958c3]" aria-hidden />
                         <span>Rolled Over</span>
                       </div>
-                      <p className="mt-0.5 text-xs text-[#3958c3]/90">Moved to next year</p>
+                      <p className="mt-0.5 text-xs text-[#5f6a94]">Moved to next year</p>
                     </div>
                     <span className="shrink-0 text-sm text-[#14182c]">$0.00</span>
                   </div>
                   <div className="flex items-center justify-between gap-4 py-3">
                     <div className="min-w-0">
-                      <div className="flex items-center gap-2 text-sm font-medium text-amber-900">
+                      <div className="flex items-center gap-2 text-sm font-medium text-[#14182c]">
                         <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600" aria-hidden />
                         <span>Unused/Forfeited</span>
                       </div>
-                      <p className="mt-0.5 text-xs text-amber-800">Not used in time</p>
+                      <p className="mt-0.5 text-xs text-[#5f6a94]">Not used in time</p>
                     </div>
                     <span className="shrink-0 text-sm text-[#14182c]">$0.00</span>
                   </div>
