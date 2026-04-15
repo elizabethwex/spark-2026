@@ -107,7 +107,7 @@ const WexPaginationPrevious = ({
     className={cn("gap-1 pl-2.5", className)}
     {...props}
   >
-    <ChevronLeft className="h-4 w-4" />
+    <ChevronLeft className="h-4 w-4 text-current" />
     <span className="text-wex-pagination-item-fg">Previous</span>
   </PaginationLinkBase>
 );
@@ -124,7 +124,7 @@ const WexPaginationNext = ({
     {...props}
   >
     <span className="text-wex-pagination-item-fg">Next</span>
-    <ChevronRight className="h-4 w-4" />
+    <ChevronRight className="h-4 w-4 text-current" />
   </PaginationNextBase>
 );
 WexPaginationNext.displayName = "WexPagination.Next";
@@ -139,7 +139,7 @@ const WexPaginationFirst = ({
     className={cn("gap-1 pl-2.5", className)}
     {...props}
   >
-    <ChevronsLeft className="h-4 w-4" />
+    <ChevronsLeft className="h-4 w-4 text-current" />
     <span className="text-wex-pagination-item-fg">First</span>
   </PaginationLinkBase>
 );
@@ -156,7 +156,7 @@ const WexPaginationLast = ({
     {...props}
   >
     <span className="text-wex-pagination-item-fg">Last</span>
-    <ChevronsRight className="h-4 w-4" />
+    <ChevronsRight className="h-4 w-4 text-current" />
   </PaginationLinkBase>
 );
 WexPaginationLast.displayName = "WexPagination.Last";

@@ -222,7 +222,7 @@ export function SparkAccountsSection({
               </div>
               <div className="flex h-[6px] w-full items-center overflow-hidden rounded-[6px] bg-[#eef2ff]">
                 <div
-                  className="h-full rounded-[6px] bg-[#3958c3]"
+                  className="h-full rounded-[6px] bg-[var(--theme-primary)]"
                   style={{ 
                     width: isInView ? `${h.contributionPctUsed}%` : "0%",
                     transition: 'width 2.2s cubic-bezier(0.22, 1, 0.36, 1) 0.15s'
@@ -230,7 +230,7 @@ export function SparkAccountsSection({
                 />
               </div>
               <p className="text-[10px] leading-[15px] text-[#5f6a94]">
-                {h.planYear} IRS limit: $4,300.00 (individual)
+                {h.planYear} IRS limit: {h.irsLimitFormatted} (individual)
               </p>
             </div>
           </div>

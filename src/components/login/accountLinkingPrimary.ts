@@ -1,8 +1,8 @@
-export type PrimaryOptionId = "ux-nicole" | "n.jackson"
+export type PrimaryOptionId = "pennysmith" | "p.smith"
 
 export const PASSWORD_MASKED_BY_ID: Record<PrimaryOptionId, string> = {
-  "ux-nicole": "UX****23!",
-  "n.jackson": "NJ****91!",
+  "pennysmith": "PS****23!",
+  "p.smith": "PS****91!",
 }
 
 export function getPrimaryCredentialsDisplay(
@@ -11,7 +11,7 @@ export function getPrimaryCredentialsDisplay(
 ): { username: string; passwordMasked: string } {
   const trimmed = sessionUsername.trim()
   return {
-    username: selected === "ux-nicole" ? trimmed || "ux-nicole" : "n.jackson",
+    username: selected === "pennysmith" ? trimmed || "pennysmith" : "p.smith",
     passwordMasked: PASSWORD_MASKED_BY_ID[selected],
   }
 }

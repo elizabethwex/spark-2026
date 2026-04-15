@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { FadeInItem } from "@/components/layout/PageFadeIn";
 import { useSearchParams, useLocation } from "react-router-dom";
 import {
@@ -21,9 +21,37 @@ import {
 import { ConsumerFooter } from "@/components/layout/Footer";
 import { ConsumerNavigation } from "@/components/layout/ConsumerNavigation";
 import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground";
-import { Pencil, Info, Plus, Calendar, X, Trash2, MoreVertical, Eye, RefreshCw, AlertCircle, User, Users, HeartPlus, ShieldCheck, Landmark, CreditCard, Bell, UserLock, Lock, SquareArrowRight } from "lucide-react";
+import {
+  WEX_PROFILE_BANK_ACCOUNTS_KEY,
+  migrateLegacyEllaBankLabel,
+} from "@/lib/profileBankAccountsSession";
+import { ReimbursementMethodsContent } from "@/pages/ReimbursementMethodsContent";
+import {
+  Pencil,
+  Info,
+  Plus,
+  Calendar,
+  X,
+  Trash2,
+  MoreVertical,
+  Eye,
+  EyeOff,
+  RefreshCw,
+  AlertCircle,
+  User,
+  Users,
+  HeartPlus,
+  ShieldCheck,
+  Landmark,
+  CreditCard,
+  Bell,
+  UserLock,
+  Lock,
+  SquareArrowRight,
+  DollarSign,
+} from "lucide-react";
 
-type SubPage = "my-profile" | "dependents" | "beneficiaries" | "authorized-signers" | "banking" | "debit-card" | "login-security" | "communication" | "report-lost-stolen" | "order-replacement-card";
+type SubPage = "my-profile" | "dependents" | "beneficiaries" | "authorized-signers" | "banking" | "reimbursement-method" | "debit-card" | "login-security" | "communication" | "report-lost-stolen" | "order-replacement-card";
 
 type Dependent = {
   id: string;
@@ -91,7 +119,27 @@ type BankAccount = {
   accountType: "checking" | "saving";
   verificationMethod: "text" | "email";
   selectedDirectDepositOptions: string[]; // Array of selected plan years/accounts
+  bankName?: string;
+  addressLine1?: string;
+  city?: string;
+  bankState?: string;
+  zipCode?: string;
+  /** Newly added accounts show verification UI until deposit is confirmed */
+  activationStatus?: "pending_deposit" | "active";
+  /** Failed deposit-amount verifications (locks activation UI at 2) */
+  activationVerifyAttemptCount?: number;
 };
+
+/** Demo micro-deposit amount users must enter to activate (consumer prototype). */
+const DEMO_MICRO_DEPOSIT_VERIFICATION_AMOUNT = 0.32;
+
+function parseBankDepositAmountInput(raw: string): number | null {
+  const cleaned = raw.trim().replace(/[$,\s]/g, "");
+  if (!cleaned) return null;
+  const n = Number.parseFloat(cleaned);
+  if (!Number.isFinite(n) || n < 0) return null;
+  return n;
+}
 
 type PurseStatus = {
   accountName: string;
@@ -109,17 +157,57 @@ type DebitCard = {
   purseStatuses?: PurseStatus[]; // Purse status information
 };
 
-const SESSION_STORAGE_DEPENDENTS_KEY = "wex_profile_dependents";
+const SESSION_STORAGE_DEPENDENTS_KEY = "wex_profile_dependents_v2";
 const SESSION_STORAGE_BENEFICIARIES_KEY = "wex_profile_beneficiaries";
-const SESSION_STORAGE_BANK_ACCOUNTS_KEY = "wex_profile_bank_accounts";
+
+/** First visit (no saved list): show one active account so Bank Accounts is not empty. */
+const DEFAULT_BANK_ACCOUNTS: BankAccount[] = [
+  {
+    id: "bank-default-1",
+    routingNumber: "021000021",
+    accountNumber: "0000000005423",
+    confirmAccountNumber: "0000000005423",
+    accountNickname: "",
+    accountType: "checking",
+    verificationMethod: "email",
+    selectedDirectDepositOptions: [],
+    bankName: "Wells Fargo Bank",
+    activationStatus: "active",
+  },
+];
+
+const DEFAULT_DEPENDENTS: Dependent[] = [
+  {
+    id: "dep-1",
+    firstName: "Ben",
+    lastName: "Smith",
+    ssn: "***-**-1234",
+    birthDate: "03/14/1986",
+    gender: "Male",
+    isFullTimeStudent: false,
+    relationship: "Spouse",
+  },
+  {
+    id: "dep-2",
+    firstName: "James",
+    lastName: "Smith",
+    ssn: "***-**-5678",
+    birthDate: "07/22/2012",
+    gender: "Male",
+    isFullTimeStudent: false,
+    relationship: "Child",
+  },
+];
 
 function loadDependentsFromStorage(): Dependent[] {
-  if (typeof window === "undefined") return [];
+  if (typeof window === "undefined") return DEFAULT_DEPENDENTS;
   try {
     const stored = sessionStorage.getItem(SESSION_STORAGE_DEPENDENTS_KEY);
-    return stored ? JSON.parse(stored) : [];
+    if (!stored) return DEFAULT_DEPENDENTS;
+    const parsed: Dependent[] = JSON.parse(stored);
+    return parsed.length > 0 ? parsed : DEFAULT_DEPENDENTS;
   } catch {
-    return [];
+    return DEFAULT_DEPENDENTS;
   }
 }
 
@@ -152,26 +240,36 @@ function saveBeneficiariesToStorage(beneficiaries: Beneficiary[]): void {
 }
 
 function loadBankAccountsFromStorage(): BankAccount[] {
-  if (typeof window === "undefined") return [];
+  if (typeof window === "undefined") return DEFAULT_BANK_ACCOUNTS;
   try {
-    const stored = sessionStorage.getItem(SESSION_STORAGE_BANK_ACCOUNTS_KEY);
-    return stored ? JSON.parse(stored) : [];
+    const stored = sessionStorage.getItem(WEX_PROFILE_BANK_ACCOUNTS_KEY);
+    if (!stored) return DEFAULT_BANK_ACCOUNTS;
+    const parsed: unknown = JSON.parse(stored);
+    if (!Array.isArray(parsed)) return DEFAULT_BANK_ACCOUNTS;
+    if (parsed.length === 0) return DEFAULT_BANK_ACCOUNTS;
+    return parsed.map((raw: BankAccount) => ({
+      ...raw,
+      accountNickname: migrateLegacyEllaBankLabel(raw.accountNickname) ?? raw.accountNickname,
+      bankName: migrateLegacyEllaBankLabel(raw.bankName) ?? raw.bankName,
+      activationStatus:
+        raw.activationStatus === "pending_deposit" ? ("pending_deposit" as const) : ("active" as const),
+    }));
   } catch {
-    return [];
+    return DEFAULT_BANK_ACCOUNTS;
   }
 }
 
 function saveBankAccountsToStorage(bankAccounts: BankAccount[]): void {
   if (typeof window === "undefined") return;
   try {
-    sessionStorage.setItem(SESSION_STORAGE_BANK_ACCOUNTS_KEY, JSON.stringify(bankAccounts));
+    sessionStorage.setItem(WEX_PROFILE_BANK_ACCOUNTS_KEY, JSON.stringify(bankAccounts));
   } catch (e) {
     console.warn("Failed to save bank accounts to sessionStorage:", e);
   }
 }
 
 export default function MyProfile() {
-  const personalName = "Emily Rose Smith";
+  const personalName = "Penny Smith";
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
   
@@ -186,7 +284,7 @@ export default function MyProfile() {
   // Contact information state
   const [isContactInfoModalOpen, setIsContactInfoModalOpen] = useState(false);
   const [mobileNumber, setMobileNumber] = useState("123-456-7890");
-  const [emailAddress, setEmailAddress] = useState("emily.smith@exampleemail.com");
+  const [emailAddress, setEmailAddress] = useState("penny.smith@wexinc.com");
   
   // Contributions preferences state
   const [contributionPostedEmail, setContributionPostedEmail] = useState(true);
@@ -379,7 +477,7 @@ export default function MyProfile() {
   const [debitCards, setDebitCards] = useState<DebitCard[]>([
     {
       id: "1",
-      cardholderName: "John Johnson",
+      cardholderName: "Ben Smith",
       cardNumber: "3522",
       fullCardNumber: "1234 5678 9012 3522",
       status: "ready-to-activate",
@@ -393,30 +491,29 @@ export default function MyProfile() {
     },
     {
       id: "2",
-      cardholderName: "Emily Johnson",
+      cardholderName: "Penny Smith",
       cardNumber: "7741",
       fullCardNumber: "1234 5678 9012 7741",
+      status: "active",
+      expirationDate: "12/31/2027",
+      effectiveDate: "01/01/2024",
+      purseStatuses: [
+        { accountName: "FSA 2024", status: "Active" },
+        { accountName: "HRA 2024", status: "Active" },
+        { accountName: "FSA 2022", status: "Suspended" },
+      ],
+    },
+    {
+      id: "3",
+      cardholderName: "James Smith",
+      cardNumber: "8412",
+      fullCardNumber: "1234 5678 9012 8412",
       status: "deactivated",
       expirationDate: "03/31/2026",
       effectiveDate: "04/01/2022",
       purseStatuses: [
         { accountName: "FSA 2022", status: "Suspended" },
         { accountName: "HRA 2022", status: "Suspended" },
-      ],
-    },
-    {
-      id: "3",
-      cardholderName: "Michael Johnson",
-      cardNumber: "8412",
-      fullCardNumber: "1234 5678 9012 8412",
-      status: "active",
-      expirationDate: "12/31/2026",
-      effectiveDate: "01/01/2023",
-      purseStatuses: [
-        { accountName: "FSA 2023", status: "Active" },
-        { accountName: "HRA 2023", status: "Active" },
-        { accountName: "FSA 2021", status: "Suspended" },
-        { accountName: "FSA 2018-2026", status: "Suspended" },
       ],
     },
   ]);
@@ -452,7 +549,7 @@ export default function MyProfile() {
   // Report Lost/Stolen page state
   const [confirmationAnswer, setConfirmationAnswer] = useState<"yes" | "no" | "">("");
   const [mailingAddress, setMailingAddress] = useState({
-    name: "John Johnson",
+    name: "Ben Smith",
     street: "5050 Lincoln Dr",
     addressLine2: "",
     city: "Edina",
@@ -553,10 +650,22 @@ export default function MyProfile() {
   
   // Banking modal state
   const [isAddBankAccountModalOpen, setIsAddBankAccountModalOpen] = useState(false);
+  const [isAddBankAccountWorkspaceOpen, setIsAddBankAccountWorkspaceOpen] = useState(false);
   const [editingBankAccountId, setEditingBankAccountId] = useState<string | null>(null);
   const [isRemoveBankAccountConfirmOpen, setIsRemoveBankAccountConfirmOpen] = useState(false);
   const [bankAccountToRemove, setBankAccountToRemove] = useState<BankAccount | null>(null);
   const [bankAccountStep, setBankAccountStep] = useState<string>("step1");
+  const [isRemoveBankAccountAuthModalOpen, setIsRemoveBankAccountAuthModalOpen] = useState(false);
+  const [removeBankAuthShowCode, setRemoveBankAuthShowCode] = useState(false);
+  const [removeBankAuthMethod, setRemoveBankAuthMethod] = useState<"" | "text" | "email">("");
+  const [removeBankAuthCode, setRemoveBankAuthCode] = useState("");
+  const [removeBankAuthCodePlain, setRemoveBankAuthCodePlain] = useState(false);
+  const [removeBankAuthResendTimer, setRemoveBankAuthResendTimer] = useState(0);
+  /** When true, closing Remove confirmation opens auth; do not clear bankAccountToRemove in AlertDialog onOpenChange. */
+  const preserveBankAccountToRemoveAfterConfirmCloseRef = useRef(false);
+  const [isActivateBankAccountModalOpen, setIsActivateBankAccountModalOpen] = useState(false);
+  const [activateBankAccountId, setActivateBankAccountId] = useState<string | null>(null);
+  const [bankAccountDepositAmountInput, setBankAccountDepositAmountInput] = useState("");
   
   // Form state for dependents
   const [formData, setFormData] = useState({
@@ -605,26 +714,31 @@ export default function MyProfile() {
   
   // Form state for bank accounts
   const [bankAccountFormData, setBankAccountFormData] = useState({
-    verificationMethod: "text" as "text" | "email",
+    verificationMethod: "" as "" | "text" | "email",
     verificationCode: "",
-    // Step 2 fields
     routingNumber: "",
     accountNumber: "",
     confirmAccountNumber: "",
     accountNickname: "",
     accountType: "checking" as "checking" | "saving",
-    // Step 3 fields
+    bankName: "",
+    addressLine1: "",
+    city: "",
+    bankState: "",
+    zipCode: "",
     selectedDirectDepositOptions: [] as string[],
   });
   
   // Verification code resend timer state
   const [resendTimer, setResendTimer] = useState(0);
   const [showVerificationCode, setShowVerificationCode] = useState(false);
+  /** Show digits vs masked dots in add-bank verification field */
+  const [showBankVerificationCodePlain, setShowBankVerificationCodePlain] = useState(false);
 
 
   const [activeSubPage, setActiveSubPage] = useState<SubPage>(() => {
     const subPage = searchParams.get("subPage");
-    const validSubPages: SubPage[] = ["my-profile", "dependents", "beneficiaries", "authorized-signers", "banking", "debit-card", "login-security", "communication", "report-lost-stolen", "order-replacement-card"];
+    const validSubPages: SubPage[] = ["my-profile", "dependents", "beneficiaries", "authorized-signers", "banking", "reimbursement-method", "debit-card", "login-security", "communication", "report-lost-stolen", "order-replacement-card"];
     if (subPage && validSubPages.includes(subPage as SubPage)) {
       return subPage as SubPage;
     }
@@ -634,7 +748,7 @@ export default function MyProfile() {
   // Sync activeSubPage with URL params
   useEffect(() => {
     const subPage = searchParams.get("subPage");
-    const validSubPages: SubPage[] = ["my-profile", "dependents", "beneficiaries", "authorized-signers", "banking", "debit-card", "login-security", "communication", "report-lost-stolen", "order-replacement-card"];
+    const validSubPages: SubPage[] = ["my-profile", "dependents", "beneficiaries", "authorized-signers", "banking", "reimbursement-method", "debit-card", "login-security", "communication", "report-lost-stolen", "order-replacement-card"];
     queueMicrotask(() => {
       if (subPage && validSubPages.includes(subPage as SubPage)) {
         setActiveSubPage(subPage as SubPage);
@@ -1287,6 +1401,7 @@ export default function MyProfile() {
 
   const handleBankAccountNext = () => {
     if (bankAccountStep === "step1") {
+      setShowVerificationCode(false);
       setBankAccountStep("step2");
     } else if (bankAccountStep === "step2") {
       // Ensure selectedDirectDepositOptions is initialized before moving to step 3
@@ -1300,6 +1415,7 @@ export default function MyProfile() {
 
   const handleBankAccountBack = () => {
     if (bankAccountStep === "step2") {
+      setShowVerificationCode(false);
       setBankAccountStep("step1");
     } else if (bankAccountStep === "step3") {
       setBankAccountStep("step2");
@@ -1308,6 +1424,12 @@ export default function MyProfile() {
 
   const handleSaveBankAccount = () => {
     // This will be called on step 3 completion
+    const verificationMethod: BankAccount["verificationMethod"] =
+      bankAccountFormData.verificationMethod === "email" ? "email" : "text";
+    const existingAccount = editingBankAccountId
+      ? bankAccounts.find((a) => a.id === editingBankAccountId)
+      : undefined;
+    const isNewBankAccount = !editingBankAccountId;
     const newBankAccount: BankAccount = {
       id: editingBankAccountId || Date.now().toString(),
       routingNumber: bankAccountFormData.routingNumber,
@@ -1315,8 +1437,17 @@ export default function MyProfile() {
       confirmAccountNumber: bankAccountFormData.confirmAccountNumber,
       accountNickname: bankAccountFormData.accountNickname,
       accountType: bankAccountFormData.accountType,
-      verificationMethod: bankAccountFormData.verificationMethod,
+      verificationMethod,
       selectedDirectDepositOptions: bankAccountFormData.selectedDirectDepositOptions || [],
+      bankName: bankAccountFormData.bankName || undefined,
+      addressLine1: bankAccountFormData.addressLine1 || undefined,
+      city: bankAccountFormData.city || undefined,
+      bankState: bankAccountFormData.bankState || undefined,
+      zipCode: bankAccountFormData.zipCode || undefined,
+      activationStatus: isNewBankAccount
+        ? "pending_deposit"
+        : (existingAccount?.activationStatus ?? "active"),
+      activationVerifyAttemptCount: existingAccount?.activationVerifyAttemptCount,
     };
     
     if (editingBankAccountId) {
@@ -1333,13 +1464,19 @@ export default function MyProfile() {
       });
     } else {
       setBankAccounts((prev) => [...prev, newBankAccount]);
-      const accountName = bankAccountFormData.accountNickname || `${bankAccountFormData.accountType.charAt(0).toUpperCase() + bankAccountFormData.accountType.slice(1)} Account`;
-      toast.success("Bank account successfully added", {
-        description: `${accountName} has been added`,
+      const displayName =
+        bankAccountFormData.accountNickname.trim() ||
+        bankAccountFormData.bankName.trim() ||
+        `${bankAccountFormData.accountType.charAt(0).toUpperCase() + bankAccountFormData.accountType.slice(1)} Account`;
+      const acctDigits = bankAccountFormData.accountNumber.replace(/\D/g, "");
+      const last4 = acctDigits.length >= 4 ? acctDigits.slice(-4) : acctDigits;
+      toast.success("Bank Account Successfully Added", {
+        description: `${displayName} ....${last4} was successfully added`,
       });
     }
     
     setIsAddBankAccountModalOpen(false);
+    setIsAddBankAccountWorkspaceOpen(false);
     setBankAccountStep("step1");
     setEditingBankAccountId(null);
     setShowVerificationCode(false);
@@ -1355,11 +1492,100 @@ export default function MyProfile() {
       accountNickname: bankAccount.accountNickname,
       accountType: bankAccount.accountType,
       selectedDirectDepositOptions: bankAccount.selectedDirectDepositOptions || [],
+      bankName: bankAccount.bankName ?? "",
+      addressLine1: bankAccount.addressLine1 ?? "",
+      city: bankAccount.city ?? "",
+      bankState: bankAccount.bankState ?? "",
+      zipCode: bankAccount.zipCode ?? "",
     });
     setEditingBankAccountId(bankAccount.id);
     setIsAddBankAccountModalOpen(true);
-    setBankAccountStep("step2"); // Start at step 2 when editing
+    setBankAccountStep("edit");
     setShowVerificationCode(false);
+  };
+
+  const closeActivateBankAccountModal = () => {
+    setIsActivateBankAccountModalOpen(false);
+    setActivateBankAccountId(null);
+    setBankAccountDepositAmountInput("");
+  };
+
+  const handleOpenActivateBankAccountModal = (bankAccount: BankAccount) => {
+    setActivateBankAccountId(bankAccount.id);
+    setBankAccountDepositAmountInput("");
+    setIsActivateBankAccountModalOpen(true);
+  };
+
+  const handleSubmitBankAccountActivation = () => {
+    if (!activateBankAccountId) return;
+    const account = bankAccounts.find((a) => a.id === activateBankAccountId);
+    if (!account) {
+      closeActivateBankAccountModal();
+      return;
+    }
+    const prevFailures = account.activationVerifyAttemptCount ?? 0;
+    if (prevFailures >= 2) {
+      toast.error("This bank account is locked after two incorrect attempts.");
+      closeActivateBankAccountModal();
+      return;
+    }
+
+    const entered = parseBankDepositAmountInput(bankAccountDepositAmountInput);
+    if (entered === null) {
+      toast.error("Enter a valid deposit amount.");
+      return;
+    }
+
+    const matchesDemoDeposit =
+      Math.abs(entered - DEMO_MICRO_DEPOSIT_VERIFICATION_AMOUNT) < 0.009;
+
+    if (matchesDemoDeposit) {
+      setBankAccounts((prev) =>
+        prev.map((a) =>
+          a.id === activateBankAccountId
+            ? {
+                ...a,
+                activationStatus: "active" as const,
+                activationVerifyAttemptCount: undefined,
+              }
+            : a
+        )
+      );
+      toast.success("Bank account activated", {
+        description: "Your account is ready to use for deposits and reimbursements.",
+      });
+      closeActivateBankAccountModal();
+      return;
+    }
+
+    const nextFailures = prevFailures + 1;
+    setBankAccounts((prev) =>
+      prev.map((a) =>
+        a.id === activateBankAccountId ? { ...a, activationVerifyAttemptCount: nextFailures } : a
+      )
+    );
+
+    if (nextFailures >= 2) {
+      toast.error("This bank account has been locked after two incorrect attempts.", {
+        description: "Remove the account and add it again, or contact support for help.",
+      });
+      closeActivateBankAccountModal();
+    } else {
+      toast.error("Incorrect amount.", {
+        description: "You have one attempt remaining before this account is locked.",
+      });
+      setBankAccountDepositAmountInput("");
+    }
+  };
+
+  const closeRemoveBankAccountAuthModal = () => {
+    setIsRemoveBankAccountAuthModalOpen(false);
+    setRemoveBankAuthShowCode(false);
+    setRemoveBankAuthMethod("");
+    setRemoveBankAuthCode("");
+    setRemoveBankAuthCodePlain(false);
+    setRemoveBankAuthResendTimer(0);
+    setBankAccountToRemove(null);
   };
 
   const handleRemoveBankAccountClick = (bankAccount: BankAccount) => {
@@ -1367,19 +1593,40 @@ export default function MyProfile() {
     setIsRemoveBankAccountConfirmOpen(true);
   };
 
+  const openRemoveBankAccountAuthAfterConfirm = () => {
+    preserveBankAccountToRemoveAfterConfirmCloseRef.current = true;
+    setRemoveBankAuthShowCode(false);
+    setRemoveBankAuthMethod("");
+    setRemoveBankAuthCode("");
+    setRemoveBankAuthCodePlain(false);
+    setRemoveBankAuthResendTimer(0);
+    setIsRemoveBankAccountConfirmOpen(false);
+    setIsRemoveBankAccountAuthModalOpen(true);
+  };
+
   const handleRemoveBankAccount = (id: string) => {
     const bankAccount = bankAccounts.find((acc) => acc.id === id);
-    const accountName = bankAccount 
-      ? (bankAccount.accountNickname || `${bankAccount.accountType.charAt(0).toUpperCase() + bankAccount.accountType.slice(1)} Account`)
+    const displayName = bankAccount
+      ? (bankAccount.accountNickname || "").trim() ||
+        bankAccount.bankName?.trim() ||
+        `${bankAccount.accountType.charAt(0).toUpperCase() + bankAccount.accountType.slice(1)} Account`
       : "Bank account";
-    
     setBankAccounts((prev) => prev.filter((acc) => acc.id !== id));
     setIsRemoveBankAccountConfirmOpen(false);
+    setIsRemoveBankAccountAuthModalOpen(false);
     setBankAccountToRemove(null);
-    
-    // Show success toast for removal
-    toast.success("Bank account successfully removed", {
-      description: `${accountName} has been removed from your accounts`,
+    setRemoveBankAuthShowCode(false);
+    setRemoveBankAuthMethod("");
+    setRemoveBankAuthCode("");
+    setRemoveBankAuthCodePlain(false);
+    setRemoveBankAuthResendTimer(0);
+
+    setActiveSubPage("banking");
+    setSearchParams({ subPage: "banking" });
+
+    toast.success("Bank account removed", {
+      description: `${displayName} has been removed from your Bank Accounts.`,
+      duration: 5000,
     });
   };
 
@@ -1430,25 +1677,31 @@ export default function MyProfile() {
     }
   }, [isAddAuthorizedSignerModalOpen, editingAuthorizedSignerId]);
 
-  // Reset bank account form and step when modal closes
+  // Reset bank account form when modal closes, unless Add Bank Account workspace is open (post-auth flow)
   useEffect(() => {
-    if (!isAddBankAccountModalOpen) {
+    if (!isAddBankAccountModalOpen && !isAddBankAccountWorkspaceOpen) {
       setBankAccountFormData({
-        verificationMethod: "text",
+        verificationMethod: "",
         verificationCode: "",
         routingNumber: "",
         accountNumber: "",
         confirmAccountNumber: "",
         accountNickname: "",
         accountType: "checking",
+        bankName: "",
+        addressLine1: "",
+        city: "",
+        bankState: "",
+        zipCode: "",
         selectedDirectDepositOptions: [],
       });
       setBankAccountStep("step1");
       setEditingBankAccountId(null);
       setShowVerificationCode(false);
       setResendTimer(0);
+      setShowBankVerificationCodePlain(false);
     }
-  }, [isAddBankAccountModalOpen]);
+  }, [isAddBankAccountModalOpen, isAddBankAccountWorkspaceOpen]);
 
   // Resend timer countdown
   useEffect(() => {
@@ -1467,6 +1720,73 @@ export default function MyProfile() {
     }
   }, [showVerificationCode]);
 
+  useEffect(() => {
+    if (removeBankAuthResendTimer > 0) {
+      const timer = setTimeout(() => {
+        setRemoveBankAuthResendTimer((prev) => prev - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [removeBankAuthResendTimer]);
+
+  const addBankWorkspaceRoutingDigits = bankAccountFormData.routingNumber.replace(/\D/g, "");
+  const addBankWorkspaceRoutingInvalid =
+    addBankWorkspaceRoutingDigits.length > 0 && addBankWorkspaceRoutingDigits.length !== 9;
+
+  const addBankWorkspaceConfirmMismatch =
+    bankAccountFormData.confirmAccountNumber.length > 0 &&
+    bankAccountFormData.accountNumber !== bankAccountFormData.confirmAccountNumber;
+
+  const addBankWorkspaceSaveDisabled = useMemo(() => {
+    const d = bankAccountFormData;
+    const routingOk = d.routingNumber.replace(/\D/g, "").length === 9;
+    const account = d.accountNumber.trim();
+    const confirm = d.confirmAccountNumber.trim();
+    return (
+      !routingOk ||
+      !account ||
+      !confirm ||
+      account !== confirm ||
+      !d.accountNickname.trim() ||
+      !d.bankName.trim() ||
+      !d.addressLine1.trim() ||
+      !d.city.trim() ||
+      !d.bankState.trim() ||
+      !d.zipCode.trim()
+    );
+  }, [bankAccountFormData]);
+
+  const bankAccountForActivationModal = useMemo((): BankAccount | null => {
+    if (!activateBankAccountId) return null;
+    return bankAccounts.find((a) => a.id === activateBankAccountId) ?? null;
+  }, [activateBankAccountId, bankAccounts]);
+
+  /** Last 9-digit routing we used to autofill Wells Fargo demo bank details (workspace). */
+  const bankDetailAutofillRoutingRef = useRef<string>("");
+
+  useEffect(() => {
+    if (!isAddBankAccountWorkspaceOpen) {
+      bankDetailAutofillRoutingRef.current = "";
+      return;
+    }
+    const digits = bankAccountFormData.routingNumber.replace(/\D/g, "");
+    if (digits.length === 9) {
+      if (bankDetailAutofillRoutingRef.current !== digits) {
+        bankDetailAutofillRoutingRef.current = digits;
+        setBankAccountFormData((prev) => ({
+          ...prev,
+          bankName: "Wells Fargo Bank",
+          addressLine1: "Address Street 123",
+          city: "Fargo",
+          bankState: "ND",
+          zipCode: "12345",
+        }));
+      }
+    } else {
+      bankDetailAutofillRoutingRef.current = "";
+    }
+  }, [bankAccountFormData.routingNumber, isAddBankAccountWorkspaceOpen]);
+
   const menuSections: { 
     title: string; 
     items: { label: string; key: SubPage; icon: React.ComponentType<{ className?: string }> }[] 
@@ -1484,6 +1804,7 @@ export default function MyProfile() {
       title: "PAYMENTS",
       items: [
         { label: "Bank Accounts", key: "banking", icon: Landmark },
+        { label: "Reimbursement Methods", key: "reimbursement-method", icon: DollarSign },
         { label: "Debit Card", key: "debit-card", icon: CreditCard },
       ],
     },
@@ -1537,7 +1858,7 @@ export default function MyProfile() {
                   </div>
                   <div className="flex gap-1.5 text-sm">
                     <span className="text-gray-500">Marital Status:</span>
-                    <span className="text-gray-800">Single</span>
+                    <span className="text-gray-800">Married</span>
                   </div>
                 </div>
               </div>
@@ -1560,11 +1881,11 @@ export default function MyProfile() {
                 <div className="space-y-2 text-sm">
                   <div className="flex gap-1.5">
                     <span className="text-gray-500">Primary email address:</span>
-                    <span className="text-gray-800">emily.grace@email.com</span>
+                    <span className="text-gray-800">penny.smith@wexinc.com</span>
                   </div>
                   <div className="flex gap-1.5">
                     <span className="text-gray-500">Secondary email address:</span>
-                    <span className="text-gray-800">emily.grace2@email.com</span>
+                    <span className="text-gray-800">pennysmith@gmail.com</span>
                   </div>
                   <div className="flex gap-1.5">
                     <span className="text-gray-500">Mobile Number:</span>
@@ -1592,30 +1913,16 @@ export default function MyProfile() {
                     Edit
                   </Button>
                 </div>
-                <div className="space-y-2 text-sm">
-                  <div className="flex gap-1.5">
+                <div className="space-y-3 text-sm">
+                  <div className="space-y-0.5">
                     <span className="text-gray-500">Home Address:</span>
-                    <span className="text-gray-800">123 Main Street</span>
+                    <div className="text-gray-800">123 Main Street</div>
+                    <div className="text-gray-800">Anytown, NY 12345</div>
+                    <div className="text-gray-800">United States</div>
                   </div>
-                  <div className="flex gap-1.5">
-                    <span className="text-gray-500">City:</span>
-                    <span className="text-gray-800">Anytown</span>
-                  </div>
-                  <div className="flex gap-1.5">
-                    <span className="text-gray-500">Province/State:</span>
-                    <span className="text-gray-800">NY</span>
-                  </div>
-                  <div className="flex gap-1.5">
-                    <span className="text-gray-500">Zip Code:</span>
-                    <span className="text-gray-800">123456</span>
-                  </div>
-                  <div className="flex gap-1.5">
-                    <span className="text-gray-500">Country:</span>
-                    <span className="text-gray-800">United States</span>
-                  </div>
-                  <div className="flex gap-1.5">
+                  <div className="space-y-0.5">
                     <span className="text-gray-500">Mailing Address:</span>
-                    <span className="text-gray-800">The same as my home address</span>
+                    <div className="text-gray-800">Same as home address</div>
                   </div>
                 </div>
               </div>
@@ -1633,14 +1940,14 @@ export default function MyProfile() {
                   intent="primary"
                   variant="outline"
                   size="sm"
-                  className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50"
+                  className="gap-0 w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50 [&_svg]:text-current"
                   onClick={() => {
                     resetForm();
                     setEditingDependentId(null);
                     setIsAddDependentModalOpen(true);
                   }}
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-4 w-4 text-current" />
                   <span className="sm:ml-2">Add Dependent</span>
                 </Button>
               </div>
@@ -1671,7 +1978,7 @@ export default function MyProfile() {
                         setIsAddDependentModalOpen(true);
                       }}
                     >
-                      <Plus className="h-4 w-4" />
+                      <Plus className="h-4 w-4 text-current" />
                       <span>Add Dependent</span>
                     </Button>
                   </EmptyContent>
@@ -1771,28 +2078,30 @@ export default function MyProfile() {
               <div className="px-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h2 className="text-2xl font-semibold text-gray-800">Beneficiaries</h2>
                 <div className="flex gap-2 w-full sm:w-auto">
-                  <Button
-                    intent="primary"
-                    variant="ghost"
-                    size="sm"
-                    className="w-full sm:w-auto justify-center"
-                    onClick={() => {
-                      const initialShares: Record<string, string> = {};
-                      beneficiaries.forEach((ben) => {
-                        initialShares[ben.id] = ben.sharePercentage || (beneficiaries.length === 1 ? "100" : "0");
-                      });
-                      setEditPercentagesShares(initialShares);
-                      setEditPercentagesSplitEqually(false);
-                      setIsEditPercentagesModalOpen(true);
-                    }}
-                  >
-                    Edit Shares
-                  </Button>
+                  {beneficiaries.length >= 2 && (
+                    <Button
+                      intent="primary"
+                      variant="ghost"
+                      size="sm"
+                      className="w-full sm:w-auto justify-center"
+                      onClick={() => {
+                        const initialShares: Record<string, string> = {};
+                        beneficiaries.forEach((ben) => {
+                          initialShares[ben.id] = ben.sharePercentage || (beneficiaries.length === 1 ? "100" : "0");
+                        });
+                        setEditPercentagesShares(initialShares);
+                        setEditPercentagesSplitEqually(false);
+                        setIsEditPercentagesModalOpen(true);
+                      }}
+                    >
+                      Edit Shares
+                    </Button>
+                  )}
                   <Button
                     intent="primary"
                     variant="outline"
                     size="sm"
-                    className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50"
+                    className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50 [&_svg]:text-current"
                     onClick={() => {
                       resetBeneficiaryForm();
                       setEditingBeneficiaryId(null);
@@ -1800,7 +2109,7 @@ export default function MyProfile() {
                       setIsAddBeneficiaryWorkspaceOpen(true);
                     }}
                   >
-                    <Plus className="h-4 w-4" />
+                    <Plus className="h-4 w-4 text-current" />
                     <span>Add Beneficiary</span>
                   </Button>
                 </div>
@@ -1833,7 +2142,7 @@ export default function MyProfile() {
                         setIsAddBeneficiaryWorkspaceOpen(true);
                       }}
                     >
-                      <Plus className="h-4 w-4" />
+                      <Plus className="h-4 w-4 text-current" />
                       <span>Add Beneficiary</span>
                     </Button>
                   </EmptyContent>
@@ -1970,14 +2279,14 @@ export default function MyProfile() {
                   intent="primary"
                   variant="outline"
                   size="sm"
-                  className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50"
+                  className="w-full gap-0 sm:w-auto justify-center border-primary text-primary hover:bg-blue-50 [&_svg]:text-current"
                   onClick={() => {
                     resetAuthorizedSignerForm();
                     setEditingAuthorizedSignerId(null);
                     setIsAddAuthorizedSignerModalOpen(true);
                   }}
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-4 w-4 text-current" />
                   <span className="sm:ml-2">Add Authorized Signer</span>
                 </Button>
               </div>
@@ -2008,7 +2317,7 @@ export default function MyProfile() {
                         setIsAddAuthorizedSignerModalOpen(true);
                       }}
                     >
-                      <Plus className="h-4 w-4" />
+                      <Plus className="h-4 w-4 text-current" />
                       <span>Add Authorized Signer</span>
                     </Button>
                   </EmptyContent>
@@ -2061,7 +2370,7 @@ export default function MyProfile() {
                             className="flex items-center gap-2 px-3 py-2 cursor-pointer text-red-500"
                             onClick={() => handleRemoveAuthorizedSignerClick(signer)}
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-4 w-4 text-red-500" aria-hidden />
                             <span className="text-sm leading-none">Remove</span>
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -2074,6 +2383,9 @@ export default function MyProfile() {
           </>
         );
 
+      case "reimbursement-method":
+        return <ReimbursementMethodsContent />;
+
       case "banking":
         return (
           <>
@@ -2084,16 +2396,21 @@ export default function MyProfile() {
                   intent="primary"
                   variant="outline"
                   size="sm"
-                  className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50"
+                  className="w-full gap-0 sm:w-auto justify-center border-primary text-primary hover:bg-blue-50 [&_svg]:text-current"
                   onClick={() => {
                     setBankAccountFormData({
-                      verificationMethod: "text",
+                      verificationMethod: "",
                       verificationCode: "",
                       accountType: "checking",
                       accountNumber: "",
                       confirmAccountNumber: "",
                       routingNumber: "",
                       accountNickname: "",
+                      bankName: "",
+                      addressLine1: "",
+                      city: "",
+                      bankState: "",
+                      zipCode: "",
                       selectedDirectDepositOptions: [],
                     });
                     setBankAccountStep("step1");
@@ -2101,7 +2418,7 @@ export default function MyProfile() {
                     setIsAddBankAccountModalOpen(true);
                   }}
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-4 w-4 text-current" />
                   <span className="sm:ml-2">Add Bank Account</span>
                 </Button>
               </div>
@@ -2128,13 +2445,18 @@ export default function MyProfile() {
                       intent="primary"
                       onClick={() => {
                         setBankAccountFormData({
-                          verificationMethod: "text",
+                          verificationMethod: "",
                           verificationCode: "",
                           accountType: "checking",
                           accountNumber: "",
                           confirmAccountNumber: "",
                           routingNumber: "",
                           accountNickname: "",
+                          bankName: "",
+                          addressLine1: "",
+                          city: "",
+                          bankState: "",
+                          zipCode: "",
                           selectedDirectDepositOptions: [],
                         });
                         setBankAccountStep("step1");
@@ -2142,7 +2464,7 @@ export default function MyProfile() {
                         setIsAddBankAccountModalOpen(true);
                       }}
                     >
-                      <Plus className="h-4 w-4" />
+                      <Plus className="h-4 w-4 text-current" />
                       <span>Add Bank Account</span>
                     </Button>
                   </EmptyContent>
@@ -2153,52 +2475,117 @@ export default function MyProfile() {
                 </div>
               </div>
             ) : (
-              <div className="p-6 space-y-4">
-                {bankAccounts.map((bankAccount) => (
-                  <div key={bankAccount.id} className="border-b border-border pb-4 last:border-b-0">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <h3 className="text-base font-semibold text-foreground mb-2">
-                          {bankAccount.accountNickname || `${bankAccount.accountType.charAt(0).toUpperCase() + bankAccount.accountType.slice(1)} Account`}
-                        </h3>
-                        <div className="space-y-1 text-sm text-foreground">
-                          <div className="flex gap-1.5">
-                            <span className="text-gray-500">Account Type:</span>
-                            <span className="capitalize">{bankAccount.accountType}</span>
-                          </div>
-                          <div className="flex gap-1.5">
-                            <span className="text-gray-500">Account Number:</span>
-                            <span>****{bankAccount.accountNumber.slice(-4)}</span>
-                          </div>
-                          <div className="flex gap-1.5">
-                            <span className="text-gray-500">Routing Number:</span>
-                            <span>****{bankAccount.routingNumber.slice(-4)}</span>
-                          </div>
+              <div className="flex flex-wrap items-start gap-6 p-6">
+                {bankAccounts.map((bankAccount) => {
+                  const displayTitle =
+                    bankAccount.accountNickname.trim() ||
+                    bankAccount.bankName?.trim() ||
+                    `${bankAccount.accountType.charAt(0).toUpperCase() + bankAccount.accountType.slice(1)} Account`;
+                  const accountDigits = bankAccount.accountNumber.replace(/\D/g, "");
+                  const last4 =
+                    accountDigits.length >= 4 ? accountDigits.slice(-4) : accountDigits || "—";
+                  const accountTypeWord =
+                    bankAccount.accountType === "checking" ? "Checking" : "Saving";
+                  const bankNameForTypeLine = bankAccount.bankName?.trim() ?? "";
+                  const accountTypeLine = bankNameForTypeLine
+                    ? `${accountTypeWord} Account | ${bankNameForTypeLine}`
+                    : `${accountTypeWord} Account`;
+                  const isPendingDeposit = bankAccount.activationStatus !== "active";
+                  const isBankActivationLocked = (bankAccount.activationVerifyAttemptCount ?? 0) >= 2;
+
+                  return (
+                    <div
+                      key={bankAccount.id}
+                      className="flex w-[325px] max-w-full shrink-0 flex-col rounded-lg border border-[#e4e6e9] bg-white p-4 shadow-[0_1px_3px_0_rgba(0,0,0,0.1),0_1px_2px_0_rgba(0,0,0,0.1)]"
+                    >
+                      <div className="mb-2 flex flex-col gap-1">
+                        <div className="flex min-h-[35px] items-center justify-between gap-2">
+                          <p className="min-w-0 flex-1 text-base font-semibold leading-6 tracking-[-0.176px] text-[#1d2c38]">
+                            {displayTitle}
+                          </p>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-[35px] w-[35px] shrink-0 text-[#1d2c38]"
+                                aria-label="Bank account options"
+                              >
+                                <MoreVertical className="h-3.5 w-3.5" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="min-w-[160px]">
+                              {isPendingDeposit ? (
+                                <DropdownMenuItem
+                                  className="flex cursor-pointer items-center gap-2 text-[#1d2c38] focus:text-[#1d2c38]"
+                                  onClick={() => handleEditBankAccount(bankAccount)}
+                                >
+                                  <Pencil className="h-4 w-4" />
+                                  <span>Edit</span>
+                                </DropdownMenuItem>
+                              ) : null}
+                              <DropdownMenuItem
+                                className="flex cursor-pointer items-center gap-2 text-destructive focus:text-destructive"
+                                onClick={() => handleRemoveBankAccountClick(bankAccount)}
+                              >
+                                <Trash2 className="h-4 w-4 text-destructive" aria-hidden />
+                                <span>Remove</span>
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
+                        <p className="text-[13px] font-normal leading-5 tracking-[0.055px] text-[#515f6b]">
+                          {accountTypeLine}
+                        </p>
                       </div>
-                      <div className="flex gap-2">
+                      <div className="mb-4 flex flex-wrap items-center gap-2">
+                        <span className="whitespace-nowrap text-sm font-normal leading-6 tracking-[-0.084px] text-[#1d2c38]">
+                          •••• {last4}
+                        </span>
+                        {isPendingDeposit ? (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button
+                                type="button"
+                                className="inline-flex cursor-help items-center rounded-md border-0 bg-[#ffecc7] px-[7px] py-[3.5px] text-[12.25px] font-bold leading-none text-[#b37a2b]"
+                              >
+                                Verify Deposit to Activate
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-xs text-left">
+                              A small deposit will be sent within 1–3 business days. Once received,
+                              you&apos;ll have 10 days to confirm the amount and activate your account.
+                            </TooltipContent>
+                          </Tooltip>
+                        ) : null}
+                      </div>
+                      {isPendingDeposit ? (
                         <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-primary hover:bg-blue-50"
+                          intent="primary"
+                          className="w-full"
+                          disabled={isBankActivationLocked}
+                          title={
+                            isBankActivationLocked
+                              ? "This account is locked after two incorrect activation attempts."
+                              : undefined
+                          }
+                          onClick={() => handleOpenActivateBankAccountModal(bankAccount)}
+                        >
+                          Activate
+                        </Button>
+                      ) : (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="h-auto w-full rounded-md border-[#0058a3] bg-transparent px-[13.25px] py-[9.75px] text-[15.75px] font-medium leading-normal text-[#0058a3] shadow-none hover:bg-[#0058a3]/10"
                           onClick={() => handleEditBankAccount(bankAccount)}
                         >
-                          <Pencil className="h-4 w-4 mr-1" />
-                          Edit
+                          View
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-destructive hover:bg-red-50"
-                          onClick={() => handleRemoveBankAccountClick(bankAccount)}
-                        >
-                          <Trash2 className="h-4 w-4 mr-1" />
-                          Remove
-                        </Button>
-                      </div>
+                      )}
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </>
@@ -2924,12 +3311,12 @@ export default function MyProfile() {
                   <div className="flex items-center gap-4">
                     <div className="flex gap-1.5 text-sm">
                       <span className="text-gray-500">Username:</span>
-                      <span className="text-gray-800">ux@wex</span>
+                      <span className="text-gray-800">pennysmith</span>
                     </div>
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-primary hover:text-primary active:text-primary [&>svg]:text-primary"
+                      className="text-[color:var(--system-link)] hover:text-[color:var(--system-link)] active:text-[color:var(--system-link)] [&>svg]:text-[color:var(--system-link)]"
                     >
                       <Pencil />
                       Update Username
@@ -2946,7 +3333,7 @@ export default function MyProfile() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-primary hover:text-primary active:text-primary [&>svg]:text-primary"
+                      className="text-[color:var(--system-link)] hover:text-[color:var(--system-link)] active:text-[color:var(--system-link)] [&>svg]:text-[color:var(--system-link)]"
                     >
                       <Pencil />
                       Change Password
@@ -2971,7 +3358,7 @@ export default function MyProfile() {
                   </Button>
                 </div>
                 <div className="space-y-1 mb-4">
-                  <p className="text-sm text-gray-800">emily.grace@email.com</p>
+                  <p className="text-sm text-gray-800">penny.smith@wexinc.com</p>
                   <p className="text-xs text-gray-600">Last Used: Today</p>
                 </div>
                 <div className="flex items-center gap-4 mb-2">
@@ -3036,10 +3423,10 @@ export default function MyProfile() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="flex items-center gap-1.5 px-3 py-1 text-sm font-medium text-primary hover:bg-gray-100"
+                  className="flex items-center gap-1.5 px-3 py-1 text-sm font-medium text-[color:var(--system-link)] hover:bg-gray-100"
                   onClick={() => setIsContactInfoModalOpen(true)}
                 >
-                  <Pencil className="h-4 w-4 text-primary" />
+                  <Pencil className="h-4 w-4 text-[color:var(--system-link)]" />
                   Edit
                 </Button>
               </div>
@@ -3091,8 +3478,8 @@ export default function MyProfile() {
                       </h3>
                       <p className="text-sm font-normal leading-6 tracking-[-0.084px] text-foreground max-w-[1094px]">
                         Set how you want to receive your account documents. Select either Paper, Email, and/or Text for each statement type. Standard text message rates may apply. Disable text alerts by unchecking the boxes below. By opting into our text alerts, you agree to our{" "}
-                        <a href="#" className="text-primary hover:underline">terms of service</a>. Please review our{" "}
-                        <a href="#" className="text-primary hover:underline">privacy policy</a> for more information.
+                        <a href="#" className="text-[color:var(--system-link)] hover:underline">terms of service</a>. Please review our{" "}
+                        <a href="#" className="text-[color:var(--system-link)] hover:underline">privacy policy</a> for more information.
                       </p>
                       <div className="flex items-center justify-end gap-2 mt-2">
                         <span className="text-sm font-normal text-foreground">Go paperless</span>
@@ -3264,8 +3651,8 @@ export default function MyProfile() {
                       </h3>
                       <p className="text-sm font-normal leading-6 tracking-[-0.084px] text-foreground max-w-[1094px]">
                         Manage how you receive real-time alerts for account activity. You can enable Email and/or Text for each notification. Standard text message rates may apply. Disable text alerts by unchecking the boxes below. By opting into our text alerts, you agree to our{" "}
-                        <a href="#" className="text-primary hover:underline">terms of service</a>. Please review our{" "}
-                        <a href="#" className="text-primary hover:underline">privacy policy</a> for more information.
+                        <a href="#" className="text-[color:var(--system-link)] hover:underline">terms of service</a>. Please review our{" "}
+                        <a href="#" className="text-[color:var(--system-link)] hover:underline">privacy policy</a> for more information.
                       </p>
                       <div className="flex items-center justify-end gap-2 mt-2">
                         <span className="text-sm font-normal text-foreground">Go paperless</span>
@@ -3465,8 +3852,8 @@ export default function MyProfile() {
                       </h3>
                       <p className="text-sm font-normal leading-6 tracking-[-0.084px] text-foreground max-w-[1094px]">
                         Manage how you receive real-time alerts for account activity. You can enable Email and/or Text for each notification. Standard text message rates may apply. Disable text alerts by unchecking the boxes below. By opting into our text alerts, you agree to our{" "}
-                        <a href="#" className="text-primary hover:underline">terms of service</a>. Please review our{" "}
-                        <a href="#" className="text-primary hover:underline">privacy policy</a> for more information.
+                        <a href="#" className="text-[color:var(--system-link)] hover:underline">terms of service</a>. Please review our{" "}
+                        <a href="#" className="text-[color:var(--system-link)] hover:underline">privacy policy</a> for more information.
                       </p>
                       <div className="flex items-center justify-end gap-2 mt-2">
                         <span className="text-sm font-normal text-foreground">Go paperless</span>
@@ -3631,8 +4018,8 @@ export default function MyProfile() {
                       </h3>
                       <p className="text-sm font-normal leading-6 tracking-[-0.084px] text-foreground max-w-[1094px]">
                         Manage how you receive real-time alerts for account activity. You can enable Email and/or Text for each notification. Standard text message rates may apply. Disable text alerts by unchecking the boxes below. By opting into our text alerts, you agree to our{" "}
-                        <a href="#" className="text-primary hover:underline">terms of service</a>. Please review our{" "}
-                        <a href="#" className="text-primary hover:underline">privacy policy</a> for more information.
+                        <a href="#" className="text-[color:var(--system-link)] hover:underline">terms of service</a>. Please review our{" "}
+                        <a href="#" className="text-[color:var(--system-link)] hover:underline">privacy policy</a> for more information.
                       </p>
                       <div className="flex items-center justify-end gap-2 mt-2">
                         <span className="text-sm font-normal text-foreground">Go paperless</span>
@@ -3945,7 +4332,7 @@ export default function MyProfile() {
                   collapsible="none"
                   className="hidden md:flex w-[264px] border-r border-wex-card-border bg-wex-card-bg flex-col h-auto"
                 >
-                  <SidebarContent className="flex-1 h-full px-2 py-4">
+                  <SidebarContent className="flex-1 h-full px-2 py-4 w-[267px]">
                     <SidebarGroup className="flex-1 h-full">
                       <SidebarGroupContent className="flex-1 h-full">
                         <SidebarMenu className="flex-1 h-full">
@@ -4814,9 +5201,395 @@ export default function MyProfile() {
         </DialogContent>
       </Dialog>
 
-      {/* Add Bank Account Multi-Step Modal */}
+      {/* Add Bank Account Multi-Step Modal — step 1 matches Consumer Experience Redesign (Figma) */}
       <Dialog open={isAddBankAccountModalOpen} onOpenChange={setIsAddBankAccountModalOpen}>
-        <DialogContent className="w-[800px] p-0 [&>div:last-child]:hidden">
+        <DialogContent
+          className={
+            bankAccountStep === "step1"
+              ? "w-full max-w-[440px] gap-0 rounded-xl border-border bg-background p-0 shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1),0_8px_10px_-6px_rgba(0,0,0,0.1)] [&>div:last-child]:hidden"
+              : bankAccountStep === "edit" && editingBankAccountId
+                ? "w-full max-w-[448px] gap-0 rounded-xl border-[#edeff0] bg-background p-0 shadow-[0px_20px_25px_0px_rgba(0,0,0,0.1),0px_8px_10px_0px_rgba(0,0,0,0.1)] [&>div:last-child]:hidden"
+                : "w-[800px] max-w-[calc(100vw-2rem)] gap-0 p-0 [&>div:last-child]:hidden"
+          }
+        >
+          {bankAccountStep === "step1" ? (
+            <div className="flex flex-col overflow-hidden rounded-xl">
+              <div className="flex items-center justify-between px-6 pb-4 pt-6">
+                <DialogTitle className="m-0 text-[17.5px] font-semibold leading-normal tracking-tight text-foreground">
+                  Authentication
+                </DialogTitle>
+                <DialogClose asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-9 w-9 shrink-0 border-0 bg-transparent shadow-none hover:bg-muted"
+                    aria-label="Close"
+                  >
+                    <X className="h-3.5 w-3.5 text-muted-foreground" />
+                  </Button>
+                </DialogClose>
+              </div>
+
+              <div className="flex flex-col gap-6 px-6 pb-2 pt-0">
+                {!showVerificationCode ? (
+                  <>
+                    <p className="text-[17px] font-normal leading-6 tracking-[-0.221px] text-foreground">
+                      Your protection is important to us. We need to take some extra steps to verify your identity.
+                      Choose how you&apos;d like to receive a verification code.
+                    </p>
+                    <RadioGroup
+                      value={bankAccountFormData.verificationMethod || undefined}
+                      onValueChange={(value) =>
+                        handleBankAccountFormChange("verificationMethod", value as "text" | "email")
+                      }
+                      className="flex flex-col gap-4"
+                    >
+                      <label
+                        htmlFor="bank-verify-text"
+                        className="flex cursor-pointer items-center gap-[7px] rounded-[11px]"
+                      >
+                        <RadioGroupItem value="text" id="bank-verify-text" />
+                        <span className="text-sm text-foreground">
+                          <span className="font-bold">Text Message</span>
+                          <span className="font-normal">{` at (***) ***-1111`}</span>
+                        </span>
+                      </label>
+                      <label
+                        htmlFor="bank-verify-email"
+                        className="flex cursor-pointer items-center gap-[7px] rounded-[11px]"
+                      >
+                        <RadioGroupItem value="email" id="bank-verify-email" />
+                        <span className="text-sm text-foreground">
+                          <span className="font-bold">Email</span>
+                          <span className="font-normal">{` at my***m**@******.com`}</span>
+                        </span>
+                      </label>
+                    </RadioGroup>
+                  </>
+                ) : (
+                  <div className="flex flex-col gap-6">
+                    <p className="text-[17px] font-normal leading-6 tracking-[-0.221px] text-[#243746]">
+                      We sent a 6-digit verification code to{" "}
+                      {bankAccountFormData.verificationMethod === "text"
+                        ? "(***) ***-1111"
+                        : "my***m**@******.com"}
+                      .
+                    </p>
+                    <div className="flex flex-col gap-3">
+                      <div
+                        className="[&_input]:rounded-lg [&_input]:border [&_input]:border-[#cdd6dd] [&_input]:bg-background [&_input]:shadow-none [&_input]:transition-colors [&_input]:focus-visible:border-primary [&_input]:focus-visible:ring-1 [&_input]:focus-visible:ring-primary/30"
+                      >
+                        <FloatLabel
+                          label="Verification Code"
+                          size="lg"
+                          type={showBankVerificationCodePlain ? "text" : "password"}
+                          inputMode="numeric"
+                          autoComplete="one-time-code"
+                          value={bankAccountFormData.verificationCode}
+                          onChange={(e) => {
+                            const digits = e.target.value.replace(/\D/g, "").slice(0, 6);
+                            handleBankAccountFormChange("verificationCode", digits);
+                          }}
+                          maxLength={6}
+                          invalid={
+                            bankAccountFormData.verificationCode.length > 0 &&
+                            bankAccountFormData.verificationCode.length < 6
+                          }
+                          aria-describedby={
+                            bankAccountFormData.verificationCode.length > 0 &&
+                            bankAccountFormData.verificationCode.length < 6
+                              ? "bank-verify-code-feedback"
+                              : undefined
+                          }
+                          className="text-base tracking-[0.2em]"
+                          rightIcon={
+                            <button
+                              type="button"
+                              onClick={() => setShowBankVerificationCodePlain((v) => !v)}
+                              className="cursor-pointer text-[#5c6b78] transition-colors hover:text-foreground"
+                              aria-label={
+                                showBankVerificationCodePlain ? "Hide verification code" : "Show verification code"
+                              }
+                            >
+                              {showBankVerificationCodePlain ? (
+                                <EyeOff className="h-4 w-4" />
+                              ) : (
+                                <Eye className="h-4 w-4" />
+                              )}
+                            </button>
+                          }
+                        />
+                      </div>
+                      {bankAccountFormData.verificationCode.length > 0 &&
+                        bankAccountFormData.verificationCode.length < 6 && (
+                          <p
+                            id="bank-verify-code-feedback"
+                            role="status"
+                            className="text-xs leading-4 text-[hsl(var(--wex-destructive))]"
+                          >
+                            Enter all 6 digits to verify.
+                          </p>
+                        )}
+                      {resendTimer > 0 ? (
+                        <p className="text-sm leading-5 text-[#5c6b78]">
+                          Resend in {Math.floor(resendTimer / 60)}:
+                          {String(resendTimer % 60).padStart(2, "0")}
+                        </p>
+                      ) : null}
+                    </div>
+                    <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={resendTimer > 0}
+                        onClick={() => {
+                          setResendTimer(45);
+                        }}
+                        className="h-9 rounded-md border border-primary bg-background px-4 text-sm font-normal text-primary shadow-none hover:bg-primary/[0.04]"
+                      >
+                        Resend Code
+                      </Button>
+                      <button
+                        type="button"
+                        className="text-sm font-normal text-primary hover:opacity-90"
+                        onClick={() => {
+                          setShowVerificationCode(false);
+                          setShowBankVerificationCodePlain(false);
+                          setBankAccountFormData((prev) => ({ ...prev, verificationCode: "" }));
+                        }}
+                      >
+                        Use a different method
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div
+                className={
+                  showVerificationCode
+                    ? "flex w-full items-center justify-end gap-[7px] px-6 pb-6 pt-8"
+                    : "flex w-full items-center justify-end gap-[7px] px-6 pb-6 pt-4"
+                }
+              >
+                {showVerificationCode ? (
+                  <>
+                    <Button
+                      variant="ghost"
+                      className="h-9 px-3 text-foreground hover:bg-muted"
+                      onClick={() => setIsAddBankAccountModalOpen(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      intent="primary"
+                      className="h-9 rounded-md px-5"
+                      disabled={!/^\d{6}$/.test(bankAccountFormData.verificationCode)}
+                      onClick={() => {
+                        setShowBankVerificationCodePlain(false);
+                        setShowVerificationCode(false);
+                        setBankAccountFormData((prev) => ({
+                          ...prev,
+                          selectedDirectDepositOptions: ["hsa", "2025"],
+                        }));
+                        setIsAddBankAccountWorkspaceOpen(true);
+                        setIsAddBankAccountModalOpen(false);
+                      }}
+                    >
+                      Verify
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      variant="ghost"
+                      className="h-9 px-3 text-foreground hover:bg-muted"
+                      onClick={() => setIsAddBankAccountModalOpen(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      intent="primary"
+                      className="h-9 rounded-md px-5"
+                      disabled={!bankAccountFormData.verificationMethod}
+                      onClick={() => {
+                        setShowBankVerificationCodePlain(false);
+                        setShowVerificationCode(true);
+                      }}
+                    >
+                      Next
+                    </Button>
+                  </>
+                )}
+              </div>
+            </div>
+          ) : bankAccountStep === "edit" && editingBankAccountId ? (
+            <div className="flex max-h-[min(90vh,840px)] flex-col gap-[26px] overflow-y-auto rounded-xl bg-background">
+              <div className="flex shrink-0 items-center justify-between px-[17.5px] pt-[17.5px]">
+                <DialogTitle className="m-0 text-[17.5px] font-semibold leading-normal text-[#243746]">
+                  Edit Bank Account
+                </DialogTitle>
+                <DialogClose asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-[35px] w-[35px] shrink-0 border-0 bg-transparent shadow-none hover:bg-muted"
+                    aria-label="Close"
+                  >
+                    <X className="h-3.5 w-3.5 text-muted-foreground" />
+                  </Button>
+                </DialogClose>
+              </div>
+
+              <div className="flex flex-col gap-2 px-[17.5px]">
+                <h3 className="text-base font-semibold leading-6 tracking-[-0.176px] text-[#243746]">
+                  Account Information
+                </h3>
+                <div className="flex flex-col gap-[9px] rounded-lg border border-[#e4e6e9] py-4">
+                  <div className="flex items-center gap-1.5 px-4">
+                    <Landmark className="h-4 w-4 shrink-0 text-[#1d2c38]" aria-hidden />
+                    <span className="text-base font-medium leading-6 tracking-[-0.176px] text-[#1d2c38]">
+                      {bankAccountFormData.bankName.trim() || "Wells Fargo Bank, NA"}
+                    </span>
+                  </div>
+                  <Separator className="bg-[#e4e6e9]" />
+                  <div className="flex flex-col gap-2 px-4">
+                    <div className="flex items-center justify-between gap-4">
+                      <span className="text-sm font-normal leading-6 tracking-[-0.084px] text-[#515f6b]">
+                        Account Type
+                      </span>
+                      <span className="inline-flex shrink-0 items-center rounded-md bg-[#dbeafe] px-[7px] py-[3.5px] text-[12.25px] font-bold leading-none text-[#1d4ed8]">
+                        {bankAccountFormData.accountType === "checking" ? "Checking" : "Saving"}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between gap-4 text-sm font-normal leading-6 tracking-[-0.084px]">
+                      <span className="text-[#515f6b]">Account Number</span>
+                      <span className="text-[#1d2c38]">
+                        ••••{" "}
+                        {(bankAccountFormData.accountNumber.replace(/\D/g, "").length >= 4
+                          ? bankAccountFormData.accountNumber.replace(/\D/g, "").slice(-4)
+                          : bankAccountFormData.accountNumber.replace(/\D/g, "") || "—")}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between gap-4 text-sm font-normal leading-6 tracking-[-0.084px]">
+                      <span className="text-[#515f6b]">Routing Number</span>
+                      <span className="text-[#1d2c38]">
+                        ••••{" "}
+                        {(bankAccountFormData.routingNumber.replace(/\D/g, "").length >= 4
+                          ? bankAccountFormData.routingNumber.replace(/\D/g, "").slice(-4)
+                          : bankAccountFormData.routingNumber.replace(/\D/g, "") || "—")}
+                      </span>
+                    </div>
+                    <div className="flex items-start justify-between gap-4 text-sm font-normal leading-6 tracking-[-0.084px]">
+                      <span className="shrink-0 text-[#515f6b]">Bank Address</span>
+                      <div className="text-right text-[#1d2c38]">
+                        {bankAccountFormData.addressLine1.trim() ||
+                        bankAccountFormData.city.trim() ||
+                        bankAccountFormData.bankState.trim() ||
+                        bankAccountFormData.zipCode.trim() ? (
+                          <>
+                            {bankAccountFormData.addressLine1.trim() ? (
+                              <p className="mb-0 leading-6">{bankAccountFormData.addressLine1.trim()}</p>
+                            ) : null}
+                            {bankAccountFormData.city.trim() ? (
+                              <p className="mb-0 leading-6">{bankAccountFormData.city.trim()}</p>
+                            ) : null}
+                            {(bankAccountFormData.bankState.trim() || bankAccountFormData.zipCode.trim()) ? (
+                              <p className="leading-6">
+                                {[
+                                  bankAccountFormData.bankState.trim(),
+                                  bankAccountFormData.zipCode.trim(),
+                                ]
+                                  .filter(Boolean)
+                                  .join(", ")}
+                              </p>
+                            ) : null}
+                          </>
+                        ) : (
+                          <p className="mb-0 leading-6">—</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-4 px-[17.5px]">
+                <div className="relative w-full [&_input]:rounded-md [&_input]:border-[#a5aeb4] [&_input]:shadow-[0px_1px_2px_0px_rgba(18,18,23,0.05)]">
+                  <FloatLabel
+                    label="Account Nickname"
+                    value={bankAccountFormData.accountNickname}
+                    onChange={(e) => handleBankAccountFormChange("accountNickname", e.target.value)}
+                    rightIcon={
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            type="button"
+                            className="flex shrink-0 text-[#5c6b78] hover:text-foreground"
+                            aria-label="Account nickname help"
+                          >
+                            <Info className="h-3.5 w-3.5" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs text-left">
+                          A name to help you identify this account.
+                        </TooltipContent>
+                      </Tooltip>
+                    }
+                  />
+                </div>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                  <span className="text-base font-normal leading-6 tracking-[-0.176px] text-[#243746]">
+                    Account Type
+                  </span>
+                  <RadioGroup
+                    value={bankAccountFormData.accountType}
+                    onValueChange={(value) => handleBankAccountFormChange("accountType", value)}
+                    className="flex flex-wrap items-center gap-4"
+                  >
+                    <label
+                      htmlFor="edit-bank-account-checking"
+                      className="flex cursor-pointer items-center gap-[7px] rounded-[11px]"
+                    >
+                      <RadioGroupItem value="checking" id="edit-bank-account-checking" />
+                      <span className="text-sm text-[#243746]">Checking</span>
+                    </label>
+                    <label
+                      htmlFor="edit-bank-account-saving"
+                      className="flex cursor-pointer items-center gap-[7px] rounded-[11px]"
+                    >
+                      <RadioGroupItem value="saving" id="edit-bank-account-saving" />
+                      <span className="text-sm text-[#243746]">Saving</span>
+                    </label>
+                  </RadioGroup>
+                </div>
+              </div>
+
+              <div className="mx-[17.5px] rounded-md border border-[#ffe0a4] bg-[#fefce8]/95 p-px shadow-[0px_4px_8px_0px_rgba(9,7,0,0.04)]">
+                <p className="px-[10.5px] py-2 text-sm font-medium leading-normal text-[#a16207]">
+                  Updates are limited to the account nickname and account type. To modify the account or routing
+                  number, remove the existing bank account and add a new one.
+                </p>
+              </div>
+
+              <div className="mt-auto flex shrink-0 justify-end gap-[7px] px-[17.5px] pb-[17.5px]">
+                <Button
+                  variant="ghost"
+                  className="h-auto px-[12.25px] py-[8.75px] text-[15.75px] font-medium text-foreground hover:bg-muted"
+                  onClick={() => setIsAddBankAccountModalOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  intent="primary"
+                  className="h-auto rounded-md border border-[#0058a3] bg-[#0058a3] px-[13.25px] py-[9.75px] text-[15.75px] font-medium text-white hover:opacity-95"
+                  onClick={() => handleSaveBankAccount()}
+                >
+                  Save
+                </Button>
+              </div>
+            </div>
+          ) : (
           <div className="flex">
             {/* Left Sidebar - Progress Indicator */}
             <div className="w-[240px] border-r border-border bg-muted p-6">
@@ -4836,15 +5609,15 @@ export default function MyProfile() {
             {/* Right Content Area */}
             <div className="flex-1">
               {/* Header */}
-              <div className="flex items-center justify-between p-[17.5px] border-b border-border">
-                <DialogTitle className="text-base font-semibold text-foreground tracking-[-0.176px] leading-6">
+              <div className="flex items-center justify-between border-b border-border p-[17.5px]">
+                <DialogTitle className="text-base font-semibold leading-6 tracking-[-0.176px] text-foreground">
                   Add Bank Account
                 </DialogTitle>
                 <DialogClose asChild>
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-6 w-6 border-0 shadow-none bg-transparent hover:bg-wex-button-tertiary-hover-bg"
+                    className="h-6 w-6 border-0 bg-transparent shadow-none hover:bg-wex-button-tertiary-hover-bg"
                     aria-label="Close"
                   >
                     <X className="h-4 w-4 text-muted-foreground" />
@@ -4854,75 +5627,6 @@ export default function MyProfile() {
 
               {/* Step Content */}
               <div className="p-6">
-                {bankAccountStep === "step1" && (
-                  <div className="space-y-6">
-                    {!showVerificationCode ? (
-                      <>
-                        <div>
-                          <h3 className="text-lg font-semibold text-foreground mb-2">Authentication</h3>
-                          <p className="text-sm text-foreground leading-6">
-                            To protect your account, we need to confirm that you're the one adding this bank information. Choose how you'd like to receive a verification code.
-                          </p>
-                        </div>
-                        <RadioGroup
-                          value={bankAccountFormData.verificationMethod}
-                          onValueChange={(value) => handleBankAccountFormChange("verificationMethod", value)}
-                          className="space-y-3"
-                        >
-                          <div className="flex items-center space-x-3 p-4 border border-border rounded-md hover:bg-muted">
-                            <RadioGroupItem value="text" id="verify-text" />
-                            <Label htmlFor="verify-text" className="cursor-pointer flex-1">
-                              <span className="text-sm text-foreground">Text Message at (***) ***-1111</span>
-                            </Label>
-                          </div>
-                          <div className="flex items-center space-x-3 p-4 border border-border rounded-md hover:bg-muted">
-                            <RadioGroupItem value="email" id="verify-email" />
-                            <Label htmlFor="verify-email" className="cursor-pointer flex-1">
-                              <span className="text-sm text-foreground">Email at my***m**@******.com</span>
-                            </Label>
-                          </div>
-                        </RadioGroup>
-                      </>
-                    ) : (
-                      <>
-                        <div>
-                          <h3 className="text-lg font-semibold text-foreground mb-2">Authentication</h3>
-                          <p className="text-sm text-foreground leading-6 mb-4">
-                            We sent a 6-digit verification code to {bankAccountFormData.verificationMethod === "text" ? "(***) ***-1111" : "my***m**@******.com"}.
-                          </p>
-                        </div>
-                        <div className="space-y-4">
-                          <FloatLabel
-                            label="Verification Code"
-                            value={bankAccountFormData.verificationCode}
-                            onChange={(e) => handleBankAccountFormChange("verificationCode", e.target.value)}
-                            maxLength={6}
-                          />
-                          <div className="flex items-center justify-between">
-                            <div className="text-sm text-muted-foreground">
-                              {resendTimer > 0 ? (
-                                `Resend in ${Math.floor(resendTimer / 60)}:${String(resendTimer % 60).padStart(2, "0")}`
-                              ) : (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-auto p-0 text-sm text-foreground hover:underline"
-                                  onClick={() => {
-                                    setResendTimer(45);
-                                    // In a real app, this would resend the code
-                                  }}
-                                >
-                                  Resend Code
-                                </Button>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                )}
-
                 {bankAccountStep === "step2" && (
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold text-foreground mb-4">Bank Information</h3>
@@ -4964,13 +5668,20 @@ export default function MyProfile() {
                         value={bankAccountFormData.accountNickname}
                         onChange={(e) => handleBankAccountFormChange("accountNickname", e.target.value)}
                       />
-                      <button
-                        type="button"
-                        className="absolute right-3 top-1/2 -translate-y-1/2"
-                        aria-label="Help"
-                      >
-                        <Info className="h-4 w-4 text-muted-foreground" />
-                      </button>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            type="button"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                            aria-label="Account nickname help"
+                          >
+                            <Info className="h-4 w-4" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs text-left">
+                          A name to help you identify this account.
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
                     
                     {/* Account Type */}
@@ -5067,77 +5778,540 @@ export default function MyProfile() {
                 )}
               </div>
 
-              {/* Footer */}
-              <div className="flex items-center justify-between p-[17.5px] border-t border-border">
-                <div>
-                  {showVerificationCode && bankAccountStep === "step1" ? (
-                    <Button
-                      variant="ghost"
-                      className="h-auto p-0 text-sm text-foreground hover:underline"
-                      onClick={() => {
-                        setShowVerificationCode(false);
-                        setBankAccountFormData((prev) => ({ ...prev, verificationCode: "" }));
-                      }}
-                    >
-                      Use a different method
-                    </Button>
-                  ) : (
-                    <Button
-                      intent="secondary"
-                      variant="outline"
-                      onClick={() => {
-                        if (bankAccountStep !== "step1") {
-                          handleBankAccountBack();
-                        } else if (showVerificationCode) {
-                          setShowVerificationCode(false);
-                          setBankAccountFormData((prev) => ({ ...prev, verificationCode: "" }));
-                        } else {
-                          setIsAddBankAccountModalOpen(false);
-                        }
-                      }}
-                    >
-                      {bankAccountStep === "step1" && !showVerificationCode ? "Cancel" : bankAccountStep === "step1" ? "Back" : "Back"}
-                    </Button>
-                  )}
-                </div>
+              {/* Footer (bank info & direct deposit steps) */}
+              <div className="flex items-center justify-between border-t border-border p-[17.5px]">
+                <Button intent="secondary" variant="outline" onClick={() => handleBankAccountBack()}>
+                  Back
+                </Button>
                 <Button
                   intent="primary"
                   onClick={() => {
-                    if (bankAccountStep === "step1" && !showVerificationCode) {
-                      // Show verification code input
-                      setShowVerificationCode(true);
-                    } else if (bankAccountStep === "step1" && showVerificationCode) {
-                      // Verify code and move to next step
-                      handleBankAccountNext();
-                    } else if (bankAccountStep !== "step3") {
-                      handleBankAccountNext();
-                    } else {
+                    if (bankAccountStep === "step3") {
                       handleSaveBankAccount();
+                    } else {
+                      handleBankAccountNext();
                     }
                   }}
-                  disabled={
-                    (bankAccountStep === "step1" && !showVerificationCode && !bankAccountFormData.verificationMethod) ||
-                    (bankAccountStep === "step1" && showVerificationCode && !bankAccountFormData.verificationCode)
-                  }
                 >
-                  {bankAccountStep === "step1" && showVerificationCode ? "Verify" : bankAccountStep === "step3" ? "Finish" : "Next"}
+                  {bankAccountStep === "step3" ? "Finish" : "Next"}
                 </Button>
               </div>
             </div>
           </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Bank Account workspace (post-authentication) — Consumer Experience Redesign */}
+      <Workspace
+        open={isAddBankAccountWorkspaceOpen}
+        onOpenChange={setIsAddBankAccountWorkspaceOpen}
+        title="Add Bank Account"
+        showFooter
+        primaryButton={
+          <Button
+            intent="primary"
+            disabled={addBankWorkspaceSaveDisabled}
+            onClick={() => handleSaveBankAccount()}
+          >
+            Add Bank Account
+          </Button>
+        }
+        tertiaryButton={
+          <Button
+            variant="ghost"
+            data-workspace-footer-cancel
+            onClick={() => setIsAddBankAccountWorkspaceOpen(false)}
+          >
+            Cancel
+          </Button>
+        }
+      >
+        <WorkspaceContent className="h-full">
+          <WorkspaceMain className="flex-1 overflow-y-auto px-6 py-8">
+            <div className="mx-auto flex w-full max-w-[400px] flex-col gap-6">
+              <div>
+                <h3 className="text-xl font-semibold leading-8 tracking-[-0.34px] text-[#243746]">
+                  Bank Information
+                </h3>
+                <div className="mt-6 flex flex-col gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <div className="relative">
+                      <FloatLabel
+                        label="Routing Number"
+                        size="lg"
+                        inputMode="numeric"
+                        autoComplete="off"
+                        value={bankAccountFormData.routingNumber}
+                        onChange={(e) => {
+                          const digits = e.target.value.replace(/\D/g, "").slice(0, 9);
+                          handleBankAccountFormChange("routingNumber", digits);
+                        }}
+                        maxLength={9}
+                        invalid={addBankWorkspaceRoutingInvalid}
+                        aria-describedby={
+                          addBankWorkspaceRoutingInvalid ? "add-bank-routing-feedback" : undefined
+                        }
+                        className="shadow-sm"
+                      />
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            type="button"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                            aria-label="Routing number help"
+                          >
+                            <Info className="h-3.5 w-3.5" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs text-left">
+                          9-digit code that identifies your bank. Found on checks or in your bank app.
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                    {addBankWorkspaceRoutingInvalid ? (
+                      <p
+                        id="add-bank-routing-feedback"
+                        role="status"
+                        className="text-xs leading-4 text-[hsl(var(--wex-destructive))]"
+                      >
+                        Enter a valid 9-digit routing number.
+                      </p>
+                    ) : null}
+                  </div>
+                  <FloatLabel
+                    label="Account Number"
+                    size="lg"
+                    value={bankAccountFormData.accountNumber}
+                    onChange={(e) => handleBankAccountFormChange("accountNumber", e.target.value)}
+                    className="shadow-sm"
+                  />
+                  <div className="flex flex-col gap-1.5">
+                    <FloatLabel
+                      label="Confirm Account Number"
+                      size="lg"
+                      value={bankAccountFormData.confirmAccountNumber}
+                      onChange={(e) => handleBankAccountFormChange("confirmAccountNumber", e.target.value)}
+                      invalid={addBankWorkspaceConfirmMismatch}
+                      aria-describedby={
+                        addBankWorkspaceConfirmMismatch ? "add-bank-confirm-feedback" : undefined
+                      }
+                      className="shadow-sm"
+                    />
+                    {addBankWorkspaceConfirmMismatch ? (
+                      <p
+                        id="add-bank-confirm-feedback"
+                        role="status"
+                        className="text-xs leading-4 text-[hsl(var(--wex-destructive))]"
+                      >
+                        Account numbers do not match.
+                      </p>
+                    ) : null}
+                  </div>
+                  <div className="relative">
+                    <FloatLabel
+                      label="Account Nickname"
+                      size="lg"
+                      value={bankAccountFormData.accountNickname}
+                      onChange={(e) => handleBankAccountFormChange("accountNickname", e.target.value)}
+                      className="shadow-sm"
+                    />
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                          aria-label="Account nickname help"
+                        >
+                          <Info className="h-3.5 w-3.5" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-xs text-left">
+                        A name to help you identify this account.
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-4">
+                    <span className="text-base tracking-[-0.176px] text-[#243746]">Account Type:</span>
+                    <RadioGroup
+                      value={bankAccountFormData.accountType}
+                      onValueChange={(value) => handleBankAccountFormChange("accountType", value)}
+                      className="flex flex-wrap items-center gap-4"
+                    >
+                      <label
+                        htmlFor="ws-account-checking"
+                        className="flex cursor-pointer items-center gap-[7px] rounded-[11px]"
+                      >
+                        <RadioGroupItem value="checking" id="ws-account-checking" />
+                        <span className="text-sm text-foreground">Checking</span>
+                      </label>
+                      <label
+                        htmlFor="ws-account-saving"
+                        className="flex cursor-pointer items-center gap-[7px] rounded-[11px]"
+                      >
+                        <RadioGroupItem value="saving" id="ws-account-saving" />
+                        <span className="text-sm text-foreground">Saving</span>
+                      </label>
+                    </RadioGroup>
+                  </div>
+                  <FloatLabel
+                    label="Bank Name"
+                    size="lg"
+                    value={bankAccountFormData.bankName}
+                    onChange={(e) => handleBankAccountFormChange("bankName", e.target.value)}
+                    className="shadow-sm"
+                  />
+                  <FloatLabel
+                    label="Address Line 1"
+                    size="lg"
+                    value={bankAccountFormData.addressLine1}
+                    onChange={(e) => handleBankAccountFormChange("addressLine1", e.target.value)}
+                    className="shadow-sm"
+                  />
+                  <FloatLabel
+                    label="City"
+                    size="lg"
+                    value={bankAccountFormData.city}
+                    onChange={(e) => handleBankAccountFormChange("city", e.target.value)}
+                    className="shadow-sm"
+                  />
+                  <div className="flex gap-2">
+                    <div className="w-[192px] min-w-0 shrink-0">
+                      <FloatLabelSelect
+                        value={bankAccountFormData.bankState || undefined}
+                        onValueChange={(value) => handleBankAccountFormChange("bankState", value)}
+                      >
+                        <FloatLabelSelect.Trigger label="State" size="lg">
+                          <FloatLabelSelect.Value placeholder=" " />
+                        </FloatLabelSelect.Trigger>
+                        <FloatLabelSelect.Content>
+                          {usStates.map((state) => (
+                            <FloatLabelSelect.Item key={state} value={state}>
+                              {state}
+                            </FloatLabelSelect.Item>
+                          ))}
+                        </FloatLabelSelect.Content>
+                      </FloatLabelSelect>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <FloatLabel
+                        label="Zip Code"
+                        size="lg"
+                        value={bankAccountFormData.zipCode}
+                        onChange={(e) => handleBankAccountFormChange("zipCode", e.target.value)}
+                        className="shadow-sm"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <Separator className="bg-border" />
+
+              <div className="flex flex-col gap-6">
+                <h3 className="text-xl font-semibold leading-8 tracking-[-0.34px] text-[#243746]">
+                  Alternate Reimbursement Method
+                </h3>
+                <p className="text-base leading-6 tracking-[-0.176px] text-[#243746]">
+                  Unselect if you don&apos;t want this bank account linked to a plan/plan year listed below.
+                </p>
+                <div className="flex flex-col gap-4">
+                  <div
+                    className={`relative cursor-pointer rounded-lg border-2 p-6 shadow-sm transition-colors ${
+                      (bankAccountFormData.selectedDirectDepositOptions || []).includes("hsa")
+                        ? "border-[#3958c3] shadow-[0_2px_6px_0_rgba(2,13,36,0.2),0_0_1px_0_rgba(2,13,36,0.3)]"
+                        : "border-border hover:border-muted-foreground/40"
+                    }`}
+                    onClick={() => {
+                      const has = (bankAccountFormData.selectedDirectDepositOptions || []).includes("hsa");
+                      if (has) {
+                        setBankAccountFormData((prev) => ({
+                          ...prev,
+                          selectedDirectDepositOptions: (prev.selectedDirectDepositOptions || []).filter(
+                            (o) => o !== "hsa"
+                          ),
+                        }));
+                      } else {
+                        setBankAccountFormData((prev) => ({
+                          ...prev,
+                          selectedDirectDepositOptions: [...(prev.selectedDirectDepositOptions || []), "hsa"],
+                        }));
+                      }
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        (e.currentTarget as HTMLDivElement).click();
+                      }
+                    }}
+                    role="button"
+                    tabIndex={0}
+                  >
+                    <div className="flex flex-col gap-2 pr-10">
+                      <p className="text-base font-bold leading-6 tracking-[-0.176px] text-[#243746]">
+                        Health Savings Account
+                      </p>
+                      <p className="text-[11px] font-normal leading-4 tracking-[0.055px] text-[#243746]">
+                        Current method: Check
+                      </p>
+                    </div>
+                    <div
+                      className="absolute right-6 top-6"
+                      onClick={(e) => e.stopPropagation()}
+                      onKeyDown={(e) => e.stopPropagation()}
+                    >
+                      <Checkbox
+                        checked={(bankAccountFormData.selectedDirectDepositOptions || []).includes("hsa")}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setBankAccountFormData((prev) => ({
+                              ...prev,
+                              selectedDirectDepositOptions: [...(prev.selectedDirectDepositOptions || []), "hsa"],
+                            }));
+                          } else {
+                            setBankAccountFormData((prev) => ({
+                              ...prev,
+                              selectedDirectDepositOptions: (prev.selectedDirectDepositOptions || []).filter(
+                                (o) => o !== "hsa"
+                              ),
+                            }));
+                          }
+                        }}
+                        aria-label="Health Savings Account alternate payment"
+                      />
+                    </div>
+                  </div>
+
+                  <div
+                    className={`relative cursor-pointer rounded-lg border-2 p-6 shadow-sm transition-colors ${
+                      (bankAccountFormData.selectedDirectDepositOptions || []).includes("2025")
+                        ? "border-[#3958c3] shadow-[0_2px_6px_0_rgba(2,13,36,0.2),0_0_1px_0_rgba(2,13,36,0.3)]"
+                        : "border-border hover:border-muted-foreground/40"
+                    }`}
+                    onClick={() => {
+                      const has = (bankAccountFormData.selectedDirectDepositOptions || []).includes("2025");
+                      if (has) {
+                        setBankAccountFormData((prev) => ({
+                          ...prev,
+                          selectedDirectDepositOptions: (prev.selectedDirectDepositOptions || []).filter(
+                            (o) => o !== "2025"
+                          ),
+                        }));
+                      } else {
+                        setBankAccountFormData((prev) => ({
+                          ...prev,
+                          selectedDirectDepositOptions: [...(prev.selectedDirectDepositOptions || []), "2025"],
+                        }));
+                      }
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        (e.currentTarget as HTMLDivElement).click();
+                      }
+                    }}
+                    role="button"
+                    tabIndex={0}
+                  >
+                    <div className="flex flex-col gap-2 pr-10">
+                      <p className="text-base font-bold leading-6 tracking-[-0.176px] text-[#243746]">
+                        01/01/2025-12/31/2025
+                      </p>
+                      <p className="text-[11px] font-normal leading-4 tracking-[0.055px] text-[#243746]">
+                        Current method: Check
+                      </p>
+                    </div>
+                    <div
+                      className="absolute right-6 top-6"
+                      onClick={(e) => e.stopPropagation()}
+                      onKeyDown={(e) => e.stopPropagation()}
+                    >
+                      <Checkbox
+                        checked={(bankAccountFormData.selectedDirectDepositOptions || []).includes("2025")}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setBankAccountFormData((prev) => ({
+                              ...prev,
+                              selectedDirectDepositOptions: [...(prev.selectedDirectDepositOptions || []), "2025"],
+                            }));
+                          } else {
+                            setBankAccountFormData((prev) => ({
+                              ...prev,
+                              selectedDirectDepositOptions: (prev.selectedDirectDepositOptions || []).filter(
+                                (o) => o !== "2025"
+                              ),
+                            }));
+                          }
+                        }}
+                        aria-label="Plan year 2025 alternate payment"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </WorkspaceMain>
+        </WorkspaceContent>
+      </Workspace>
+
+      {/* Activate Bank Account — Consumer Experience Redesign (Figma 19653:15928) */}
+      <Dialog
+        open={isActivateBankAccountModalOpen}
+        onOpenChange={(open) => {
+          if (!open) closeActivateBankAccountModal();
+        }}
+      >
+        <DialogContent className="w-full max-w-[448px] gap-0 rounded-xl border-[#edeff0] bg-background p-0 shadow-[0px_20px_25px_0px_rgba(0,0,0,0.1),0px_8px_10px_0px_rgba(0,0,0,0.1)] [&>div:last-child]:hidden">
+          {bankAccountForActivationModal ? (
+            <>
+              <div className="flex shrink-0 items-center justify-between px-[17.5px] pt-[17.5px]">
+                <DialogTitle className="m-0 text-[17.5px] font-semibold leading-normal text-[#243746]">
+                  Activate Bank Account
+                </DialogTitle>
+                <DialogClose asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-[35px] w-[35px] shrink-0 border-0 bg-transparent shadow-none hover:bg-muted"
+                    aria-label="Close"
+                  >
+                    <X className="h-3.5 w-3.5 text-muted-foreground" />
+                  </Button>
+                </DialogClose>
+              </div>
+
+              <div className="flex flex-col gap-6 px-6 pb-6">
+                <p className="text-sm font-normal leading-6 tracking-[-0.084px] text-[#243746]">
+                  To activate this bank account you must verify the amount that was deposited to the account
+                  below.
+                </p>
+
+                <div className="rounded-md border border-[#ffe0a4] bg-[#fefce8]/95 p-px shadow-[0px_4px_8px_0px_rgba(9,7,0,0.04)]">
+                  <p className="px-[10.5px] py-[7px] text-sm font-medium leading-normal text-[#a16207]">
+                    You are allowed only{" "}
+                    <span className="font-bold">two attempts</span> before the account will be locked.
+                  </p>
+                </div>
+
+                <div className="flex flex-col gap-[9px] rounded-lg border border-[#e4e6e9] py-4">
+                  <div className="flex items-center gap-1.5 px-4">
+                    <Landmark className="h-4 w-4 shrink-0 text-[#1d2c38]" aria-hidden />
+                    <span className="text-base font-medium leading-6 tracking-[-0.176px] text-[#1d2c38]">
+                      {bankAccountForActivationModal.bankName?.trim() || "Wells Fargo Bank, NA"}
+                    </span>
+                  </div>
+                  <Separator className="bg-[#e4e6e9]" />
+                  <div className="flex flex-col gap-2 px-4">
+                    <div className="flex items-center justify-between gap-4 text-sm font-normal leading-6 tracking-[-0.084px]">
+                      <span className="text-[#515f6b]">Account Number</span>
+                      <span className="text-[#1d2c38]">
+                        ••••{" "}
+                        {(() => {
+                          const d = bankAccountForActivationModal.accountNumber.replace(/\D/g, "");
+                          return d.length >= 4 ? d.slice(-4) : d || "—";
+                        })()}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between gap-4 text-sm font-normal leading-6 tracking-[-0.084px]">
+                      <span className="text-[#515f6b]">Routing Number</span>
+                      <span className="text-[#1d2c38]">
+                        ••••{" "}
+                        {(() => {
+                          const d = bankAccountForActivationModal.routingNumber.replace(/\D/g, "");
+                          return d.length >= 4 ? d.slice(-4) : d || "—";
+                        })()}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="relative w-full">
+                  <div className="relative rounded-md border border-[#a5aeb4] bg-white px-[11.5px] pb-2 pt-[22px] shadow-[0px_1px_2px_0px_rgba(18,18,23,0.05)]">
+                    <span className="pointer-events-none absolute left-[11.5px] top-[7px] text-[10.5px] font-normal text-[#7c858e]">
+                      Deposit Amount
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm text-[#243746]" aria-hidden>
+                        $
+                      </span>
+                      <input
+                        type="text"
+                        inputMode="decimal"
+                        autoComplete="transaction-amount"
+                        className="min-w-0 flex-1 border-0 bg-transparent p-0 text-sm text-[#243746] outline-none placeholder:text-[#7c858e]"
+                        placeholder="0.00"
+                        value={bankAccountDepositAmountInput}
+                        onChange={(e) => {
+                          let v = e.target.value.replace(/[^0-9.]/g, "");
+                          const firstDot = v.indexOf(".");
+                          if (firstDot !== -1) {
+                            v =
+                              v.slice(0, firstDot + 1) +
+                              v.slice(firstDot + 1).replace(/\./g, "");
+                          }
+                          setBankAccountDepositAmountInput(v);
+                        }}
+                        aria-label="Deposit amount in dollars"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex shrink-0 justify-end gap-[7px] px-[17.5px] pb-[17.5px]">
+                <Button
+                  variant="ghost"
+                  className="h-auto px-[12.25px] py-[8.75px] text-[15.75px] font-medium text-foreground hover:bg-muted"
+                  onClick={closeActivateBankAccountModal}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  intent="primary"
+                  className="h-auto rounded-md border border-[#0058a3] bg-[#0058a3] px-[13.25px] py-[9.75px] text-[15.75px] font-medium text-white hover:opacity-95 disabled:opacity-50"
+                  disabled={
+                    parseBankDepositAmountInput(bankAccountDepositAmountInput) === null
+                  }
+                  onClick={handleSubmitBankAccountActivation}
+                >
+                  Activate Account
+                </Button>
+              </div>
+            </>
+          ) : null}
         </DialogContent>
       </Dialog>
 
       {/* Remove Bank Account Confirmation Modal */}
-      <AlertDialog open={isRemoveBankAccountConfirmOpen} onOpenChange={setIsRemoveBankAccountConfirmOpen}>
+      <AlertDialog
+        open={isRemoveBankAccountConfirmOpen}
+        onOpenChange={(open) => {
+          setIsRemoveBankAccountConfirmOpen(open);
+          if (!open) {
+            if (preserveBankAccountToRemoveAfterConfirmCloseRef.current) {
+              preserveBankAccountToRemoveAfterConfirmCloseRef.current = false;
+            } else {
+              setBankAccountToRemove(null);
+            }
+          }
+        }}
+      >
         <AlertDialogContent className="w-[448px]">
           <AlertDialogHeader className="text-left">
             <AlertDialogTitle>Remove Bank Account</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to remove <strong>{bankAccountToRemove ? (bankAccountToRemove.accountNickname || `${bankAccountToRemove.accountType.charAt(0).toUpperCase() + bankAccountToRemove.accountType.slice(1)} Account`) : ""}</strong> from your bank accounts? This action cannot be undone.
+              Are you sure you want to delete your bank account{" "}
+              <strong>
+                {bankAccountToRemove
+                  ? (bankAccountToRemove.accountNickname || "").trim() ||
+                    bankAccountToRemove.bankName?.trim() ||
+                    `${bankAccountToRemove.accountType.charAt(0).toUpperCase() + bankAccountToRemove.accountType.slice(1)} Account`
+                  : ""}
+              </strong>
+              ?
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="flex gap-2 justify-end items-end">
+          <AlertDialogFooter className="mt-6 flex gap-2 justify-end items-end">
             <AlertDialogCancel asChild>
               <Button intent="secondary" variant="outline">
                 Cancel
@@ -5147,7 +6321,9 @@ export default function MyProfile() {
               <Button
                 intent="destructive"
                 className="bg-wex-button-destructive-bg text-wex-button-destructive-fg border border-wex-button-destructive-border hover:bg-wex-button-destructive-hover-bg active:bg-wex-button-destructive-active-bg"
-                onClick={() => bankAccountToRemove && handleRemoveBankAccount(bankAccountToRemove.id)}
+                onClick={() => {
+                  if (bankAccountToRemove) openRemoveBankAccountAuthAfterConfirm();
+                }}
               >
                 Remove
               </Button>
@@ -5155,6 +6331,213 @@ export default function MyProfile() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Remove Bank Account — Authentication (after confirmation) */}
+      <Dialog
+        open={isRemoveBankAccountAuthModalOpen}
+        onOpenChange={(open) => {
+          if (!open) closeRemoveBankAccountAuthModal();
+        }}
+      >
+        <DialogContent className="w-full max-w-[440px] gap-0 rounded-xl border-border bg-background p-0 shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1),0_8px_10px_-6px_rgba(0,0,0,0.1)] [&>div:last-child]:hidden">
+          <div className="flex flex-col overflow-hidden rounded-xl">
+            <div className="flex items-center justify-between px-6 pb-4 pt-6">
+              <DialogTitle className="m-0 text-[17.5px] font-semibold leading-normal tracking-tight text-foreground">
+                Authentication
+              </DialogTitle>
+              <DialogClose asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-9 w-9 shrink-0 border-0 bg-transparent shadow-none hover:bg-muted"
+                  aria-label="Close"
+                >
+                  <X className="h-3.5 w-3.5 text-muted-foreground" />
+                </Button>
+              </DialogClose>
+            </div>
+
+            <div className="flex flex-col gap-6 px-6 pb-2 pt-0">
+              {!removeBankAuthShowCode ? (
+                <>
+                  <p className="text-[17px] font-normal leading-6 tracking-[-0.221px] text-foreground">
+                    Your protection is important to us. We need to take some extra steps to verify your identity.
+                    Choose how you&apos;d like to receive a verification code.
+                  </p>
+                  <RadioGroup
+                    value={removeBankAuthMethod || undefined}
+                    onValueChange={(value) => setRemoveBankAuthMethod(value as "text" | "email")}
+                    className="flex flex-col gap-4"
+                  >
+                    <label
+                      htmlFor="remove-bank-verify-text"
+                      className="flex cursor-pointer items-center gap-[7px] rounded-[11px]"
+                    >
+                      <RadioGroupItem value="text" id="remove-bank-verify-text" />
+                      <span className="text-sm text-foreground">
+                        <span className="font-bold">Text Message</span>
+                        <span className="font-normal">{` at (***) ***-1111`}</span>
+                      </span>
+                    </label>
+                    <label
+                      htmlFor="remove-bank-verify-email"
+                      className="flex cursor-pointer items-center gap-[7px] rounded-[11px]"
+                    >
+                      <RadioGroupItem value="email" id="remove-bank-verify-email" />
+                      <span className="text-sm text-foreground">
+                        <span className="font-bold">Email</span>
+                        <span className="font-normal">{` at my***m**@******.com`}</span>
+                      </span>
+                    </label>
+                  </RadioGroup>
+                </>
+              ) : (
+                <div className="flex flex-col gap-6">
+                  <p className="text-[17px] font-normal leading-6 tracking-[-0.221px] text-[#243746]">
+                    We sent a 6-digit verification code to{" "}
+                    {removeBankAuthMethod === "text" ? "(***) ***-1111" : "my***m**@******.com"}.
+                  </p>
+                  <div className="flex flex-col gap-3">
+                    <div
+                      className="[&_input]:rounded-lg [&_input]:border [&_input]:border-[#cdd6dd] [&_input]:bg-background [&_input]:shadow-none [&_input]:transition-colors [&_input]:focus-visible:border-primary [&_input]:focus-visible:ring-1 [&_input]:focus-visible:ring-primary/30"
+                    >
+                      <FloatLabel
+                        label="Verification Code"
+                        size="lg"
+                        type={removeBankAuthCodePlain ? "text" : "password"}
+                        inputMode="numeric"
+                        autoComplete="one-time-code"
+                        value={removeBankAuthCode}
+                        onChange={(e) => {
+                          const digits = e.target.value.replace(/\D/g, "").slice(0, 6);
+                          setRemoveBankAuthCode(digits);
+                        }}
+                        maxLength={6}
+                        invalid={
+                          removeBankAuthCode.length > 0 && removeBankAuthCode.length < 6
+                        }
+                        aria-describedby={
+                          removeBankAuthCode.length > 0 && removeBankAuthCode.length < 6
+                            ? "remove-bank-verify-code-feedback"
+                            : undefined
+                        }
+                        className="text-base tracking-[0.2em]"
+                        rightIcon={
+                          <button
+                            type="button"
+                            onClick={() => setRemoveBankAuthCodePlain((v) => !v)}
+                            className="cursor-pointer text-[#5c6b78] transition-colors hover:text-foreground"
+                            aria-label={
+                              removeBankAuthCodePlain ? "Hide verification code" : "Show verification code"
+                            }
+                          >
+                            {removeBankAuthCodePlain ? (
+                              <EyeOff className="h-4 w-4" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
+                            )}
+                          </button>
+                        }
+                      />
+                    </div>
+                    {removeBankAuthCode.length > 0 && removeBankAuthCode.length < 6 ? (
+                      <p
+                        id="remove-bank-verify-code-feedback"
+                        role="status"
+                        className="text-xs leading-4 text-[hsl(var(--wex-destructive))]"
+                      >
+                        Enter all 6 digits to verify.
+                      </p>
+                    ) : null}
+                    {removeBankAuthResendTimer > 0 ? (
+                      <p className="text-sm leading-5 text-[#5c6b78]">
+                        Resend in {Math.floor(removeBankAuthResendTimer / 60)}:
+                        {String(removeBankAuthResendTimer % 60).padStart(2, "0")}
+                      </p>
+                    ) : null}
+                  </div>
+                  <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={removeBankAuthResendTimer > 0}
+                      onClick={() => setRemoveBankAuthResendTimer(45)}
+                      className="h-9 rounded-md border border-primary bg-background px-4 text-sm font-normal text-primary shadow-none hover:bg-primary/[0.04]"
+                    >
+                      Resend Code
+                    </Button>
+                    <button
+                      type="button"
+                      className="text-sm font-normal text-primary hover:opacity-90"
+                      onClick={() => {
+                        setRemoveBankAuthShowCode(false);
+                        setRemoveBankAuthCodePlain(false);
+                        setRemoveBankAuthCode("");
+                      }}
+                    >
+                      Use a different method
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div
+              className={
+                removeBankAuthShowCode
+                  ? "flex w-full items-center justify-end gap-[7px] px-6 pb-6 pt-8"
+                  : "flex w-full items-center justify-end gap-[7px] px-6 pb-6 pt-4"
+              }
+            >
+              {removeBankAuthShowCode ? (
+                <>
+                  <Button
+                    variant="ghost"
+                    className="h-9 px-3 text-foreground hover:bg-muted"
+                    onClick={closeRemoveBankAccountAuthModal}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="button"
+                    intent="primary"
+                    className="h-9 rounded-md px-5"
+                    disabled={!/^\d{6}$/.test(removeBankAuthCode)}
+                    onClick={() => {
+                      if (!bankAccountToRemove) return;
+                      handleRemoveBankAccount(bankAccountToRemove.id);
+                    }}
+                  >
+                    Verify
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    variant="ghost"
+                    className="h-9 px-3 text-foreground hover:bg-muted"
+                    onClick={closeRemoveBankAccountAuthModal}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    intent="primary"
+                    className="h-9 rounded-md px-5"
+                    disabled={!removeBankAuthMethod}
+                    onClick={() => {
+                      setRemoveBankAuthCodePlain(false);
+                      setRemoveBankAuthShowCode(true);
+                      setRemoveBankAuthResendTimer(45);
+                    }}
+                  >
+                    Next
+                  </Button>
+                </>
+              )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Edit Contact Information Modal */}
       <Dialog open={isContactInfoModalOpen} onOpenChange={setIsContactInfoModalOpen}>
@@ -5335,7 +6718,11 @@ export default function MyProfile() {
           </Button>
         }
         tertiaryButton={
-          <Button variant="ghost" onClick={() => setIsAddBeneficiaryWorkspaceOpen(false)}>
+          <Button
+            variant="ghost"
+            data-workspace-footer-cancel
+            onClick={() => setIsAddBeneficiaryWorkspaceOpen(false)}
+          >
             Cancel
           </Button>
         }
@@ -5366,7 +6753,7 @@ export default function MyProfile() {
                 setIsAddBeneficiaryModalOpen(true);
               }}
             >
-              <Plus className="h-4 w-4" />
+              <Plus className="h-4 w-4 text-current" />
               <span>Add Beneficiary</span>
             </Button>
 
@@ -5479,7 +6866,7 @@ export default function MyProfile() {
                             className="h-8 w-8 text-destructive hover:bg-red-50"
                             onClick={() => handleRemoveWorkspaceBeneficiaryClick(beneficiary)}
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-4 w-4 text-destructive" aria-hidden />
                           </Button>
                         )}
                       </div>
@@ -5780,6 +7167,7 @@ export default function MyProfile() {
         tertiaryButton={
           <Button
             variant="ghost"
+            data-workspace-footer-cancel
             onClick={() => {
               setIsReportLostStolenWorkspaceOpen(false);
               setConfirmationAnswer("");
@@ -6030,6 +7418,7 @@ export default function MyProfile() {
         tertiaryButton={
           <Button
             variant="ghost"
+            data-workspace-footer-cancel
             onClick={() => {
               setIsOrderReplacementWorkspaceOpen(false);
               setCardBeingReplaced(null);

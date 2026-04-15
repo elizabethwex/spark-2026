@@ -115,7 +115,7 @@ const ScrollableTabsList = React.forwardRef<
             className="absolute left-0 z-10 flex h-full items-center justify-center w-8 bg-gradient-to-r from-muted to-transparent hover:from-muted"
             aria-label="Scroll tabs left"
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-4 w-4 text-current" />
           </button>
         )}
         <div
@@ -141,7 +141,7 @@ const ScrollableTabsList = React.forwardRef<
             className="absolute right-0 z-10 flex h-full items-center justify-center w-8 bg-gradient-to-l from-muted to-transparent hover:from-muted"
             aria-label="Scroll tabs right"
           >
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-4 w-4 text-current" />
           </button>
         )}
       </div>

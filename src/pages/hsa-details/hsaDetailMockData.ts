@@ -5,7 +5,7 @@
 
 import type { Transaction } from "./mockData";
 
-/** Recent transactions shown on the HSA details table (Figma sample rows). */
+/** Transaction rows shown on the HSA details table (Figma sample rows). */
 export const hsaDetailTransactions: Transaction[] = [
   {
     id: "hsa-tx-1",

@@ -39,7 +39,7 @@ export function ThemingEnginePreviewDashboard({ darkMode: _darkMode }: ThemingEn
       </header>
 
       <h1 className="text-2xl font-display font-semibold text-foreground">
-        Welcome back, Crystal
+        Welcome back, Penny
       </h1>
 
       {/* Alert card */}

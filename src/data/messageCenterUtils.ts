@@ -12,6 +12,11 @@ export type Message = {
   isArchived: boolean;
   body?: string;
   attachmentFileName?: string;
+  /**
+   * When set (prototype seeds), drives Attention Needed UI instead of policy lookup by subject,
+   * so demos can show fewer urgent stripes while keeping a cohesive story.
+   */
+  needsAttention?: boolean;
 };
 
 const MESSAGE_READ_STATUS_KEY = "messageCenter_readStatus";

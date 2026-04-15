@@ -8,7 +8,7 @@ import {
 import { cn } from "@/lib/utils"
 import { loginFlowPrimaryButtonClass, loginFlowTertiaryGhostButtonClass } from "@/components/login/loginFlowTheme"
 
-const LINK_VERIFY_ACCEPTED_USERNAME = "n.jackson"
+const LINK_VERIFY_ACCEPTED_USERNAME = "p.smith"
 
 export interface AccountLinkingVerifyAccessProps {
   row: MatchedAccountRow

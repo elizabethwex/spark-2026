@@ -25,7 +25,9 @@ import { usePrototype } from "@/context/PrototypeContext";
 import { useReimburseWorkspace } from "@/context/ReimburseWorkspaceContext";
 import { cn, homepageAccountSurfaceClass } from "@/lib/utils";
 import { hsaPlannerData } from "@/data/mockData";
+import { HsaContributeWorkspaceHost } from "./HsaContributeWorkspaceHost";
 import { HsaRecentTransactionsTable } from "./HsaRecentTransactionsTable";
+import { HSA_2026_CONTRIBUTION_MOCK } from "@/data/hsaSharedContributions";
 import { hsaDetailTransactions, hsaInvestmentChartPoints } from "./hsaDetailMockData";
 
 const fmt = (n: number) =>
@@ -53,6 +55,7 @@ export function HsaAccountDetails() {
   const { openReimburseWorkspace } = useReimburseWorkspace();
   const [plannerTab, setPlannerTab] = useState<"2026" | "longterm">("2026");
   const [investRange, setInvestRange] = useState<(typeof INVESTMENT_RANGES)[number]>("1W");
+  const [isContributeOpen, setIsContributeOpen] = useState(false);
 
   const filteredChartPoints = useMemo(
     () => hsaInvestmentChartPoints.slice(-RANGE_WEEKS[investRange]),
@@ -75,10 +78,8 @@ export function HsaAccountDetails() {
   const plannerOnTrack =
     plannerTab === "2026" ? true : longTerm.status === "on-track";
 
-  const contributionLimit = 4_400;
-  const yourContrib = 3_000;
-  const employerContrib = 400;
-  const leftToContribute = 1_000;
+  const { contributionLimit, yourContrib, employerContrib, leftToContribute } =
+    HSA_2026_CONTRIBUTION_MOCK;
   const totalContribYtd = yourContrib + employerContrib;
   const pctLimitUsed = Math.round((totalContribYtd / contributionLimit) * 100);
 
@@ -101,8 +102,8 @@ export function HsaAccountDetails() {
               <CardContent className="flex flex-1 flex-col gap-6 p-6">
                 {/* Header */}
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-[#3958c3]">
-                    <Building2 className="h-5 w-5" aria-hidden />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--theme-secondary-ramp-50)] text-[var(--theme-secondary)]">
+                    <Building2 className="h-5 w-5 text-current" aria-hidden />
                   </div>
                   <h2 className="text-[20px] font-bold leading-7 text-[#14182c]">Account Overview</h2>
                 </div>
@@ -137,7 +138,7 @@ export function HsaAccountDetails() {
                   <div className="flex items-center justify-between px-4 py-4">
                     <div className="flex items-center gap-2">
                       <div className="flex h-9 w-9 shrink-0 items-center justify-center text-[#3958c3]">
-                        <TrendingUp className="h-[24px] w-[24px]" aria-hidden />
+                        <TrendingUp className="h-[24px] w-[24px] text-current" aria-hidden />
                       </div>
                       <span className="text-[16px] font-bold leading-5 text-[#14182c]">Invested assets</span>
                     </div>
@@ -149,15 +150,26 @@ export function HsaAccountDetails() {
                 </div>
 
                 {/* CTA */}
-                <Button
-                  intent="primary"
-                  size="md"
-                  className="w-full rounded-[12px]"
-                  type="button"
-                  onClick={() => openReimburseWorkspace()}
-                >
-                  Reimburse Myself
-                </Button>
+                <div className="flex w-full gap-3">
+                  <Button
+                    intent="primary"
+                    variant="outline"
+                    size="md"
+                    className="min-w-0 flex-1 rounded-[12px]"
+                    type="button"
+                  >
+                    Pay provider
+                  </Button>
+                  <Button
+                    intent="primary"
+                    size="md"
+                    className="min-w-0 flex-1 rounded-[12px]"
+                    type="button"
+                    onClick={() => openReimburseWorkspace()}
+                  >
+                    Reimburse Myself
+                  </Button>
+                </div>
               </CardContent>
             </Card>
 
@@ -168,8 +180,8 @@ export function HsaAccountDetails() {
             >
               <CardContent className="flex flex-1 flex-col gap-6 p-6">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-[#3958c3]">
-                    <Wallet className="h-5 w-5" aria-hidden />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--theme-secondary-ramp-50)] text-[var(--theme-secondary)]">
+                    <Wallet className="h-5 w-5 text-current" aria-hidden />
                   </div>
                   <h2 className="text-lg font-semibold text-foreground">2026 Contributions</h2>
                 </div>
@@ -271,6 +283,7 @@ export function HsaAccountDetails() {
                     size="md"
                     className="w-full rounded-xl border-primary text-primary"
                     type="button"
+                    onClick={() => setIsContributeOpen(true)}
                   >
                     Contribute to HSA
                   </Button>
@@ -285,8 +298,8 @@ export function HsaAccountDetails() {
             >
               <CardContent className="flex flex-1 flex-col gap-4 p-6">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-[#3958c3]">
-                    <TrendingUp className="h-5 w-5" aria-hidden />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--theme-secondary-ramp-50)] text-[var(--theme-secondary)]">
+                    <TrendingUp className="h-5 w-5 text-current" aria-hidden />
                   </div>
                   <h2 className="text-lg font-semibold text-foreground">Investments</h2>
                 </div>
@@ -457,7 +470,7 @@ export function HsaAccountDetails() {
                     Plus use DirectPay™ and check out instantly!
                   </p>
                   <div>
-                    <Button intent="primary" size="md" className="rounded-xl" type="button">
+                    <Button intent="primary" size="md" className="rounded-xl" type="button" onClick={() => window.open("https://hsastore.com", "_blank")}>
                       Shop HSA Store
                     </Button>
                   </div>
@@ -476,6 +489,10 @@ export function HsaAccountDetails() {
       </FadeInItem>
 
       <ConsumerFooter />
+
+      {isContributeOpen ? (
+        <HsaContributeWorkspaceHost onClose={() => setIsContributeOpen(false)} />
+      ) : null}
     </div>
   );
 }

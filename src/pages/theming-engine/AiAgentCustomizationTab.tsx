@@ -10,10 +10,10 @@ const PRESETS: { value: AiIconPreset; label: string; icon: React.ElementType }[]
   { value: "chat", label: "Chat", icon: MessageCircle },
 ];
 
-const RADIUS: { value: CornerRadiusOption; label: string }[] = [
-  { value: "square", label: "Square" },
-  { value: "soft", label: "Soft" },
-  { value: "round", label: "Round" },
+const RADIUS: { value: CornerRadiusOption; label: string; icon: string }[] = [
+  { value: "square", label: "Square", icon: "corder-radius-sharp.svg" },
+  { value: "soft", label: "Soft", icon: "corder-radius-soft.svg" },
+  { value: "round", label: "Round", icon: "corder-radius-round.svg" },
 ];
 
 export function AiAgentCustomizationTab() {
@@ -64,7 +64,7 @@ export function AiAgentCustomizationTab() {
               })}
             </SelectContent>
           </Select>
-          <Button variant="outline" className="flex-1 text-primary border-primary hover:bg-primary/5">
+          <Button variant="outline" className="flex-1 text-primary border-primary hover:bg-primary/5 [&_svg]:text-current">
             <Upload className="mr-2 h-4 w-4" />
             Upload custom icon
           </Button>
@@ -88,17 +88,18 @@ export function AiAgentCustomizationTab() {
       </div>
 
       <div className="space-y-2">
-        <Label className="text-sm font-medium text-foreground">Border radius</Label>
-        <div className="flex flex-wrap gap-2">
+        <Label className="text-sm font-medium text-foreground">Corner Radius</Label>
+        <div className="grid grid-cols-3 gap-2">
           {RADIUS.map((opt) => (
             <label
               key={opt.value}
               className={cn(
-                "flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors",
+                "flex cursor-pointer items-center gap-3 rounded-md border p-3 text-sm font-medium transition-colors",
                 watch("aiAgent.borderRadius") === opt.value
-                  ? "border-primary bg-primary/10 text-primary"
-                  : "border-input bg-background hover:bg-muted/50"
+                  ? "border-[#5F6A94] border-2 bg-white text-primary"
+                  : "border-[#9CA7C7] bg-white text-foreground hover:bg-muted/50"
               )}
+              style={watch("aiAgent.borderRadius") === opt.value ? { borderImage: "none" } : undefined}
             >
               <input
                 type="radio"
@@ -106,7 +107,8 @@ export function AiAgentCustomizationTab() {
                 checked={watch("aiAgent.borderRadius") === opt.value}
                 onChange={() => setValue("aiAgent.borderRadius", opt.value)}
               />
-              {opt.label}
+              <img src={`${import.meta.env.BASE_URL}theming-icons/${opt.icon}`} alt="" className="h-8 w-8 shrink-0" />
+              <span style={{ color: "var(--system-text-primary)" }}>{opt.label}</span>
             </label>
           ))}
         </div>
