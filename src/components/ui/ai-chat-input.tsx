@@ -40,7 +40,13 @@ const letterVariants = {
   },
 };
 
-export function AiChatInput({ onSubmit }: { onSubmit?: (value: string) => void }) {
+export function AiChatInput({ 
+  onSubmit,
+  autocompletePhrase 
+}: { 
+  onSubmit?: (value: string) => void;
+  autocompletePhrase?: string;
+}) {
   const [inputValue, setInputValue] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -50,6 +56,9 @@ export function AiChatInput({ onSubmit }: { onSubmit?: (value: string) => void }
   const inputRef = useRef<HTMLInputElement>(null);
 
   const showPlaceholder = !isFocused && !inputValue && !isDropdownOpen;
+
+  const isPrefix = !!autocompletePhrase && inputValue.length > 0 && autocompletePhrase.toLowerCase().startsWith(inputValue.toLowerCase());
+  const prediction = isPrefix ? autocompletePhrase.slice(inputValue.length) : "";
 
   // Handle clicking outside to close
   useEffect(() => {
@@ -109,7 +118,7 @@ export function AiChatInput({ onSubmit }: { onSubmit?: (value: string) => void }
           isDropdownOpen ? "shadow-md" : ""
         }`}
       >
-        <div className="relative flex-1 min-h-[20px]">
+        <div className="relative flex-1 min-h-[20px] flex items-center">
           <input
             ref={inputRef}
             type="text"
@@ -127,13 +136,27 @@ export function AiChatInput({ onSubmit }: { onSubmit?: (value: string) => void }
               if (!inputValue) setIsDropdownOpen(true);
             }}
             onKeyDown={(e) => {
-              if (e.key === "Enter") {
+              if (e.key === "Tab" && prediction) {
+                e.preventDefault();
+                setInputValue(autocompletePhrase!);
+              } else if (e.key === "Enter") {
                 e.preventDefault();
                 handleSubmit();
               }
             }}
-            className="w-full border-0 bg-transparent text-[14px] text-[#14182c] outline-none placeholder-transparent"
+            className="relative z-10 w-full border-0 bg-transparent text-[14px] text-[#14182c] outline-none placeholder-transparent"
           />
+          
+          {prediction && (
+            <div className="pointer-events-none absolute inset-0 z-0 flex items-center overflow-hidden">
+              <span className="text-[14px] text-transparent whitespace-pre">{inputValue}</span>
+              <span className="text-[14px] text-[#7a87b2] whitespace-pre">{prediction}</span>
+              <span className="ml-2 flex items-center gap-[4px] rounded-[4px] border border-[#e3e7f4] bg-[#f8f9fe] px-[6px] py-[2px] text-[10px] font-bold text-[#7a87b2]">
+                Tab ⇥
+              </span>
+            </div>
+          )}
+
           {showPlaceholder && (
             <div
               className="pointer-events-none absolute inset-0 flex items-center overflow-hidden"

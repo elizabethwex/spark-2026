@@ -42,7 +42,7 @@ function HomePageAiForward() {
 
       <div className="flex w-full min-h-[calc(100vh-80px)] relative">
         <div id="page-content-wrapper" className="@container group flex-1 min-w-0 transition-all duration-300">
-          <main id="main-content" className="mx-auto w-full max-w-[1200px] px-4 py-8 sm:px-6 sm:py-10 @5xl:px-8 transition-all duration-300 group-[.is-docked]:max-w-[900px]">
+          <main id="main-content" className="mx-auto w-full max-w-[1200px] px-4 py-8 sm:px-6 sm:py-10 @5xl:px-8 transition-all duration-300">
             <PageFadeIn className="space-y-10">
               <FadeInItem><SparkAiForwardHero activeView={activeView} /></FadeInItem>
               {activeView === 3 ? (

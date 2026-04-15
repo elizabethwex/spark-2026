@@ -237,7 +237,7 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
       initial={shouldAnimate ? "hidden" : "instant"}
       animate={animateState}
       variants={containerVariants}
-      className="spark-hero-root group relative isolate z-40 flex flex-col lg:group-[.is-docked]:flex-col lg:flex-row w-full items-center lg:items-stretch lg:group-[.is-docked]:items-center justify-center gap-6 lg:gap-[32px] lg:group-[.is-docked]:gap-6 rounded-[24px] lg:rounded-[32px] lg:group-[.is-docked]:rounded-[24px] border border-[#e3e7f4] p-6 sm:p-8 lg:p-[41px] lg:group-[.is-docked]:p-6 lg:group-[.is-docked]:sm:p-8 shadow-[0_1.5px_4.5px_rgba(43,49,78,0.04)] bg-white [filter:drop-shadow(0_0_0_transparent)]"
+      className="spark-hero-root group relative isolate z-40 flex flex-col lg:flex-row lg:group-[.is-docked]:flex-col xl:group-[.is-docked]:flex-row w-full items-center lg:items-stretch justify-center gap-6 lg:gap-[32px] lg:group-[.is-docked]:gap-6 xl:group-[.is-docked]:gap-[32px] rounded-[24px] lg:rounded-[32px] lg:group-[.is-docked]:rounded-[24px] xl:group-[.is-docked]:rounded-[32px] border border-[#e3e7f4] p-6 sm:p-8 lg:p-[41px] lg:group-[.is-docked]:p-6 lg:group-[.is-docked]:sm:p-8 xl:group-[.is-docked]:p-[41px] shadow-[0_1.5px_4.5px_rgba(43,49,78,0.04)] bg-white [filter:drop-shadow(0_0_0_transparent)]"
       style={{
         backgroundImage:
           "url('data:image/svg+xml;utf8,<svg viewBox=\\'0 0 1200 523.5\\' xmlns=\\'http://www.w3.org/2000/svg\\' preserveAspectRatio=\\'none\\'><rect x=\\'0\\' y=\\'0\\' height=\\'100%\\' width=\\'100%\\' fill=\\'url(%23grad)\\' opacity=\\'1\\'/><defs><radialGradient id=\\'grad\\' gradientUnits=\\'userSpaceOnUse\\' cx=\\'0\\' cy=\\'0\\' r=\\'10\\' gradientTransform=\\'matrix(176.49 0 0 51.824 -48 157.05)\\'><stop stop-color=\\'rgba(23,45,161,0.09)\\' offset=\\'0\\'/><stop stop-color=\\'rgba(23,45,161,0)\\' offset=\\'0.5\\'/></radialGradient></defs></svg>'), url('data:image/svg+xml;utf8,<svg viewBox=\\'0 0 1200 523.5\\' xmlns=\\'http://www.w3.org/2000/svg\\' preserveAspectRatio=\\'none\\'><rect x=\\'0\\' y=\\'0\\' height=\\'100%\\' width=\\'100%\\' fill=\\'url(%23grad)\\' opacity=\\'1\\'/><defs><radialGradient id=\\'grad\\' gradientUnits=\\'userSpaceOnUse\\' cx=\\'0\\' cy=\\'0\\' r=\\'10\\' gradientTransform=\\'matrix(176.49 0 0 55.526 1248 392.62)\\'><stop stop-color=\\'rgba(200,16,46,0.07)\\' offset=\\'0\\'/><stop stop-color=\\'rgba(200,16,46,0)\\' offset=\\'0.45\\'/></radialGradient></defs></svg>'), url('data:image/svg+xml;utf8,<svg viewBox=\\'0 0 1200 523.5\\' xmlns=\\'http://www.w3.org/2000/svg\\' preserveAspectRatio=\\'none\\'><rect x=\\'0\\' y=\\'0\\' height=\\'100%\\' width=\\'100%\\' fill=\\'url(%23grad)\\' opacity=\\'1\\'/><defs><radialGradient id=\\'grad\\' gradientUnits=\\'userSpaceOnUse\\' cx=\\'0\\' cy=\\'0\\' r=\\'10\\' gradientTransform=\\'matrix(93.338 0 0 103.65 660 732.9)\\'><stop stop-color=\\'rgba(23,45,161,0.04)\\' offset=\\'0\\'/><stop stop-color=\\'rgba(23,45,161,0)\\' offset=\\'0.4\\'/></radialGradient></defs></svg>'), linear-gradient(90deg, rgba(255, 255, 255, 0.93) 0%, rgba(255, 255, 255, 0.93) 100%)",
@@ -247,7 +247,7 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
         borderWidth={1.5}
         duration={18}
         color={["#25146f", "#c8102e", "#25146f"]}
-        className="absolute inset-0 pointer-events-none p-0 border-none bg-transparent dark:bg-transparent shadow-none z-50 rounded-[24px] lg:rounded-[32px] lg:group-[.is-docked]:rounded-[24px]"
+        className="absolute inset-0 pointer-events-none p-0 border-none bg-transparent dark:bg-transparent shadow-none z-50 rounded-[24px] lg:rounded-[32px] lg:group-[.is-docked]:rounded-[24px] xl:group-[.is-docked]:rounded-[32px]"
       >
         {null}
       </ShineBorder>
@@ -255,7 +255,7 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
       <motion.div
         layout
         transition={{ layout: layoutSpring }}
-        className="flex w-full lg:flex-1 lg:group-[.is-docked]:flex-none flex-col gap-[24px]"
+        className="flex w-full lg:flex-1 lg:group-[.is-docked]:flex-none xl:group-[.is-docked]:flex-1 flex-col gap-[24px]"
       >
         <motion.div
           variants={greetingVariants}
@@ -292,6 +292,7 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
 
         <motion.div variants={inputVariants}>
           <AiChatInput 
+            autocompletePhrase="Help me with my claims"
             onSubmit={(val) => {
               if (val.toLowerCase().includes("help me with my claims")) {
                 setAssistInitialMessage(val);
@@ -366,25 +367,25 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
               overflow: "hidden",
               transition: { duration: 0.42, ease: softEaseOut },
             }}
-            className="flex flex-col lg:flex-row lg:group-[.is-docked]:flex-col gap-6 lg:gap-[32px] lg:group-[.is-docked]:gap-6 items-center lg:items-stretch lg:group-[.is-docked]:items-center"
+            className="flex flex-col lg:flex-row lg:group-[.is-docked]:flex-col xl:group-[.is-docked]:flex-row lg:group-[.is-docked]:w-full xl:group-[.is-docked]:w-auto gap-6 lg:gap-[32px] lg:group-[.is-docked]:gap-6 xl:group-[.is-docked]:gap-[32px] items-center lg:items-stretch"
           >
             {/* Divider */}
             <motion.div
               variants={dividerDesktopVariants}
               style={{ originY: 0 }}
-              className="hidden lg:block lg:group-[.is-docked]:hidden w-[1.5px] self-stretch shrink-0 bg-[#e3e7f4]"
+              className="hidden lg:block lg:group-[.is-docked]:hidden xl:group-[.is-docked]:block w-[1.5px] self-stretch shrink-0 bg-[#e3e7f4]"
             />
             <motion.div
               variants={dividerMobileVariants}
               style={{ originX: 0 }}
-              className="block lg:hidden lg:group-[.is-docked]:block w-full h-[1.5px] shrink-0 bg-[#e3e7f4]"
+              className="block lg:hidden lg:group-[.is-docked]:block xl:group-[.is-docked]:hidden w-full h-[1.5px] shrink-0 bg-[#e3e7f4]"
             />
 
             {/* Right Column: Next Steps */}
             <motion.div
               layout
               transition={{ layout: layoutSpring }}
-              className="flex w-full lg:w-[376px] lg:group-[.is-docked]:w-full shrink-0 flex-col gap-[8px]"
+              className="flex w-full lg:w-[376px] lg:group-[.is-docked]:w-full xl:group-[.is-docked]:w-[376px] shrink-0 flex-col gap-[8px]"
             >
               <motion.div
                 layout="position"
