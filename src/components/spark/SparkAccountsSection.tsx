@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { CalendarCheck2, PiggyBank, TrendingUp, CircleDollarSign, Info, Lightbulb, ChevronRight, HeartPulse, Baby, RotateCw, ClockAlert, CalendarClock, Calendar, ChartNoAxesCombined, Landmark } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@wexinc-healthbenefits/ben-ui-kit";
 import {
   sparkHsaSummary,
   sparkLpfsaSummary,
@@ -296,7 +297,18 @@ export function SparkAccountsSection({
                   <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#5f6a94]">
                     Available balance
                   </p>
-                  <Info className="h-4 w-4 text-[#5f6a94]" />
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button type="button" className="focus:outline-none">
+                        <Info className="h-4 w-4 text-[#5f6a94]" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-sm max-w-[220px] text-center">
+                        Your available balance reflects the funds available for payment requests made at this time
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
                 <p className="text-[40px] font-bold leading-[56px] tracking-[-0.88px] text-[#14182c]">
                   {l.balance}
@@ -446,7 +458,18 @@ export function SparkAccountsSection({
                   <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#5f6a94]">
                     Available balance
                   </p>
-                  <Info className="h-4 w-4 text-[#5f6a94]" />
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button type="button" className="focus:outline-none">
+                        <Info className="h-4 w-4 text-[#5f6a94]" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-sm max-w-[220px] text-center">
+                        Your available balance reflects the funds available for payment requests made at this time
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
                 <p className="text-[40px] font-bold leading-[56px] tracking-[-0.88px] text-[#14182c]">
                   {fsa.balance}
@@ -589,7 +612,18 @@ export function SparkAccountsSection({
                   <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#5f6a94]">
                     Available balance
                   </p>
-                  <Info className="h-4 w-4 text-[#5f6a94]" />
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button type="button" className="focus:outline-none">
+                        <Info className="h-4 w-4 text-[#5f6a94]" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-sm max-w-[220px] text-center">
+                        Your available balance reflects the funds available for payment requests made at this time
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
                 <p className="text-[40px] font-bold leading-[56px] tracking-[-0.88px] text-[#14182c]">
                   {dcfsa.balance}
