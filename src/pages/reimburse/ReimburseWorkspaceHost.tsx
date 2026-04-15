@@ -197,15 +197,17 @@ function CustomStepper({ steps, currentStepId }: { steps: Step[], currentStepId:
   const currentIndex = steps.findIndex(s => s.id === currentStepId);
 
   return (
-    <div className="flex flex-col gap-[24px] px-[32px] py-[40px] w-[calc(100%+48px)] bg-[#f7f7f7] min-h-[calc(100%+48px)] -m-6 shrink-0">
+    <div
+      className="flex h-full min-h-0 min-w-0 w-full flex-1 flex-col gap-[24px] overflow-x-hidden bg-[var(--neutral-50)] p-6"
+    >
       {steps.map((step, index) => {
         const isCompleted = index < currentIndex;
         const isActive = index === currentIndex;
         const isLast = index === steps.length - 1;
 
         return (
-          <div key={step.id} className="relative flex flex-col gap-[16px] items-start shrink-0">
-            <div className="flex items-center gap-[12px] relative shrink-0 w-full z-10">
+          <div key={step.id} className="relative flex min-w-0 w-full flex-col gap-[16px] items-start">
+            <div className="relative z-10 flex min-w-0 w-full items-center gap-[12px]">
               {/* Circle */}
               <div className={`
                 flex items-center justify-center w-[24px] h-[24px] rounded-full text-[14px] shrink-0
@@ -222,7 +224,7 @@ function CustomStepper({ steps, currentStepId }: { steps: Step[], currentStepId:
               
               {/* Label */}
               <span className={`
-                text-[14px] tracking-[-0.084px] whitespace-nowrap
+                min-w-0 flex-1 text-[14px] leading-snug tracking-[-0.084px] break-words
                 ${isActive ? 'font-semibold text-[#243746]' : 'font-medium text-[#7c858e]'}
               `}>
                 {step.label}
@@ -330,7 +332,12 @@ function ReimburseWorkspaceSession({
 
   if (state.step !== "processing" && state.step !== "confirmation") {
     tertiaryBtn = (
-      <Button variant="ghost" onClick={() => handleOpenChange(false)} className="px-4 py-2 mr-auto">
+      <Button
+        variant="ghost"
+        data-workspace-footer-cancel
+        onClick={() => handleOpenChange(false)}
+        className="px-4 py-2"
+      >
         Cancel
       </Button>
     );
@@ -482,7 +489,6 @@ function ReimburseWorkspaceSession({
     <>
       <Workspace
         open
-        className="max-w-[1920px]"
         onOpenChange={handleOpenChange}
         title="Reimburse myself"
         stepperContent={state.step === "confirmation" ? undefined : stepperContent}
@@ -1294,7 +1300,7 @@ function DestinationStep({
       label: "Direct Deposit",
       sublabel: "1-2 business days after approval.",
       badge: "Default" as string | undefined,
-      bankName: "Penny's Bank",
+      bankName: "Wells Fargo Bank",
       accountMask: "•••• 5423 Checking",
     },
     {
@@ -1510,7 +1516,7 @@ function ValidationStep({
                 </div>
                 {state.destination === "bank" && (
                   <div className="mt-1 ml-7 space-y-0.5">
-                    <p className="text-[14px] font-medium text-[#515f6b]">Ella's Bank</p>
+                    <p className="text-[14px] font-medium text-[#515f6b]">Wells Fargo Bank</p>
                     <p className="text-[14px] text-[#7c858e]">•••• 5423 Checking</p>
                   </div>
                 )}

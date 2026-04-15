@@ -243,7 +243,7 @@ export function SparkAccountsSection({
               </div>
               <div className="flex w-full">
                 <p className="text-[12px] leading-[15px] text-[#5f6a94]">
-                  {h.planYear} IRS limit: {h.irsLimit} (individual)
+                  {h.planYear} IRS limit: {h.irsLimitFormatted} (individual)
                 </p>
               </div>
             </div>

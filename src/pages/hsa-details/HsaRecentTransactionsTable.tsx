@@ -65,7 +65,7 @@ export function HsaRecentTransactionsTable({ transactions }: HsaRecentTransactio
       <CardContent className="p-6">
         <div className="flex w-full flex-col items-center space-y-4">
           <div className="flex w-full flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <h2 className="text-2xl font-semibold text-foreground">Recent Transactions</h2>
+            <h2 className="text-2xl font-semibold text-foreground">Transactions</h2>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <div className="w-full min-w-[200px] sm:w-[280px]">
                 <Input
@@ -95,7 +95,7 @@ export function HsaRecentTransactionsTable({ transactions }: HsaRecentTransactio
           <div className="w-full overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow>
+                <TableRow className="hover:bg-transparent border-y border-border bg-muted/30">
                   <TableHead>
                     <div className="flex items-center gap-1">
                       Date
@@ -115,7 +115,7 @@ export function HsaRecentTransactionsTable({ transactions }: HsaRecentTransactio
               </TableHeader>
               <TableBody>
                 {paginated.map((transaction) => (
-                  <TableRow key={transaction.id}>
+                  <TableRow key={transaction.id} className="h-[49px]">
                     <TableCell>{transaction.date}</TableCell>
                     <TableCell>
                       <Badge
@@ -140,7 +140,7 @@ export function HsaRecentTransactionsTable({ transactions }: HsaRecentTransactio
             </Table>
           </div>
 
-          <div className="flex w-fit flex-col gap-0 sm:flex-row sm:items-center sm:justify-start sm:gap-[4px]">
+          <div className="flex w-fit flex-col gap-0 sm:flex-row sm:items-center sm:justify-start sm:gap-0">
             <Pagination className="flex w-fit items-center justify-start">
               <PaginationContent>
                 <PaginationItem>
@@ -216,7 +216,7 @@ export function HsaRecentTransactionsTable({ transactions }: HsaRecentTransactio
                 }}
               >
                 <SelectTrigger
-                  className="h-8 w-[70px]"
+                  className="h-8 w-[64px] gap-0"
                   aria-label="Select rows per page"
                 >
                   <SelectValue />

@@ -1,5 +1,9 @@
 import type { LucideIcon } from "lucide-react";
 import { CreditCard, DollarSign, Send, ShoppingBag } from "lucide-react";
+import {
+  HSA_2026_CONTRIBUTION_MOCK,
+  hsa2026ContributionPctUsed,
+} from "@/data/hsaSharedContributions";
 
 /**
  * Copy and structure aligned with SPARK-2026 Figma (AI-forward homepage).
@@ -10,19 +14,24 @@ export const SPARK_MEMBER_FIRST_NAME = "Penny";
 export const sparkAccountQuickActions: { label: string; href: string; icon: LucideIcon }[] = [
   { label: "Lost or Stolen Card", href: "/my-profile?subPage=debit-card", icon: CreditCard },
   { label: "Send Payment", href: "/send-payment", icon: Send },
-  { label: "HSA Store", href: "/resources", icon: ShoppingBag },
+  { label: "HSA Store", href: "https://hsastore.com/", icon: ShoppingBag },
   { label: "Reimburse Myself", href: "/reimburse", icon: DollarSign },
 ];
+
+const fmtUsd = (n: number) =>
+  n.toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 });
+
+const hsaC = HSA_2026_CONTRIBUTION_MOCK;
 
 export const sparkHsaSummary = {
   totalValue: "$15,900.00",
   investedAssets: "$12,700.00",
   ytdReturnPct: "+12.5% YTD",
   cashBalance: "$3,200.00",
-  contributionPctUsed: 77,
-  planYear: "2026",
-  remainingLimit: "$1,000.00",
-  irsLimit: "$4,400.00",
+  contributionPctUsed: hsa2026ContributionPctUsed(),
+  planYear: hsaC.planYear,
+  remainingLimit: fmtUsd(hsaC.leftToContribute),
+  irsLimitFormatted: fmtUsd(hsaC.contributionLimit),
 };
 
 export const sparkLpfsaSummary = {
