@@ -784,7 +784,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange }: Props) {
         {/* Main column — transparent so outer gradient shows through */}
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
           <header className={`relative flex h-14 shrink-0 items-center justify-between bg-white transition-all duration-300 ${
-            isDocked ? "rounded-none px-4 border-b border-[#e3e7f4]" : "rounded-tr-[32px] px-6"
+            isDocked ? "rounded-none px-4" : "rounded-tr-[32px] px-6"
           }`}>
             <div className="flex min-w-0 items-center gap-2">
               {isDocked ? (
