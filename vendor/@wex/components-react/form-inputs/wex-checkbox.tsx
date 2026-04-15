@@ -69,15 +69,15 @@ export const WexCheckbox = React.forwardRef<
       checked={isIndeterminate ? undefined : checked}
       onCheckedChange={handleCheckedChange}
       className={cn(
-        "peer h-4 w-4 shrink-0 rounded-sm border-2 bg-wex-checkbox-bg focus-visible:outline-none focus-visible:ring-0 disabled:cursor-not-allowed disabled:opacity-[var(--wex-component-checkbox-disabled-opacity)] data-[state=checked]:bg-wex-checkbox-checked-bg data-[state=checked]:text-wex-checkbox-checked-fg data-[state=checked]:border-wex-checkbox-checked-bg",
-        isIndeterminate && "[&[data-state=indeterminate]]:bg-wex-checkbox-checked-bg [&[data-state=indeterminate]]:text-wex-checkbox-checked-fg [&[data-state=indeterminate]]:border-wex-checkbox-checked-bg",
+        "peer h-4 w-4 shrink-0 rounded-sm border-2 bg-wex-checkbox-bg focus-visible:outline-none focus-visible:ring-0 disabled:cursor-not-allowed disabled:opacity-[var(--wex-component-checkbox-disabled-opacity)] data-[state=checked]:bg-[var(--system-link,#1C6EFF)] data-[state=checked]:text-white data-[state=checked]:border-[var(--system-link,#1C6EFF)]",
+        isIndeterminate && "[&[data-state=indeterminate]]:bg-[var(--system-link,#1C6EFF)] [&[data-state=indeterminate]]:text-white [&[data-state=indeterminate]]:border-[var(--system-link,#1C6EFF)]",
         className
       )}
       {...(isIndeterminate ? { "data-state": "indeterminate" } : {})}
       {...props}
     >
       {isIndeterminate ? (
-        <div className="flex items-center justify-center w-full h-full text-wex-checkbox-checked-fg">
+        <div className="flex items-center justify-center w-full h-full text-white">
           <Minus className="h-3 w-3" />
         </div>
       ) : (

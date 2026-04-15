@@ -18,7 +18,7 @@ import {
 
 export interface AccountLinkingIntroProps {
   primaryUsername: string
-  onContinue: (selectedAccountIds: string[]) => void
+  onContinue: (_selectedAccountIds: string[]) => void
   onNotNow: () => void
   onAddAnotherAccount: () => void
   continueRef: RefObject<HTMLButtonElement | null>

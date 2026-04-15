@@ -231,14 +231,15 @@ export function SparkAccountsSection({
                   </p>
                 </div>
               </div>
-              <div className="relative h-[20px] w-full overflow-hidden rounded-full bg-[#eef2ff]">
-                <div 
-                  className="absolute left-0 top-0 h-full bg-[#3958c3] transition-all duration-1000 ease-out"
-                  style={{ width: isInView ? `${h.contributionPctUsed}%` : "0%" }}
+              <div className="flex h-[6px] w-full items-center overflow-hidden rounded-[6px] bg-[#eef2ff]">
+                <div
+                  className="h-full rounded-[6px] bg-[var(--theme-primary)]"
+                  style={{ 
+                    width: isInView ? `${h.contributionPctUsed}%` : "0%",
+                    transition: 'width 2.2s cubic-bezier(0.22, 1, 0.36, 1) 0.15s'
+                  }}
                 />
-                <div 
-                  className="absolute top-0 h-full w-px bg-[#cefafe] transition-all duration-1000 ease-out"
-                  style={{ left: isInView ? `${h.contributionPctUsed}%` : "0%" }}
+              </div>
                 />
               </div>
               <div className="flex w-full">

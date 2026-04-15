@@ -10,10 +10,10 @@ import {
   ThumbsUp,
   ThumbsDown,
   CreditCard,
-  Shield,
-  MapPin,
   Camera,
   Image as ImageIcon,
+  ShoppingCart,
+  Search,
 } from "lucide-react";
 import { AppNavBar } from "@/components/app-shell/AppNavBar";
 import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
@@ -109,6 +109,8 @@ const CANNED: Record<string, string> = {
     "For 2025:\n\n• HSA: Up to $4,300 (individual) or $8,550 (family)\n• Health FSA: Up to $3,200\n• Dependent Care FSA: Up to $5,000",
   "claim denied":
     "Your most recent denied claim was from CVS Pharmacy ($18.50) on December 10, 2024. It was denied because the item was a cosmetic product, not an IRS-eligible HSA expense.",
+  braces:
+    "Yes, you have $875 left to spend towards this purchase.",
 };
 
 function getResponse(input: string): string {
@@ -125,9 +127,9 @@ const WELCOME_CHIPS = [
     label: "Upload Claim Documents",
     icon: <FileText size={16} color="#25146f" />,
   },
-  { label: "Check My Benefits", icon: <Shield size={16} color="#25146f" /> },
-  { label: "Find a Provider", icon: <MapPin size={16} color="#25146f" /> },
-  { label: "Card Issues", icon: <CreditCard size={16} color="#25146f" /> },
+  { label: "Report Lost/Stolen Card", icon: <CreditCard size={16} color="#25146f" /> },
+  { label: "Shop HSA Store", icon: <ShoppingCart size={16} color="#25146f" /> },
+  { label: "Find recent claims", icon: <Search size={16} color="#25146f" /> },
 ];
 
 // ─── CheckSquareIcon ──────────────────────────────────────────────────────────
@@ -248,7 +250,7 @@ function FeedbackRow() {
             borderColor:
               voted === dir
                 ? dir === "up"
-                  ? "#3958c3"
+                  ? "var(--neutral-700)"
                   : "#c8102e"
                 : "#d0d6ea",
             background:
@@ -262,7 +264,7 @@ function FeedbackRow() {
           }}
         >
           {dir === "up" ? (
-            <ThumbsUp size={13} color={voted === "up" ? "#3958c3" : "#5f6a94"} />
+            <ThumbsUp size={13} color={voted === "up" ? "var(--neutral-700)" : "#5f6a94"} />
           ) : (
             <ThumbsDown
               size={13}

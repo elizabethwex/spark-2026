@@ -51,7 +51,7 @@ export function FsaTransactionDetailSheet({
   row,
 }: {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onOpenChange: (_open: boolean) => void;
   row: FsaTransactionRow | null;
 }) {
   const { openReimburseWorkspace } = useReimburseWorkspace();
