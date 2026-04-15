@@ -860,31 +860,6 @@ export function AssistIQUploadClaimModal({ open, onOpenChange }: Props) {
           <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
             <div ref={scrollRef} className={`min-h-0 flex-1 overflow-y-auto py-6 transition-all duration-300 ${isDocked ? "px-4" : "px-4 sm:px-8"}`}>
               <div className="mx-auto max-w-[722px]">
-                <div className="mb-8 flex flex-col gap-3">
-                  <AssistIQAvatar size={isDocked ? 32 : 40} />
-                  <h2 className={`font-semibold tracking-[-0.88px] text-[#444c72] transition-all duration-300 ${isDocked ? "text-[28px] leading-[36px]" : "text-[44px] leading-[56px]"}`}>
-                    {chatGreeting()}, {SPARK_MEMBER_FIRST_NAME}!
-                  </h2>
-                  <p className={`tracking-[-0.304px] text-[#444c72] transition-all duration-300 ${isDocked ? "text-[15px] leading-[24px]" : "text-[19px] leading-[32px]"}`}>
-                    I&apos;m{" "}
-                    <strong
-                      className="font-semibold"
-                      style={{
-                        backgroundImage:
-                          "linear-gradient(174.29deg, #25146f 13.72%, #c8102e 27.32%)",
-                        WebkitBackgroundClip: "text",
-                        WebkitTextFillColor: "transparent",
-                        backgroundClip: "text",
-                      }}
-                    >
-                      WEXly
-                    </strong>
-                    , your Benefits helper.
-                    <br />
-                    How can I help you today?
-                  </p>
-                </div>
-
                 {chatPhase === "new_chat" ? (
                   <motion.div 
                     initial={{ opacity: 0, y: 10 }}
@@ -892,6 +867,32 @@ export function AssistIQUploadClaimModal({ open, onOpenChange }: Props) {
                     transition={{ duration: 0.3 }}
                     className="flex flex-col gap-8"
                   >
+                    {/* Centered Welcome Message */}
+                    <motion.div 
+                      className="flex flex-col items-center justify-center text-center mt-2 mb-4"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <AssistIQAvatar size={isDocked ? 48 : 64} />
+                      <h2 className={`mt-6 font-semibold tracking-[-0.88px] text-[#444c72] transition-all duration-300 ${isDocked ? "text-[32px] leading-[40px]" : "text-[48px] md:text-[56px] leading-[1.1]"}`}>
+                        {chatGreeting()},{" "}
+                        <span
+                          style={{
+                            backgroundImage: "linear-gradient(174.29deg, #25146f 13.72%, #c8102e 27.32%)",
+                            WebkitBackgroundClip: "text",
+                            WebkitTextFillColor: "transparent",
+                            backgroundClip: "text",
+                          }}
+                        >
+                          {SPARK_MEMBER_FIRST_NAME}
+                        </span>!
+                      </h2>
+                      <p className={`mt-4 tracking-[-0.304px] text-[#7a87b2] transition-all duration-300 ${isDocked ? "text-[16px] leading-[24px]" : "text-[20px] leading-[32px]"}`}>
+                        I&apos;m WEXly, your Benefits helper. How can I help you today?
+                      </p>
+                    </motion.div>
+
                     {/* Recent Conversations */}
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
