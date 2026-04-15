@@ -512,20 +512,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
 
   useEffect(() => {
     if (!open) {
-      setChatPhase("typing");
-      setIsSidebarOpen(false);
-      setSelectedClaim(null);
-      setUploadProgress(0);
-      setIsLoadingMore(false);
-      setHasLoadedMore(false);
-      setChatInput("");
-      if (progressIntervalRef.current) {
-        clearInterval(progressIntervalRef.current);
-        progressIntervalRef.current = null;
-      }
       return;
-    } else {
-      setCurrentMessage(initialMessage);
     }
     
     // Only lock scrolling if the modal is expanded (not docked)
@@ -537,6 +524,32 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
       };
     }
   }, [open, isDocked]);
+
+  const prevInitialMessageRef = useRef(initialMessage);
+
+  // Handle new initial messages from the parent
+  useEffect(() => {
+    if (open && initialMessage) {
+      // Only reset if the parent passed a completely new initialMessage
+      // (meaning the user typed a new query in the hero input)
+      // or if we were on the new_chat screen
+      if (initialMessage !== prevInitialMessageRef.current || chatPhase === "new_chat") {
+        setChatPhase("typing");
+        setIsSidebarOpen(false);
+        setSelectedClaim(null);
+        setUploadProgress(0);
+        setIsLoadingMore(false);
+        setHasLoadedMore(false);
+        setChatInput("");
+        setCurrentMessage(initialMessage);
+        if (progressIntervalRef.current) {
+          clearInterval(progressIntervalRef.current);
+          progressIntervalRef.current = null;
+        }
+      }
+      prevInitialMessageRef.current = initialMessage;
+    }
+  }, [open, initialMessage]);
 
   useEffect(() => {
     if (!open) return;
