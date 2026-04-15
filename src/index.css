@@ -452,9 +452,14 @@ code[class*="language-"] {
   z-index: 50;
 }
 
-/* Tabs component - make tablist full width */
+/* Tabs component - make tablist full width and use primary color for active tab */
 [role="tablist"].inline-flex.h-10.items-center.gap-1.border-b.border-wex-tabs-divider {
   width: 100% !important;
+}
+
+[role="tablist"] button[role="tab"][data-state="active"] {
+  border-color: var(--app-primary, hsl(var(--primary))) !important;
+  color: var(--app-primary, hsl(var(--primary))) !important;
 }
 
 /* Workspace component - explicit background overrides for higher specificity */
@@ -554,13 +559,23 @@ div.w-64.border-r.border-wex-workspace-sidebar-border.bg-wex-workspace-sidebar-b
 }
 
 /* ============================================================
-   CHECKBOX INDETERMINATE STATE FIX
+   CHECKBOX STYLES
    ============================================================
-   Ensures indeterminate checkboxes display correctly with minus icon
+   Ensures checkboxes have white check mark and system-link background
    ============================================================ */
+button[role="checkbox"] {
+  border-color: var(--system-link, #1C6EFF) !important;
+}
+
+button[role="checkbox"][data-state="checked"],
 button[role="checkbox"][data-state="indeterminate"] {
-  background-color: hsl(var(--wex-component-checkbox-checked-bg)) !important;
-  border-color: hsl(var(--wex-component-checkbox-checked-bg)) !important;
+  background-color: var(--system-link, #1C6EFF) !important;
+  color: #FFFFFF !important;
+}
+
+button[role="checkbox"][data-state="checked"] svg,
+button[role="checkbox"][data-state="indeterminate"] svg {
+  color: #FFFFFF !important;
 }
 
 /* Use descendant selector: SVG is inside span (button > span > svg), not direct child */
@@ -588,4 +603,14 @@ button[role="checkbox"][data-state="indeterminate"] svg {
 
 .bg-primary button[role="checkbox"][data-state="checked"] svg {
   color: hsl(var(--primary)) !important;
+}
+
+/* Pagination active link override */
+nav[aria-label="pagination"] a[aria-current="page"],
+nav[aria-label="pagination"] a[aria-current="page"]:hover,
+.wex-pagination-content a[aria-current="page"],
+.wex-pagination-content a[aria-current="page"]:hover {
+  background-color: var(--theme-primary-ramp-50) !important;
+  border: none !important;
+  color: var(--theme-primary) !important;
 }

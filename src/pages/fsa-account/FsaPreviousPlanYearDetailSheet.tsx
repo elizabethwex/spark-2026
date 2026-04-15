@@ -95,7 +95,7 @@ export function FsaPreviousPlanYearDetailSheet({
   planYearRange = "01/01/2025 - 12/31/2025",
 }: {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onOpenChange: (_open: boolean) => void;
   /** Display string under the title, e.g. from plan period control */
   planYearRange?: string;
 }) {

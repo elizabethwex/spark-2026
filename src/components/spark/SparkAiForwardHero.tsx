@@ -313,6 +313,14 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
                   disabled={isInactive}
                   onClick={() => {
                     if (isInactive) return;
+                    if (action.label === "HSA Store") {
+                      window.open("https://hsastore.com", "_blank", "noopener,noreferrer");
+                      return;
+                    }
+                    if (action.label === "FSA Store") {
+                      window.open("https://fsastore.com", "_blank", "noopener,noreferrer");
+                      return;
+                    }
                     if (action.href === "/reimburse") {
                       openReimburseWorkspace();
                       return;
