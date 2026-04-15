@@ -904,7 +904,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange }: Props) {
                         <button className="flex items-center justify-between rounded-xl border border-[#e3e7f4] bg-white p-4 text-left transition-shadow hover:shadow-sm">
                           <div className="flex items-center gap-3 text-[#3958c3]">
                             <Clock className="h-4 w-4" />
-                            <span className="text-[14px]">Recent claim denied</span>
+                            <span className="text-[14px]">Why was my claim denied?</span>
                           </div>
                           <ChevronRight className="h-4 w-4 text-[#a5aeb4]" />
                         </button>
