@@ -633,7 +633,24 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
     }
   };
 
-  if (!open) return null;
+  if (!open) {
+    if (chatPhase !== "new_chat") {
+      const resumeButton = (
+        <motion.button
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.8 }}
+          onClick={() => onOpenChange(true)}
+          className="fixed bottom-6 right-6 z-[300] flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-[0_4px_20px_rgba(43,49,78,0.15)] hover:scale-105 transition-transform"
+          aria-label="Resume chat"
+        >
+          <AssistIQAvatar size={40} />
+        </motion.button>
+      );
+      return createPortal(resumeButton, document.body);
+    }
+    return null;
+  }
 
   const node = (
     <div

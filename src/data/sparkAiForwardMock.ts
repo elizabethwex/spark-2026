@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { CreditCard, DollarSign, Send, ShoppingBag, Upload } from "lucide-react";
+import { CreditCard, DollarSign, Send, ShoppingBag } from "lucide-react";
 
 /**
  * Copy and structure aligned with SPARK-2026 Figma (AI-forward homepage).
