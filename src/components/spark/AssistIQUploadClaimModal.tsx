@@ -479,6 +479,8 @@ export function AssistIQUploadClaimModal({ open, onOpenChange }: Props) {
     | "submitted"
     | "final_typing"
     | "final_approval"
+    | "see_all_typing"
+    | "see_all_results"
   >("typing");
   const [selectedClaim, setSelectedClaim] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -1017,6 +1019,10 @@ export function AssistIQUploadClaimModal({ open, onOpenChange }: Props) {
                         <div className="mt-2 flex flex-col gap-2 sm:flex-row">
                           <button
                             type="button"
+                            onClick={() => {
+                              setChatPhase("see_all_typing");
+                              setTimeout(() => setChatPhase("see_all_results"), 1500);
+                            }}
                             className="flex items-center justify-center rounded-full border border-[#25146f] bg-white px-5 py-2 text-[14px] font-medium text-[#25146f] transition-colors hover:bg-[#f8f9fe]"
                           >
                             See all claims
@@ -1026,6 +1032,107 @@ export function AssistIQUploadClaimModal({ open, onOpenChange }: Props) {
                     )}
                   </div>
                 </div>
+
+                {/* See All Claims Flow */}
+                <AnimatePresence>
+                  {(chatPhase === "see_all_typing" || chatPhase === "see_all_results") && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mt-6 flex flex-col gap-4"
+                    >
+                      {/* User message */}
+                      <div className="flex flex-col items-end gap-2">
+                        <div className="flex items-center gap-1 text-[11px] leading-[16px] tracking-[0.055px]">
+                          <span className="text-[#243746]">{SPARK_MEMBER_FIRST_NAME}</span>
+                          <span className="text-[#a5aeb4]">{timeLabel}</span>
+                        </div>
+                        <div className={`rounded-tl-[24px] rounded-tr-[24px] rounded-bl-[24px] border border-[#e3e7f4] bg-[#e3e7f4] p-4 ${isDocked ? "max-w-[85%]" : "max-w-[358px]"}`}>
+                          <p className="text-[14px] leading-[24px] tracking-[-0.084px] text-[#1d2c38]">
+                            See all claims
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Assistant response */}
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-2">
+                          <AssistIQAvatar size={28} />
+                          <span className="text-[12px] text-[#7a87b2]">{timeLabel}</span>
+                        </div>
+                        <div className="flex flex-col gap-3 pl-1">
+                          {chatPhase === "see_all_typing" ? (
+                            <div className="flex items-center gap-3">
+                              <div className="flex gap-1">
+                                {[0, 1, 2].map((i) => (
+                                  <motion.span
+                                    key={i}
+                                    className="h-2 w-2 rounded-full bg-[#9ca7c7]"
+                                    animate={{ opacity: [0.35, 1, 0.35], y: [0, -3, 0] }}
+                                    transition={{
+                                      duration: 0.9,
+                                      repeat: Infinity,
+                                      ease: "easeInOut",
+                                      delay: i * 0.12,
+                                    }}
+                                  />
+                                ))}
+                              </div>
+                              <p className="text-[12px] italic leading-[16px] text-[#7a87b2]">
+                                Fetching your claims...
+                              </p>
+                            </div>
+                          ) : (
+                            <motion.div
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ type: "spring", stiffness: 340, damping: 28 }}
+                              className="flex flex-col gap-3"
+                            >
+                              <div className={`pb-2 ${isDocked ? "max-w-[85%]" : "max-w-[358px]"}`}>
+                                <p className="text-[14px] leading-[24px] tracking-[-0.084px] text-[#253341]">
+                                  Here are your recent claims:
+                                </p>
+                              </div>
+                              <ClaimPreviewCard
+                                provider="Bigtown Dentistry"
+                                amount="$210.00"
+                                date="Apr 26, 2026"
+                                claimId="#123456"
+                                delay={0.1}
+                                onWorkOnClaim={() => handleWorkOnClaim("#123456")}
+                              />
+                              <ClaimPreviewCard
+                                provider="Dr. Smith Vision"
+                                amount="$120.00"
+                                date="Nov 15, 2025"
+                                claimId="#789012"
+                                delay={0.2}
+                                onWorkOnClaim={() => handleWorkOnClaim("#789012")}
+                              />
+                              <ClaimPreviewCard
+                                provider="City Hospital"
+                                amount="$450.00"
+                                date="Oct 02, 2025"
+                                claimId="#345678"
+                                delay={0.3}
+                                onWorkOnClaim={() => handleWorkOnClaim("#345678")}
+                              />
+                              <ClaimPreviewCard
+                                provider="Main St Pharmacy"
+                                amount="$45.00"
+                                date="Sep 18, 2025"
+                                claimId="#901234"
+                                delay={0.4}
+                                onWorkOnClaim={() => handleWorkOnClaim("#901234")}
+                              />
+                            </motion.div>
+                          )}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
                 {/* Working on a claim flow */}
                 <AnimatePresence>
