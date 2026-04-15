@@ -886,9 +886,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange }: Props) {
                         >
                           WEXly
                         </strong>
-                        , your Benefits helper.
-                        <br />
-                        How can I help you today?
+                        , your Benefits helper. How can I help you today?
                       </p>
                     </div>
 
@@ -942,9 +940,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange }: Props) {
                         >
                           WEXly
                         </strong>
-                        , your Benefits helper.
-                        <br />
-                        How can I help you today?
+                        , your Benefits helper. How can I help you today?
                       </p>
                     </div>
 
