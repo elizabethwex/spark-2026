@@ -872,7 +872,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange }: Props) {
                       <h2 className={`font-semibold tracking-[-0.88px] text-[#444c72] transition-all duration-300 ${isDocked ? "text-[28px] leading-[36px]" : "text-[44px] leading-[56px]"}`}>
                         {chatGreeting()}, {SPARK_MEMBER_FIRST_NAME}!
                       </h2>
-                      <p className={`tracking-[-0.304px] text-[#444c72] transition-all duration-300 ${isDocked ? "text-[15px] leading-[24px]" : "text-[19px] leading-[32px]"}`}>
+                      <p className={`tracking-[-0.304px] text-[#444c72] transition-all duration-300 ${isDocked ? "text-[16px] leading-[26px]" : "text-[19px] leading-[32px]"}`}>
                         I&apos;m{" "}
                         <strong
                           className="font-semibold"
@@ -926,7 +926,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange }: Props) {
                       <h2 className={`font-semibold tracking-[-0.88px] text-[#444c72] transition-all duration-300 ${isDocked ? "text-[28px] leading-[36px]" : "text-[44px] leading-[56px]"}`}>
                         {chatGreeting()}, {SPARK_MEMBER_FIRST_NAME}!
                       </h2>
-                      <p className={`tracking-[-0.304px] text-[#444c72] transition-all duration-300 ${isDocked ? "text-[15px] leading-[24px]" : "text-[19px] leading-[32px]"}`}>
+                      <p className={`tracking-[-0.304px] text-[#444c72] transition-all duration-300 ${isDocked ? "text-[16px] leading-[26px]" : "text-[19px] leading-[32px]"}`}>
                         I&apos;m{" "}
                         <strong
                           className="font-semibold"
