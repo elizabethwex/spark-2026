@@ -314,15 +314,12 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
           >
             {quickActions.map((action) => {
               const Icon = action.icon;
-              const isInactive = action.label === "Send Payment";
               return (
                 <motion.button
                   variants={pillVariants}
                   key={action.label}
                   type="button"
-                  disabled={isInactive}
                   onClick={() => {
-                    if (isInactive) return;
                     if (action.label === "HSA Store") {
                       window.open("https://hsastore.com", "_blank", "noopener,noreferrer");
                       return;
