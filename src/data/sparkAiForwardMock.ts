@@ -17,37 +17,92 @@ export const sparkAccountQuickActions: { label: string; href: string; icon: Luci
 export const sparkHsaSummary = {
   totalValue: "$15,900.00",
   investedAssets: "$12,700.00",
-  ytdReturnPct: "+12.5%",
+  ytdReturnPct: "+12.5% YTD",
   cashBalance: "$3,200.00",
-  contributionPctUsed: 74,
+  contributionPctUsed: 77,
   planYear: "2026",
-  remainingLimit: "$1,100.00",
+  remainingLimit: "$1,000.00",
+  irsLimit: "$4,400.00",
 };
 
 export const sparkLpfsaSummary = {
-  balance: "$850.00",
+  balance: "$1,000.00",
   planRange: "01/01/2026 – 12/31/2026",
   daysToSpend: 28,
-  spendByTag: "Spend $350 by 12/31",
+  spendByTag: "spend by 12/31",
   eligibleLabel: "Vision & Dental",
+  contributionPctUsed: 60,
+  contributionLimit: "$2,500",
+  rolloverAmount: "$500.00",
+  useItOrLoseIt: "$500.00",
+  finalFilingDate: "3/1/27",
+};
+
+export const sparkLpfsaPrimarySummary = {
+  balance: "$2,425.00",
+  planRange: "01/01/2026 – 12/31/2026",
+  daysToSpend: 28,
+  spendByTag: null,
+  eligibleLabel: "Vision & Dental",
+  contributionPctUsed: 11,
+  contributionLimit: "$2,500",
+  rolloverAmount: "$500.00",
+  useItOrLoseIt: "$1,925.00",
+  finalFilingDate: "3/1/27",
 };
 
 export const sparkFsaSummary = {
-  balance: "$850.00",
+  balance: "$1,000.00",
   planRange: "01/01/2026 - 4/15/2026",
   daysToSpend: 28,
-  spendByTag: "Spend $350 by 12/31",
+  spendByTag: "spend by 12/31",
   eligibleLabel: "Health FSA",
   eligibleDesc: "Medical, Dental, Vision, RX, OTC meds.",
+  contributionPctUsed: 60,
+  contributionLimit: "$2,500",
+  rolloverAmount: "$500.00",
+  useItOrLoseIt: "$500.00",
+  finalFilingDate: "3/1/27",
+};
+
+export const sparkFsaPrimarySummary = {
+  balance: "$2,425.00",
+  planRange: "01/01/2026 - 4/15/2026",
+  daysToSpend: 28,
+  spendByTag: null,
+  eligibleLabel: "Health FSA",
+  eligibleDesc: "Medical, Dental, Vision, RX, OTC meds.",
+  contributionPctUsed: 11,
+  contributionLimit: "$2,500",
+  rolloverAmount: "$500.00",
+  useItOrLoseIt: "$1,925.00",
+  finalFilingDate: "3/1/27",
 };
 
 export const sparkDcfsaSummary = {
+  balance: "$300.00",
+  planRange: "01/01/2025 - 12/31/2025",
+  daysToSpend: 28,
+  spendByTag: "spend by 12/31",
+  eligibleLabel: "Using DCFSA funds",
+  eligibleDesc: "Daycare, Preschool, Day Camps, Adult Care.",
+  contributionPctUsed: 80,
+  contributionLimit: "$1,500",
+  useItOrLoseIt: "$300.00",
+  finalFilingDate: "3/1/26",
+};
+
+export const sparkDcfsaPrimarySummary = {
   balance: "$620.00",
   planRange: "01/01/2025 - 12/31/2025",
   daysToSpend: 28,
-  spendByTag: "Spend $120 by 12/31",
+  spendByTag: null,
   eligibleLabel: "Using DCFSA funds",
   eligibleDesc: "Daycare, Preschool, Day Camps, Adult Care.",
+  contributionPctUsed: 41,
+  contributionLimit: "$1,500",
+  useItOrLoseIt: "$620.00",
+  finalFilingDate: "3/1/26",
 };
 
 export type SparkActivityStatus = "approved" | "needs_attention" | "completed";

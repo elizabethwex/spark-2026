@@ -28,11 +28,11 @@ export function HSAPlannerCard() {
   const isOnTrack = current.status === "on-track";
 
   return (
-    <GlassCard hoverable className="group/card flex h-full flex-col">
+    <GlassCard className="group/card flex h-full flex-col">
       <div className="flex items-start justify-between p-6 pb-0">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
-            <PiggyBank className="h-5 w-5" />
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--app-secondary-50)] text-[var(--theme-secondary)] transition-transform group-hover/card:scale-110">
+            <PiggyBank className="h-5 w-5 transition-transform group-hover/card:rotate-12 text-[var(--theme-secondary)]" />
           </div>
           <div>
             <h2 className="font-display font-bold text-foreground">
