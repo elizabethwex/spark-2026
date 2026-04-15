@@ -341,6 +341,7 @@ export default function FsaAccountPage() {
                         type="button"
                         variant="outline"
                         className="h-10 w-full rounded-xl border-primary text-primary hover:bg-primary/10"
+                        onClick={() => window.open("https://fsastore.com", "_blank")}
                       >
                         Shop Now
                       </Button>
@@ -463,7 +464,7 @@ export default function FsaAccountPage() {
               <div className="mt-6 overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow>
+                    <TableRow className="hover:bg-transparent border-y border-border bg-muted/30">
                       <TableHead>
                         <div className="flex items-center gap-1 whitespace-nowrap">
                           Date
@@ -861,7 +862,7 @@ function FsaTransactionTableRow({
   onDeniedRowClick,
 }: {
   row: FsaTransactionRow;
-  onDeniedRowClick?: (row: FsaTransactionRow) => void;
+  onDeniedRowClick?: (_row: FsaTransactionRow) => void;
 }) {
   const { openReimburseWorkspace } = useReimburseWorkspace();
   const isDeniedInteractive = row.status === "Denied" && onDeniedRowClick != null;

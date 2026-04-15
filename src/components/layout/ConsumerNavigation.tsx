@@ -447,7 +447,7 @@ export function ConsumerNavigation({
                   { label: "Dependents", subPage: "dependents" },
                   { label: "Beneficiaries", subPage: "beneficiaries" },
                   { label: "Bank Accounts", subPage: "banking" },
-                  { label: "Reimbursement Method", subPage: "reimbursement-method" },
+                  { label: "Reimbursement Methods", subPage: "reimbursement-method" },
                   { label: "Debit Card", subPage: "debit-card" },
                   { label: "Login and Security", subPage: "login-security" },
                   { label: "Communication Preferences", subPage: "communication" },
@@ -459,7 +459,7 @@ export function ConsumerNavigation({
                       onClick={() => handleProfileNavigation(item.subPage)}
                       className={`flex items-center gap-[8px] pl-[12px] pr-0 py-[8px] text-sm tracking-[-0.084px] ${
                         isItemActive
-                          ? "bg-[#f1fafe] text-primary"
+                          ? "bg-neutral-100 text-primary"
                           : "text-foreground hover:bg-gray-50"
                       }`}
                     >

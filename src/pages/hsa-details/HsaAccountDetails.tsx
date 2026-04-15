@@ -25,7 +25,9 @@ import { usePrototype } from "@/context/PrototypeContext";
 import { useReimburseWorkspace } from "@/context/ReimburseWorkspaceContext";
 import { cn, homepageAccountSurfaceClass } from "@/lib/utils";
 import { hsaPlannerData } from "@/data/mockData";
+import { HsaContributeWorkspaceHost } from "./HsaContributeWorkspaceHost";
 import { HsaRecentTransactionsTable } from "./HsaRecentTransactionsTable";
+import { HSA_2026_CONTRIBUTION_MOCK } from "@/data/hsaSharedContributions";
 import { hsaDetailTransactions, hsaInvestmentChartPoints } from "./hsaDetailMockData";
 
 const fmt = (n: number) =>
@@ -53,6 +55,7 @@ export function HsaAccountDetails() {
   const { openReimburseWorkspace } = useReimburseWorkspace();
   const [plannerTab, setPlannerTab] = useState<"2026" | "longterm">("2026");
   const [investRange, setInvestRange] = useState<(typeof INVESTMENT_RANGES)[number]>("1W");
+  const [isContributeOpen, setIsContributeOpen] = useState(false);
 
   const filteredChartPoints = useMemo(
     () => hsaInvestmentChartPoints.slice(-RANGE_WEEKS[investRange]),
@@ -75,10 +78,8 @@ export function HsaAccountDetails() {
   const plannerOnTrack =
     plannerTab === "2026" ? true : longTerm.status === "on-track";
 
-  const contributionLimit = 4_400;
-  const yourContrib = 3_000;
-  const employerContrib = 400;
-  const leftToContribute = 1_000;
+  const { contributionLimit, yourContrib, employerContrib, leftToContribute } =
+    HSA_2026_CONTRIBUTION_MOCK;
   const totalContribYtd = yourContrib + employerContrib;
   const pctLimitUsed = Math.round((totalContribYtd / contributionLimit) * 100);
 
@@ -149,15 +150,26 @@ export function HsaAccountDetails() {
                 </div>
 
                 {/* CTA */}
-                <Button
-                  intent="primary"
-                  size="md"
-                  className="w-full rounded-[12px]"
-                  type="button"
-                  onClick={() => openReimburseWorkspace()}
-                >
-                  Reimburse Myself
-                </Button>
+                <div className="flex w-full gap-3">
+                  <Button
+                    intent="primary"
+                    variant="outline"
+                    size="md"
+                    className="min-w-0 flex-1 rounded-[12px]"
+                    type="button"
+                  >
+                    Pay provider
+                  </Button>
+                  <Button
+                    intent="primary"
+                    size="md"
+                    className="min-w-0 flex-1 rounded-[12px]"
+                    type="button"
+                    onClick={() => openReimburseWorkspace()}
+                  >
+                    Reimburse Myself
+                  </Button>
+                </div>
               </CardContent>
             </Card>
 
@@ -271,6 +283,7 @@ export function HsaAccountDetails() {
                     size="md"
                     className="w-full rounded-xl border-primary text-primary"
                     type="button"
+                    onClick={() => setIsContributeOpen(true)}
                   >
                     Contribute to HSA
                   </Button>
@@ -457,7 +470,7 @@ export function HsaAccountDetails() {
                     Plus use DirectPay™ and check out instantly!
                   </p>
                   <div>
-                    <Button intent="primary" size="md" className="rounded-xl" type="button">
+                    <Button intent="primary" size="md" className="rounded-xl" type="button" onClick={() => window.open("https://hsastore.com", "_blank")}>
                       Shop HSA Store
                     </Button>
                   </div>
@@ -476,6 +489,10 @@ export function HsaAccountDetails() {
       </FadeInItem>
 
       <ConsumerFooter />
+
+      {isContributeOpen ? (
+        <HsaContributeWorkspaceHost onClose={() => setIsContributeOpen(false)} />
+      ) : null}
     </div>
   );
 }

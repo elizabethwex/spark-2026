@@ -21,9 +21,37 @@ import {
 import { ConsumerFooter } from "@/components/layout/Footer";
 import { ConsumerNavigation } from "@/components/layout/ConsumerNavigation";
 import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground";
-import { Pencil, Info, Plus, Calendar, X, Trash2, MoreVertical, Eye, EyeOff, RefreshCw, AlertCircle, User, Users, HeartPlus, ShieldCheck, Landmark, CreditCard, Bell, UserLock, Lock, SquareArrowRight } from "lucide-react";
+import {
+  WEX_PROFILE_BANK_ACCOUNTS_KEY,
+  migrateLegacyEllaBankLabel,
+} from "@/lib/profileBankAccountsSession";
+import { ReimbursementMethodsContent } from "@/pages/ReimbursementMethodsContent";
+import {
+  Pencil,
+  Info,
+  Plus,
+  Calendar,
+  X,
+  Trash2,
+  MoreVertical,
+  Eye,
+  EyeOff,
+  RefreshCw,
+  AlertCircle,
+  User,
+  Users,
+  HeartPlus,
+  ShieldCheck,
+  Landmark,
+  CreditCard,
+  Bell,
+  UserLock,
+  Lock,
+  SquareArrowRight,
+  DollarSign,
+} from "lucide-react";
 
-type SubPage = "my-profile" | "dependents" | "beneficiaries" | "authorized-signers" | "banking" | "debit-card" | "login-security" | "communication" | "report-lost-stolen" | "order-replacement-card";
+type SubPage = "my-profile" | "dependents" | "beneficiaries" | "authorized-signers" | "banking" | "reimbursement-method" | "debit-card" | "login-security" | "communication" | "report-lost-stolen" | "order-replacement-card";
 
 type Dependent = {
   id: string;
@@ -131,7 +159,22 @@ type DebitCard = {
 
 const SESSION_STORAGE_DEPENDENTS_KEY = "wex_profile_dependents_v2";
 const SESSION_STORAGE_BENEFICIARIES_KEY = "wex_profile_beneficiaries";
-const SESSION_STORAGE_BANK_ACCOUNTS_KEY = "wex_profile_bank_accounts";
+
+/** First visit (no saved list): show one active account so Bank Accounts is not empty. */
+const DEFAULT_BANK_ACCOUNTS: BankAccount[] = [
+  {
+    id: "bank-default-1",
+    routingNumber: "021000021",
+    accountNumber: "0000000005423",
+    confirmAccountNumber: "0000000005423",
+    accountNickname: "",
+    accountType: "checking",
+    verificationMethod: "email",
+    selectedDirectDepositOptions: [],
+    bankName: "Wells Fargo Bank",
+    activationStatus: "active",
+  },
+];
 
 const DEFAULT_DEPENDENTS: Dependent[] = [
   {
@@ -197,26 +240,29 @@ function saveBeneficiariesToStorage(beneficiaries: Beneficiary[]): void {
 }
 
 function loadBankAccountsFromStorage(): BankAccount[] {
-  if (typeof window === "undefined") return [];
+  if (typeof window === "undefined") return DEFAULT_BANK_ACCOUNTS;
   try {
-    const stored = sessionStorage.getItem(SESSION_STORAGE_BANK_ACCOUNTS_KEY);
-    if (!stored) return [];
+    const stored = sessionStorage.getItem(WEX_PROFILE_BANK_ACCOUNTS_KEY);
+    if (!stored) return DEFAULT_BANK_ACCOUNTS;
     const parsed: unknown = JSON.parse(stored);
-    if (!Array.isArray(parsed)) return [];
+    if (!Array.isArray(parsed)) return DEFAULT_BANK_ACCOUNTS;
+    if (parsed.length === 0) return DEFAULT_BANK_ACCOUNTS;
     return parsed.map((raw: BankAccount) => ({
       ...raw,
+      accountNickname: migrateLegacyEllaBankLabel(raw.accountNickname) ?? raw.accountNickname,
+      bankName: migrateLegacyEllaBankLabel(raw.bankName) ?? raw.bankName,
       activationStatus:
-        raw.activationStatus === "pending_deposit" ? "pending_deposit" : "active",
+        raw.activationStatus === "pending_deposit" ? ("pending_deposit" as const) : ("active" as const),
     }));
   } catch {
-    return [];
+    return DEFAULT_BANK_ACCOUNTS;
   }
 }
 
 function saveBankAccountsToStorage(bankAccounts: BankAccount[]): void {
   if (typeof window === "undefined") return;
   try {
-    sessionStorage.setItem(SESSION_STORAGE_BANK_ACCOUNTS_KEY, JSON.stringify(bankAccounts));
+    sessionStorage.setItem(WEX_PROFILE_BANK_ACCOUNTS_KEY, JSON.stringify(bankAccounts));
   } catch (e) {
     console.warn("Failed to save bank accounts to sessionStorage:", e);
   }
@@ -692,7 +738,7 @@ export default function MyProfile() {
 
   const [activeSubPage, setActiveSubPage] = useState<SubPage>(() => {
     const subPage = searchParams.get("subPage");
-    const validSubPages: SubPage[] = ["my-profile", "dependents", "beneficiaries", "authorized-signers", "banking", "debit-card", "login-security", "communication", "report-lost-stolen", "order-replacement-card"];
+    const validSubPages: SubPage[] = ["my-profile", "dependents", "beneficiaries", "authorized-signers", "banking", "reimbursement-method", "debit-card", "login-security", "communication", "report-lost-stolen", "order-replacement-card"];
     if (subPage && validSubPages.includes(subPage as SubPage)) {
       return subPage as SubPage;
     }
@@ -702,7 +748,7 @@ export default function MyProfile() {
   // Sync activeSubPage with URL params
   useEffect(() => {
     const subPage = searchParams.get("subPage");
-    const validSubPages: SubPage[] = ["my-profile", "dependents", "beneficiaries", "authorized-signers", "banking", "debit-card", "login-security", "communication", "report-lost-stolen", "order-replacement-card"];
+    const validSubPages: SubPage[] = ["my-profile", "dependents", "beneficiaries", "authorized-signers", "banking", "reimbursement-method", "debit-card", "login-security", "communication", "report-lost-stolen", "order-replacement-card"];
     queueMicrotask(() => {
       if (subPage && validSubPages.includes(subPage as SubPage)) {
         setActiveSubPage(subPage as SubPage);
@@ -1565,7 +1611,6 @@ export default function MyProfile() {
         bankAccount.bankName?.trim() ||
         `${bankAccount.accountType.charAt(0).toUpperCase() + bankAccount.accountType.slice(1)} Account`
       : "Bank account";
-
     setBankAccounts((prev) => prev.filter((acc) => acc.id !== id));
     setIsRemoveBankAccountConfirmOpen(false);
     setIsRemoveBankAccountAuthModalOpen(false);
@@ -1759,6 +1804,7 @@ export default function MyProfile() {
       title: "PAYMENTS",
       items: [
         { label: "Bank Accounts", key: "banking", icon: Landmark },
+        { label: "Reimbursement Methods", key: "reimbursement-method", icon: DollarSign },
         { label: "Debit Card", key: "debit-card", icon: CreditCard },
       ],
     },
@@ -1894,7 +1940,7 @@ export default function MyProfile() {
                   intent="primary"
                   variant="outline"
                   size="sm"
-                  className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50 [&_svg]:text-current"
+                  className="gap-0 w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50 [&_svg]:text-current"
                   onClick={() => {
                     resetForm();
                     setEditingDependentId(null);
@@ -2032,23 +2078,25 @@ export default function MyProfile() {
               <div className="px-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h2 className="text-2xl font-semibold text-gray-800">Beneficiaries</h2>
                 <div className="flex gap-2 w-full sm:w-auto">
-                  <Button
-                    intent="primary"
-                    variant="ghost"
-                    size="sm"
-                    className="w-full sm:w-auto justify-center"
-                    onClick={() => {
-                      const initialShares: Record<string, string> = {};
-                      beneficiaries.forEach((ben) => {
-                        initialShares[ben.id] = ben.sharePercentage || (beneficiaries.length === 1 ? "100" : "0");
-                      });
-                      setEditPercentagesShares(initialShares);
-                      setEditPercentagesSplitEqually(false);
-                      setIsEditPercentagesModalOpen(true);
-                    }}
-                  >
-                    Edit Shares
-                  </Button>
+                  {beneficiaries.length >= 2 && (
+                    <Button
+                      intent="primary"
+                      variant="ghost"
+                      size="sm"
+                      className="w-full sm:w-auto justify-center"
+                      onClick={() => {
+                        const initialShares: Record<string, string> = {};
+                        beneficiaries.forEach((ben) => {
+                          initialShares[ben.id] = ben.sharePercentage || (beneficiaries.length === 1 ? "100" : "0");
+                        });
+                        setEditPercentagesShares(initialShares);
+                        setEditPercentagesSplitEqually(false);
+                        setIsEditPercentagesModalOpen(true);
+                      }}
+                    >
+                      Edit Shares
+                    </Button>
+                  )}
                   <Button
                     intent="primary"
                     variant="outline"
@@ -2231,7 +2279,7 @@ export default function MyProfile() {
                   intent="primary"
                   variant="outline"
                   size="sm"
-                  className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50 [&_svg]:text-current"
+                  className="w-full gap-0 sm:w-auto justify-center border-primary text-primary hover:bg-blue-50 [&_svg]:text-current"
                   onClick={() => {
                     resetAuthorizedSignerForm();
                     setEditingAuthorizedSignerId(null);
@@ -2322,7 +2370,7 @@ export default function MyProfile() {
                             className="flex items-center gap-2 px-3 py-2 cursor-pointer text-red-500"
                             onClick={() => handleRemoveAuthorizedSignerClick(signer)}
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-4 w-4 text-red-500" aria-hidden />
                             <span className="text-sm leading-none">Remove</span>
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -2335,6 +2383,9 @@ export default function MyProfile() {
           </>
         );
 
+      case "reimbursement-method":
+        return <ReimbursementMethodsContent />;
+
       case "banking":
         return (
           <>
@@ -2345,7 +2396,7 @@ export default function MyProfile() {
                   intent="primary"
                   variant="outline"
                   size="sm"
-                  className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50 [&_svg]:text-current"
+                  className="w-full gap-0 sm:w-auto justify-center border-primary text-primary hover:bg-blue-50 [&_svg]:text-current"
                   onClick={() => {
                     setBankAccountFormData({
                       verificationMethod: "",
@@ -2433,56 +2484,61 @@ export default function MyProfile() {
                   const accountDigits = bankAccount.accountNumber.replace(/\D/g, "");
                   const last4 =
                     accountDigits.length >= 4 ? accountDigits.slice(-4) : accountDigits || "—";
-                  const accountTypeLabel = `${bankAccount.accountType.charAt(0).toUpperCase() + bankAccount.accountType.slice(1)} Account`;
+                  const accountTypeWord =
+                    bankAccount.accountType === "checking" ? "Checking" : "Saving";
+                  const bankNameForTypeLine = bankAccount.bankName?.trim() ?? "";
+                  const accountTypeLine = bankNameForTypeLine
+                    ? `${accountTypeWord} Account | ${bankNameForTypeLine}`
+                    : `${accountTypeWord} Account`;
                   const isPendingDeposit = bankAccount.activationStatus !== "active";
                   const isBankActivationLocked = (bankAccount.activationVerifyAttemptCount ?? 0) >= 2;
 
                   return (
                     <div
                       key={bankAccount.id}
-                      className="flex w-[325px] max-w-full shrink-0 flex-col gap-2 rounded-lg border border-[#e4e6e9] bg-white p-4 shadow-[0_1px_3px_0_rgba(0,0,0,0.1),0_1px_2px_0_rgba(0,0,0,0.1)]"
+                      className="flex w-[325px] max-w-full shrink-0 flex-col rounded-lg border border-[#e4e6e9] bg-white p-4 shadow-[0_1px_3px_0_rgba(0,0,0,0.1),0_1px_2px_0_rgba(0,0,0,0.1)]"
                     >
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0 flex-1">
-                          <p className="text-base font-semibold leading-6 tracking-[-0.176px] text-[#1d2c38]">
+                      <div className="mb-2 flex flex-col gap-1">
+                        <div className="flex min-h-[35px] items-center justify-between gap-2">
+                          <p className="min-w-0 flex-1 text-base font-semibold leading-6 tracking-[-0.176px] text-[#1d2c38]">
                             {displayTitle}
                           </p>
-                          <p className="text-[11px] font-normal leading-4 tracking-[0.055px] text-[#515f6b]">
-                            {accountTypeLabel}
-                          </p>
-                        </div>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-[35px] w-[35px] shrink-0 text-[#1d2c38]"
-                              aria-label="Bank account options"
-                            >
-                              <MoreVertical className="h-3.5 w-3.5" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="min-w-[160px]">
-                            {isPendingDeposit ? (
-                              <DropdownMenuItem
-                                className="flex cursor-pointer items-center gap-2 text-[#1d2c38] focus:text-[#1d2c38]"
-                                onClick={() => handleEditBankAccount(bankAccount)}
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-[35px] w-[35px] shrink-0 text-[#1d2c38]"
+                                aria-label="Bank account options"
                               >
-                                <Pencil className="h-4 w-4" />
-                                <span>Edit</span>
+                                <MoreVertical className="h-3.5 w-3.5" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="min-w-[160px]">
+                              {isPendingDeposit ? (
+                                <DropdownMenuItem
+                                  className="flex cursor-pointer items-center gap-2 text-[#1d2c38] focus:text-[#1d2c38]"
+                                  onClick={() => handleEditBankAccount(bankAccount)}
+                                >
+                                  <Pencil className="h-4 w-4" />
+                                  <span>Edit</span>
+                                </DropdownMenuItem>
+                              ) : null}
+                              <DropdownMenuItem
+                                className="flex cursor-pointer items-center gap-2 text-destructive focus:text-destructive"
+                                onClick={() => handleRemoveBankAccountClick(bankAccount)}
+                              >
+                                <Trash2 className="h-4 w-4 text-destructive" aria-hidden />
+                                <span>Remove</span>
                               </DropdownMenuItem>
-                            ) : null}
-                            <DropdownMenuItem
-                              className="flex cursor-pointer items-center gap-2 text-destructive focus:text-destructive"
-                              onClick={() => handleRemoveBankAccountClick(bankAccount)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                              <span>Remove</span>
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                        <p className="text-[13px] font-normal leading-5 tracking-[0.055px] text-[#515f6b]">
+                          {accountTypeLine}
+                        </p>
                       </div>
-                      <div className="flex flex-wrap items-center gap-2">
+                      <div className="mb-4 flex flex-wrap items-center gap-2">
                         <span className="whitespace-nowrap text-sm font-normal leading-6 tracking-[-0.084px] text-[#1d2c38]">
                           •••• {last4}
                         </span>
@@ -2506,7 +2562,7 @@ export default function MyProfile() {
                       {isPendingDeposit ? (
                         <Button
                           intent="primary"
-                          className="mt-0 w-full"
+                          className="w-full"
                           disabled={isBankActivationLocked}
                           title={
                             isBankActivationLocked
@@ -2524,7 +2580,7 @@ export default function MyProfile() {
                           className="h-auto w-full rounded-md border-[#0058a3] bg-transparent px-[13.25px] py-[9.75px] text-[15.75px] font-medium leading-normal text-[#0058a3] shadow-none hover:bg-[#0058a3]/10"
                           onClick={() => handleEditBankAccount(bankAccount)}
                         >
-                          Edit
+                          View
                         </Button>
                       )}
                     </div>
@@ -3422,8 +3478,8 @@ export default function MyProfile() {
                       </h3>
                       <p className="text-sm font-normal leading-6 tracking-[-0.084px] text-foreground max-w-[1094px]">
                         Set how you want to receive your account documents. Select either Paper, Email, and/or Text for each statement type. Standard text message rates may apply. Disable text alerts by unchecking the boxes below. By opting into our text alerts, you agree to our{" "}
-                        <a href="#" className="text-primary hover:underline">terms of service</a>. Please review our{" "}
-                        <a href="#" className="text-primary hover:underline">privacy policy</a> for more information.
+                        <a href="#" className="text-[color:var(--system-link)] hover:underline">terms of service</a>. Please review our{" "}
+                        <a href="#" className="text-[color:var(--system-link)] hover:underline">privacy policy</a> for more information.
                       </p>
                       <div className="flex items-center justify-end gap-2 mt-2">
                         <span className="text-sm font-normal text-foreground">Go paperless</span>
@@ -3595,8 +3651,8 @@ export default function MyProfile() {
                       </h3>
                       <p className="text-sm font-normal leading-6 tracking-[-0.084px] text-foreground max-w-[1094px]">
                         Manage how you receive real-time alerts for account activity. You can enable Email and/or Text for each notification. Standard text message rates may apply. Disable text alerts by unchecking the boxes below. By opting into our text alerts, you agree to our{" "}
-                        <a href="#" className="text-primary hover:underline">terms of service</a>. Please review our{" "}
-                        <a href="#" className="text-primary hover:underline">privacy policy</a> for more information.
+                        <a href="#" className="text-[color:var(--system-link)] hover:underline">terms of service</a>. Please review our{" "}
+                        <a href="#" className="text-[color:var(--system-link)] hover:underline">privacy policy</a> for more information.
                       </p>
                       <div className="flex items-center justify-end gap-2 mt-2">
                         <span className="text-sm font-normal text-foreground">Go paperless</span>
@@ -3796,8 +3852,8 @@ export default function MyProfile() {
                       </h3>
                       <p className="text-sm font-normal leading-6 tracking-[-0.084px] text-foreground max-w-[1094px]">
                         Manage how you receive real-time alerts for account activity. You can enable Email and/or Text for each notification. Standard text message rates may apply. Disable text alerts by unchecking the boxes below. By opting into our text alerts, you agree to our{" "}
-                        <a href="#" className="text-primary hover:underline">terms of service</a>. Please review our{" "}
-                        <a href="#" className="text-primary hover:underline">privacy policy</a> for more information.
+                        <a href="#" className="text-[color:var(--system-link)] hover:underline">terms of service</a>. Please review our{" "}
+                        <a href="#" className="text-[color:var(--system-link)] hover:underline">privacy policy</a> for more information.
                       </p>
                       <div className="flex items-center justify-end gap-2 mt-2">
                         <span className="text-sm font-normal text-foreground">Go paperless</span>
@@ -3962,8 +4018,8 @@ export default function MyProfile() {
                       </h3>
                       <p className="text-sm font-normal leading-6 tracking-[-0.084px] text-foreground max-w-[1094px]">
                         Manage how you receive real-time alerts for account activity. You can enable Email and/or Text for each notification. Standard text message rates may apply. Disable text alerts by unchecking the boxes below. By opting into our text alerts, you agree to our{" "}
-                        <a href="#" className="text-primary hover:underline">terms of service</a>. Please review our{" "}
-                        <a href="#" className="text-primary hover:underline">privacy policy</a> for more information.
+                        <a href="#" className="text-[color:var(--system-link)] hover:underline">terms of service</a>. Please review our{" "}
+                        <a href="#" className="text-[color:var(--system-link)] hover:underline">privacy policy</a> for more information.
                       </p>
                       <div className="flex items-center justify-end gap-2 mt-2">
                         <span className="text-sm font-normal text-foreground">Go paperless</span>
@@ -4276,7 +4332,7 @@ export default function MyProfile() {
                   collapsible="none"
                   className="hidden md:flex w-[264px] border-r border-wex-card-border bg-wex-card-bg flex-col h-auto"
                 >
-                  <SidebarContent className="flex-1 h-full px-2 py-4">
+                  <SidebarContent className="flex-1 h-full px-2 py-4 w-[267px]">
                     <SidebarGroup className="flex-1 h-full">
                       <SidebarGroupContent className="flex-1 h-full">
                         <SidebarMenu className="flex-1 h-full">
@@ -5762,7 +5818,11 @@ export default function MyProfile() {
           </Button>
         }
         tertiaryButton={
-          <Button variant="ghost" onClick={() => setIsAddBankAccountWorkspaceOpen(false)}>
+          <Button
+            variant="ghost"
+            data-workspace-footer-cancel
+            onClick={() => setIsAddBankAccountWorkspaceOpen(false)}
+          >
             Cancel
           </Button>
         }
@@ -6658,7 +6718,11 @@ export default function MyProfile() {
           </Button>
         }
         tertiaryButton={
-          <Button variant="ghost" onClick={() => setIsAddBeneficiaryWorkspaceOpen(false)}>
+          <Button
+            variant="ghost"
+            data-workspace-footer-cancel
+            onClick={() => setIsAddBeneficiaryWorkspaceOpen(false)}
+          >
             Cancel
           </Button>
         }
@@ -6802,7 +6866,7 @@ export default function MyProfile() {
                             className="h-8 w-8 text-destructive hover:bg-red-50"
                             onClick={() => handleRemoveWorkspaceBeneficiaryClick(beneficiary)}
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-4 w-4 text-destructive" aria-hidden />
                           </Button>
                         )}
                       </div>
@@ -7103,6 +7167,7 @@ export default function MyProfile() {
         tertiaryButton={
           <Button
             variant="ghost"
+            data-workspace-footer-cancel
             onClick={() => {
               setIsReportLostStolenWorkspaceOpen(false);
               setConfirmationAnswer("");
@@ -7353,6 +7418,7 @@ export default function MyProfile() {
         tertiaryButton={
           <Button
             variant="ghost"
+            data-workspace-footer-cancel
             onClick={() => {
               setIsOrderReplacementWorkspaceOpen(false);
               setCardBeingReplaced(null);
