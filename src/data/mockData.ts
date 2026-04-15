@@ -313,6 +313,6 @@ export const navigationItems = [
       { label: "Lifestyle Spending Account", href: "/account-overview?account=lifestyle" },
     ],
   },
-  { label: "Claims & Payments", href: "/claims", icon: "document", hasDropdown: false },
+  { label: "Claims", href: "/claims", icon: "document", hasDropdown: false },
   { label: "Messages", href: "/message-center", icon: "mail", hasDropdown: false },
 ];

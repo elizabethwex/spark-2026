@@ -481,7 +481,7 @@ export function ClaimsPaymentsContent() {
             size="md"
             asChild
           >
-            <Link to="/reimburse">Reimburse Myself</Link>
+            <Link to="/reimburse" state={{ from: "/claims" }}>Reimburse Myself</Link>
           </Button>
         </div>
       </div>
