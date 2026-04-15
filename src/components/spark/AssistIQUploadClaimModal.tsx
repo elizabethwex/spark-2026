@@ -897,7 +897,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange }: Props) {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3, delay: 0.1 }}
-                      className="w-full max-w-[500px]"
+                      className="w-full"
                     >
                       <div className="mb-3 flex items-center justify-between">
                         <h3 className="text-[14px] font-semibold text-[#444c72]">Recent conversations:</h3>
