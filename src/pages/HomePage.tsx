@@ -40,24 +40,29 @@ function HomePageAiForward() {
     <div className="min-h-screen font-['Inter']" style={consumerPageBackgroundStyle}>
       <ConsumerNavigation hidePrototypeFloating />
 
-      <main className="mx-auto w-full max-w-[1200px] px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
-        <PageFadeIn className="space-y-10">
-          <FadeInItem><SparkAiForwardHero activeView={activeView} /></FadeInItem>
-          {activeView === 3 ? (
-            <FadeInItem className="grid grid-cols-1 gap-x-10 gap-y-10 lg:grid-cols-2 pl-2">
-              <SparkAccountsSection activeView={activeView} />
-              <SparkRecentActivity activeView={activeView} />
-            </FadeInItem>
-          ) : (
-            <>
-              <FadeInItem><SparkAccountsSection activeView={activeView} /></FadeInItem>
-              <FadeInItem><SparkRecentActivity activeView={activeView} /></FadeInItem>
-            </>
-          )}
-        </PageFadeIn>
-      </main>
+      <div className="flex w-full min-h-[calc(100vh-80px)] relative">
+        <div id="page-content-wrapper" className="@container group flex-1 min-w-0 transition-all duration-300">
+          <main id="main-content" className="mx-auto w-full max-w-[1200px] px-4 py-8 sm:px-6 sm:py-10 @5xl:px-8 transition-all duration-300 group-[.is-docked]:max-w-[900px]">
+            <PageFadeIn className="space-y-10">
+              <FadeInItem><SparkAiForwardHero activeView={activeView} /></FadeInItem>
+              {activeView === 3 ? (
+                <FadeInItem className="grid grid-cols-1 gap-x-10 gap-y-10 @5xl:grid-cols-2 pl-2">
+                  <SparkAccountsSection activeView={activeView} />
+                  <SparkRecentActivity activeView={activeView} />
+                </FadeInItem>
+              ) : (
+                <>
+                  <FadeInItem><SparkAccountsSection activeView={activeView} /></FadeInItem>
+                  <FadeInItem><SparkRecentActivity activeView={activeView} /></FadeInItem>
+                </>
+              )}
+            </PageFadeIn>
+          </main>
 
-      <ConsumerFooter />
+          <ConsumerFooter />
+        </div>
+        <div id="docked-sidebar-container" className="shrink-0 overflow-hidden transition-all duration-300" />
+      </div>
     </div>
   );
 }

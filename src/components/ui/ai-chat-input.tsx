@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "motion/react";
 const PLACEHOLDER_PREFIX = "Ask me… ";
 
 const QUERIES = [
+  "Help me with my claims",
   "Can I use my FSA for dental?",
   "why my claim needs attention",
   "what document I need to upload",
@@ -39,7 +40,7 @@ const letterVariants = {
   },
 };
 
-export function AiChatInput() {
+export function AiChatInput({ onSubmit }: { onSubmit?: (value: string) => void }) {
   const [inputValue, setInputValue] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -81,6 +82,15 @@ export function AiChatInput() {
     setIsDropdownOpen(false);
     setIsFocused(true);
     inputRef.current?.focus();
+    if (onSubmit) {
+      onSubmit(query);
+    }
+  };
+
+  const handleSubmit = () => {
+    if (inputValue.trim() && onSubmit) {
+      onSubmit(inputValue);
+    }
   };
 
   return (
@@ -115,6 +125,12 @@ export function AiChatInput() {
             onFocus={() => {
               setIsFocused(true);
               if (!inputValue) setIsDropdownOpen(true);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleSubmit();
+              }
             }}
             className="w-full border-0 bg-transparent text-[14px] text-[#14182c] outline-none placeholder-transparent"
           />
@@ -213,6 +229,7 @@ export function AiChatInput() {
               backgroundImage:
                 "linear-gradient(133.514deg, rgba(37, 20, 111, 0.1) 2.4625%, rgba(200, 16, 46, 0.1) 100%)",
             }}
+            onClick={handleSubmit}
           >
             <Send className="h-[14px] w-[14px] text-[#25146f]" />
           </div>

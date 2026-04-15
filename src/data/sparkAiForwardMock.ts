@@ -11,7 +11,15 @@ import {
 
 export const SPARK_MEMBER_FIRST_NAME = "Penny";
 
-export const sparkAccountQuickActions: { label: string; href: string; icon: LucideIcon }[] = [
+export type SparkAccountQuickAction = {
+  label: string;
+  href: string;
+  icon: LucideIcon;
+  /** Opens Assist IQ modal instead of navigating */
+  assistModal?: "upload-claim-documents";
+};
+
+export const sparkAccountQuickActions: SparkAccountQuickAction[] = [
   { label: "Lost or Stolen Card", href: "/my-profile?subPage=debit-card", icon: CreditCard },
   { label: "Send Payment", href: "/send-payment", icon: Send },
   { label: "HSA Store", href: "https://hsastore.com/", icon: ShoppingBag },
