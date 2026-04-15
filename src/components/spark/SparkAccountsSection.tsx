@@ -1,13 +1,17 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { CalendarCheck2, PiggyBank, TrendingUp, CircleDollarSign, Info, Lightbulb, ChevronRight, HeartPulse, Baby } from "lucide-react";
+import { CalendarCheck2, TrendingUp, CircleDollarSign, Info, ChevronRight, HeartPulse, Baby, RotateCw, ClockAlert, CalendarClock, Calendar, ChartNoAxesCombined, Landmark } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@wexinc-healthbenefits/ben-ui-kit";
 import {
   sparkHsaSummary,
   sparkLpfsaSummary,
+  sparkLpfsaPrimarySummary,
   sparkFsaSummary,
+  sparkFsaPrimarySummary,
   sparkDcfsaSummary,
+  sparkDcfsaPrimarySummary,
 } from "@/data/sparkAiForwardMock";
 
 function useInView(options?: IntersectionObserverInit) {
@@ -48,19 +52,25 @@ export function SparkAccountsSection({
   activeView?: 1 | 2 | 3;
 }) {
   const navigate = useNavigate();
+  const [showInvestments, setShowInvestments] = useState(true);
+  const [isPrimary, setIsPrimary] = useState(true);
+
   const h = sparkHsaSummary;
-  const l = sparkLpfsaSummary;
-  const fsa = sparkFsaSummary;
-  const dcfsa = sparkDcfsaSummary;
+  const l = isPrimary ? sparkLpfsaPrimarySummary : sparkLpfsaSummary;
+  const fsa = isPrimary ? sparkFsaPrimarySummary : sparkFsaSummary;
+  const dcfsa = isPrimary ? sparkDcfsaPrimarySummary : sparkDcfsaSummary;
 
   const { ref, isInView } = useInView({ threshold: 0.3, rootMargin: "0px 0px -15% 0px" });
 
-  const [showInvestments, setShowInvestments] = useState(true);
-
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() === 'i' && e.target instanceof Element && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
-        setShowInvestments(prev => !prev);
+      if (e.target instanceof Element && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+        if (e.key.toLowerCase() === 'i') {
+          setShowInvestments(prev => !prev);
+        }
+        if (e.key.toLowerCase() === 'z') {
+          setIsPrimary(prev => !prev);
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -87,7 +97,7 @@ export function SparkAccountsSection({
             {/* HSA Card */}
         <div
           className={cn(
-            "group/card flex h-full w-full flex-col overflow-hidden rounded-[24px] transition-shadow hover:shadow-md",
+            "group/card flex h-full w-full flex-col overflow-hidden rounded-[24px]",
             variant === "partner-safe"
               ? "bg-card border border-border shadow-sm text-card-foreground"
               : "border border-white/60 bg-white shadow-[0_3px_9px_rgba(43,49,78,0.04),0_6px_18px_rgba(43,49,78,0.06)]"
@@ -98,10 +108,10 @@ export function SparkAccountsSection({
           <div className="flex items-start justify-between px-6 pt-6">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--app-secondary-50)] text-[var(--theme-secondary)] transition-transform group-hover/card:scale-110">
-                <PiggyBank className="h-5 w-5 transition-transform group-hover/card:rotate-12 text-[var(--theme-secondary)]" />
+                <Landmark className="h-5 w-5 transition-transform group-hover/card:rotate-12 text-[var(--theme-secondary)]" />
               </div>
               <div className="flex flex-col">
-                <h3 className="text-[16px] font-bold leading-[24px] text-[var(--system-text-primary)]">Health Savings Account</h3>
+                <h3 className="text-[16px] font-bold leading-[24px] text-[var(--system-text-primary)]">HSA</h3>
                 <p className="text-[12px] font-bold uppercase leading-[16px] tracking-[0.6px] text-[#5f6a94]">
                   Health Savings
                 </p>
@@ -121,7 +131,7 @@ export function SparkAccountsSection({
           <div className="flex flex-1 flex-col gap-4 px-6 pb-8 pt-6">
             {showInvestments ? (
               <>
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-1 w-full">
                   <div className="flex flex-col gap-[2px]">
                     <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#5f6a94]">
                       Total Account Value
@@ -130,22 +140,22 @@ export function SparkAccountsSection({
                       Cash + Invested Assets
                     </p>
                   </div>
-                  <p className="text-[40px] font-bold leading-[40px] tracking-[-0.9px] text-[var(--system-text-primary)]">
+                  <p className="text-[40px] font-bold leading-[56px] tracking-[-0.88px] text-[#14182c]">
                     {h.totalValue}
                   </p>
                 </div>
 
                 {/* Balances Box */}
-                <div className="flex flex-col gap-3 rounded-xl bg-[#f1f3fb] px-4 py-3">
-                  <div className="flex h-[44px] items-center gap-3">
+                <div className="flex flex-col gap-3 rounded-xl bg-[#f1f3fb] px-4 py-3 w-full">
+                  <div className="flex h-[44px] items-center gap-3 w-full">
                     <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
                       <CircleDollarSign className="h-5 w-5" />
                     </div>
                     <div className="flex flex-1 items-center justify-between">
-                      <p className="text-[16px] font-semibold leading-[24px] tracking-[-0.176px] text-[var(--system-text-primary)]">
+                      <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#14182c]">
                         Cash Balance
                       </p>
-                      <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-foreground">
+                      <p className="text-[16px] font-semibold leading-[24px] tracking-[-0.176px] text-[#14182c]">
                         {h.cashBalance}
                       </p>
                     </div>
@@ -153,19 +163,19 @@ export function SparkAccountsSection({
                   
                   <div className="h-px w-full bg-[#d1d5db]" />
                   
-                  <div className="flex h-[44px] items-center gap-3">
+                  <div className="flex h-[44px] items-center gap-3 w-full">
                     <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
-                      <TrendingUp className="h-5 w-5" />
+                      <ChartNoAxesCombined className="h-5 w-5" />
                     </div>
                     <div className="flex flex-1 items-center justify-between">
-                      <p className="text-[16px] font-semibold leading-[24px] tracking-[-0.176px] text-[var(--system-text-primary)]">
+                      <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#14182c]">
                         Invested assets
                       </p>
                       <div className="flex items-center gap-4">
                         <p className="text-[14px] font-semibold leading-[24px] tracking-[-0.084px] text-[#009966]">
-                          {h.ytdReturnPct} YTD
+                          {h.ytdReturnPct}
                         </p>
-                        <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-foreground">
+                        <p className="text-[16px] font-semibold leading-[24px] tracking-[-0.176px] text-[#14182c]">
                           {h.investedAssets}
                         </p>
                       </div>
@@ -175,17 +185,17 @@ export function SparkAccountsSection({
               </>
             ) : (
               <>
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-1 w-full">
                   <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#5f6a94]">
                     Cash Balance
                   </p>
-                  <p className="text-[40px] font-bold leading-[40px] tracking-[-0.9px] text-[var(--system-text-primary)]">
+                  <p className="text-[40px] font-bold leading-[56px] tracking-[-0.88px] text-[#14182c]">
                     {h.cashBalance}
                   </p>
                 </div>
 
                 {/* Promo Box */}
-                <div className="flex items-center justify-between rounded-xl bg-[#f1f3fb] px-4 py-2">
+                <div className="flex items-center justify-between rounded-xl bg-[#f1f3fb] px-4 py-2 w-full">
                   <div className="flex items-center gap-3">
                     <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
                       <TrendingUp className="h-5 w-5" />
@@ -211,27 +221,35 @@ export function SparkAccountsSection({
             )}
 
             {/* Progress Section */}
-            <div className="flex flex-col gap-[6px]">
-              <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-1.5 items-end w-full">
+              <div className="flex items-center justify-between w-full">
                 <p className="text-[12px] leading-[16px] text-[#5f6a94]">
                   {h.contributionPctUsed}% of {h.planYear} contribution limit used
                 </p>
-                <p className="text-[12px] leading-[16px] text-foreground">
-                  {h.remainingLimit} remaining
-                </p>
+                <div className="flex items-center gap-1 px-[7px] py-[3.5px] rounded-[16px] bg-[#f7f7f7]">
+                  <p className="text-[12.25px] font-bold text-[#515f6b]">
+                    {h.remainingLimit} remaining
+                  </p>
+                </div>
               </div>
-              <div className="flex h-[6px] w-full items-center overflow-hidden rounded-[6px] bg-[#eef2ff]">
-                <div
-                  className="h-full rounded-[6px] bg-[var(--theme-primary)]"
-                  style={{ 
-                    width: isInView ? `${h.contributionPctUsed}%` : "0%",
-                    transition: 'width 2.2s cubic-bezier(0.22, 1, 0.36, 1) 0.15s'
-                  }}
+              <div className="relative h-[20px] w-full overflow-hidden rounded-full bg-[#eef2ff]">
+                <div 
+                  className={cn(
+                    "absolute left-0 top-0 h-full transition-all duration-1000 ease-out",
+                    isPrimary ? "bg-[#3958c3]" : "bg-[#e6a800]"
+                  )}
+                  style={{ width: isInView ? `${h.contributionPctUsed}%` : "0%" }}
+                />
+                <div 
+                  className="absolute top-0 h-full w-px bg-[#cefafe] transition-all duration-1000 ease-out"
+                  style={{ left: isInView ? `${h.contributionPctUsed}%` : "0%" }}
                 />
               </div>
-              <p className="text-[10px] leading-[15px] text-[#5f6a94]">
-                {h.planYear} IRS limit: {h.irsLimitFormatted} (individual)
-              </p>
+              <div className="flex w-full">
+                <p className="text-[12px] leading-[15px] text-[#5f6a94]">
+                  {h.planYear} IRS limit: {h.irsLimitFormatted} (individual)
+                </p>
+              </div>
             </div>
           </div>
 
@@ -241,7 +259,7 @@ export function SparkAccountsSection({
         {activeView === 1 && (
         <div 
           className={cn(
-            "group/card flex h-full w-full flex-col overflow-hidden rounded-[24px] transition-shadow hover:shadow-md",
+            "group/card flex h-full w-full flex-col overflow-hidden rounded-[24px]",
             variant === "partner-safe"
               ? "bg-card border border-border shadow-sm text-card-foreground"
               : "border border-white/60 bg-white shadow-[0_3px_9px_rgba(43,49,78,0.04),0_6px_18px_rgba(43,49,78,0.06)]"
@@ -255,20 +273,17 @@ export function SparkAccountsSection({
                 <CalendarCheck2 className="h-5 w-5 transition-transform group-hover/card:rotate-12 text-[var(--theme-secondary)]" />
               </div>
               <div className="flex flex-col">
-                <div className="flex items-center gap-2">
-                  <h3 className="text-[16px] font-bold leading-[24px] text-[var(--system-text-primary)]">Limited Purpose FSA</h3>
-                  <Info className="h-4 w-4 text-[#5f6a94]" />
-                </div>
+                <h3 className="text-[16px] font-bold leading-[24px] text-[var(--system-text-primary)]">Limited Purpose FSA</h3>
                 <p className="text-[12px] font-bold leading-[16px] tracking-[0.6px] text-[#5f6a94]">
                   {l.planRange}
                 </p>
               </div>
             </div>
-            <button
-              type="button"
-              onClick={() => navigate("/account/lpfsa")}
-              className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[color:var(--system-link,#1c6eff)] hover:underline transition-colors -mr-3"
-            >
+                <button
+                  type="button"
+                  onClick={() => navigate("/account-overview?account=fsa")}
+                  className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[color:var(--system-link,#1c6eff)] hover:underline transition-colors -mr-3"
+                >
               View Details
               <ChevronRight className="h-4 w-4" />
             </button>
@@ -276,88 +291,128 @@ export function SparkAccountsSection({
 
           {/* Body */}
           <div className="flex flex-1 flex-col gap-4 px-6 pb-8 pt-6">
-            <div className="flex w-full items-start justify-between">
-              <div className="flex flex-col gap-1">
-                <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#5f6a94]">
-                  Available balance
-                </p>
-                <p className="text-[40px] font-bold leading-[36px] tracking-[-0.9px] text-[var(--system-text-primary)]">
+            <div className="flex flex-col gap-4 w-full">
+              {/* Top part */}
+              <div className="flex flex-col gap-1 w-full">
+                <div className="flex items-center gap-2">
+                  <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#5f6a94]">
+                    Available balance
+                  </p>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button type="button" className="focus:outline-none">
+                        <Info className="h-4 w-4 text-[#5f6a94]" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-sm max-w-[220px] text-center">
+                        Your available balance reflects the funds available for payment requests made at this time
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+                <p className="text-[40px] font-bold leading-[56px] tracking-[-0.88px] text-[#14182c]">
                   {l.balance}
                 </p>
-                <div className="mt-1 flex flex-col items-start gap-2">
-                  <p className="text-[12px] text-[#5f6a94]">
-                    <span className="font-normal leading-[16px]">Max rollover: </span>
-                    <span className="font-bold leading-[16px]">$500</span>
-                  </p>
-                  {l.spendByTag && (
-                    <div className="flex items-center rounded-full border border-[#fff9e6] bg-[#fffbeb] px-[7px] py-[3px]">
-                      <span className="text-[10px] font-bold leading-[15px] text-[#bf8a00]">
-                        {l.spendByTag}
-                      </span>
-                    </div>
-                  )}
-                </div>
               </div>
 
-              {/* Spend Ring */}
-              <div className="group relative flex h-[112px] w-[112px] shrink-0 items-center justify-center">
-                {/* Background Ring */}
-                <svg className="absolute inset-0 h-full w-full -rotate-90 transform" viewBox="0 0 112 112">
-                  <circle
-                    cx="56"
-                    cy="56"
-                    r="48"
-                    fill="none"
-                    stroke="#e3e7f4"
-                    strokeWidth="10"
+              {/* Progress bar */}
+              <div className="flex flex-col gap-1.5 items-end w-full">
+                <div className="flex items-center gap-1 px-[7px] py-[3.5px] rounded-[16px] bg-[#f7f7f7]">
+                  <p className="text-[12.25px] font-bold text-[#515f6b]">
+                    {l.contributionPctUsed}% of {l.contributionLimit} used
+                  </p>
+                </div>
+                <div className="relative h-[20px] w-full overflow-hidden rounded-full bg-[#eef2ff]">
+                  <div 
+                    className={cn(
+                      "absolute left-0 top-0 h-full transition-all duration-1000 ease-out",
+                      isPrimary ? "bg-[#3958c3]" : "bg-[#e6a800]"
+                    )}
+                    style={{ width: isInView ? `${l.contributionPctUsed}%` : "0%" }}
                   />
-                  {/* Progress Ring */}
-                  <circle
-                    cx="56"
-                    cy="56"
-                    r="48"
-                    fill="none"
-                    stroke={l.daysToSpend <= 30 ? "#bf8a00" : "#3958c3"}
-                    strokeWidth="10"
-                    strokeLinecap="round"
-                    strokeDasharray={`${2 * Math.PI * 48}`}
-                    strokeDashoffset={isInView ? `${2 * Math.PI * 48 * (1 - Math.min(Math.max(l.daysToSpend, 0), 90) / 90)}` : "0"}
-                    style={{ transition: 'stroke-dashoffset 2s cubic-bezier(0.22, 1, 0.36, 1) 0.15s' }}
+                  <div 
+                    className="absolute top-0 h-full w-px bg-[#cefafe] transition-all duration-1000 ease-out"
+                    style={{ left: isInView ? `${l.contributionPctUsed}%` : "0%" }}
                   />
-                </svg>
-                <div className="absolute flex flex-col items-center justify-center rounded-full bg-white">
-                  <span className="text-[24px] font-bold leading-[32px] text-[#1f2636]">
-                    {l.daysToSpend}
-                  </span>
-                  <span className="-mt-[2px] text-center text-[10px] font-bold uppercase leading-[15px] tracking-[0.5px] text-[#5d688c]">
-                    days<br />to spend
-                  </span>
                 </div>
               </div>
             </div>
 
-            {/* Info Box */}
-            <div className="flex w-full items-center justify-between rounded-xl bg-[#3958c3]/5 p-4">
-              <div className="flex items-center gap-3">
+            {/* Gray box */}
+            <div className="flex flex-col gap-3 rounded-xl bg-[#f1f3fb] px-4 py-3 w-full">
+              {/* Row 1 */}
+              <div className="flex h-[44px] items-center gap-3 w-full">
                 <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
-                  <Lightbulb className="h-5 w-5" />
+                  <RotateCw className="h-5 w-5" />
                 </div>
-                <div className="flex flex-col gap-[2px]">
-                  <p className="text-[14px] font-bold leading-[20px] text-foreground">
-                    {l.eligibleLabel}
-                  </p>
-                  <p className="text-[12px] leading-[16px] text-[#5f6a94]">
-                    Covers dental & vision expenses only
+                <div className="flex flex-1 items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#14182c]">
+                      Available to rollover
+                    </p>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button type="button" className="focus:outline-none">
+                          <Info className="h-4 w-4 text-[#5f6a94]" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="text-sm max-w-[220px] text-center">
+                          Unused funds that carry over to next year- up to $500.
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                  <p className="text-[16px] font-semibold leading-[24px] tracking-[-0.176px] text-[#14182c]">
+                    {l.rolloverAmount}
                   </p>
                 </div>
               </div>
-              <button
-                type="button"
-                className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[color:var(--system-link,#1c6eff)] hover:underline transition-colors -mr-3"
-              >
-                View Eligible Expenses
-                <ChevronRight className="h-4 w-4" />
-              </button>
+              
+              <div className="h-px w-full bg-[#d1d5db]" />
+              
+              {/* Row 2 */}
+              <div className="flex h-[44px] items-center gap-3 w-full">
+                <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
+                  <ClockAlert className="h-5 w-5" />
+                </div>
+                <div className="flex flex-1 items-center justify-between">
+                  <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#14182c]">
+                    Use it or lose it
+                  </p>
+                  <div className="flex items-center gap-4">
+                    {l.spendByTag && (
+                      <div className="flex items-center gap-1 rounded-md bg-[#fff9e6] px-[7px] py-[3.5px]">
+                        <Calendar className="h-3 w-3 text-[#4a3500]" />
+                        <span className="text-[12.25px] font-bold text-[#4a3500]">
+                          {l.spendByTag}
+                        </span>
+                      </div>
+                    )}
+                    <p className="text-[16px] font-semibold leading-[24px] tracking-[-0.176px] text-[#14182c]">
+                      {l.useItOrLoseIt}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="h-px w-full bg-[#d1d5db]" />
+
+              {/* Row 3 */}
+              <div className="flex h-[44px] items-center gap-3 w-full">
+                <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
+                  <CalendarClock className="h-5 w-5" />
+                </div>
+                <div className="flex flex-1 items-center justify-between">
+                  <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#14182c]">
+                    Final Filing Date
+                  </p>
+                  <p className="text-[16px] font-semibold leading-[24px] tracking-[-0.176px] text-[#14182c]">
+                    {l.finalFilingDate}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -373,7 +428,7 @@ export function SparkAccountsSection({
             {/* FSA Card */}
             <div 
               className={cn(
-                "group/card flex h-full w-full flex-col overflow-hidden rounded-[24px] transition-shadow hover:shadow-md",
+                "group/card flex h-full w-full flex-col overflow-hidden rounded-[24px]",
                 variant === "partner-safe"
                   ? "bg-card border border-border shadow-sm text-card-foreground"
                   : "border border-white/60 bg-white shadow-[0_3px_9px_rgba(43,49,78,0.04),0_6px_18px_rgba(43,49,78,0.06)]"
@@ -387,10 +442,7 @@ export function SparkAccountsSection({
                     <HeartPulse className="h-5 w-5 transition-transform group-hover/card:rotate-12 text-[var(--theme-secondary)]" />
                   </div>
                   <div className="flex flex-col">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-[16px] font-bold leading-[24px] text-[var(--system-text-primary)]">Healthcare FSA</h3>
-                      <Info className="h-4 w-4 text-[#5f6a94]" />
-                    </div>
+                    <h3 className="text-[16px] font-bold leading-[24px] text-[var(--system-text-primary)]">Healthcare FSA</h3>
                     <p className="text-[12px] font-bold leading-[16px] tracking-[0.6px] text-[#5f6a94]">
                       {fsa.planRange}
                     </p>
@@ -398,7 +450,7 @@ export function SparkAccountsSection({
                 </div>
                 <button
                   type="button"
-                  onClick={() => navigate("/account/fsa")}
+                  onClick={() => navigate("/account-overview?account=fsa")}
                   className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[color:var(--system-link,#1c6eff)] hover:underline transition-colors -mr-3"
                 >
                   View Details
@@ -406,99 +458,139 @@ export function SparkAccountsSection({
                 </button>
               </div>
 
-              {/* Body */}
-              <div className="flex flex-1 flex-col gap-4 px-6 pb-8 pt-6">
-                <div className="flex w-full items-start justify-between">
-                  <div className="flex flex-col gap-1">
-                    <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#5f6a94]">
-                      Available balance
-                    </p>
-                    <p className="text-[40px] font-bold leading-[36px] tracking-[-0.9px] text-[var(--system-text-primary)]">
-                      {fsa.balance}
-                    </p>
-                    <div className="mt-1 flex flex-col items-start gap-2">
-                      <p className="text-[12px] text-[#5f6a94]">
-                        <span className="font-normal leading-[16px]">Max rollover: </span>
-                        <span className="font-bold leading-[16px]">$500</span>
+          {/* Body */}
+          <div className="flex flex-1 flex-col gap-4 px-6 pb-8 pt-6">
+            <div className="flex flex-col gap-4 w-full">
+              {/* Top part */}
+              <div className="flex flex-col gap-1 w-full">
+                <div className="flex items-center gap-2">
+                  <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#5f6a94]">
+                    Available balance
+                  </p>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button type="button" className="focus:outline-none">
+                        <Info className="h-4 w-4 text-[#5f6a94]" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-sm max-w-[220px] text-center">
+                        Your available balance reflects the funds available for payment requests made at this time
                       </p>
-                      {fsa.spendByTag && (
-                        <div className="flex items-center rounded-full border border-[#fff9e6] bg-[#fffbeb] px-[7px] py-[3px]">
-                          <span className="text-[10px] font-bold leading-[15px] text-[#bf8a00]">
-                            {fsa.spendByTag}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Spend Ring */}
-                  <div className="group relative flex h-[112px] w-[112px] shrink-0 items-center justify-center">
-                    {/* Background Ring */}
-                    <svg className="absolute inset-0 h-full w-full -rotate-90 transform" viewBox="0 0 112 112">
-                      <circle
-                        cx="56"
-                        cy="56"
-                        r="48"
-                        fill="none"
-                        stroke="#e3e7f4"
-                        strokeWidth="10"
-                      />
-                      {/* Progress Ring */}
-                      <circle
-                        cx="56"
-                        cy="56"
-                        r="48"
-                        fill="none"
-                        stroke={fsa.daysToSpend <= 30 ? "#bf8a00" : "#3958c3"}
-                        strokeWidth="10"
-                        strokeLinecap="round"
-                        strokeDasharray={`${2 * Math.PI * 48}`}
-                        strokeDashoffset={isInView ? `${2 * Math.PI * 48 * (1 - Math.min(Math.max(fsa.daysToSpend, 0), 90) / 90)}` : "0"}
-                        style={{ transition: 'stroke-dashoffset 2s cubic-bezier(0.22, 1, 0.36, 1) 0.15s' }}
-                      />
-                    </svg>
-                    <div className="absolute flex flex-col items-center justify-center rounded-full bg-white">
-                      <span className="text-[24px] font-bold leading-[32px] text-[#1f2636]">
-                        {fsa.daysToSpend}
-                      </span>
-                      <span className="-mt-[2px] text-center text-[10px] font-bold uppercase leading-[15px] tracking-[0.5px] text-[#5d688c]">
-                        days<br />to spend
-                      </span>
-                    </div>
-                  </div>
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
+                <p className="text-[40px] font-bold leading-[56px] tracking-[-0.88px] text-[#14182c]">
+                  {fsa.balance}
+                </p>
+              </div>
 
-                {/* Info Box */}
-                <div className="flex w-full items-center justify-between rounded-xl bg-[#3958c3]/5 p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
-                      <HeartPulse className="h-5 w-5" />
-                    </div>
-                    <div className="flex flex-col gap-[2px]">
-                      <p className="text-[14px] font-bold leading-[20px] text-foreground">
-                        {fsa.eligibleLabel}
-                      </p>
-                      <p className="text-[12px] leading-[16px] text-[#5f6a94]">
-                        {fsa.eligibleDesc}
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[color:var(--system-link,#1c6eff)] hover:underline transition-colors -mr-3"
-                  >
-                    View Eligible Expenses
-                    <ChevronRight className="h-4 w-4" />
-                  </button>
+              {/* Progress bar */}
+              <div className="flex flex-col gap-1.5 items-end w-full">
+                <div className="flex items-center gap-1 px-[7px] py-[3.5px] rounded-[16px] bg-[#f7f7f7]">
+                  <p className="text-[12.25px] font-bold text-[#515f6b]">
+                    {fsa.contributionPctUsed}% of {fsa.contributionLimit} used
+                  </p>
+                </div>
+                <div className="relative h-[20px] w-full overflow-hidden rounded-full bg-[#eef2ff]">
+                  <div 
+                    className={cn(
+                      "absolute left-0 top-0 h-full transition-all duration-1000 ease-out",
+                      isPrimary ? "bg-[#3958c3]" : "bg-[#e6a800]"
+                    )}
+                    style={{ width: isInView ? `${fsa.contributionPctUsed}%` : "0%" }}
+                  />
+                  <div 
+                    className="absolute top-0 h-full w-px bg-[#cefafe] transition-all duration-1000 ease-out"
+                    style={{ left: isInView ? `${fsa.contributionPctUsed}%` : "0%" }}
+                  />
                 </div>
               </div>
+            </div>
+
+            {/* Gray box */}
+            <div className="flex flex-col gap-3 rounded-xl bg-[#f1f3fb] px-4 py-3 w-full">
+              {/* Row 1 */}
+              <div className="flex h-[44px] items-center gap-3 w-full">
+                <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
+                  <RotateCw className="h-5 w-5" />
+                </div>
+                <div className="flex flex-1 items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#14182c]">
+                      Available to rollover
+                    </p>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button type="button" className="focus:outline-none">
+                          <Info className="h-4 w-4 text-[#5f6a94]" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="text-sm max-w-[220px] text-center">
+                          Unused funds that carry over to next year- up to $500.
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                  <p className="text-[16px] font-semibold leading-[24px] tracking-[-0.176px] text-[#14182c]">
+                    {fsa.rolloverAmount}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="h-px w-full bg-[#d1d5db]" />
+              
+              {/* Row 2 */}
+              <div className="flex h-[44px] items-center gap-3 w-full">
+                <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
+                  <ClockAlert className="h-5 w-5" />
+                </div>
+                <div className="flex flex-1 items-center justify-between">
+                  <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#14182c]">
+                    Use it or lose it
+                  </p>
+                  <div className="flex items-center gap-4">
+                    {fsa.spendByTag && (
+                      <div className="flex items-center gap-1 rounded-md bg-[#fff9e6] px-[7px] py-[3.5px]">
+                        <Calendar className="h-3 w-3 text-[#4a3500]" />
+                        <span className="text-[12.25px] font-bold text-[#4a3500]">
+                          {fsa.spendByTag}
+                        </span>
+                      </div>
+                    )}
+                    <p className="text-[16px] font-semibold leading-[24px] tracking-[-0.176px] text-[#14182c]">
+                      {fsa.useItOrLoseIt}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="h-px w-full bg-[#d1d5db]" />
+
+              {/* Row 3 */}
+              <div className="flex h-[44px] items-center gap-3 w-full">
+                <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
+                  <CalendarClock className="h-5 w-5" />
+                </div>
+                <div className="flex flex-1 items-center justify-between">
+                  <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#14182c]">
+                    Final Filing Date
+                  </p>
+                  <p className="text-[16px] font-semibold leading-[24px] tracking-[-0.176px] text-[#14182c]">
+                    {fsa.finalFilingDate}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
 
             </div>
 
             {/* DCFSA Card */}
             <div 
               className={cn(
-                "group/card flex h-full w-full flex-col overflow-hidden rounded-[24px] transition-shadow hover:shadow-md",
+                "group/card flex h-full w-full flex-col overflow-hidden rounded-[24px]",
                 variant === "partner-safe"
                   ? "bg-card border border-border shadow-sm text-card-foreground"
                   : "border border-white/60 bg-white shadow-[0_3px_9px_rgba(43,49,78,0.04),0_6px_18px_rgba(43,49,78,0.06)]"
@@ -512,10 +604,7 @@ export function SparkAccountsSection({
                     <Baby className="h-5 w-5 transition-transform group-hover/card:rotate-12 text-[var(--theme-secondary)]" />
                   </div>
                   <div className="flex flex-col">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-[16px] font-bold leading-[24px] text-[var(--system-text-primary)]">DCFSA</h3>
-                      <Info className="h-4 w-4 text-[#5f6a94]" />
-                    </div>
+                    <h3 className="text-[16px] font-bold leading-[24px] text-[var(--system-text-primary)]">DCFSA</h3>
                     <p className="text-[12px] font-bold leading-[16px] tracking-[0.6px] text-[#5f6a94]">
                       {dcfsa.planRange}
                     </p>
@@ -531,92 +620,101 @@ export function SparkAccountsSection({
                 </button>
               </div>
 
-              {/* Body */}
-              <div className="flex flex-1 flex-col gap-4 px-6 pb-8 pt-6">
-                <div className="flex w-full items-start justify-between">
-                  <div className="flex flex-col gap-1">
-                    <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#5f6a94]">
-                      Available balance
-                    </p>
-                    <p className="text-[40px] font-bold leading-[36px] tracking-[-0.9px] text-[var(--system-text-primary)]">
-                      {dcfsa.balance}
-                    </p>
-                    <div className="mt-1 flex flex-col items-start gap-2">
-                      <p className="text-[12px] text-[#5f6a94]">
-                        <span className="font-normal leading-[16px]">Max rollover: </span>
-                        <span className="font-bold leading-[16px]">$500</span>
+          {/* Body */}
+          <div className="flex flex-1 flex-col gap-4 px-6 pb-8 pt-6">
+            <div className="flex flex-col gap-4 w-full">
+              {/* Top part */}
+              <div className="flex flex-col gap-1 w-full">
+                <div className="flex items-center gap-2">
+                  <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#5f6a94]">
+                    Available balance
+                  </p>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button type="button" className="focus:outline-none">
+                        <Info className="h-4 w-4 text-[#5f6a94]" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-sm max-w-[220px] text-center">
+                        Your available balance reflects the funds available for payment requests made at this time
                       </p>
-                      {dcfsa.spendByTag && (
-                        <div className="flex items-center rounded-full border border-[#fff9e6] bg-[#fffbeb] px-[7px] py-[3px]">
-                          <span className="text-[10px] font-bold leading-[15px] text-[#bf8a00]">
-                            {dcfsa.spendByTag}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Spend Ring */}
-                  <div className="group relative flex h-[112px] w-[112px] shrink-0 items-center justify-center">
-                    {/* Background Ring */}
-                    <svg className="absolute inset-0 h-full w-full -rotate-90 transform" viewBox="0 0 112 112">
-                      <circle
-                        cx="56"
-                        cy="56"
-                        r="48"
-                        fill="none"
-                        stroke="#e3e7f4"
-                        strokeWidth="10"
-                      />
-                      {/* Progress Ring */}
-                      <circle
-                        cx="56"
-                        cy="56"
-                        r="48"
-                        fill="none"
-                        stroke={dcfsa.daysToSpend <= 30 ? "#bf8a00" : "#3958c3"}
-                        strokeWidth="10"
-                        strokeLinecap="round"
-                        strokeDasharray={`${2 * Math.PI * 48}`}
-                        strokeDashoffset={isInView ? `${2 * Math.PI * 48 * (1 - Math.min(Math.max(dcfsa.daysToSpend, 0), 90) / 90)}` : "0"}
-                        style={{ transition: 'stroke-dashoffset 2s cubic-bezier(0.22, 1, 0.36, 1) 0.15s' }}
-                      />
-                    </svg>
-                    <div className="absolute flex flex-col items-center justify-center rounded-full bg-white">
-                      <span className="text-[24px] font-bold leading-[32px] text-[#1f2636]">
-                        {dcfsa.daysToSpend}
-                      </span>
-                      <span className="-mt-[2px] text-center text-[10px] font-bold uppercase leading-[15px] tracking-[0.5px] text-[#5d688c]">
-                        days<br />to spend
-                      </span>
-                    </div>
-                  </div>
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
+                <p className="text-[40px] font-bold leading-[56px] tracking-[-0.88px] text-[#14182c]">
+                  {dcfsa.balance}
+                </p>
+              </div>
 
-                {/* Info Box */}
-                <div className="flex w-full items-center justify-between rounded-xl bg-[#3958c3]/5 p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
-                      <Lightbulb className="h-5 w-5" />
-                    </div>
-                    <div className="flex flex-col gap-[2px]">
-                      <p className="text-[14px] font-bold leading-[20px] text-foreground">
-                        {dcfsa.eligibleLabel}
-                      </p>
-                      <p className="text-[12px] leading-[16px] text-[#5f6a94]">
-                        {dcfsa.eligibleDesc}
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[color:var(--system-link,#1c6eff)] hover:underline transition-colors -mr-3"
-                  >
-                    View Eligible Expenses
-                    <ChevronRight className="h-4 w-4" />
-                  </button>
+              {/* Progress bar */}
+              <div className="flex flex-col gap-1.5 items-end w-full">
+                <div className="flex items-center gap-1 px-[7px] py-[3.5px] rounded-[16px] bg-[#f7f7f7]">
+                  <p className="text-[12.25px] font-bold text-[#515f6b]">
+                    {dcfsa.contributionPctUsed}% of {dcfsa.contributionLimit} used
+                  </p>
+                </div>
+                <div className="relative h-[20px] w-full overflow-hidden rounded-full bg-[#eef2ff]">
+                  <div 
+                    className={cn(
+                      "absolute left-0 top-0 h-full transition-all duration-1000 ease-out",
+                      isPrimary ? "bg-[#3958c3]" : "bg-[#e6a800]"
+                    )}
+                    style={{ width: isInView ? `${dcfsa.contributionPctUsed}%` : "0%" }}
+                  />
+                  <div 
+                    className="absolute top-0 h-full w-px bg-[#cefafe] transition-all duration-1000 ease-out"
+                    style={{ left: isInView ? `${dcfsa.contributionPctUsed}%` : "0%" }}
+                  />
                 </div>
               </div>
+            </div>
+
+            {/* Gray box */}
+            <div className="flex flex-col gap-3 rounded-xl bg-[#f1f3fb] px-4 py-3 w-full">
+              {/* Row 1 */}
+              <div className="flex h-[44px] items-center gap-3 w-full">
+                <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
+                  <ClockAlert className="h-5 w-5" />
+                </div>
+                <div className="flex flex-1 items-center justify-between">
+                  <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#14182c]">
+                    Use it or lose it
+                  </p>
+                  <div className="flex items-center gap-4">
+                    {dcfsa.spendByTag && (
+                      <div className="flex items-center gap-1 rounded-md bg-[#fff9e6] px-[7px] py-[3.5px]">
+                        <Calendar className="h-3 w-3 text-[#4a3500]" />
+                        <span className="text-[12.25px] font-bold text-[#4a3500]">
+                          {dcfsa.spendByTag}
+                        </span>
+                      </div>
+                    )}
+                    <p className="text-[16px] font-semibold leading-[24px] tracking-[-0.176px] text-[#14182c]">
+                      {dcfsa.useItOrLoseIt}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="h-px w-full bg-[#d1d5db]" />
+
+              {/* Row 2 */}
+              <div className="flex h-[44px] items-center gap-3 w-full">
+                <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
+                  <CalendarClock className="h-5 w-5" />
+                </div>
+                <div className="flex flex-1 items-center justify-between">
+                  <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#14182c]">
+                    Final Filing Date
+                  </p>
+                  <p className="text-[16px] font-semibold leading-[24px] tracking-[-0.176px] text-[#14182c]">
+                    {dcfsa.finalFilingDate}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
 
             </div>
           </>

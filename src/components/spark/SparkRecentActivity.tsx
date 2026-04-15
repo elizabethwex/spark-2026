@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { Clock, ChevronDown, Check } from "lucide-react";
 import {
   Tooltip,
@@ -13,16 +12,15 @@ import {
 } from "@/data/sparkAiForwardMock";
 import { cn } from "@/lib/utils";
 
-function statusStyles(status: SparkActivityStatus): string {
+function statusStyles(status: SparkActivityStatus): { wrapper: string; text: string } {
   switch (status) {
     case "approved":
-      return "text-[#009966]";
-    case "needs_attention":
-      return "text-[#996e00]";
     case "completed":
-      return "text-[#009966]";
+      return { wrapper: "border-[#e6f5f0] bg-[#e6f5f0]", text: "text-[#009966]" };
+    case "needs_attention":
+      return { wrapper: "border-[#fff9e6] bg-[#fffbeb]", text: "text-[#bf8a00]" };
     default:
-      return "text-[#5f6a94]";
+      return { wrapper: "border-[#f1f3fb] bg-[#f1f3fb]", text: "text-[#5f6a94]" };
   }
 }
 
@@ -105,19 +103,19 @@ export function SparkRecentActivity({ activeView = 1 }: { activeView?: 1 | 2 | 3
 
   const displayActivity = sparkRecentActivity.map((row) => {
     if (activeView === 2) {
-      if (row.meta.includes("LPFSA")) {
-        return { ...row, meta: row.meta.replace("LPFSA", "FSA") };
+      if (row.meta.includes("Limited Purpose FSA")) {
+        return { ...row, meta: row.meta.replace("Limited Purpose FSA", "Healthcare FSA") };
       }
       if (row.merchant === "Vanguard Invest") {
         return {
           ...row,
           merchant: "Bright Horizons Daycare",
-          meta: "12/14/25 • DCFSA Account",
+          meta: "12/14/25 • DCFSA",
         };
       }
     } else if (activeView === 3) {
-      if (row.meta.includes("LPFSA")) {
-        return { ...row, meta: row.meta.replace("LPFSA", "HSA") };
+      if (row.meta.includes("Limited Purpose FSA")) {
+        return { ...row, meta: row.meta.replace("Limited Purpose FSA", "HSA") };
       }
     }
     return row;
@@ -129,12 +127,6 @@ export function SparkRecentActivity({ activeView = 1 }: { activeView?: 1 | 2 | 3
         <h2 id="spark-activity-heading" className="text-[12px] font-black uppercase tracking-[3px] text-[#5f6a94] leading-[16px]">
           Recent Activity
         </h2>
-        <Link
-          to="/account-overview"
-          className="text-[12px] font-bold uppercase tracking-[1.2px] text-[color:var(--system-link,#1c6eff)] leading-[16px] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
-        >
-          View All
-        </Link>
       </div>
 
       <div className="flex flex-col gap-[12px]">
@@ -169,18 +161,25 @@ export function SparkRecentActivity({ activeView = 1 }: { activeView?: 1 | 2 | 3
                   </div>
                   
                   <div className="flex items-center gap-[24px]">
-                    <div className="flex flex-col items-end">
+                    <div className="flex flex-col items-end gap-1">
                       <p className="text-[14px] font-bold leading-[20px] text-foreground">
                         {row.amount}
                       </p>
-                      <p
+                      <div
                         className={cn(
-                          "text-[12px] font-bold uppercase tracking-[1.2px] leading-[16px]",
-                          statusStyles(row.status)
+                          "flex items-center rounded-full border px-[7px] py-[3px]",
+                          statusStyles(row.status).wrapper
                         )}
                       >
-                        {row.statusLabel}
-                      </p>
+                        <span
+                          className={cn(
+                            "text-[10px] font-bold leading-[15px] capitalize",
+                            statusStyles(row.status).text
+                          )}
+                        >
+                          {row.statusLabel.toLowerCase()}
+                        </span>
+                      </div>
                     </div>
                     {hasTimeline ? (
                       <ChevronDown 
