@@ -34,6 +34,7 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
   const [isTaskVisible, setIsTaskVisible] = useState(true);
   const [isHeroExpanded, setIsHeroExpanded] = useState(false);
   const [uploadClaimAssistOpen, setUploadClaimAssistOpen] = useState(false);
+  const [assistInitialMessage, setAssistInitialMessage] = useState("Upload Claim Documents");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -290,7 +291,14 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
         </motion.div>
 
         <motion.div variants={inputVariants}>
-          <AiChatInput />
+          <AiChatInput 
+            onSubmit={(val) => {
+              if (val.toLowerCase().includes("help me with my claims")) {
+                setAssistInitialMessage(val);
+                setUploadClaimAssistOpen(true);
+              }
+            }} 
+          />
         </motion.div>
 
         <motion.div
@@ -854,6 +862,7 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
       <AssistIQUploadClaimModal
         open={uploadClaimAssistOpen}
         onOpenChange={setUploadClaimAssistOpen}
+        initialMessage={assistInitialMessage}
       />
     </motion.div>
   );

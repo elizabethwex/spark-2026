@@ -20,12 +20,6 @@ export const sparkAccountQuickActions: SparkAccountQuickAction[] = [
   { label: "Send Payment", href: "/send-payment", icon: Send },
   { label: "HSA Store", href: "/resources", icon: ShoppingBag },
   { label: "Reimburse Myself", href: "/reimburse", icon: DollarSign },
-  {
-    label: "Upload Claim Documents",
-    href: "/claims",
-    icon: Upload,
-    assistModal: "upload-claim-documents",
-  },
 ];
 
 export const sparkHsaSummary = {

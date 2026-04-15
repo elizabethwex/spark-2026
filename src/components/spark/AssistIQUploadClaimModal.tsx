@@ -49,7 +49,7 @@ function formatTime(): string {
 }
 
 const RECENT_CHATS = [
-  { label: "Upload Claim Documents", active: true },
+  { label: "Help me with my claims", active: true },
   { label: "Claim status for family doctor vis…", active: false },
   { label: "Why was my claim denied?", active: false },
 ];
@@ -456,18 +456,21 @@ function ExplainableAIProcessing() {
 type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  initialMessage?: string;
 };
 
 /**
  * Assist IQ popup for “Upload Claim Documents” (SPARK-2026 Figma: Assist IQ Popup — Claim Doc request).
  */
-export function AssistIQUploadClaimModal({ open, onOpenChange }: Props) {
+export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = "Help me with my claims" }: Props) {
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const timeLabel = formatTime();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDocked, setIsDocked] = useState(false);
+  const [currentMessage, setCurrentMessage] = useState(initialMessage);
+  const [chatInput, setChatInput] = useState("");
   const [chatPhase, setChatPhase] = useState<
     | "new_chat"
     | "typing"
@@ -515,11 +518,14 @@ export function AssistIQUploadClaimModal({ open, onOpenChange }: Props) {
       setUploadProgress(0);
       setIsLoadingMore(false);
       setHasLoadedMore(false);
+      setChatInput("");
       if (progressIntervalRef.current) {
         clearInterval(progressIntervalRef.current);
         progressIntervalRef.current = null;
       }
       return;
+    } else {
+      setCurrentMessage(initialMessage);
     }
     
     // Only lock scrolling if the modal is expanded (not docked)
@@ -604,6 +610,14 @@ export function AssistIQUploadClaimModal({ open, onOpenChange }: Props) {
         setChatPhase("final_approval");
       }, 5000); // Extended for explainable AI processing
     }, 800);
+  };
+
+  const handleChatSubmit = () => {
+    if (chatInput.trim().toLowerCase().includes("help me with my claims")) {
+      setCurrentMessage(chatInput);
+      setChatInput("");
+      setChatPhase("typing");
+    }
   };
 
   const handleStartNewChat = () => {
@@ -825,7 +839,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange }: Props) {
                 transition={{ duration: 0.15 }}
                 className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-[14px] font-bold leading-[24px] text-[#14182c]"
               >
-                {isDocked ? "WEXly" : (chatPhase === "new_chat" ? "New Chat" : "Upload Claim Documents")}
+                {isDocked ? "WEXly" : (chatPhase === "new_chat" ? "New Chat" : currentMessage)}
               </motion.span>
             </AnimatePresence>
 
@@ -960,7 +974,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange }: Props) {
                       </div>
                       <div className={`rounded-tl-[24px] rounded-tr-[24px] rounded-bl-[24px] border border-[#e3e7f4] bg-[#e3e7f4] p-4 ${isDocked ? "max-w-[85%]" : "max-w-[358px]"}`}>
                         <p className="text-[14px] leading-[24px] tracking-[-0.084px] text-[#1d2c38]">
-                          Upload Claim Documents
+                          {currentMessage}
                         </p>
                       </div>
                     </div>
@@ -1312,11 +1326,14 @@ export function AssistIQUploadClaimModal({ open, onOpenChange }: Props) {
                     >
                       <div className="flex flex-row flex-wrap items-start gap-2">
                         <button 
-                          onClick={() => setChatPhase("typing")}
+                          onClick={() => {
+                            setCurrentMessage("Help me with my claims");
+                            setChatPhase("typing");
+                          }}
                           className="flex items-center gap-2 rounded-full border border-[#e3e7f4] bg-white px-4 py-2 text-[14px] font-medium text-[#25146f] transition-all hover:-translate-y-[1px] hover:bg-[#f8f9fe] hover:shadow-sm"
                         >
-                          <Upload className="h-4 w-4 text-[#9b2b5e]" />
-                          Upload Claim Documents
+                          <FileText className="h-4 w-4 text-[#9b2b5e]" />
+                          Help me with my claims
                         </button>
                         <button className="flex items-center gap-2 rounded-full border border-[#e3e7f4] bg-white px-4 py-2 text-[14px] font-medium text-[#25146f] transition-all hover:-translate-y-[1px] hover:bg-[#f8f9fe] hover:shadow-sm">
                           <CreditCard className="h-4 w-4 text-[#9b2b5e]" />
@@ -1340,7 +1357,15 @@ export function AssistIQUploadClaimModal({ open, onOpenChange }: Props) {
                     type="text"
                     placeholder="Ask a question"
                     className="min-w-0 flex-1 border-0 bg-transparent text-[15px] text-[#14182c] outline-none placeholder:text-[#9ca7c7]"
-                    readOnly aria-label="Ask a question"
+                    aria-label="Ask a question"
+                    value={chatInput}
+                    onChange={(e) => setChatInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleChatSubmit();
+                      }
+                    }}
                   />
                   <button
                     type="button"
@@ -1353,6 +1378,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange }: Props) {
                     type="button"
                     className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[24px] bg-[#5f6a94] text-white"
                     aria-label="Send"
+                    onClick={handleChatSubmit}
                   >
                     <Send className="h-4 w-4" />
                   </button>
