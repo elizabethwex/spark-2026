@@ -12,6 +12,11 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   Select,
   SelectContent,
   SelectItem,
@@ -35,14 +40,23 @@ import {
   Check,
   ChevronsLeft,
   ChevronsRight,
+  ClipboardList,
   Clock,
   CreditCard,
+  Download,
+  FileText,
+  Info,
+  MoreVertical,
   Paperclip,
+  Pencil,
   Search,
+  Trash2,
   Upload,
 } from "lucide-react"
 import { ClaimExpenseDetailSheet } from "@/components/claims/ClaimExpenseDetailSheet"
 import { expenseStatusBadgeClass, type ExpenseRow } from "@/components/claims/expenseTypes"
+import { DOCUMENTS, type DocumentItem } from "@/components/documents/documentData"
+import { FilePreviewModal } from "@/components/documents/FilePreviewModal"
 
 const ACTION_ITEMS = [
   {
@@ -234,11 +248,8 @@ const EXPENSE_ROWS: ExpenseRow[] = [
   },
 ]
 
-const DOCUMENT_CARDS = [
-  { id: "1", title: "EOB", date: "Feb 28, 2026", tag: "Unattached", attached: false },
-  { id: "2", title: "Walgreens", date: "Jan 31, 2026", tag: "Attached", attached: true },
-  { id: "3", title: "Bright Smiles Dental", date: "Jan 22, 2026", tag: "Attached", attached: true },
-] as const
+// Show the 3 most recent loose files from the shared document store
+const DOCUMENT_CARDS = DOCUMENTS.filter((d) => d.folderId === null).slice(0, 3)
 
 /** SparkAccountsSection-aligned shell for main Claims section cards */
 const CLAIMS_SPARK_CARD_PROPS = {
@@ -427,6 +438,7 @@ export function ClaimsPaymentsContent() {
     dir: "asc" | "desc"
   }>({ key: "dateOfService", dir: "desc" })
   const [selectedClaimRow, setSelectedClaimRow] = useState<ExpenseRow | null>(null)
+  const [previewDoc, setPreviewDoc] = useState<DocumentItem | null>(null)
 
   const filteredExpenseRows = useMemo(() => {
     return EXPENSE_ROWS.filter((row) => {
@@ -872,13 +884,13 @@ export function ClaimsPaymentsContent() {
           {/* Section header */}
           <div className="flex items-center justify-between px-6 py-4">
             <h2 className="text-xl font-semibold text-foreground">Document Organizer</h2>
-            <Button type="button" intent="primary" variant="outline" size="md">
-              See All Documents
+            <Button type="button" intent="primary" variant="outline" size="md" asChild>
+              <Link to="/document-org">See All Documents</Link>
             </Button>
           </div>
 
           {/* Document grid */}
-          <div className="grid grid-cols-1 gap-4 p-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 px-6 pb-6 pt-0 sm:grid-cols-2 lg:grid-cols-4">
             {/* Upload card */}
             <div className="flex min-h-[220px] flex-col items-center justify-center rounded-lg border-2 border-dashed border-border bg-muted/20 px-6 py-8 text-center">
               <Upload className="mb-3 h-6 w-6 text-muted-foreground" aria-hidden />
@@ -901,24 +913,84 @@ export function ClaimsPaymentsContent() {
             {DOCUMENT_CARDS.map((doc) => (
               <div
                 key={doc.id}
-                className="overflow-hidden rounded-lg border border-border bg-card"
+                className="group relative overflow-hidden rounded-[8px] border border-[#d1d6d8] bg-white transition-shadow hover:shadow-md"
               >
-                <div className="h-[153px] w-full bg-muted/60" />
-                <div className="space-y-2 p-4">
-                  <p className="text-sm font-semibold text-foreground">{doc.title}</p>
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-xs text-muted-foreground">{doc.date}</span>
-                    {doc.attached ? (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">
-                        <Check className="h-3 w-3 text-current" aria-hidden />
-                        {doc.tag}
-                      </span>
-                    ) : (
-                      <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
-                        {doc.tag}
-                      </span>
-                    )}
+                {/* Clickable thumbnail */}
+                <button
+                  type="button"
+                  aria-label={`Preview ${doc.title}`}
+                  onClick={() => setPreviewDoc(doc)}
+                  className="relative h-[153px] w-full rounded-t-[8px] bg-[#d9d9d9] block cursor-pointer overflow-hidden ring-[3px] ring-inset ring-[#f8f9fe] focus-visible:outline-none focus-visible:ring-wex-input-focus-ring"
+                >
+                  {doc.imageUrl && (
+                    <img src={doc.imageUrl} alt={doc.title} className="h-full w-full object-cover" />
+                  )}
+                  {doc.status === "attached" ? (
+                    <span className="absolute bottom-2 right-2 inline-flex items-center gap-1 rounded-full bg-[#dcfce7] px-[7px] py-[3.5px] text-[12px] font-bold text-[#008375]">
+                      <Check className="h-[10.5px] w-[10.5px] shrink-0 text-current" aria-hidden />
+                      Attached
+                    </span>
+                  ) : (
+                    <span className="absolute bottom-2 right-2 inline-flex items-center rounded-full bg-[#f7f7f7] px-[7px] py-[3.5px] text-[12px] font-bold text-[#515f6b]">
+                      Unattached
+                    </span>
+                  )}
+                </button>
+
+                {/* Footer — title + three-dots menu */}
+                <div className="space-y-1.5 bg-[#f8f9fe] p-4">
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setPreviewDoc(doc)}
+                      className="flex-1 truncate text-left text-sm font-semibold leading-5 text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-wex-input-focus-ring"
+                    >
+                      {doc.title}
+                    </button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button
+                          type="button"
+                          aria-label={`More options for ${doc.title}`}
+                          className="shrink-0 rounded p-0.5 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:text-foreground focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-wex-input-focus-ring"
+                        >
+                          <MoreVertical className="h-4 w-4" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48">
+                        {doc.status === "attached" ? (
+                          <DropdownMenuItem className="gap-2">
+                            <ClipboardList className="h-4 w-4 shrink-0 text-muted-foreground" />
+                            Edit Claim
+                          </DropdownMenuItem>
+                        ) : (
+                          <DropdownMenuItem className="gap-2">
+                            <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
+                            File Claim
+                          </DropdownMenuItem>
+                        )}
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="gap-2">
+                          <Download className="h-4 w-4 shrink-0 text-muted-foreground" />
+                          Download
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="gap-2">
+                          <Pencil className="h-4 w-4 shrink-0 text-muted-foreground" />
+                          Rename
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="gap-2">
+                          <Info className="h-4 w-4 shrink-0 text-muted-foreground" />
+                          See Details
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="gap-2 text-destructive focus:text-destructive">
+                          <Trash2 className="h-4 w-4 shrink-0 text-current" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
+                  <p className="text-xs leading-4 text-[#7c858e]">{doc.date} — 3mb</p>
                 </div>
               </div>
             ))}
@@ -934,6 +1006,8 @@ export function ClaimsPaymentsContent() {
         }}
         row={selectedClaimRow}
       />
+
+      <FilePreviewModal doc={previewDoc} onClose={() => setPreviewDoc(null)} />
     </div>
   )
 }
