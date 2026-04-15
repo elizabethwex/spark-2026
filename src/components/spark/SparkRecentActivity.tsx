@@ -130,7 +130,7 @@ export function SparkRecentActivity({ activeView = 1 }: { activeView?: 1 | 2 | 3
           Recent Activity
         </h2>
         <Link
-          to="/account-overview"
+          to="/claims"
           className="text-[12px] font-bold uppercase tracking-[1.2px] text-[color:var(--system-link,#1c6eff)] leading-[16px] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
         >
           View All

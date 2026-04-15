@@ -285,7 +285,8 @@ function TransactionRow({ title, subtitle, amount, onClick }: TransactionRowProp
 
 export default function AppHome() {
   const navigate = useNavigate();
-  const { deviceOn } = useDeviceMockup();
+  const { deviceOn, isMobileDevice } = useDeviceMockup();
+  const shellMatchesFrame = deviceOn || !isMobileDevice;
   const [showFsaStore, setShowFsaStore] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<TransactionData | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -301,8 +302,8 @@ export default function AppHome() {
     setRefreshKey(prev => prev + 1);
   };
 
-  /** Device frame: tab bar is fixed over the scroll area — clear it. Mobile web: shell already reserves tab bar + safe area; add a small inner gap. */
-  const contentPaddingBottom = deviceOn
+  /** Mockup or desktop frame-off: tab bar fixed over scroll. Real mobile web: smaller inner gap. */
+  const contentPaddingBottom = shellMatchesFrame
     ? "calc(28px + var(--app-tabbar-height) + env(safe-area-inset-bottom, 0px))"
     : 56;
 

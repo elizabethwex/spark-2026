@@ -130,7 +130,7 @@ export function TransactionsAndLinks({ activeView = 1 }: { activeView?: 1 | 2 | 
           <SectionHeader
             title="Recent Transactions"
             actionLabel="View All Transactions"
-            actionHref="/account-overview"
+            actionHref="/claims"
           />
 
           <div className="flex flex-col gap-[12px]">

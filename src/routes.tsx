@@ -29,8 +29,8 @@ const AppReimburseFlowPage  = React.lazy(() => import("@/pages/app/AppReimburseF
 // Consumer Experience page - standalone route
 const HomePage = React.lazy(() => import("@/pages/HomePage"));
 
-// Account Overview page - standalone route
-const AccountOverviewPage = React.lazy(() => import("@/pages/AccountOverview"));
+// FSA account dashboard (consumer)
+const FsaAccountPage = React.lazy(() => import("@/pages/fsa-account/FsaAccountPage"));
 
 // HSA account details — /hsa-details
 const HsaDetailsPage = React.lazy(() =>
@@ -128,8 +128,8 @@ export function AppRoutes() {
         {/* Home */}
         <Route index element={withConsumerLight(<HomePage />)} />
         
-        {/* Account Overview */}
-        <Route path="account-overview" element={withConsumerLight(<AccountOverviewPage />)} />
+        {/* FSA account dashboard (consumer) */}
+        <Route path="fsa-account" element={withConsumerLight(<FsaAccountPage />)} />
 
         {/* HSA account details (consumer) */}
         <Route path="hsa-details" element={withConsumerLight(<HsaDetailsPage />)} />

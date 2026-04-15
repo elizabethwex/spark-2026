@@ -66,7 +66,7 @@ export function AccountsSection() {
           variant="link"
           size="md"
           className="h-auto p-0"
-          onClick={() => navigate("/account-overview")}
+          onClick={() => navigate("/")}
         >
           View All
           <ChevronRight className="h-4 w-4" />

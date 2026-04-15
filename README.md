@@ -85,13 +85,12 @@ src/
   pages/                        # Route-level pages
     Login.tsx
     HomePage.tsx                 # Consumer dashboard
-    AccountOverview.tsx
+    fsa-account/FsaAccountPage.tsx
     MessageCenter.tsx
     MyProfile.tsx
     Claims.tsx
     Resources.tsx
     AccountDocuments.tsx
-    account-overview/            # Account overview sub-components
     hsa/                         # HSA enrollment flow pages
     reimburse/                   # Reimbursement flow pages
   components/
@@ -199,7 +198,7 @@ const { register, handleSubmit } = useForm({
 |-------|------|
 | `/` | Home / Dashboard |
 | `/login` | Login |
-| `/account-overview` | Account Overview |
+| `/fsa-account` | FSA account dashboard |
 | `/message-center` | Message Center |
 | `/my-profile` | My Profile |
 | `/claims` | Claims |
