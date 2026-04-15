@@ -511,7 +511,7 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
                 key="claim-summary"
                 layout
                 {...phasePresenceMotion}
-                className="flex items-center justify-between rounded-[24px] bg-[#f8f9fe] border border-[#f8f9fe] p-[17px]"
+                className="flex items-center justify-between rounded-[24px] bg-[#f8f9fe] border border-[#f8f9fe] py-[12px] px-[16px]"
               >
                 <div className="flex items-center gap-[16px]">
                   <div className="flex h-[48px] w-[48px] shrink-0 items-center justify-center rounded-[12px] border border-[#e2e8f0] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
@@ -522,7 +522,10 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
                       Bigtown Dentistry
                     </p>
                     <p className="text-[12px] font-medium leading-[20px] text-[#5f6a94]">
-                      4/27/26 • {claimAccountText}
+                      {claimAccountText}
+                    </p>
+                    <p className="text-[12px] font-medium leading-[20px] text-[#5f6a94]">
+                      4/27/26
                     </p>
                   </div>
                 </div>
