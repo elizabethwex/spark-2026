@@ -230,7 +230,7 @@ export function SparkAccountsSection({
                 />
               </div>
               <p className="text-[10px] leading-[15px] text-[#5f6a94]">
-                {h.planYear} IRS limit: $4,300.00 (individual)
+                {h.planYear} IRS limit: {h.irsLimitFormatted} (individual)
               </p>
             </div>
           </div>

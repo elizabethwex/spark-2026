@@ -273,6 +273,7 @@ export default function HSAEnrollmentWorkspace({ open, onOpenChange }: HSAEnroll
           footerConfig.tertiary ? (
             <Button
               variant={footerConfig.tertiary.variant}
+              data-workspace-footer-cancel
               onClick={footerConfig.tertiary.onClick}
               className="px-4 py-2"
             >

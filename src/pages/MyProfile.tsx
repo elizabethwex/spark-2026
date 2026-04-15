@@ -21,12 +21,35 @@ import {
 import { ConsumerFooter } from "@/components/layout/Footer";
 import { ConsumerNavigation } from "@/components/layout/ConsumerNavigation";
 import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground";
-import { Pencil, Info, Plus, Calendar, X, Trash2, MoreVertical, Eye, EyeOff, RefreshCw, AlertCircle, User, Users, HeartPlus, ShieldCheck, Landmark, CreditCard, Bell, UserLock, Lock, SquareArrowRight, DollarSign } from "lucide-react";
-import { ReimbursementMethodsContent } from "@/pages/ReimbursementMethodsContent";
 import {
   WEX_PROFILE_BANK_ACCOUNTS_KEY,
   migrateLegacyEllaBankLabel,
 } from "@/lib/profileBankAccountsSession";
+import { ReimbursementMethodsContent } from "@/pages/ReimbursementMethodsContent";
+import {
+  Pencil,
+  Info,
+  Plus,
+  Calendar,
+  X,
+  Trash2,
+  MoreVertical,
+  Eye,
+  EyeOff,
+  RefreshCw,
+  AlertCircle,
+  User,
+  Users,
+  HeartPlus,
+  ShieldCheck,
+  Landmark,
+  CreditCard,
+  Bell,
+  UserLock,
+  Lock,
+  SquareArrowRight,
+  DollarSign,
+} from "lucide-react";
 
 type SubPage = "my-profile" | "dependents" | "beneficiaries" | "authorized-signers" | "banking" | "reimbursement-method" | "debit-card" | "login-security" | "communication" | "report-lost-stolen" | "order-replacement-card";
 
@@ -229,7 +252,7 @@ function loadBankAccountsFromStorage(): BankAccount[] {
       accountNickname: migrateLegacyEllaBankLabel(raw.accountNickname) ?? raw.accountNickname,
       bankName: migrateLegacyEllaBankLabel(raw.bankName) ?? raw.bankName,
       activationStatus:
-        raw.activationStatus === "pending_deposit" ? "pending_deposit" : "active",
+        raw.activationStatus === "pending_deposit" ? ("pending_deposit" as const) : ("active" as const),
     }));
   } catch {
     return DEFAULT_BANK_ACCOUNTS;
@@ -1588,7 +1611,6 @@ export default function MyProfile() {
         bankAccount.bankName?.trim() ||
         `${bankAccount.accountType.charAt(0).toUpperCase() + bankAccount.accountType.slice(1)} Account`
       : "Bank account";
-
     setBankAccounts((prev) => prev.filter((acc) => acc.id !== id));
     setIsRemoveBankAccountConfirmOpen(false);
     setIsRemoveBankAccountAuthModalOpen(false);
@@ -1918,7 +1940,7 @@ export default function MyProfile() {
                   intent="primary"
                   variant="outline"
                   size="sm"
-                  className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50 [&_svg]:text-current"
+                  className="gap-0 w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50 [&_svg]:text-current"
                   onClick={() => {
                     resetForm();
                     setEditingDependentId(null);
@@ -2056,23 +2078,25 @@ export default function MyProfile() {
               <div className="px-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h2 className="text-2xl font-semibold text-gray-800">Beneficiaries</h2>
                 <div className="flex gap-2 w-full sm:w-auto">
-                  <Button
-                    intent="primary"
-                    variant="ghost"
-                    size="sm"
-                    className="w-full sm:w-auto justify-center"
-                    onClick={() => {
-                      const initialShares: Record<string, string> = {};
-                      beneficiaries.forEach((ben) => {
-                        initialShares[ben.id] = ben.sharePercentage || (beneficiaries.length === 1 ? "100" : "0");
-                      });
-                      setEditPercentagesShares(initialShares);
-                      setEditPercentagesSplitEqually(false);
-                      setIsEditPercentagesModalOpen(true);
-                    }}
-                  >
-                    Edit Shares
-                  </Button>
+                  {beneficiaries.length >= 2 && (
+                    <Button
+                      intent="primary"
+                      variant="ghost"
+                      size="sm"
+                      className="w-full sm:w-auto justify-center"
+                      onClick={() => {
+                        const initialShares: Record<string, string> = {};
+                        beneficiaries.forEach((ben) => {
+                          initialShares[ben.id] = ben.sharePercentage || (beneficiaries.length === 1 ? "100" : "0");
+                        });
+                        setEditPercentagesShares(initialShares);
+                        setEditPercentagesSplitEqually(false);
+                        setIsEditPercentagesModalOpen(true);
+                      }}
+                    >
+                      Edit Shares
+                    </Button>
+                  )}
                   <Button
                     intent="primary"
                     variant="outline"
@@ -2255,7 +2279,7 @@ export default function MyProfile() {
                   intent="primary"
                   variant="outline"
                   size="sm"
-                  className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50 [&_svg]:text-current"
+                  className="w-full gap-0 sm:w-auto justify-center border-primary text-primary hover:bg-blue-50 [&_svg]:text-current"
                   onClick={() => {
                     resetAuthorizedSignerForm();
                     setEditingAuthorizedSignerId(null);
@@ -2372,7 +2396,7 @@ export default function MyProfile() {
                   intent="primary"
                   variant="outline"
                   size="sm"
-                  className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50 [&_svg]:text-current"
+                  className="w-full gap-0 sm:w-auto justify-center border-primary text-primary hover:bg-blue-50 [&_svg]:text-current"
                   onClick={() => {
                     setBankAccountFormData({
                       verificationMethod: "",
@@ -2491,22 +2515,22 @@ export default function MyProfile() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="min-w-[160px]">
-                            {isPendingDeposit ? (
+                              {isPendingDeposit ? (
+                                <DropdownMenuItem
+                                  className="flex cursor-pointer items-center gap-2 text-[#1d2c38] focus:text-[#1d2c38]"
+                                  onClick={() => handleEditBankAccount(bankAccount)}
+                                >
+                                  <Pencil className="h-4 w-4" />
+                                  <span>Edit</span>
+                                </DropdownMenuItem>
+                              ) : null}
                               <DropdownMenuItem
-                                className="flex cursor-pointer items-center gap-2 text-[#1d2c38] focus:text-[#1d2c38]"
-                                onClick={() => handleEditBankAccount(bankAccount)}
+                                className="flex cursor-pointer items-center gap-2 text-destructive focus:text-destructive"
+                                onClick={() => handleRemoveBankAccountClick(bankAccount)}
                               >
-                                <Pencil className="h-4 w-4" />
-                                <span>Edit</span>
+                                <Trash2 className="h-4 w-4 text-destructive" aria-hidden />
+                                <span>Remove</span>
                               </DropdownMenuItem>
-                            ) : null}
-                            <DropdownMenuItem
-                              className="flex cursor-pointer items-center gap-2 text-destructive focus:text-destructive"
-                              onClick={() => handleRemoveBankAccountClick(bankAccount)}
-                            >
-                              <Trash2 className="h-4 w-4 text-destructive" aria-hidden />
-                              <span>Remove</span>
-                            </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </div>
@@ -2556,7 +2580,7 @@ export default function MyProfile() {
                           className="h-auto w-full rounded-md border-[#0058a3] bg-transparent px-[13.25px] py-[9.75px] text-[15.75px] font-medium leading-normal text-[#0058a3] shadow-none hover:bg-[#0058a3]/10"
                           onClick={() => handleEditBankAccount(bankAccount)}
                         >
-                          Edit
+                          View
                         </Button>
                       )}
                     </div>
@@ -5794,7 +5818,11 @@ export default function MyProfile() {
           </Button>
         }
         tertiaryButton={
-          <Button variant="ghost" onClick={() => setIsAddBankAccountWorkspaceOpen(false)}>
+          <Button
+            variant="ghost"
+            data-workspace-footer-cancel
+            onClick={() => setIsAddBankAccountWorkspaceOpen(false)}
+          >
             Cancel
           </Button>
         }
@@ -6690,7 +6718,11 @@ export default function MyProfile() {
           </Button>
         }
         tertiaryButton={
-          <Button variant="ghost" onClick={() => setIsAddBeneficiaryWorkspaceOpen(false)}>
+          <Button
+            variant="ghost"
+            data-workspace-footer-cancel
+            onClick={() => setIsAddBeneficiaryWorkspaceOpen(false)}
+          >
             Cancel
           </Button>
         }
@@ -7135,6 +7167,7 @@ export default function MyProfile() {
         tertiaryButton={
           <Button
             variant="ghost"
+            data-workspace-footer-cancel
             onClick={() => {
               setIsReportLostStolenWorkspaceOpen(false);
               setConfirmationAnswer("");
@@ -7385,6 +7418,7 @@ export default function MyProfile() {
         tertiaryButton={
           <Button
             variant="ghost"
+            data-workspace-footer-cancel
             onClick={() => {
               setIsOrderReplacementWorkspaceOpen(false);
               setCardBeingReplaced(null);
