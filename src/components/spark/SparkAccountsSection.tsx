@@ -350,7 +350,18 @@ export function SparkAccountsSection({
                     <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#14182c]">
                       Available to rollover
                     </p>
-                    <Info className="h-4 w-4 text-[#5f6a94]" />
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button type="button" className="focus:outline-none">
+                          <Info className="h-4 w-4 text-[#5f6a94]" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="text-sm max-w-[220px] text-center">
+                          Unused funds that carry over to next year- up to $500.
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
                   </div>
                   <p className="text-[16px] font-semibold leading-[24px] tracking-[-0.176px] text-[#14182c]">
                     {l.rolloverAmount}
@@ -511,7 +522,18 @@ export function SparkAccountsSection({
                     <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#14182c]">
                       Available to rollover
                     </p>
-                    <Info className="h-4 w-4 text-[#5f6a94]" />
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button type="button" className="focus:outline-none">
+                          <Info className="h-4 w-4 text-[#5f6a94]" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="text-sm max-w-[220px] text-center">
+                          Unused funds that carry over to next year- up to $500.
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
                   </div>
                   <p className="text-[16px] font-semibold leading-[24px] tracking-[-0.176px] text-[#14182c]">
                     {fsa.rolloverAmount}
