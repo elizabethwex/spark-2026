@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import { useDocumentViewMode } from "./DocumentViewContext"
-import { Link, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import {
   Button,
   Card,
@@ -429,7 +429,7 @@ function FolderDropdownMenu({ name, onRename, onNavigate }: { name: string; onRe
   )
 }
 
-function FolderCard({ folderId: _folderId, name, fileCount, onNavigate, onRename }: FolderItemProps) {
+function FolderCard({ folderId: _folderId, name, fileCount: _fileCount, onNavigate, onRename }: FolderItemProps) {
   return (
     <div
       role="button"

@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { CalendarCheck2, PiggyBank, TrendingUp, CircleDollarSign, Info, Lightbulb, ChevronRight, HeartPulse, Baby, RotateCw, ClockAlert, CalendarClock, Calendar, ChartNoAxesCombined, Landmark } from "lucide-react";
+import { CalendarCheck2, TrendingUp, CircleDollarSign, Info, ChevronRight, HeartPulse, Baby, RotateCw, ClockAlert, CalendarClock, Calendar, ChartNoAxesCombined, Landmark } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@wexinc-healthbenefits/ben-ui-kit";
@@ -232,13 +232,17 @@ export function SparkAccountsSection({
                   </p>
                 </div>
               </div>
-              <div className="flex h-[6px] w-full items-center overflow-hidden rounded-[6px] bg-[#eef2ff]">
-                <div
-                  className="h-full rounded-[6px] bg-[var(--theme-primary)]"
-                  style={{ 
-                    width: isInView ? `${h.contributionPctUsed}%` : "0%",
-                    transition: 'width 2.2s cubic-bezier(0.22, 1, 0.36, 1) 0.15s'
-                  }}
+              <div className="relative h-[20px] w-full overflow-hidden rounded-full bg-[#eef2ff]">
+                <div 
+                  className={cn(
+                    "absolute left-0 top-0 h-full transition-all duration-1000 ease-out",
+                    isPrimary ? "bg-[#3958c3]" : "bg-[#e6a800]"
+                  )}
+                  style={{ width: isInView ? `${h.contributionPctUsed}%` : "0%" }}
+                />
+                <div 
+                  className="absolute top-0 h-full w-px bg-[#cefafe] transition-all duration-1000 ease-out"
+                  style={{ left: isInView ? `${h.contributionPctUsed}%` : "0%" }}
                 />
               </div>
               <div className="flex w-full">
@@ -269,10 +273,7 @@ export function SparkAccountsSection({
                 <CalendarCheck2 className="h-5 w-5 transition-transform group-hover/card:rotate-12 text-[var(--theme-secondary)]" />
               </div>
               <div className="flex flex-col">
-                <div className="flex items-center gap-2">
-                  <h3 className="text-[16px] font-bold leading-[24px] text-[var(--system-text-primary)]">Limited Purpose FSA</h3>
-                  <Info className="h-4 w-4 text-[#5f6a94]" />
-                </div>
+                <h3 className="text-[16px] font-bold leading-[24px] text-[var(--system-text-primary)]">Limited Purpose FSA</h3>
                 <p className="text-[12px] font-bold leading-[16px] tracking-[0.6px] text-[#5f6a94]">
                   {l.planRange}
                 </p>
@@ -441,10 +442,7 @@ export function SparkAccountsSection({
                     <HeartPulse className="h-5 w-5 transition-transform group-hover/card:rotate-12 text-[var(--theme-secondary)]" />
                   </div>
                   <div className="flex flex-col">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-[16px] font-bold leading-[24px] text-[var(--system-text-primary)]">Healthcare FSA</h3>
-                      <Info className="h-4 w-4 text-[#5f6a94]" />
-                    </div>
+                    <h3 className="text-[16px] font-bold leading-[24px] text-[var(--system-text-primary)]">Healthcare FSA</h3>
                     <p className="text-[12px] font-bold leading-[16px] tracking-[0.6px] text-[#5f6a94]">
                       {fsa.planRange}
                     </p>
@@ -606,10 +604,7 @@ export function SparkAccountsSection({
                     <Baby className="h-5 w-5 transition-transform group-hover/card:rotate-12 text-[var(--theme-secondary)]" />
                   </div>
                   <div className="flex flex-col">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-[16px] font-bold leading-[24px] text-[var(--system-text-primary)]">DCFSA</h3>
-                      <Info className="h-4 w-4 text-[#5f6a94]" />
-                    </div>
+                    <h3 className="text-[16px] font-bold leading-[24px] text-[var(--system-text-primary)]">DCFSA</h3>
                     <p className="text-[12px] font-bold leading-[16px] tracking-[0.6px] text-[#5f6a94]">
                       {dcfsa.planRange}
                     </p>

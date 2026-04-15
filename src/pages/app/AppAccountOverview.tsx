@@ -49,11 +49,11 @@ interface AccountCardData {
 const ACCOUNTS_BY_VARIANT: Record<AppVariant, AccountCardData[]> = {
   1: [
     { id: "hsa", name: "Health Savings Account", subtitle: "HSA", balanceLabel: "Cash + Invested Assets", balance: "$15,900.00", icon: "landmark" },
-    { id: "lpfsa", name: "Limited Purpose FSA", subtitle: "01/01/2026 - 12/31/2026", balanceLabel: "", balance: "$850.00", icon: "calendar-check", warningTag: "28 Days left to spend" },
+    { id: "lpfsa", name: "Limited Purpose FSA", subtitle: "01/01/2026 - 12/31/2026", balanceLabel: "", balance: "$2,425.00", icon: "calendar-check" },
   ],
   2: [
-    { id: "fsa", name: "Healthcare FSA", subtitle: "01/01/2026 - 12/31/2026", balanceLabel: "", balance: "$850.00", icon: "heart-pulse", warningTag: "28 Days left to spend" },
-    { id: "dcfsa", name: "DCFSA", subtitle: "01/01/2025 - 12/31/2025", balanceLabel: "", balance: "$620.00", icon: "baby", warningTag: "28 Days left to spend" },
+    { id: "fsa", name: "Healthcare FSA", subtitle: "01/01/2026 - 12/31/2026", balanceLabel: "", balance: "$2,425.00", icon: "heart-pulse" },
+    { id: "dcfsa", name: "DCFSA", subtitle: "01/01/2026 - 12/31/2026", balanceLabel: "", balance: "$620.00", icon: "baby" },
   ],
   3: [
     { id: "hsa", name: "Health Savings Account", subtitle: "HSA", balanceLabel: "Cash + Invested Assets", balance: "$15,900.00", icon: "landmark" },
@@ -110,7 +110,7 @@ const TRANSACTIONS_V1: TransactionRow[] = [
 const TRANSACTIONS_V2: TransactionRow[] = [
   { merchant: "Pharmacy", date: "4/27/2026", account: "FSA", amount: "$42.50", processedDate: "04/27/2026", description: "Prescription Medicine", planYear: "2026", availableBalance: "$807.50", runningBalance: "$765.00", status: "complete" },
   { merchant: "Bright Horizons Daycare", date: "4/27/2026", account: "DCFSA", amount: "$185.00", processedDate: "04/27/2026", description: "Childcare", planYear: "2025", availableBalance: "$620.00", runningBalance: "$435.00", status: "complete" },
-  { merchant: "CVS Pharmacy", date: "4/25/2026", account: "FSA", amount: "$28.10", processedDate: "04/25/2026", description: "OTC Medicine", planYear: "2026", availableBalance: "$878.10", runningBalance: "$850.00", status: "complete" },
+  { merchant: "CVS Pharmacy", date: "4/25/2026", account: "FSA", amount: "$28.10", processedDate: "04/25/2026", description: "OTC Medicine", planYear: "2026", availableBalance: "$878.10", runningBalance: "$2,425.00", status: "complete" },
   { merchant: "KinderCare", date: "4/22/2026", account: "DCFSA", amount: "$210.00", processedDate: "04/22/2026", description: "Daycare", planYear: "2025", availableBalance: "$830.00", runningBalance: "$620.00", status: "complete" },
   { merchant: "Target Store", date: "4/20/2026", account: "FSA", amount: "$34.99", processedDate: "04/20/2026", description: "Health Products", planYear: "2026", availableBalance: "$913.09", runningBalance: "$878.10", status: "complete" },
   { merchant: "Walgreens Pharmacy", date: "4/18/2026", account: "FSA", amount: "$19.50", processedDate: "04/18/2026", description: "Prescription Medicine", planYear: "2026", availableBalance: "$932.59", runningBalance: "$913.09", status: "complete" },

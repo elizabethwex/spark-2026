@@ -98,7 +98,7 @@ export const sparkFsaPrimarySummary = {
 
 export const sparkDcfsaSummary = {
   balance: "$300.00",
-  planRange: "01/01/2025 - 12/31/2025",
+  planRange: "01/01/2026 - 12/31/2026",
   daysToSpend: 28,
   spendByTag: "spend by 12/31",
   eligibleLabel: "Using DCFSA funds",
@@ -106,12 +106,12 @@ export const sparkDcfsaSummary = {
   contributionPctUsed: 80,
   contributionLimit: "$1,500",
   useItOrLoseIt: "$300.00",
-  finalFilingDate: "3/1/26",
+  finalFilingDate: "3/1/27",
 };
 
 export const sparkDcfsaPrimarySummary = {
   balance: "$620.00",
-  planRange: "01/01/2025 - 12/31/2025",
+  planRange: "01/01/2026 - 12/31/2026",
   daysToSpend: 28,
   spendByTag: null,
   eligibleLabel: "Using DCFSA funds",
@@ -119,7 +119,7 @@ export const sparkDcfsaPrimarySummary = {
   contributionPctUsed: 41,
   contributionLimit: "$1,500",
   useItOrLoseIt: "$620.00",
-  finalFilingDate: "3/1/26",
+  finalFilingDate: "3/1/27",
 };
 
 export type SparkActivityStatus = "approved" | "needs_attention" | "completed";
@@ -165,7 +165,7 @@ export const sparkRecentActivity: SparkActivityRow[] = [
   },
   {
     merchant: "Vanguard Invest",
-    meta: "12/14/25 • HSA",
+    meta: "12/14/26 • HSA",
     amount: "$500.00",
     status: "completed",
     statusLabel: "COMPLETED",
@@ -177,7 +177,7 @@ export const sparkRecentActivity: SparkActivityRow[] = [
   },
   {
     merchant: "Target",
-    meta: "11/20/25 • HSA",
+    meta: "11/20/26 • HSA",
     amount: "$15.99",
     status: "completed",
     statusLabel: "COMPLETED",
@@ -189,7 +189,7 @@ export const sparkRecentActivity: SparkActivityRow[] = [
   },
   {
     merchant: "Dr. Smith Vision",
-    meta: "11/15/25 • Limited Purpose FSA",
+    meta: "11/15/26 • Limited Purpose FSA",
     amount: "$120.00",
     status: "completed",
     statusLabel: "COMPLETED",

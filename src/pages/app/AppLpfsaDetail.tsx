@@ -11,8 +11,6 @@ const TEXT_PRIMARY = "#14182c";
 const TEXT_SECONDARY = "#5f6a94";
 const TINT = "#3958c3";
 const SEPARATOR = "#e6e6e6";
-const WARNING_BG = "#fff9e6";
-const WARNING_TEXT = "#4a3500";
 const SUCCESS_SURFACE = "#ecfdf5";
 const SUCCESS_TEXT = "#002c22";
 const CRITICAL_RED = "#dc2626";
@@ -54,19 +52,19 @@ const ACCOUNT_DATA: Record<string, AccountData> = {
     title: "Limited Purpose FSA",
     icon: CalendarCheck2,
     balanceSubtitle: "FSA Available Balance",
-    balance: "$850.00",
+    balance: "$2,425.00",
     balanceRows: [
-      { label: "Plan Year", value: "$1,500.00" },
-      { label: "Eligible Amount", value: "$1,750.00" },
-      { label: "Rollover Amount", value: "$250.00" },
-      { label: "Use it or Lose It", value: "$300.00", valueColor: CRITICAL_RED },
-      { label: "File by 3/31/2026", badge: { text: "90 days", bg: WARNING_BG, color: WARNING_TEXT } },
+      { label: "Plan Year", value: "01/01/2026 - 12/31/2026" },
+      { label: "Eligible Amount", value: "$2,500.00" },
+      { label: "Max Rollover", value: "$500.00" },
+      { label: "Use it or Lose It", value: "$1,925.00", valueColor: CRITICAL_RED },
+      { label: "File by 3/1/27" },
     ],
     effectiveDate: "January 1, 2026",
     planDuration: "Jan 1, 2026 - Dec 31, 2026",
-    finalServiceDate: "December 31, 2025",
-    finalFilingDate: "March 31, 2026",
-    finalFilingDescription: "Last date to submit claims for the 2025 plan year",
+    finalServiceDate: "December 31, 2026",
+    finalFilingDate: "March 1, 2027",
+    finalFilingDescription: "Last date to submit claims for the 2026 plan year",
     debitCardAllowed: "Yes",
     maxPerTransaction: "No maximum",
     claimsStats: [
@@ -75,14 +73,14 @@ const ACCOUNT_DATA: Record<string, AccountData> = {
       { value: "0.00", label: "Total Pending" },
       { value: "$252.00", label: "Total Denied" },
     ],
-    electionAmount: "$640.00",
+    electionAmount: "$2,500.00",
     contributions: [
-      { label: "Employer", value: "$892.00" },
-      { label: "My Contribution to Date", value: "$0.00" },
+      { label: "Employer", value: "$0.00" },
+      { label: "My Contribution to Date", value: "$2,500.00" },
     ],
     status: [
-      { label: "Eligible Amount", value: "$0.00" },
-      { label: "Estimated Payroll Deductible", value: "$252.00" },
+      { label: "Eligible Amount", value: "$2,500.00" },
+      { label: "Estimated Payroll Deductible", value: "$57.69" },
     ],
     transactions: [
       { merchant: "Pharmacy", date: "4/27/2026", account: "LPFSA", amount: "$42.50", processedDate: "04/27/2026", description: "Prescription Medicine", planYear: "2026", availableBalance: "$807.50", runningBalance: "$765.00", status: "complete" },
@@ -96,19 +94,19 @@ const ACCOUNT_DATA: Record<string, AccountData> = {
     title: "Healthcare FSA",
     icon: HeartPulse,
     balanceSubtitle: "FSA Available Balance",
-    balance: "$850.00",
+    balance: "$2,425.00",
     balanceRows: [
-      { label: "Plan Year", value: "$1,500.00" },
-      { label: "Eligible Amount", value: "$1,750.00" },
+      { label: "Plan Year", value: "01/01/2026 - 12/31/2026" },
+      { label: "Eligible Amount", value: "$2,500.00" },
       { label: "Max Rollover", value: "$500.00" },
-      { label: "Use it or Lose It", value: "$350.00", valueColor: CRITICAL_RED },
-      { label: "File by 3/31/2026", badge: { text: "90 days", bg: WARNING_BG, color: WARNING_TEXT } },
+      { label: "Use it or Lose It", value: "$1,925.00", valueColor: CRITICAL_RED },
+      { label: "File by 3/1/27" },
     ],
     effectiveDate: "January 1, 2026",
     planDuration: "Jan 1, 2026 - Dec 31, 2026",
-    finalServiceDate: "December 31, 2025",
-    finalFilingDate: "March 31, 2026",
-    finalFilingDescription: "Last date to submit claims for the 2025 plan year",
+    finalServiceDate: "December 31, 2026",
+    finalFilingDate: "March 1, 2027",
+    finalFilingDescription: "Last date to submit claims for the 2026 plan year",
     debitCardAllowed: "Yes",
     maxPerTransaction: "No maximum",
     claimsStats: [
@@ -117,13 +115,13 @@ const ACCOUNT_DATA: Record<string, AccountData> = {
       { value: "$0.00", label: "Total Pending" },
       { value: "$0.00", label: "Total Denied" },
     ],
-    electionAmount: "$1,500.00",
+    electionAmount: "$2,500.00",
     contributions: [
       { label: "Employer", value: "$0.00" },
-      { label: "My Contribution to Date", value: "$1,500.00" },
+      { label: "My Contribution to Date", value: "$2,500.00" },
     ],
     status: [
-      { label: "Eligible Amount", value: "$1,500.00" },
+      { label: "Eligible Amount", value: "$2,500.00" },
       { label: "Estimated Payroll Deductible", value: "$57.69" },
     ],
     transactions: [
@@ -140,31 +138,31 @@ const ACCOUNT_DATA: Record<string, AccountData> = {
     balanceSubtitle: "DCFSA Available Balance",
     balance: "$620.00",
     balanceRows: [
-      { label: "Plan Year", value: "$5,000.00" },
-      { label: "Eligible Amount", value: "$5,000.00" },
+      { label: "Plan Year", value: "01/01/2026 - 12/31/2026" },
+      { label: "Eligible Amount", value: "$1,500.00" },
       { label: "Use it or Lose It", value: "$620.00", valueColor: CRITICAL_RED },
-      { label: "File by 3/31/2026", badge: { text: "90 days", bg: WARNING_BG, color: WARNING_TEXT } },
+      { label: "File by 3/1/27" },
     ],
-    effectiveDate: "January 1, 2025",
-    planDuration: "Jan 1, 2025 - Dec 31, 2025",
-    finalServiceDate: "December 31, 2025",
-    finalFilingDate: "March 31, 2026",
-    finalFilingDescription: "Last date to submit claims for the 2025 plan year",
+    effectiveDate: "January 1, 2026",
+    planDuration: "Jan 1, 2026 - Dec 31, 2026",
+    finalServiceDate: "December 31, 2026",
+    finalFilingDate: "March 1, 2027",
+    finalFilingDescription: "Last date to submit claims for the 2026 plan year",
     debitCardAllowed: "No",
     maxPerTransaction: "No maximum",
     claimsStats: [
-      { value: "$4,380.00", label: "Total Paid" },
-      { value: "$4,380.00", label: "Total Submitted" },
+      { value: "$880.00", label: "Total Paid" },
+      { value: "$880.00", label: "Total Submitted" },
       { value: "$0.00", label: "Total Pending" },
       { value: "$0.00", label: "Total Denied" },
     ],
-    electionAmount: "$5,000.00",
+    electionAmount: "$1,500.00",
     contributions: [
       { label: "Employer", value: "$0.00" },
-      { label: "My Contribution to Date", value: "$5,000.00" },
+      { label: "My Contribution to Date", value: "$1,500.00" },
     ],
     status: [
-      { label: "Eligible Amount", value: "$5,000.00" },
+      { label: "Eligible Amount", value: "$1,500.00" },
       { label: "Estimated Payroll Deductible", value: "$192.31" },
     ],
     transactions: [
