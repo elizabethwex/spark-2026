@@ -886,57 +886,70 @@ export function AssistIQUploadClaimModal({ open, onOpenChange }: Props) {
                 </div>
 
                 {chatPhase === "new_chat" ? (
-                  <div className="flex flex-col gap-8">
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="flex flex-col gap-8"
+                  >
                     {/* Recent Conversations */}
-                    <div>
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3, delay: 0.1 }}
+                    >
                       <div className="mb-3 flex items-center justify-between">
                         <h3 className="text-[14px] font-semibold text-[#444c72]">Recent conversations:</h3>
                         <button className="text-[13px] font-medium text-[#3958c3] hover:underline">View all</button>
                       </div>
                       <div className="flex flex-col gap-2">
-                        <button className="flex items-center justify-between rounded-xl border border-[#e3e7f4] bg-white p-4 text-left transition-shadow hover:shadow-sm">
+                        <button className="group flex items-center justify-between rounded-xl border border-[#e3e7f4] bg-white p-4 text-left transition-all hover:-translate-y-[1px] hover:bg-[#f8f9fe] hover:shadow-sm">
                           <div className="flex items-center gap-3 text-[#3958c3]">
                             <Clock className="h-4 w-4" />
                             <span className="text-[14px]">Claim status for my family doctor visit</span>
                           </div>
-                          <ChevronRight className="h-4 w-4 text-[#a5aeb4]" />
+                          <ChevronRight className="h-4 w-4 text-[#a5aeb4] transition-colors group-hover:text-[#3958c3]" />
                         </button>
-                        <button className="flex items-center justify-between rounded-xl border border-[#e3e7f4] bg-white p-4 text-left transition-shadow hover:shadow-sm">
+                        <button className="group flex items-center justify-between rounded-xl border border-[#e3e7f4] bg-white p-4 text-left transition-all hover:-translate-y-[1px] hover:bg-[#f8f9fe] hover:shadow-sm">
                           <div className="flex items-center gap-3 text-[#3958c3]">
                             <Clock className="h-4 w-4" />
                             <span className="text-[14px]">Why was my claim denied?</span>
                           </div>
-                          <ChevronRight className="h-4 w-4 text-[#a5aeb4]" />
+                          <ChevronRight className="h-4 w-4 text-[#a5aeb4] transition-colors group-hover:text-[#3958c3]" />
                         </button>
                       </div>
-                    </div>
+                    </motion.div>
 
                     {/* Suggested Actions */}
-                    <div>
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3, delay: 0.2 }}
+                    >
                       <h3 className="mb-3 text-[14px] font-semibold text-[#444c72]">Suggested actions:</h3>
-                      <div className="flex flex-col items-start gap-2">
+                      <div className="flex flex-row flex-wrap items-start gap-2">
                         <button 
                           onClick={() => setChatPhase("typing")}
-                          className="flex items-center gap-2 rounded-full border border-[#9b2b5e] px-4 py-2 text-[14px] font-medium text-[#25146f] transition-colors hover:bg-[#fff5f8]"
+                          className="flex items-center gap-2 rounded-full border border-[#9b2b5e] px-4 py-2 text-[14px] font-medium text-[#25146f] transition-all hover:-translate-y-[1px] hover:bg-[#fff5f8] hover:shadow-sm"
                         >
                           <Upload className="h-4 w-4" />
                           Upload Claim Documents
                         </button>
-                        <button className="flex items-center gap-2 rounded-full border border-[#9b2b5e] px-4 py-2 text-[14px] font-medium text-[#25146f] transition-colors hover:bg-[#fff5f8]">
+                        <button className="flex items-center gap-2 rounded-full border border-[#9b2b5e] px-4 py-2 text-[14px] font-medium text-[#25146f] transition-all hover:-translate-y-[1px] hover:bg-[#fff5f8] hover:shadow-sm">
                           <CreditCard className="h-4 w-4" />
                           Report Lost/Stolen Card
                         </button>
-                        <button className="flex items-center gap-2 rounded-full border border-[#9b2b5e] px-4 py-2 text-[14px] font-medium text-[#25146f] transition-colors hover:bg-[#fff5f8]">
+                        <button className="flex items-center gap-2 rounded-full border border-[#9b2b5e] px-4 py-2 text-[14px] font-medium text-[#25146f] transition-all hover:-translate-y-[1px] hover:bg-[#fff5f8] hover:shadow-sm">
                           <Receipt className="h-4 w-4" />
                           Find Medical FSA eligible expenses
                         </button>
-                        <button className="flex items-center gap-2 rounded-full border border-[#9b2b5e] px-4 py-2 text-[14px] font-medium text-[#25146f] transition-colors hover:bg-[#fff5f8]">
+                        <button className="flex items-center gap-2 rounded-full border border-[#9b2b5e] px-4 py-2 text-[14px] font-medium text-[#25146f] transition-all hover:-translate-y-[1px] hover:bg-[#fff5f8] hover:shadow-sm">
                           <Wallet className="h-4 w-4" />
                           Lookup Benefit Plan Balance
                         </button>
                       </div>
-                    </div>
-                  </div>
+                    </motion.div>
+                  </motion.div>
                 ) : (
                   <>
                     {/* User message */}
