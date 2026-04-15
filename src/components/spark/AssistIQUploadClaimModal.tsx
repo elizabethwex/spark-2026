@@ -484,6 +484,8 @@ export function AssistIQUploadClaimModal({ open, onOpenChange }: Props) {
   >("typing");
   const [selectedClaim, setSelectedClaim] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasLoadedMore, setHasLoadedMore] = useState(false);
   const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Auto-scroll to bottom when chatPhase or uploadProgress changes
@@ -511,6 +513,8 @@ export function AssistIQUploadClaimModal({ open, onOpenChange }: Props) {
       setIsSidebarOpen(false);
       setSelectedClaim(null);
       setUploadProgress(0);
+      setIsLoadingMore(false);
+      setHasLoadedMore(false);
       if (progressIntervalRef.current) {
         clearInterval(progressIntervalRef.current);
         progressIntervalRef.current = null;
@@ -607,6 +611,8 @@ export function AssistIQUploadClaimModal({ open, onOpenChange }: Props) {
     setIsSidebarOpen(false);
     setSelectedClaim(null);
     setUploadProgress(0);
+    setIsLoadingMore(false);
+    setHasLoadedMore(false);
     if (progressIntervalRef.current) {
       clearInterval(progressIntervalRef.current);
       progressIntervalRef.current = null;
@@ -1126,6 +1132,59 @@ export function AssistIQUploadClaimModal({ open, onOpenChange }: Props) {
                                 delay={0.4}
                                 onWorkOnClaim={() => handleWorkOnClaim("#901234")}
                               />
+                              
+                              <AnimatePresence>
+                                {hasLoadedMore && (
+                                  <motion.div
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: "auto" }}
+                                    className="flex flex-col gap-3"
+                                  >
+                                    <ClaimPreviewCard
+                                      provider="Valley Orthopedics"
+                                      amount="$350.00"
+                                      date="Aug 12, 2025"
+                                      claimId="#456789"
+                                      delay={0.1}
+                                      onWorkOnClaim={() => handleWorkOnClaim("#456789")}
+                                    />
+                                    <ClaimPreviewCard
+                                      provider="Downtown Clinic"
+                                      amount="$85.00"
+                                      date="Jul 30, 2025"
+                                      claimId="#567890"
+                                      delay={0.2}
+                                      onWorkOnClaim={() => handleWorkOnClaim("#567890")}
+                                    />
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+
+                              {!hasLoadedMore && (
+                                <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setIsLoadingMore(true);
+                                      setTimeout(() => {
+                                        setIsLoadingMore(false);
+                                        setHasLoadedMore(true);
+                                      }, 1000);
+                                    }}
+                                    disabled={isLoadingMore}
+                                    className="flex items-center justify-center rounded-full border border-[#25146f] bg-white px-5 py-2 text-[14px] font-medium text-[#25146f] transition-colors hover:bg-[#f8f9fe] disabled:opacity-70"
+                                  >
+                                    {isLoadingMore ? (
+                                      <div className="flex items-center gap-2">
+                                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#25146f] border-t-transparent" />
+                                        <span>Loading...</span>
+                                      </div>
+                                    ) : (
+                                      "Load more"
+                                    )}
+                                  </button>
+                                </div>
+                              )}
                             </motion.div>
                           )}
                         </div>
