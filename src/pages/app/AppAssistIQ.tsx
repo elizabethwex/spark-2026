@@ -10,8 +10,6 @@ import {
   ThumbsUp,
   ThumbsDown,
   CreditCard,
-  Shield,
-  MapPin,
   Camera,
   Image as ImageIcon,
   ShoppingCart,
