@@ -850,27 +850,32 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
                   </Tooltip>
                 </TooltipProvider>
               ) : (
-                <div className="flex items-center justify-center gap-1 rounded-full px-2 py-1">
+                <button 
+                  onClick={handleStartNewChat}
+                  className="flex items-center justify-center gap-1 rounded-full px-2 py-1 hover:bg-[#f8f9fe] transition-colors"
+                  aria-label="Start new chat"
+                >
                   <Sparkles className="h-3.5 w-3.5 text-[#5f6a94]" />
                   <span className="text-[14px] font-semibold leading-[24px] tracking-[-0.084px] text-[#5f6a94]">
                     WEXly
                   </span>
-                </div>
+                </button>
               )}
             </div>
             
             <AnimatePresence mode="wait">
-              <motion.span
+              <motion.button
                 key={isDocked ? "docked" : "expanded"}
                 id={titleId}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.15 }}
-                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-[14px] font-bold leading-[24px] text-[#14182c]"
+                onClick={isDocked ? handleStartNewChat : undefined}
+                className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-[14px] font-bold leading-[24px] text-[#14182c] ${isDocked ? "hover:opacity-80 transition-opacity" : ""}`}
               >
                 {isDocked ? "WEXly" : (chatPhase === "new_chat" ? "New Chat" : currentMessage)}
-              </motion.span>
+              </motion.button>
             </AnimatePresence>
 
             <div className="flex min-w-0 items-center justify-end gap-1">
