@@ -148,8 +148,8 @@ export function TransactionsAndLinks({ activeView = 1 }: { activeView?: 1 | 2 | 
                   <div className="relative w-full bg-white/40">
                     <div className="flex w-full items-center justify-between p-[16px]">
                       <div className="flex items-center gap-[16px]">
-                        <div className="flex h-[40px] w-[40px] shrink-0 items-center justify-center rounded-[12px] bg-[var(--theme-secondary-ramp-50)] text-[var(--theme-secondary)]">
-                          <Clock className="h-[18px] w-[18px]" />
+                        <div className="flex h-[40px] w-[40px] shrink-0 items-center justify-center rounded-[12px] bg-[var(--app-secondary-50)] text-[var(--theme-secondary)]">
+                          <Clock className="h-[18px] w-[18px] text-[var(--theme-secondary)]" />
                         </div>
                         <div className="flex flex-col items-start">
                           <p className="text-[14px] font-bold leading-[20px] text-[#14182c]">
