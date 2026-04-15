@@ -239,6 +239,14 @@
 /* ============================================================
    MESH ANIMATIONS
    ============================================================ */
+@keyframes ring {
+  0%, 100% { transform: rotate(0deg); }
+  10% { transform: rotate(15deg); }
+  20% { transform: rotate(-10deg); }
+  30% { transform: rotate(5deg); }
+  40% { transform: rotate(-5deg); }
+  50% { transform: rotate(0deg); }
+}
 @keyframes mesh-drift {
   0% { transform: translate(0, 0) rotate(0deg) scale(1); }
   33% { transform: translate(15%, -10%) rotate(10deg) scale(1.1); }

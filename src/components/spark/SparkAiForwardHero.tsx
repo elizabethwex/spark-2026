@@ -43,9 +43,9 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
   };
 
   const claimAccountText = 
-    activeView === 1 ? "LPFSA Account" : 
-    activeView === 2 ? "FSA Account" : 
-    "HSA Account";
+    activeView === 1 ? "Limited Purpose FSA" : 
+    activeView === 2 ? "Healthcare FSA" : 
+    "HSA";
 
   const quickActions = sparkAccountQuickActions.map(action => {
     if (activeView === 2 && action.label === "HSA Store") {
@@ -234,7 +234,7 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
       initial={shouldAnimate ? "hidden" : "instant"}
       animate={animateState}
       variants={containerVariants}
-      className="spark-hero-root relative isolate z-40 flex flex-col lg:flex-row w-full items-center lg:items-stretch justify-center gap-6 lg:gap-[32px] rounded-[24px] lg:rounded-[32px] border border-[#e3e7f4] p-6 sm:p-8 lg:p-[41px] shadow-[0_1.5px_4.5px_rgba(43,49,78,0.04)] bg-white [filter:drop-shadow(0_0_0_transparent)]"
+      className="spark-hero-root group relative isolate z-40 flex flex-col lg:flex-row w-full items-center lg:items-stretch justify-center gap-6 lg:gap-[32px] rounded-[24px] lg:rounded-[32px] border border-[#e3e7f4] p-6 sm:p-8 lg:p-[41px] shadow-[0_1.5px_4.5px_rgba(43,49,78,0.04)] bg-white [filter:drop-shadow(0_0_0_transparent)]"
       style={{
         backgroundImage:
           "url('data:image/svg+xml;utf8,<svg viewBox=\\'0 0 1200 523.5\\' xmlns=\\'http://www.w3.org/2000/svg\\' preserveAspectRatio=\\'none\\'><rect x=\\'0\\' y=\\'0\\' height=\\'100%\\' width=\\'100%\\' fill=\\'url(%23grad)\\' opacity=\\'1\\'/><defs><radialGradient id=\\'grad\\' gradientUnits=\\'userSpaceOnUse\\' cx=\\'0\\' cy=\\'0\\' r=\\'10\\' gradientTransform=\\'matrix(176.49 0 0 51.824 -48 157.05)\\'><stop stop-color=\\'rgba(23,45,161,0.09)\\' offset=\\'0\\'/><stop stop-color=\\'rgba(23,45,161,0)\\' offset=\\'0.5\\'/></radialGradient></defs></svg>'), url('data:image/svg+xml;utf8,<svg viewBox=\\'0 0 1200 523.5\\' xmlns=\\'http://www.w3.org/2000/svg\\' preserveAspectRatio=\\'none\\'><rect x=\\'0\\' y=\\'0\\' height=\\'100%\\' width=\\'100%\\' fill=\\'url(%23grad)\\' opacity=\\'1\\'/><defs><radialGradient id=\\'grad\\' gradientUnits=\\'userSpaceOnUse\\' cx=\\'0\\' cy=\\'0\\' r=\\'10\\' gradientTransform=\\'matrix(176.49 0 0 55.526 1248 392.62)\\'><stop stop-color=\\'rgba(200,16,46,0.07)\\' offset=\\'0\\'/><stop stop-color=\\'rgba(200,16,46,0)\\' offset=\\'0.45\\'/></radialGradient></defs></svg>'), url('data:image/svg+xml;utf8,<svg viewBox=\\'0 0 1200 523.5\\' xmlns=\\'http://www.w3.org/2000/svg\\' preserveAspectRatio=\\'none\\'><rect x=\\'0\\' y=\\'0\\' height=\\'100%\\' width=\\'100%\\' fill=\\'url(%23grad)\\' opacity=\\'1\\'/><defs><radialGradient id=\\'grad\\' gradientUnits=\\'userSpaceOnUse\\' cx=\\'0\\' cy=\\'0\\' r=\\'10\\' gradientTransform=\\'matrix(93.338 0 0 103.65 660 732.9)\\'><stop stop-color=\\'rgba(23,45,161,0.04)\\' offset=\\'0\\'/><stop stop-color=\\'rgba(23,45,161,0)\\' offset=\\'0.4\\'/></radialGradient></defs></svg>'), linear-gradient(90deg, rgba(255, 255, 255, 0.93) 0%, rgba(255, 255, 255, 0.93) 100%)",
@@ -376,7 +376,7 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
                 variants={ctaHeaderVariants}
                 className="flex items-center gap-[8px]"
               >
-                <Bell className="h-[18px] w-[18px] text-[#5f6a94]" />
+                <Bell className="h-[18px] w-[18px] text-[#5f6a94] origin-top group-hover:animate-[ring_1.5s_ease-in-out]" />
                 <h3 className="text-[12px] font-black uppercase leading-[16px] tracking-[2.4px] text-[#5f6a94]">
                   Your next steps
                 </h3>

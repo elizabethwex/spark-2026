@@ -133,7 +133,7 @@ export interface SparkActivityRow {
 export const sparkRecentActivity: SparkActivityRow[] = [
   {
     merchant: "Walgreens",
-    meta: "4/27/26 • LPFSA Account",
+    meta: "4/27/26 • Limited Purpose FSA",
     amount: "$42.50",
     status: "approved",
     statusLabel: "APPROVED",
@@ -145,7 +145,7 @@ export const sparkRecentActivity: SparkActivityRow[] = [
   },
   {
     merchant: "Bigtown Dentistry",
-    meta: "4/27/26 • LPFSA Account",
+    meta: "4/27/26 • Limited Purpose FSA",
     amount: "$210.00",
     status: "needs_attention",
     statusLabel: "NEEDS ATTENTION",
@@ -157,7 +157,7 @@ export const sparkRecentActivity: SparkActivityRow[] = [
   },
   {
     merchant: "Vanguard Invest",
-    meta: "12/14/25 • HSA Account",
+    meta: "12/14/25 • HSA",
     amount: "$500.00",
     status: "completed",
     statusLabel: "COMPLETED",
@@ -169,7 +169,7 @@ export const sparkRecentActivity: SparkActivityRow[] = [
   },
   {
     merchant: "Target",
-    meta: "11/20/25 • HSA Account",
+    meta: "11/20/25 • HSA",
     amount: "$15.99",
     status: "completed",
     statusLabel: "COMPLETED",
@@ -181,7 +181,7 @@ export const sparkRecentActivity: SparkActivityRow[] = [
   },
   {
     merchant: "Dr. Smith Vision",
-    meta: "11/15/25 • LPFSA Account",
+    meta: "11/15/25 • Limited Purpose FSA",
     amount: "$120.00",
     status: "completed",
     statusLabel: "COMPLETED",
