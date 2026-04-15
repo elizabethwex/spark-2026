@@ -13,6 +13,7 @@ import {
   FileText,
   CheckSquare,
   CheckCircle2,
+  ChevronRight,
   CreditCard,
   Info,
   Upload,
@@ -858,30 +859,35 @@ export function AssistIQUploadClaimModal({ open, onOpenChange }: Props) {
 
           <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
             <div ref={scrollRef} className={`min-h-0 flex-1 overflow-y-auto py-6 transition-all duration-300 ${isDocked ? "px-4" : "px-4 sm:px-8"}`}>
-              <div className={`mx-auto max-w-[722px] ${chatPhase === "new_chat" ? "flex h-full flex-col items-center justify-center pb-12" : ""}`}>
+              <div className={`mx-auto max-w-[722px] ${chatPhase === "new_chat" ? "flex h-full flex-col justify-center pb-12" : ""}`}>
                 {chatPhase === "new_chat" ? (
                   <motion.div 
-                    className="flex flex-col items-center justify-center text-center mt-2 mb-4"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3 }}
+                    className="mb-8 flex flex-col gap-3"
                   >
-                    <AssistIQAvatar size={isDocked ? 48 : 64} />
-                    <h2 className={`mt-6 font-semibold tracking-[-0.88px] text-[#444c72] transition-all duration-300 ${isDocked ? "text-[32px] leading-[40px]" : "text-[48px] md:text-[56px] leading-[1.1]"}`}>
-                      {chatGreeting()},{" "}
-                      <span
+                    <AssistIQAvatar size={isDocked ? 32 : 40} />
+                    <h2 className={`font-semibold tracking-[-0.88px] text-[#444c72] transition-all duration-300 ${isDocked ? "text-[28px] leading-[36px]" : "text-[44px] leading-[56px]"}`}>
+                      {chatGreeting()}, {SPARK_MEMBER_FIRST_NAME}!
+                    </h2>
+                    <p className={`tracking-[-0.304px] text-[#444c72] transition-all duration-300 ${isDocked ? "text-[15px] leading-[24px]" : "text-[19px] leading-[32px]"}`}>
+                      I&apos;m{" "}
+                      <strong
+                        className="font-semibold"
                         style={{
-                          backgroundImage: "linear-gradient(174.29deg, #25146f 13.72%, #c8102e 27.32%)",
+                          backgroundImage:
+                            "linear-gradient(174.29deg, #25146f 13.72%, #c8102e 27.32%)",
                           WebkitBackgroundClip: "text",
                           WebkitTextFillColor: "transparent",
                           backgroundClip: "text",
                         }}
                       >
-                        {SPARK_MEMBER_FIRST_NAME}
-                      </span>!
-                    </h2>
-                    <p className={`mt-4 tracking-[-0.304px] text-[#7a87b2] transition-all duration-300 ${isDocked ? "text-[16px] leading-[24px]" : "text-[20px] leading-[32px]"}`}>
-                      I&apos;m WEXly, your Benefits helper. How can I help you today?
+                        WEXly
+                      </strong>
+                      , your Benefits helper.
+                      <br />
+                      How can I help you today?
                     </p>
                   </motion.div>
                 ) : (
@@ -1111,7 +1117,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange }: Props) {
                       transition={{ duration: 0.3, delay: 0.2 }}
                       className="mb-4"
                     >
-                      <div className="flex flex-row flex-wrap items-start justify-center gap-2">
+                      <div className="flex flex-row flex-wrap items-start gap-2">
                         <button 
                           onClick={() => setChatPhase("typing")}
                           className="flex items-center gap-2 rounded-full border border-[#e3e7f4] bg-white px-4 py-2 text-[14px] font-medium text-[#25146f] transition-all hover:-translate-y-[1px] hover:bg-[#f8f9fe] hover:shadow-sm"
