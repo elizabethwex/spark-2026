@@ -13,10 +13,14 @@ import {
   FileText,
   CheckSquare,
   CheckCircle2,
+  ChevronRight,
+  CreditCard,
   Info,
   Upload,
   Menu,
+  Receipt,
   Sparkles,
+  Wallet,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import QRCode from "react-qr-code";
@@ -465,6 +469,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange }: Props) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDocked, setIsDocked] = useState(false);
   const [chatPhase, setChatPhase] = useState<
+    | "new_chat"
     | "typing"
     | "results"
     | "working_typing"
@@ -595,6 +600,17 @@ export function AssistIQUploadClaimModal({ open, onOpenChange }: Props) {
     }, 800);
   };
 
+  const handleStartNewChat = () => {
+    setChatPhase("new_chat");
+    setIsSidebarOpen(false);
+    setSelectedClaim(null);
+    setUploadProgress(0);
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+      progressIntervalRef.current = null;
+    }
+  };
+
   if (!open) return null;
 
   const node = (
@@ -682,6 +698,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange }: Props) {
                 {/* New chat button */}
                 <button
                   type="button"
+                  onClick={handleStartNewChat}
                   className="flex h-8 w-full items-center justify-center gap-2 rounded-lg border border-[#e3e7f4] bg-[#f8f9fe] text-[14px] font-medium text-[#3958c3] transition-colors hover:bg-[#eef2ff]"
                 >
                   <Plus className="h-3.5 w-3.5" />
@@ -800,7 +817,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange }: Props) {
                 transition={{ duration: 0.15 }}
                 className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-[14px] font-bold leading-[24px] text-[#14182c]"
               >
-                {isDocked ? "WEXly" : "Upload Claim Documents"}
+                {isDocked ? "WEXly" : (chatPhase === "new_chat" ? "New Chat" : "Upload Claim Documents")}
               </motion.span>
             </AnimatePresence>
 
@@ -868,18 +885,72 @@ export function AssistIQUploadClaimModal({ open, onOpenChange }: Props) {
                   </p>
                 </div>
 
-                {/* User message */}
-                <div className="mb-4 flex flex-col items-end gap-2">
-                  <div className="flex items-center gap-1 text-[11px] leading-[16px] tracking-[0.055px]">
-                    <span className="text-[#243746]">{SPARK_MEMBER_FIRST_NAME}</span>
-                    <span className="text-[#a5aeb4]">{timeLabel}</span>
+                {chatPhase === "new_chat" ? (
+                  <div className="flex flex-col gap-8">
+                    {/* Recent Conversations */}
+                    <div>
+                      <div className="mb-3 flex items-center justify-between">
+                        <h3 className="text-[14px] font-semibold text-[#444c72]">Recent conversations:</h3>
+                        <button className="text-[13px] font-medium text-[#3958c3] hover:underline">View all</button>
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <button className="flex items-center justify-between rounded-xl border border-[#e3e7f4] bg-white p-4 text-left transition-shadow hover:shadow-sm">
+                          <div className="flex items-center gap-3 text-[#3958c3]">
+                            <Clock className="h-4 w-4" />
+                            <span className="text-[14px]">Claim status for my family doctor visit</span>
+                          </div>
+                          <ChevronRight className="h-4 w-4 text-[#a5aeb4]" />
+                        </button>
+                        <button className="flex items-center justify-between rounded-xl border border-[#e3e7f4] bg-white p-4 text-left transition-shadow hover:shadow-sm">
+                          <div className="flex items-center gap-3 text-[#3958c3]">
+                            <Clock className="h-4 w-4" />
+                            <span className="text-[14px]">Recent claim denied</span>
+                          </div>
+                          <ChevronRight className="h-4 w-4 text-[#a5aeb4]" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Suggested Actions */}
+                    <div>
+                      <h3 className="mb-3 text-[14px] font-semibold text-[#444c72]">Suggested actions:</h3>
+                      <div className="flex flex-col items-start gap-2">
+                        <button 
+                          onClick={() => setChatPhase("typing")}
+                          className="flex items-center gap-2 rounded-full border border-[#9b2b5e] px-4 py-2 text-[14px] font-medium text-[#25146f] transition-colors hover:bg-[#fff5f8]"
+                        >
+                          <Upload className="h-4 w-4" />
+                          Upload Claim Documents
+                        </button>
+                        <button className="flex items-center gap-2 rounded-full border border-[#9b2b5e] px-4 py-2 text-[14px] font-medium text-[#25146f] transition-colors hover:bg-[#fff5f8]">
+                          <CreditCard className="h-4 w-4" />
+                          Report Lost/Stolen Card
+                        </button>
+                        <button className="flex items-center gap-2 rounded-full border border-[#9b2b5e] px-4 py-2 text-[14px] font-medium text-[#25146f] transition-colors hover:bg-[#fff5f8]">
+                          <Receipt className="h-4 w-4" />
+                          Find Medical FSA eligible expenses
+                        </button>
+                        <button className="flex items-center gap-2 rounded-full border border-[#9b2b5e] px-4 py-2 text-[14px] font-medium text-[#25146f] transition-colors hover:bg-[#fff5f8]">
+                          <Wallet className="h-4 w-4" />
+                          Lookup Benefit Plan Balance
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                  <div className={`rounded-tl-[24px] rounded-tr-[24px] rounded-bl-[24px] border border-[#e3e7f4] bg-[#e3e7f4] p-4 ${isDocked ? "max-w-[85%]" : "max-w-[358px]"}`}>
-                    <p className="text-[14px] leading-[24px] tracking-[-0.084px] text-[#1d2c38]">
-                      Upload Claim Documents
-                    </p>
-                  </div>
-                </div>
+                ) : (
+                  <>
+                    {/* User message */}
+                    <div className="mb-4 flex flex-col items-end gap-2">
+                      <div className="flex items-center gap-1 text-[11px] leading-[16px] tracking-[0.055px]">
+                        <span className="text-[#243746]">{SPARK_MEMBER_FIRST_NAME}</span>
+                        <span className="text-[#a5aeb4]">{timeLabel}</span>
+                      </div>
+                      <div className={`rounded-tl-[24px] rounded-tr-[24px] rounded-bl-[24px] border border-[#e3e7f4] bg-[#e3e7f4] p-4 ${isDocked ? "max-w-[85%]" : "max-w-[358px]"}`}>
+                        <p className="text-[14px] leading-[24px] tracking-[-0.084px] text-[#1d2c38]">
+                          Upload Claim Documents
+                        </p>
+                      </div>
+                    </div>
 
                 {/* Assistant typing or results */}
                 <div className="flex flex-col gap-2">
@@ -1050,6 +1121,8 @@ export function AssistIQUploadClaimModal({ open, onOpenChange }: Props) {
                     </motion.div>
                   )}
                 </AnimatePresence>
+                </>
+                )}
               </div>
             </div>
 
