@@ -70,7 +70,7 @@ export function DocumentOrganizerContent() {
     setNewFolderValue("")
     setNewFolderOpen(false)
   }
-  const [folders, setFolders] = useState<{ id: string; name: string }[]>(FOLDERS)
+  const [folders, setFolders] = useState<{ id: string; name: string; lastModified?: string }[]>(FOLDERS)
   const [renamingFolderId, setRenamingFolderId] = useState<string | null>(null)
   const [renameValue, setRenameValue] = useState("")
   const [newFolderOpen, setNewFolderOpen] = useState(false)
