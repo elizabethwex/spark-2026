@@ -865,30 +865,61 @@ export function AssistIQUploadClaimModal({ open, onOpenChange }: Props) {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3 }}
-                    className="mb-8 flex flex-col gap-3"
+                    className="flex w-full flex-col gap-8"
                   >
-                    <AssistIQAvatar size={isDocked ? 32 : 40} />
-                    <h2 className={`font-semibold tracking-[-0.88px] text-[#444c72] transition-all duration-300 ${isDocked ? "text-[28px] leading-[36px]" : "text-[44px] leading-[56px]"}`}>
-                      {chatGreeting()}, {SPARK_MEMBER_FIRST_NAME}!
-                    </h2>
-                    <p className={`tracking-[-0.304px] text-[#444c72] transition-all duration-300 ${isDocked ? "text-[15px] leading-[24px]" : "text-[19px] leading-[32px]"}`}>
-                      I&apos;m{" "}
-                      <strong
-                        className="font-semibold"
-                        style={{
-                          backgroundImage:
-                            "linear-gradient(174.29deg, #25146f 13.72%, #c8102e 27.32%)",
-                          WebkitBackgroundClip: "text",
-                          WebkitTextFillColor: "transparent",
-                          backgroundClip: "text",
-                        }}
-                      >
-                        WEXly
-                      </strong>
-                      , your Benefits helper.
-                      <br />
-                      How can I help you today?
-                    </p>
+                    <div className="flex flex-col gap-3">
+                      <AssistIQAvatar size={isDocked ? 32 : 40} />
+                      <h2 className={`font-semibold tracking-[-0.88px] text-[#444c72] transition-all duration-300 ${isDocked ? "text-[28px] leading-[36px]" : "text-[44px] leading-[56px]"}`}>
+                        {chatGreeting()}, {SPARK_MEMBER_FIRST_NAME}!
+                      </h2>
+                      <p className={`tracking-[-0.304px] text-[#444c72] transition-all duration-300 ${isDocked ? "text-[15px] leading-[24px]" : "text-[19px] leading-[32px]"}`}>
+                        I&apos;m{" "}
+                        <strong
+                          className="font-semibold"
+                          style={{
+                            backgroundImage:
+                              "linear-gradient(174.29deg, #25146f 13.72%, #c8102e 27.32%)",
+                            WebkitBackgroundClip: "text",
+                            WebkitTextFillColor: "transparent",
+                            backgroundClip: "text",
+                          }}
+                        >
+                          WEXly
+                        </strong>
+                        , your Benefits helper.
+                        <br />
+                        How can I help you today?
+                      </p>
+                    </div>
+
+                    {/* Recent Conversations */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3, delay: 0.1 }}
+                      className="w-full max-w-[500px]"
+                    >
+                      <div className="mb-3 flex items-center justify-between">
+                        <h3 className="text-[14px] font-semibold text-[#444c72]">Recent conversations:</h3>
+                        <button className="text-[13px] font-medium text-[#3958c3] hover:underline">View all</button>
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <button className="group flex items-center justify-between rounded-xl border border-[#e3e7f4] bg-white p-4 text-left transition-all hover:-translate-y-[1px] hover:bg-[#f8f9fe] hover:shadow-sm">
+                          <div className="flex items-center gap-3 text-[#3958c3]">
+                            <Clock className="h-4 w-4" />
+                            <span className="text-[14px]">Claim status for my family doctor visit</span>
+                          </div>
+                          <ChevronRight className="h-4 w-4 text-[#a5aeb4] transition-colors group-hover:text-[#3958c3]" />
+                        </button>
+                        <button className="group flex items-center justify-between rounded-xl border border-[#e3e7f4] bg-white p-4 text-left transition-all hover:-translate-y-[1px] hover:bg-[#f8f9fe] hover:shadow-sm">
+                          <div className="flex items-center gap-3 text-[#3958c3]">
+                            <Clock className="h-4 w-4" />
+                            <span className="text-[14px]">Why was my claim denied?</span>
+                          </div>
+                          <ChevronRight className="h-4 w-4 text-[#a5aeb4] transition-colors group-hover:text-[#3958c3]" />
+                        </button>
+                      </div>
+                    </motion.div>
                   </motion.div>
                 ) : (
                   <>
