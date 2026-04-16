@@ -31,11 +31,43 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
   const { openReimburseWorkspace } = useReimburseWorkspace();
   const prefersReducedMotion = useReducedMotion();
   const [uploadPhase, setUploadPhase] = useState<UploadPhase>("default");
-  const [isTaskVisible, setIsTaskVisible] = useState(true);
-  const [isDismissed, setIsDismissed] = useState(false);
-  const [isHeroExpanded, setIsHeroExpanded] = useState(false);
+  const [isTaskVisible, setIsTaskVisible] = useState(() => {
+    const saved = sessionStorage.getItem("sparkHeroTaskVisible");
+    return saved ? JSON.parse(saved) : true;
+  });
+  const [isDismissed, setIsDismissed] = useState(() => {
+    const saved = sessionStorage.getItem("sparkHeroDismissed");
+    return saved ? JSON.parse(saved) : false;
+  });
+  const [isHeroExpanded, setIsHeroExpanded] = useState(() => {
+    const saved = sessionStorage.getItem("sparkHeroExpanded");
+    return saved ? JSON.parse(saved) : false;
+  });
   const [uploadClaimAssistOpen, setUploadClaimAssistOpen] = useState(false);
   const [assistInitialMessage, setAssistInitialMessage] = useState("Upload Claim Documents");
+
+  useEffect(() => {
+    sessionStorage.setItem("sparkHeroTaskVisible", JSON.stringify(isTaskVisible));
+  }, [isTaskVisible]);
+
+  useEffect(() => {
+    sessionStorage.setItem("sparkHeroDismissed", JSON.stringify(isDismissed));
+  }, [isDismissed]);
+
+  useEffect(() => {
+    sessionStorage.setItem("sparkHeroExpanded", JSON.stringify(isHeroExpanded));
+  }, [isHeroExpanded]);
+
+  useEffect(() => {
+    const handleReset = () => {
+      setIsTaskVisible(true);
+      setIsDismissed(false);
+      setIsHeroExpanded(false);
+      setUploadPhase("default");
+    };
+    window.addEventListener("sparkHeroReset", handleReset);
+    return () => window.removeEventListener("sparkHeroReset", handleReset);
+  }, []);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 

@@ -13,6 +13,7 @@ import { QuickActionsSection } from "@/components/sections/QuickActionsSection";
 import { ConsumerFooter } from "@/components/layout/Footer";
 import { HSAPlannerCard } from "@/components/HSAPlannerCard";
 import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground";
+import { AssistIQUploadClaimModal } from "@/components/spark/AssistIQUploadClaimModal";
 
 /**
  * Partner-safe homepage: traditional dashboard without the prominent AI chat bar.
@@ -20,6 +21,7 @@ import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground"
 export default function HomePagePartnerSafe() {
   const { homeLayoutMode: layoutMode } = usePrototype();
   const [activeView, setActiveView] = useState<1 | 2 | 3>(1);
+  const [isAssistIQOpen, setIsAssistIQOpen] = useState(false);
 
   const effectiveLayoutMode = activeView === 2 ? "standard" : layoutMode;
 
@@ -104,6 +106,12 @@ export default function HomePagePartnerSafe() {
       </main>
 
       <ConsumerFooter />
+      
+      <AssistIQUploadClaimModal
+        open={isAssistIQOpen}
+        onOpenChange={setIsAssistIQOpen}
+        alwaysShowFloatingButton={true}
+      />
     </div>
   );
 }

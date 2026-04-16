@@ -457,12 +457,13 @@ type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   initialMessage?: string;
+  alwaysShowFloatingButton?: boolean;
 };
 
 /**
  * Assist IQ popup for “Upload Claim Documents” (SPARK-2026 Figma: Assist IQ Popup — Claim Doc request).
  */
-export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = "Help me with my claims" }: Props) {
+export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = "Help me with my claims", alwaysShowFloatingButton = false }: Props) {
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -650,7 +651,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
     const hasStarted = chatPhase !== "new_chat";
     const isNotResolved = chatPhase !== "final_approval";
 
-    if (hasStarted && isNotResolved) {
+    if (alwaysShowFloatingButton || (hasStarted && isNotResolved)) {
       const resumeButton = (
         <motion.button
           initial={{ opacity: 0, scale: 0.8 }}

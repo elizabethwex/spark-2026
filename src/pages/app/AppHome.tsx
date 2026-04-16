@@ -297,6 +297,9 @@ export default function AppHome() {
     // Simulate a quick network request delay for the UI
     await new Promise(resolve => setTimeout(resolve, 800));
     
+    // Clear the persisted cards from sessionStorage so they reset
+    sessionStorage.removeItem("taskCards");
+    
     // Incrementing the key forces TaskCardStack to remount and reset!
     setRefreshKey(prev => prev + 1);
   };

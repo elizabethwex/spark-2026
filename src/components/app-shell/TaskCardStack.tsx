@@ -45,8 +45,23 @@ const MOCK_TASKS: TaskCardData[] = [
 ];
 
 export function TaskCardStack() {
-  const [cards, setCards] = useState<TaskCardData[]>(MOCK_TASKS);
-  const [showEmptyState, setShowEmptyState] = useState(true);
+  const [cards, setCards] = useState<TaskCardData[]>(() => {
+    const saved = sessionStorage.getItem("taskCards");
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        return MOCK_TASKS;
+      }
+    }
+    return MOCK_TASKS;
+  });
+
+  useEffect(() => {
+    sessionStorage.setItem("taskCards", JSON.stringify(cards));
+  }, [cards]);
+
+  const [showEmptyState, setShowEmptyState] = useState(() => cards.length > 0);
   const navigate = useNavigate();
 
   // Auto-dismiss the empty state after a few seconds
