@@ -119,10 +119,14 @@ function BackPill({ label, onClick }: { label: string; onClick: () => void }) {
 
 export function AppNavBar(props: AppNavBarProps) {
   const navigate = useNavigate();
-  const { deviceOn } = useDeviceMockup();
+  const { deviceOn, isMobileDevice } = useDeviceMockup();
   const { topChromeHidden, isScrolled } = useAppChrome();
 
-  const hideY = deviceOn ? -(STATUS_BAR_HEIGHT + APP_NAV_HOME_INNER_H) : "-100%";
+  /** Desktop /app always uses AppShell’s status bar (mockup or frame-off). */
+  const shellMatchesFrame = deviceOn || !isMobileDevice;
+  const hideY = shellMatchesFrame
+    ? -(STATUS_BAR_HEIGHT + APP_NAV_HOME_INNER_H)
+    : "-100%";
 
   const fixedChrome: React.CSSProperties = {
     position: "fixed",
@@ -133,8 +137,8 @@ export function AppNavBar(props: AppNavBarProps) {
     width: "100%",
     zIndex: 49,
     fontFamily: "var(--app-font)",
-    paddingTop: deviceOn ? 0 : "env(safe-area-inset-top, 0px)",
-    top: deviceOn ? STATUS_BAR_HEIGHT : 0,
+    paddingTop: shellMatchesFrame ? 0 : "env(safe-area-inset-top, 0px)",
+    top: shellMatchesFrame ? STATUS_BAR_HEIGHT : 0,
     ...(isScrolled 
       ? APP_TOP_LIQUID_GLASS 
       : { 

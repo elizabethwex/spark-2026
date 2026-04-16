@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { ConsumerNavigation } from "@/components/layout/ConsumerNavigation";
 import { usePrototype } from "@/context/PrototypeContext";
 import { PageFadeIn, FadeInItem } from "@/components/layout/PageFadeIn";
@@ -18,24 +17,9 @@ import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground"
  * Partner-safe homepage: traditional dashboard without the prominent AI chat bar.
  */
 export default function HomePagePartnerSafe() {
-  const { homeLayoutMode: layoutMode } = usePrototype();
-  const [activeView, setActiveView] = useState<1 | 2 | 3>(1);
+  const { homeLayoutMode: layoutMode, sparkActiveView: activeView } = usePrototype();
 
   const effectiveLayoutMode = activeView === 2 ? "standard" : layoutMode;
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Ignore keypresses if the user is typing in an input
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-      
-      if (e.key === '1') setActiveView(1);
-      if (e.key === '2') setActiveView(2);
-      if (e.key === '3') setActiveView(3);
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
 
   return (
     <div className="min-h-screen font-['Inter']" style={consumerPageBackgroundStyle}>

@@ -103,7 +103,7 @@ function InfoTip({ label, children }: { label: string; children: React.ReactNode
 }
 
 /**
- * Flexible Spending Account dashboard for /account-overview?account=fsa
+ * Flexible Spending Account dashboard at `/fsa-account`
  * (Consumer Experience Redesign — Figma node 29515:8367).
  */
 export default function FsaAccountPage() {
@@ -116,7 +116,7 @@ export default function FsaAccountPage() {
   const [currentPage, setCurrentPage] = useState(1);
   /** When true, table lists only rows with an Actions control (e.g. Upload Receipt). */
   const [filterActionsOnly, setFilterActionsOnly] = useState(false);
-  /** Animates account-overview usage bar from 0 → 11% on first paint. */
+  /** Animates FSA usage bar from 0 → 11% on first paint. */
   const [usageBarPct, setUsageBarPct] = useState(0);
   /** Denied transaction row opened in the details slideout (Figma 30062:11931). */
   const [transactionDetailRow, setTransactionDetailRow] = useState<FsaTransactionRow | null>(null);

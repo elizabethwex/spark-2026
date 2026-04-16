@@ -23,7 +23,10 @@ import { AppNavBar } from "@/components/app-shell/AppNavBar";
 import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
 import { useDeviceMockup } from "@/hooks/useDeviceMockup";
 import { useAppChrome } from "@/context/AppChromeContext";
-import { APP_NAV_HOME_INNER_H } from "@/components/app-shell/appChromeLayout";
+import {
+  APP_NAV_HOME_INNER_H,
+  APP_TABBAR_END_SCROLL_PADDING,
+} from "@/components/app-shell/appChromeLayout";
 import { STATUS_BAR_HEIGHT } from "@/components/app-shell/AppStatusBar";
 import { AppCard } from "@/components/app-shell/primitives/AppCard";
 import {
@@ -141,15 +144,6 @@ const FILTERS: { id: FilterId; label: string }[] = [
   { id: "money-activity", label: "Money Activity" },
   { id: "tax-statements", label: "Tax & Statements" },
 ];
-
-/** Fills viewport above tab bar (AppShell adds bottom padding for tab bar). */
-const PAGE_ROOT: CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  minHeight:
-    "calc(100dvh - var(--app-tabbar-height) - env(safe-area-inset-bottom, 0px))",
-  fontFamily: "var(--app-font)",
-};
 
 const PILL_SELECTED_BG = "var(--app-primary-900)";
 const PILL_SELECTED_TEXT = "#ffffff";
@@ -682,13 +676,29 @@ export default function AppMessageCenter() {
   );
 
   const closeSheet = useCallback(() => setSelected(null), []);
-  const { deviceOn } = useDeviceMockup();
+  const { deviceOn, isMobileDevice } = useDeviceMockup();
   const { topChromeHidden } = useAppChrome();
 
-  const hideY = deviceOn ? -(STATUS_BAR_HEIGHT + APP_NAV_HOME_INNER_H) : "-100%";
+  /** Desktop /app uses the same shell as the device mockup (status bar in AppShell). */
+  const shellMatchesFrame = deviceOn || !isMobileDevice;
+  const hideY = shellMatchesFrame
+    ? -(STATUS_BAR_HEIGHT + APP_NAV_HOME_INNER_H)
+    : "-100%";
+
+  const pageRootStyle: CSSProperties = useMemo(
+    () => ({
+      display: "flex",
+      flexDirection: "column",
+      minHeight: isMobileDevice
+        ? "calc(100dvh - var(--app-tabbar-height) - env(safe-area-inset-bottom, 0px))"
+        : "calc(var(--app-screen-height, 100dvh) - var(--app-tabbar-height) - env(safe-area-inset-bottom, 0px))",
+      fontFamily: "var(--app-font)",
+    }),
+    [isMobileDevice]
+  );
 
   return (
-    <div style={PAGE_ROOT}>
+    <div style={pageRootStyle}>
       <AppTopSpacer variant="home" />
       <AppNavBar variant="title" title="Messages" />
 
@@ -698,7 +708,9 @@ export default function AppMessageCenter() {
         transition={{ duration: 0.3, ease: "easeOut" }}
         style={{
           position: "sticky",
-          top: deviceOn ? STATUS_BAR_HEIGHT + APP_NAV_HOME_INNER_H : `calc(env(safe-area-inset-top, 0px) + ${APP_NAV_HOME_INNER_H}px)`,
+          top: shellMatchesFrame
+            ? STATUS_BAR_HEIGHT + APP_NAV_HOME_INNER_H
+            : `calc(env(safe-area-inset-top, 0px) + ${APP_NAV_HOME_INNER_H}px)`,
           zIndex: 40,
         }}
       >
@@ -745,7 +757,10 @@ export default function AppMessageCenter() {
 
       <div
         style={{
-          padding: "16px 16px 24px",
+          paddingLeft: 16,
+          paddingRight: 16,
+          paddingTop: 16,
+          paddingBottom: APP_TABBAR_END_SCROLL_PADDING,
           display: "flex",
           flexDirection: "column",
           gap: 8,

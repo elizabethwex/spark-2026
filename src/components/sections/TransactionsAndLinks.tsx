@@ -128,6 +128,8 @@ export function TransactionsAndLinks({ activeView = 1 }: { activeView?: 1 | 2 | 
         <div className="space-y-6">
           <SectionHeader
             title="Recent Transactions"
+            actionLabel="View All Transactions"
+            actionHref="/claims"
           />
 
           <div className="flex flex-col gap-[12px]">
