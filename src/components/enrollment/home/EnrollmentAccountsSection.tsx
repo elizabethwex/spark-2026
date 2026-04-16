@@ -102,7 +102,7 @@ export function EnrollmentAccountsSection({
         annualCents={hsaCents}
         isFamilyCoverage={isFamilyCoverage}
         isInView={isInView}
-        onNavigate={() => navigate("/account-overview")}
+        onNavigate={() => navigate("/hsa-details")}
         spentCents={isCobra ? Math.round(hsaCents * 0.75) : isSimulated ? Math.round(hsaCents * 0.35) : 0}
         contributionsFrozen={isCobra}
       />

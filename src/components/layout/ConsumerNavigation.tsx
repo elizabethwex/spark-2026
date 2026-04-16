@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Accordion,
@@ -33,9 +33,9 @@ import {
   X,
 } from "lucide-react";
 import { navigationItems } from "@/data/mockData";
+import { getAccountsSubItems } from "@/data/consumerAccountsNav";
 import { getUnreadCount, UNREAD_COUNT_CHANGED_EVENT } from "@/data/messageCenterUtils";
 import { useAuth } from "@/context/AuthContext";
-import { PrototypeFloatingControls } from "@/components/PrototypeFloatingControls";
 import { usePrototype } from "@/context/PrototypeContext";
 
 // Icon mapping for navigation items
@@ -82,7 +82,17 @@ export function ConsumerNavigation({
   const location = useLocation();
   const navigate = useNavigate();
   const { logout } = useAuth();
-  const { logoMode } = usePrototype();
+  const { logoMode, sparkActiveView } = usePrototype();
+
+  const navItemsForView = useMemo(
+    () =>
+      navigationItems.map((item) =>
+        item.label === "Accounts" && item.subItems
+          ? { ...item, subItems: getAccountsSubItems(sparkActiveView) }
+          : item
+      ),
+    [sparkActiveView]
+  );
   const [unreadCount, setUnreadCount] = useState<number>(getUnreadCount());
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [language, setLanguage] = useState("English (Default)");
@@ -187,7 +197,7 @@ export function ConsumerNavigation({
               </div>
 
               <nav className="flex flex-col gap-1 px-2 py-3 flex-1 overflow-y-auto">
-                {navigationItems.map((item) => {
+                {navItemsForView.map((item) => {
                   const Icon = iconMap[item.icon];
                   const active = isActive(item.href);
                   const hasSubItems = item.subItems && item.subItems.length > 0;
@@ -205,7 +215,17 @@ export function ConsumerNavigation({
                           <AccordionContent className="pb-0">
                             <div className="flex flex-col gap-2 px-4 py-2">
                               {item.subItems?.map((subItem) => {
-                                const subActive = isActive(subItem.href);
+                                const subActive = subItem.href ? isActive(subItem.href) : false;
+                                if (!subItem.href) {
+                                  return (
+                                    <div
+                                      key={subItem.label}
+                                      className="flex w-full items-center rounded-md px-2 py-3 text-base font-semibold text-foreground"
+                                    >
+                                      <span className="truncate">{subItem.label}</span>
+                                    </div>
+                                  );
+                                }
                                 return (
                                   <SheetClose asChild key={subItem.label}>
                                     <Button
@@ -301,11 +321,11 @@ export function ConsumerNavigation({
         <div className="flex flex-1 items-center justify-end gap-[16px] min-w-0">
           {/* Navigation Menu (desktop) — hidden when nav items are suppressed */}
           <nav className={hideNav ? "hidden" : "hidden lg:flex items-center gap-[16px]"}>
-            {navigationItems.map((item) => {
+            {navItemsForView.map((item) => {
               const Icon = iconMap[item.icon];
               const hasSubItems = item.subItems && item.subItems.length > 0;
-              const active = hasSubItems 
-                ? item.subItems?.some(subItem => isActive(subItem.href)) || false
+              const active = hasSubItems
+                ? item.subItems?.some((subItem) => subItem.href && isActive(subItem.href)) || false
                 : isActive(item.href);
               
               if (hasSubItems) {
@@ -324,7 +344,17 @@ export function ConsumerNavigation({
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start">
                       {item.subItems?.map((subItem) => {
-                        const subActive = isActive(subItem.href);
+                        const subActive = subItem.href ? isActive(subItem.href) : false;
+                        if (!subItem.href) {
+                          return (
+                            <div
+                              key={subItem.label}
+                              className={`relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none ${subActive ? "bg-muted" : ""}`}
+                            >
+                              {subItem.label}
+                            </div>
+                          );
+                        }
                         return (
                           <DropdownMenuItem
                             key={subItem.label}
@@ -448,6 +478,7 @@ export function ConsumerNavigation({
                   { label: "My Profile", subPage: "my-profile" },
                   { label: "Dependents", subPage: "dependents" },
                   { label: "Beneficiaries", subPage: "beneficiaries" },
+                  { label: "Authorized Signers", subPage: "authorized-signers" },
                   { label: "Bank Accounts", subPage: "banking" },
                   { label: "Reimbursement Methods", subPage: "reimbursement-method" },
                   { label: "Debit Card", subPage: "debit-card" },
