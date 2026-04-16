@@ -458,12 +458,13 @@ type Props = {
   onOpenChange: (open: boolean) => void;
   initialMessage?: string;
   alwaysShowFloatingButton?: boolean;
+  hideRecentConversations?: boolean;
 };
 
 /**
  * Assist IQ popup for “Upload Claim Documents” (SPARK-2026 Figma: Assist IQ Popup — Claim Doc request).
  */
-export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = "Help me with my claims", alwaysShowFloatingButton = false }: Props) {
+export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = "Help me with my claims", alwaysShowFloatingButton = false, hideRecentConversations = false }: Props) {
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -920,7 +921,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
 
           <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
             <div ref={scrollRef} className={`min-h-0 flex-1 overflow-y-auto pt-6 pb-[140px] transition-all duration-300 ${isDocked ? "px-4" : "px-4 sm:px-8"}`}>
-              <div className={`mx-auto w-full max-w-[722px] ${chatPhase === "new_chat" ? "flex h-full flex-col justify-center pb-12" : ""}`}>
+              <div className={`mx-auto w-full max-w-[722px] ${chatPhase === "new_chat" ? "flex h-full flex-col justify-start items-center pb-0" : ""}`}>
                 {chatPhase === "new_chat" ? (
                   <motion.div 
                     initial={{ opacity: 0, y: 10 }}
@@ -952,33 +953,35 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
                     </div>
 
                     {/* Recent Conversations */}
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3, delay: 0.1 }}
-                      className="w-full"
-                    >
-                      <div className="mb-3 flex items-center justify-between">
-                        <h3 className="text-[14px] font-semibold text-[#444c72]">Recent conversations:</h3>
-                        <button className="text-[13px] font-medium text-[#3958c3] hover:underline">View all</button>
-                      </div>
-                      <div className="flex flex-col gap-2">
-                        <button className="group flex items-center justify-between rounded-xl border border-[#e3e7f4] bg-white p-4 text-left transition-all hover:-translate-y-[1px] hover:bg-[#f8f9fe] hover:shadow-sm">
-                          <div className="flex items-center gap-3 text-[#3958c3]">
-                            <Clock className="h-4 w-4" />
-                            <span className="text-[14px]">Claim status for my family doctor visit</span>
-                          </div>
-                          <ChevronRight className="h-4 w-4 text-[#a5aeb4] transition-colors group-hover:text-[#3958c3]" />
-                        </button>
-                        <button className="group flex items-center justify-between rounded-xl border border-[#e3e7f4] bg-white p-4 text-left transition-all hover:-translate-y-[1px] hover:bg-[#f8f9fe] hover:shadow-sm">
-                          <div className="flex items-center gap-3 text-[#3958c3]">
-                            <Clock className="h-4 w-4" />
-                            <span className="text-[14px]">Why was my claim denied?</span>
-                          </div>
-                          <ChevronRight className="h-4 w-4 text-[#a5aeb4] transition-colors group-hover:text-[#3958c3]" />
-                        </button>
-                      </div>
-                    </motion.div>
+                    {!hideRecentConversations && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: 0.1 }}
+                        className="w-full"
+                      >
+                        <div className="mb-3 flex items-center justify-between">
+                          <h3 className="text-[14px] font-semibold text-[#444c72]">Recent conversations:</h3>
+                          <button className="text-[13px] font-medium text-[#3958c3] hover:underline">View all</button>
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          <button className="group flex items-center justify-between rounded-xl border border-[#e3e7f4] bg-white p-4 text-left transition-all hover:-translate-y-[1px] hover:bg-[#f8f9fe] hover:shadow-sm">
+                            <div className="flex items-center gap-3 text-[#3958c3]">
+                              <Clock className="h-4 w-4" />
+                              <span className="text-[14px]">Claim status for my family doctor visit</span>
+                            </div>
+                            <ChevronRight className="h-4 w-4 text-[#a5aeb4] transition-colors group-hover:text-[#3958c3]" />
+                          </button>
+                          <button className="group flex items-center justify-between rounded-xl border border-[#e3e7f4] bg-white p-4 text-left transition-all hover:-translate-y-[1px] hover:bg-[#f8f9fe] hover:shadow-sm">
+                            <div className="flex items-center gap-3 text-[#3958c3]">
+                              <Clock className="h-4 w-4" />
+                              <span className="text-[14px]">Why was my claim denied?</span>
+                            </div>
+                            <ChevronRight className="h-4 w-4 text-[#a5aeb4] transition-colors group-hover:text-[#3958c3]" />
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
                   </motion.div>
                 ) : (
                   <>

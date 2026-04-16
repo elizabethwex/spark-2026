@@ -111,6 +111,8 @@ export default function HomePagePartnerSafe() {
         open={isAssistIQOpen}
         onOpenChange={setIsAssistIQOpen}
         alwaysShowFloatingButton={true}
+        initialMessage=""
+        hideRecentConversations={true}
       />
     </div>
   );

@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "motion/react";
 const PLACEHOLDER_PREFIX = "Ask me… ";
 
 const QUERIES = [
-  "Help me with my claims",
+  "Is toothpaste FSA eligible?",
   "Can I use my FSA for dental?",
   "why my claim needs attention",
   "what document I need to upload",
