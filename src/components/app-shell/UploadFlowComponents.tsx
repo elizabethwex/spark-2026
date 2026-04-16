@@ -32,7 +32,7 @@ export function DentistEobPlaceholder() {
       <div style={{ padding: "10px 16px 12px", display: "flex", flexDirection: "column", gap: 7 }}>
         {[
           ["Patient", "Penny Smith"],
-          ["Provider", "Bright Smiles Dental"],
+          ["Provider", "Bigtown Dentistry"],
           ["Date of Service", "Mar 14, 2026"],
           ["Group #", "GRP-88421"],
         ].map(([label, value]) => (
