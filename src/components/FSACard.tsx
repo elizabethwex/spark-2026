@@ -18,7 +18,7 @@ const accountsData = {
     name: "LPFSA",
     fullName: "Limited Purpose FSA",
     tooltip: "Covers eligible dental and vision expenses only. Use it or lose it by plan year end.",
-    balance: "$850.00",
+    balance: "$2,425.00",
     icon: <CalendarCheck2 className="h-5 w-5" />,
     hasExpiration: true,
     daysLeft: 28,

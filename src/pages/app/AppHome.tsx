@@ -49,11 +49,11 @@ interface HomeAccountCard {
 const HOME_ACCOUNTS: Record<AppVariant, HomeAccountCard[]> = {
   1: [
     { id: "hsa", name: "Health Savings Account", tag: "HSA", balanceLabel: "Cash + Invested Assets", balance: "$15,900.00", icon: Landmark, route: "/app/account/hsa" },
-    { id: "lpfsa", name: "Limited Purpose FSA", tag: "01/01/2026 – 12/31/2026", balance: "$850.00", icon: CalendarCheck2, warningTag: "28 Days left to spend", route: "/app/account/lpfsa" },
+    { id: "lpfsa", name: "Limited Purpose FSA", tag: "01/01/2026 – 12/31/2026", balance: "$2,425.00", icon: CalendarCheck2, route: "/app/account/lpfsa" },
   ],
   2: [
-    { id: "fsa", name: "Healthcare FSA", tag: "01/01/2026 – 12/31/2026", balance: "$850.00", icon: HeartPulse, warningTag: "28 Days left to spend", route: "/app/account/fsa" },
-    { id: "dcfsa", name: "DCFSA", tag: "01/01/2025 – 12/31/2025", balance: "$620.00", icon: Baby, warningTag: "28 Days left to spend", route: "/app/account/dcfsa" },
+    { id: "fsa", name: "Healthcare FSA", tag: "01/01/2026 – 12/31/2026", balance: "$2,425.00", icon: HeartPulse, route: "/app/account/fsa" },
+    { id: "dcfsa", name: "DCFSA", tag: "01/01/2026 – 12/31/2026", balance: "$620.00", icon: Baby, route: "/app/account/dcfsa" },
   ],
   3: [
     { id: "hsa", name: "Health Savings Account", tag: "HSA", balanceLabel: "Cash + Invested Assets", balance: "$15,900.00", icon: Landmark, route: "/app/account/hsa" },
@@ -79,7 +79,7 @@ const HOME_TRANSACTIONS: Record<AppVariant, HomeTxRow[]> = {
   2: [
     { id: "c1", title: "Pharmacy", subtitle: "4/27/2026 · FSA", amount: "$42.50", txData: { merchant: "Pharmacy", date: "4/27/2026", account: "FSA", amount: "$42.50", processedDate: "04/27/2026", description: "Prescription Medicine", planYear: "2026", availableBalance: "$807.50", runningBalance: "$765.00", status: "complete" } },
     { id: "c3", title: "Bright Horizons Daycare", subtitle: "4/27/2026 · DCFSA", amount: "$185.00", txData: { merchant: "Bright Horizons Daycare", date: "4/27/2026", account: "DCFSA", amount: "$185.00", processedDate: "04/27/2026", description: "Childcare", planYear: "2025", availableBalance: "$620.00", runningBalance: "$435.00", status: "complete" } },
-    { id: "c2", title: "CVS Pharmacy", subtitle: "4/25/2026 · FSA", amount: "$28.10", txData: { merchant: "CVS Pharmacy", date: "4/25/2026", account: "FSA", amount: "$28.10", processedDate: "04/25/2026", description: "OTC Medicine", planYear: "2026", availableBalance: "$878.10", runningBalance: "$850.00", status: "complete" } },
+    { id: "c2", title: "CVS Pharmacy", subtitle: "4/25/2026 · FSA", amount: "$28.10", txData: { merchant: "CVS Pharmacy", date: "4/25/2026", account: "FSA", amount: "$28.10", processedDate: "04/25/2026", description: "OTC Medicine", planYear: "2026", availableBalance: "$878.10", runningBalance: "$2,425.00", status: "complete" } },
     { id: "c4", title: "Target", subtitle: "4/20/2026 · FSA", amount: "$15.99", txData: { merchant: "Target", date: "4/20/2026", account: "FSA", amount: "$15.99", processedDate: "04/20/2026", description: "First Aid Supplies", planYear: "2026", availableBalance: "$894.09", runningBalance: "$878.10", status: "complete" } },
     { id: "c5", title: "Dr. Smith Vision", subtitle: "4/15/2026 · FSA", amount: "$120.00", txData: { merchant: "Dr. Smith Vision", date: "4/15/2026", account: "FSA", amount: "$120.00", processedDate: "04/15/2026", description: "Eye Exam", planYear: "2026", availableBalance: "$1,014.09", runningBalance: "$894.09", status: "complete" } },
   ],

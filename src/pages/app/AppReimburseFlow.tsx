@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Image as ImageIcon, Info, CheckCircle2, Check, Search, Trash2 } from "lucide-react";
 import confetti from "canvas-confetti";
 import { AppNavBar } from "@/components/app-shell/AppNavBar";
+import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const PRIMARY = "var(--app-primary)";
@@ -1083,7 +1084,7 @@ export default function AppReimburseFlow() {
     >
       {step !== 2.5 && step !== 2 && (
         <>
-          <div aria-hidden style={{ height: 56, flexShrink: 0, pointerEvents: "none" }} />
+          <AppTopSpacer variant="home" />
           <AppNavBar variant="full-page" solid title={navTitle} onClose={handleClose} />
           {progress > 0 && <ProgressBar progress={progress} />}
         </>

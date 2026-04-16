@@ -23,7 +23,7 @@ const MOCK_TASKS: TaskCardData[] = [
     title: "Missing Document Required",
     description: "Upload your document to complete this claim for Bigtown Dentistry.",
     provider: "Bigtown Dentistry",
-    dateAndAccount: "4/26/2027 · LPFSA Account",
+    dateAndAccount: "4/26/2027 · Limited Purpose FSA",
     amount: "$210.00",
   },
   {
@@ -39,7 +39,7 @@ const MOCK_TASKS: TaskCardData[] = [
     title: "Receipt Needed",
     description: "We need a receipt for your recent pharmacy purchase to approve the claim.",
     provider: "Corner Pharmacy",
-    dateAndAccount: "4/15/2027 · HSA Account",
+    dateAndAccount: "4/15/2027 · HSA",
     amount: "$45.50",
   },
 ];

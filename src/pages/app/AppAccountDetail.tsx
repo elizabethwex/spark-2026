@@ -15,6 +15,7 @@ import {
   Landmark,
 } from "lucide-react";
 import { AppNavBar } from "@/components/app-shell/AppNavBar";
+import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
 
 const CARD_SHADOW = "0px 3.017px 9.051px rgba(43,49,78,0.04), 0px 6.034px 18.101px rgba(43,49,78,0.06)";
 const INVESTMENT_SHADOW =
@@ -123,8 +124,8 @@ const ACCOUNT_META: Record<string, { name: string; totalBalance: string; availab
   },
   lpfsa: {
     name: "Limited Purpose FSA",
-    totalBalance: "$850.00",
-    availableCash: "$850.00",
+    totalBalance: "$2,425.00",
+    availableCash: "$2,425.00",
   },
 };
 
@@ -1036,6 +1037,7 @@ export default function AppAccountDetail() {
         paddingBottom: "calc(var(--app-tabbar-height, 95px) + env(safe-area-inset-bottom, 0px) + 64px)",
       }}
     >
+      <AppTopSpacer variant="page" />
       <AppNavBar variant="sub-page" title={meta.name} backTo="/app/account" />
 
       {/* Page content */}
