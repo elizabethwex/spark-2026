@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Link } from "react-router-dom"
 import {
   Badge,
@@ -12,6 +12,16 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Table,
   TableBody,
   TableCell,
@@ -28,14 +38,25 @@ import {
   ArrowUp,
   ArrowUpDown,
   Check,
+  ChevronsLeft,
+  ChevronsRight,
+  ClipboardList,
   Clock,
   CreditCard,
+  Download,
+  FileText,
+  Info,
+  MoreVertical,
   Paperclip,
+  Pencil,
   Search,
+  Trash2,
   Upload,
 } from "lucide-react"
 import { ClaimExpenseDetailSheet } from "@/components/claims/ClaimExpenseDetailSheet"
-import { expenseStatusBadgeClass, type ExpenseRow } from "@/components/claims/expenseTypes"
+import { attachmentLabel, expenseStatusBadgeClass, type ExpenseRow } from "@/components/claims/expenseTypes"
+import { DOCUMENTS, type DocumentItem } from "@/components/documents/documentData"
+import { FilePreviewModal } from "@/components/documents/FilePreviewModal"
 
 const ACTION_ITEMS = [
   {
@@ -45,7 +66,7 @@ const ACTION_ITEMS = [
     alertDescription: "Documentation is required to complete this claim.",
     deadlineLabel: "28 Days Remaining",
     provider: "Bigtown Dentistry",
-    dateLine: "Jan 12, 2026",
+    dateLine: "Jan 22, 2026",
     account: "Healthcare FSA",
     amount: "$210.00",
     primaryAction: { label: "Upload Documentation", icon: "upload" as const },
@@ -59,7 +80,7 @@ const ACTION_ITEMS = [
       "This expense is not eligible for reimbursement under a Dependent Care FSA.",
     deadlineLabel: "14 Days Remaining",
     provider: "Buddy's Overnight Camp",
-    dateLine: "Feb 13-14, 2026",
+    dateLine: "Feb 20-21, 2026",
     account: "Dependent Care FSA",
     amount: "$180.00",
     primaryAction: { label: "Repay Expense", icon: "card" as const },
@@ -70,64 +91,70 @@ const ACTION_ITEMS = [
 const EXPENSE_ROWS: ExpenseRow[] = [
   {
     id: "1",
-    dateOfService: "Feb 14, 2026",
+    dateOfService: "Mar 5, 2026",
     status: { label: "Payment Processing", tone: "blue" },
     origin: "manual",
     account: "Healthcare FSA",
     provider: "Dr. John Doe",
-    recipient: "ES",
+    recipient: "BS",
     category: "Medical",
     categoryType: "Office Visit",
-    payTo: { cardholderName: "Emily Smith", last4: "4523" },
-    attachments: "2 Documents",
+    payTo: { cardholderName: "Ben Smith", last4: "4523" },
+    documentIds: ["1"],
+    letterIds: ["LTR-4"],
     amount: "$150.00",
   },
   {
     id: "2",
-    dateOfService: "Feb 14, 2026",
+    dateOfService: "Feb 28, 2026",
     status: { label: "Documentation Review", tone: "blue" },
     origin: "card",
     account: "Healthcare FSA",
-    provider: "Dr. John Doe",
-    recipient: "ES",
+    provider: "1-800-CONTACTS",
+    recipient: "BS",
     category: "Medical",
     categoryType: "Specialist Visit",
-    payTo: { cardholderName: "Emily Smith", last4: "4523" },
-    attachments: "2 Documents",
-    amount: "$60.00",
+    payTo: { cardholderName: "Ben Smith", last4: "4523" },
+    documentIds: ["14"],
+    letterIds: ["LTR-2"],
+    amount: "$144.67",
   },
   {
     id: "3",
-    dateOfService: "Feb 14, 2026",
+    dateOfService: "Feb 7, 2026",
     status: { label: "Approved", tone: "green" },
     origin: "manual",
     account: "Healthcare FSA",
     provider: "Dr. John Doe",
-    recipient: "ES",
+    recipient: "BS",
     category: "Medical",
     categoryType: "Office Visit",
-    payTo: { cardholderName: "Emily Smith", last4: "4523" },
-    attachments: "2 Documents",
+    payTo: { cardholderName: "Ben Smith", last4: "4523" },
+    documentIds: ["4", "5"],
+    letterIds: ["LTR-4"],
     amount: "$88.00",
   },
   {
     id: "4",
-    dateOfService: "Feb 14, 2026",
+    dateOfService: "Jan 31, 2026",
     status: { label: "Denied", tone: "amber" },
     origin: "card",
     denialReason: "Expense is not eligible under Healthcare FSA plan.",
     account: "Healthcare FSA",
     provider: "Walgreens",
-    recipient: "ES",
+    recipient: "BS",
     category: "Prescription",
     categoryType: "OTC Item",
-    payTo: { cardholderName: "Emily Smith", last4: "4523" },
-    attachments: "2 Documents",
+    payTo: { cardholderName: "Ben Smith", last4: "4523" },
+    // doc 11 "Walgreens" (provider match), doc 8 "EOB"
+    documentIds: ["11", "8"],
+    letterIds: ["LTR-1"],
     amount: "$16.00",
   },
   {
     id: "5",
-    dateOfService: "Feb 13–14, 2026",
+    dateOfService: "Feb 20–21, 2026",
+    statusDate: "Feb 23, 2025",
     status: { label: "Repayment Due", tone: "red", icon: true },
     origin: "card",
     denialReason: "Dependent care expense is not eligible under this plan.",
@@ -136,13 +163,14 @@ const EXPENSE_ROWS: ExpenseRow[] = [
     recipient: "JS",
     category: "Dependent Care",
     categoryType: "Overnight Camp",
-    payTo: { cardholderName: "Julia Smith", last4: "4523" },
-    attachments: "1 Document",
+    payTo: { cardholderName: "James Smith", last4: "4523" },
+    documentIds: ["12"],
+    letterIds: ["LTR-1"],
     amount: "$210.00",
   },
   {
     id: "6",
-    dateOfService: "Feb 14, 2026",
+    dateOfService: "Feb 10, 2026",
     status: { label: "Hold", tone: "amber" },
     origin: "manual",
     holdReason: "Additional review required for this expense category.",
@@ -151,13 +179,14 @@ const EXPENSE_ROWS: ExpenseRow[] = [
     recipient: "JS",
     category: "Prescription",
     categoryType: "Generic Drug",
-    payTo: { cardholderName: "Julia Smith", last4: "4523" },
-    attachments: "2 Documents",
+    payTo: { cardholderName: "James Smith", last4: "4523" },
+    documentIds: ["6", "7"],
+    letterIds: ["LTR-4"],
     amount: "$150.00",
   },
   {
     id: "7",
-    dateOfService: "Feb 14, 2026",
+    dateOfService: "Jan 18, 2026",
     status: { label: "Paid", tone: "green" },
     origin: "card",
     account: "Healthcare FSA",
@@ -165,73 +194,77 @@ const EXPENSE_ROWS: ExpenseRow[] = [
     recipient: "JS",
     category: "Medical",
     categoryType: "Office Visit",
-    payTo: { cardholderName: "Julia Smith", last4: "4523" },
-    attachments: "2 Documents",
+    payTo: { cardholderName: "James Smith", last4: "4523" },
+    // doc 3 "Bright Smiles Dental" (attached), doc 10 "Quest Labs"
+    documentIds: ["3", "10"],
+    letterIds: [],
     amount: "$45.00",
   },
   {
     id: "8",
-    dateOfService: "Jan 12, 2025",
+    dateOfService: "Jan 22, 2026",
     status: { label: "Documentation Needed", tone: "red", icon: true },
     origin: "manual",
     account: "Healthcare FSA",
     provider: "Bigtown Dentistry",
-    recipient: "ES",
+    recipient: "BS",
     category: "Dental",
     categoryType: "Dental Exam",
-    payTo: { cardholderName: "Emily Smith", last4: "4523" },
-    attachments: null,
+    payTo: { cardholderName: "Ben Smith", last4: "4523" },
+    documentIds: [],
+    letterIds: ["LTR-3", "LTR-4"],
     amount: "$85.00",
   },
   {
     id: "9",
-    dateOfService: "Nov 11, 2025",
+    dateOfService: "Jan 10, 2026",
     status: { label: "Not Submitted", tone: "gray" },
     origin: "manual",
     account: "Healthcare FSA",
     provider: "Target Optical",
-    recipient: "ES",
+    recipient: "BS",
     category: "Vision",
     categoryType: "Eye Exam",
-    payTo: { cardholderName: "Emily Smith", last4: "4523" },
-    attachments: "1 Document",
-    amount: "$150.00",
+    payTo: { cardholderName: "Ben Smith", last4: "4523" },
+    // doc 15 "Target Optical" (provider + date match)
+    documentIds: ["15"],
+    letterIds: ["LTR-4"],
+    amount: "$123.98",
   },
   {
     id: "10",
-    dateOfService: "Sept 22, 2025",
+    dateOfService: "Jan 4, 2026",
     status: { label: "Paid", tone: "green" },
     origin: "card",
     account: "Healthcare FSA",
     provider: "CVS Pharmacy",
-    recipient: "ES",
+    recipient: "BS",
     category: "Prescription",
     categoryType: "Brand Name Drug",
-    payTo: { cardholderName: "Emily Smith", last4: "4523" },
-    attachments: "2 Documents",
+    payTo: { cardholderName: "Ben Smith", last4: "4523" },
+    documentIds: ["9", "10"],
+    letterIds: [],
     amount: "$36.00",
   },
   {
     id: "11",
-    dateOfService: "Mar 15, 2026",
+    dateOfService: "Mar 12, 2026",
     status: { label: "Submitted", tone: "blue" },
     origin: "manual",
     account: "Healthcare FSA",
     provider: "City Medical Center",
-    recipient: "ES",
+    recipient: "BS",
     category: "Medical",
     categoryType: "Urgent Care",
-    payTo: { cardholderName: "Emily Smith", last4: "4523" },
-    attachments: null,
+    payTo: { cardholderName: "Ben Smith", last4: "4523" },
+    documentIds: [],
+    letterIds: ["LTR-4"],
     amount: "$220.00",
   },
 ]
 
-const DOCUMENT_CARDS = [
-  { id: "1", title: "EOB", date: "Dec 12, 2025", tag: "Unattached", attached: false },
-  { id: "2", title: "Walgreens", date: "Dec 12, 2025", tag: "Attached", attached: true },
-  { id: "3", title: "Bright Smiles Dental", date: "Dec 12, 2025", tag: "Attached", attached: true },
-] as const
+// Show the 3 most recent loose files from the shared document store
+const DOCUMENT_CARDS = DOCUMENTS.filter((d) => d.folderId === null).slice(0, 3)
 
 /** SparkAccountsSection-aligned shell for main Claims section cards */
 const CLAIMS_SPARK_CARD_PROPS = {
@@ -295,7 +328,7 @@ function matchesExpenseSearch(row: ExpenseRow, query: string) {
     row.recipient,
     row.category,
     row.amount,
-    row.attachments ?? "",
+    attachmentLabel(row.documentIds.length) ?? "",
   ]
     .join(" ")
     .toLowerCase()
@@ -323,6 +356,23 @@ function parseDateOfServiceForSort(s: string): number {
   return Number.isNaN(ms) ? 0 : ms
 }
 
+function formatDateOfService(s: string): string {
+  const pad = (n: number) => String(n).padStart(2, "0")
+  const fmt = (d: Date) => `${pad(d.getMonth() + 1)}/${pad(d.getDate())}/${d.getFullYear()}`
+  const t = s.replace(/\bSept\b/g, "Sep")
+  const rangeMatch = /^(\w+)\s+(\d{1,2})[–—](\d{1,2}),\s*(\d{4})$/.exec(t)
+  if (rangeMatch) {
+    const [, month, d1, d2, year] = rangeMatch
+    const start = new Date(`${month} ${d1}, ${year}`)
+    const end = new Date(`${month} ${d2}, ${year}`)
+    if (!Number.isNaN(start.getTime()) && !Number.isNaN(end.getTime())) {
+      return `${fmt(start)}–${fmt(end)}`
+    }
+  }
+  const d = new Date(t)
+  return Number.isNaN(d.getTime()) ? s : fmt(d)
+}
+
 function parseAmountForSort(amount: string): number {
   const n = Number.parseFloat(amount.replace(/[$,]/g, ""))
   return Number.isNaN(n) ? 0 : n
@@ -343,11 +393,8 @@ function compareExpenseRowsAsc(a: ExpenseRow, b: ExpenseRow, key: ExpenseSortKey
       return a.recipient.localeCompare(b.recipient, undefined, { sensitivity: "base" })
     case "category":
       return a.category.localeCompare(b.category, undefined, { sensitivity: "base" })
-    case "attachments": {
-      const as = a.attachments?.trim() ?? ""
-      const bs = b.attachments?.trim() ?? ""
-      return as.localeCompare(bs, undefined, { sensitivity: "base" })
-    }
+    case "attachments":
+      return a.documentIds.length - b.documentIds.length
     case "amount":
       return parseAmountForSort(a.amount) - parseAmountForSort(b.amount)
     default:
@@ -362,8 +409,8 @@ function sortExpenseRows(
 ): ExpenseRow[] {
   return [...rows].sort((a, b) => {
     if (key === "attachments") {
-      const ae = !a.attachments?.trim()
-      const be = !b.attachments?.trim()
+      const ae = a.documentIds.length === 0
+      const be = b.documentIds.length === 0
       if (ae && be) return 0
       if (ae) return 1
       if (be) return -1
@@ -397,34 +444,48 @@ export function ClaimsPaymentsContent() {
   const [expenseSearch, setExpenseSearch] = useState("")
   const [expenseFilter, setExpenseFilter] = useState<ExpenseFilterId>("all")
   const [currentPage, setCurrentPage] = useState(1)
+  const [rowsPerPage, setRowsPerPage] = useState(EXPENSE_PAGE_SIZE)
   const [expenseSort, setExpenseSort] = useState<{
     key: ExpenseSortKey
     dir: "asc" | "desc"
   }>({ key: "dateOfService", dir: "desc" })
   const [selectedClaimRow, setSelectedClaimRow] = useState<ExpenseRow | null>(null)
+  const [previewDoc, setPreviewDoc] = useState<DocumentItem | null>(null)
+  const [caughtUp, setCaughtUp] = useState(false)
+
+  useEffect(() => {
+    function handleKey(e: KeyboardEvent) {
+      const tag = (e.target as HTMLElement).tagName
+      if (tag === "INPUT" || tag === "TEXTAREA" || (e.target as HTMLElement).isContentEditable) return
+      if (e.key === "c" || e.key === "C") setCaughtUp((v) => !v)
+    }
+    window.addEventListener("keydown", handleKey)
+    return () => window.removeEventListener("keydown", handleKey)
+  }, [])
 
   const filteredExpenseRows = useMemo(() => {
     return EXPENSE_ROWS.filter((row) => {
+      if (caughtUp && getExpenseBucket(row.status.label) === "actionRequired") return false
       if (expenseFilter !== "all" && getExpenseBucket(row.status.label) !== expenseFilter) {
         return false
       }
       return matchesExpenseSearch(row, expenseSearch)
     })
-  }, [expenseFilter, expenseSearch])
+  }, [expenseFilter, expenseSearch, caughtUp])
 
   const sortedFilteredExpenseRows = useMemo(
     () => sortExpenseRows(filteredExpenseRows, expenseSort.key, expenseSort.dir),
     [filteredExpenseRows, expenseSort]
   )
 
-  const totalPages = Math.max(1, Math.ceil(sortedFilteredExpenseRows.length / EXPENSE_PAGE_SIZE))
+  const totalPages = Math.max(1, Math.ceil(sortedFilteredExpenseRows.length / rowsPerPage))
 
   const effectivePage = Math.min(currentPage, totalPages)
 
   const paginatedExpenseRows = useMemo(() => {
-    const start = (effectivePage - 1) * EXPENSE_PAGE_SIZE
-    return sortedFilteredExpenseRows.slice(start, start + EXPENSE_PAGE_SIZE)
-  }, [sortedFilteredExpenseRows, effectivePage])
+    const start = (effectivePage - 1) * rowsPerPage
+    return sortedFilteredExpenseRows.slice(start, start + rowsPerPage)
+  }, [sortedFilteredExpenseRows, effectivePage, rowsPerPage])
 
   const handleExpenseSort = (key: ExpenseSortKey) => {
     setExpenseSort((prev) =>
@@ -456,7 +517,7 @@ export function ClaimsPaymentsContent() {
             size="md"
             asChild
           >
-            <Link to="/reimburse">Reimburse Myself</Link>
+            <Link to="/reimburse" state={{ from: "/claims" }}>Reimburse Myself</Link>
           </Button>
         </div>
       </div>
@@ -467,12 +528,28 @@ export function ClaimsPaymentsContent() {
           {/* Section header */}
           <div className="flex items-center gap-2 px-6 pt-5 pb-4">
             <h2 className="text-xl font-semibold text-foreground">Action Required</h2>
-            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-[11px] font-bold leading-none text-white">
-              2
-            </span>
+            {!caughtUp && (
+              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-[11px] font-bold leading-none text-white">
+                2
+              </span>
+            )}
           </div>
 
-          {/* Action items — nested cards inset to align with section title */}
+          {caughtUp ? (
+            /* Empty / caught-up state */
+            <div className="flex flex-col items-center justify-center gap-4 px-6 pb-10 pt-2">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#EEF2FF]">
+                <div className="flex h-7 w-7 items-center justify-center rounded-full border-[2.5px] border-[#3958C3]">
+                  <Check className="h-4 w-4 text-[#3958C3]" strokeWidth={3.5} aria-hidden />
+                </div>
+              </div>
+              <div className="flex flex-col items-center gap-2 text-center">
+                <p className="text-xl font-semibold text-foreground">You're all caught up!</p>
+                <p className="text-sm text-muted-foreground">No pending tasks at the moment.</p>
+              </div>
+            </div>
+          ) : (
+          /* Action items — nested cards inset to align with section title */
           <div className="flex flex-col gap-4 px-6 pb-6 pt-0">
             {ACTION_ITEMS.map((item) => {
               const actionRow = EXPENSE_ROWS.find((r) => r.id === item.rowId) ?? null
@@ -508,7 +585,7 @@ export function ClaimsPaymentsContent() {
                         className="shrink-0 whitespace-nowrap"
                       >
                         <span className="inline-flex items-center gap-1.5">
-                          <Clock className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                          <Clock className="h-3.5 w-3.5 shrink-0 text-current" aria-hidden />
                           {item.deadlineLabel}
                         </span>
                       </Badge>
@@ -540,10 +617,10 @@ export function ClaimsPaymentsContent() {
                           onClick={(e) => e.stopPropagation()}
                         >
                           {item.primaryAction.icon === "upload" && (
-                            <Upload className="size-4 shrink-0" aria-hidden />
+                            <Upload className="size-4 shrink-0 text-current" aria-hidden />
                           )}
                           {item.primaryAction.icon === "card" && (
-                            <CreditCard className="size-4 shrink-0" aria-hidden />
+                            <CreditCard className="size-4 shrink-0 text-current" aria-hidden />
                           )}
                           {item.primaryAction.label}
                         </Button>
@@ -566,6 +643,7 @@ export function ClaimsPaymentsContent() {
               )
             })}
           </div>
+          )}
         </CardContent>
       </Card>
 
@@ -580,7 +658,7 @@ export function ClaimsPaymentsContent() {
                 inputSize="md"
                 type="search"
                 placeholder="Find a claim..."
-                leftIcon={<Search className="h-4 w-4" />}
+                leftIcon={<Search className="h-4 w-4 text-current" />}
                 value={expenseSearch}
                 onChange={(e) => {
                   setExpenseSearch(e.target.value)
@@ -625,12 +703,12 @@ export function ClaimsPaymentsContent() {
               <colgroup>
                 <col className="w-[12%]" />
                 <col className="w-[16%]" />
-                <col className="w-[11%]" />
+                <col className="w-[15%]" />
                 <col className="w-[18%]" />
                 <col className="w-[7%]" />
                 <col className="w-[11%]" />
                 <col className="w-[13%]" />
-                <col className="w-[12%]" />
+                <col className="w-[8%]" />
               </colgroup>
               <TableHeader>
                 <TableRow className="hover:bg-transparent border-y border-border bg-muted/30">
@@ -649,7 +727,7 @@ export function ClaimsPaymentsContent() {
                         key={key}
                         aria-sort={expenseSortAriaSort(expenseSort.key, key, expenseSort.dir)}
                         className={cn(
-                          "h-10 px-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground",
+                          "px-2 py-4 text-xs font-semibold uppercase tracking-wide text-muted-foreground",
                           align === "right" && "text-right"
                         )}
                       >
@@ -696,8 +774,8 @@ export function ClaimsPaymentsContent() {
                         }
                       }}
                     >
-                    <TableCell className="min-w-0 px-2 py-2.5 text-sm text-foreground">
-                      <span className="line-clamp-2 break-words">{row.dateOfService}</span>
+                    <TableCell className="min-w-0 px-2 py-4 text-sm text-foreground">
+                      <span className="line-clamp-2 break-words">{formatDateOfService(row.dateOfService)}</span>
                     </TableCell>
                     <TableCell className="min-w-0 px-2 py-2.5">
                       <span
@@ -706,14 +784,14 @@ export function ClaimsPaymentsContent() {
                           expenseStatusBadgeClass(row.status.tone)
                         )}
                       >
-                        {row.status.icon && <AlertTriangle className="h-3 w-3 shrink-0" aria-hidden />}
+                        {row.status.icon && <AlertTriangle className="h-3 w-3 shrink-0 text-current" aria-hidden />}
                         <span className="min-w-0 truncate">{row.status.label}</span>
                       </span>
                     </TableCell>
-                    <TableCell className="min-w-0 px-2 py-2.5 text-sm text-foreground">
-                      <span className="line-clamp-2 break-words">{row.account}</span>
+                    <TableCell className="min-w-0 px-2 py-4 text-sm text-foreground">
+                      <span className="block truncate">{row.account}</span>
                     </TableCell>
-                    <TableCell className="min-w-0 px-2 py-2.5 text-sm text-foreground">
+                    <TableCell className="min-w-0 px-2 py-4 text-sm text-foreground">
                       <span className="line-clamp-2 break-words">{row.provider}</span>
                     </TableCell>
                     <TableCell className="min-w-0 px-2 py-2.5">
@@ -730,10 +808,10 @@ export function ClaimsPaymentsContent() {
                       </span>
                     </TableCell>
                     <TableCell className="min-w-0 px-2 py-2.5 text-sm text-muted-foreground">
-                      {row.attachments ? (
+                      {row.documentIds.length > 0 ? (
                         <span className="inline-flex min-w-0 max-w-full items-center gap-1.5 truncate">
-                          <Paperclip className="h-3.5 w-3.5 shrink-0" aria-hidden />
-                          <span className="min-w-0 truncate">{row.attachments}</span>
+                          <Paperclip className="h-3.5 w-3.5 shrink-0 text-current" aria-hidden />
+                          <span className="min-w-0 truncate">{attachmentLabel(row.documentIds.length)}</span>
                         </span>
                       ) : (
                         <span className="text-muted-foreground/50">—</span>
@@ -752,44 +830,90 @@ export function ClaimsPaymentsContent() {
           {/* Pagination — border inset to match table padding, not full card width */}
           <div className="px-6 pb-4 pt-0">
             <div className="flex items-center justify-center border-t border-border pt-4">
-              <Pagination className="mx-0 w-auto">
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        setCurrentPage((p) => Math.max(1, p - 1))
-                      }}
-                      className={cn(effectivePage === 1 && "pointer-events-none opacity-40")}
-                    />
-                  </PaginationItem>
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                    <PaginationItem key={p}>
+              <div className="flex w-fit flex-col gap-0 sm:flex-row sm:items-center sm:justify-start sm:gap-[4px]">
+                <Pagination className="flex w-fit items-center justify-start">
+                  <PaginationContent>
+                    <PaginationItem>
                       <PaginationLink
                         href="#"
-                        isActive={p === effectivePage}
+                        className="gap-0 px-2"
                         onClick={(e) => {
                           e.preventDefault()
-                          setCurrentPage(p)
+                          setCurrentPage(1)
                         }}
+                        aria-disabled={effectivePage <= 1}
+                        aria-label="First page"
                       >
-                        {p}
+                        <ChevronsLeft className="h-4 w-4" />
                       </PaginationLink>
                     </PaginationItem>
-                  ))}
-                  <PaginationItem>
-                    <PaginationNext
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        setCurrentPage((p) => Math.min(totalPages, p + 1))
-                      }}
-                      className={cn(effectivePage === totalPages && "pointer-events-none opacity-40")}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
+                    <PaginationItem>
+                      <PaginationPrevious
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          setCurrentPage((p) => Math.max(1, p - 1))
+                        }}
+                      />
+                    </PaginationItem>
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => i + 1).map((p) => (
+                      <PaginationItem key={p}>
+                        <PaginationLink
+                          href="#"
+                          isActive={p === effectivePage}
+                          onClick={(e) => {
+                            e.preventDefault()
+                            setCurrentPage(p)
+                          }}
+                        >
+                          {p}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+                    <PaginationItem>
+                      <PaginationNext
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          setCurrentPage((p) => Math.min(totalPages, p + 1))
+                        }}
+                      />
+                    </PaginationItem>
+                    <PaginationItem>
+                      <PaginationLink
+                        href="#"
+                        className="gap-0 px-2"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          setCurrentPage(totalPages)
+                        }}
+                        aria-disabled={effectivePage >= totalPages}
+                        aria-label="Last page"
+                      >
+                        <ChevronsRight className="h-4 w-4" />
+                      </PaginationLink>
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+                <div className="flex shrink-0 items-center">
+                  <Select
+                    value={String(rowsPerPage)}
+                    onValueChange={(value) => {
+                      setRowsPerPage(Number(value))
+                      setCurrentPage(1)
+                    }}
+                  >
+                    <SelectTrigger className="h-8 w-[70px]" aria-label="Select rows per page">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="5">5</SelectItem>
+                      <SelectItem value="10">10</SelectItem>
+                      <SelectItem value="25">25</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
             </div>
           </div>
         </CardContent>
@@ -801,13 +925,13 @@ export function ClaimsPaymentsContent() {
           {/* Section header */}
           <div className="flex items-center justify-between px-6 py-4">
             <h2 className="text-xl font-semibold text-foreground">Document Organizer</h2>
-            <Button type="button" intent="primary" variant="outline" size="md">
-              See All Documents
+            <Button type="button" intent="primary" variant="outline" size="md" asChild>
+              <Link to="/document-org">See All Documents</Link>
             </Button>
           </div>
 
           {/* Document grid */}
-          <div className="grid grid-cols-1 gap-4 p-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 px-6 pb-6 pt-0 sm:grid-cols-2 lg:grid-cols-4">
             {/* Upload card */}
             <div className="flex min-h-[220px] flex-col items-center justify-center rounded-lg border-2 border-dashed border-border bg-muted/20 px-6 py-8 text-center">
               <Upload className="mb-3 h-6 w-6 text-muted-foreground" aria-hidden />
@@ -830,24 +954,84 @@ export function ClaimsPaymentsContent() {
             {DOCUMENT_CARDS.map((doc) => (
               <div
                 key={doc.id}
-                className="overflow-hidden rounded-lg border border-border bg-card"
+                className="group relative overflow-hidden rounded-[8px] border border-[#d1d6d8] bg-white transition-shadow hover:shadow-md"
               >
-                <div className="h-[153px] w-full bg-muted/60" />
-                <div className="space-y-2 p-4">
-                  <p className="text-sm font-semibold text-foreground">{doc.title}</p>
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-xs text-muted-foreground">{doc.date}</span>
-                    {doc.attached ? (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">
-                        <Check className="h-3 w-3" aria-hidden />
-                        {doc.tag}
-                      </span>
-                    ) : (
-                      <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
-                        {doc.tag}
-                      </span>
-                    )}
+                {/* Clickable thumbnail */}
+                <button
+                  type="button"
+                  aria-label={`Preview ${doc.title}`}
+                  onClick={() => setPreviewDoc(doc)}
+                  className="relative h-[153px] w-full rounded-t-[8px] bg-[#d9d9d9] block cursor-pointer overflow-hidden ring-[3px] ring-inset ring-[#f8f9fe] focus-visible:outline-none focus-visible:ring-wex-input-focus-ring"
+                >
+                  {doc.imageUrl && (
+                    <img src={doc.imageUrl} alt={doc.title} className="h-full w-full object-cover" />
+                  )}
+                  {doc.status === "attached" ? (
+                    <span className="absolute bottom-2 right-2 inline-flex items-center gap-1 rounded-full bg-[#dcfce7] px-[7px] py-[3.5px] text-[12px] font-bold text-[#008375]">
+                      <Check className="h-[10.5px] w-[10.5px] shrink-0 text-current" aria-hidden />
+                      Attached
+                    </span>
+                  ) : (
+                    <span className="absolute bottom-2 right-2 inline-flex items-center rounded-full bg-[#f7f7f7] px-[7px] py-[3.5px] text-[12px] font-bold text-[#515f6b]">
+                      Unattached
+                    </span>
+                  )}
+                </button>
+
+                {/* Footer — title + three-dots menu */}
+                <div className="space-y-1.5 bg-[#f8f9fe] p-4">
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setPreviewDoc(doc)}
+                      className="flex-1 truncate text-left text-sm font-semibold leading-5 text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-wex-input-focus-ring"
+                    >
+                      {doc.title}
+                    </button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button
+                          type="button"
+                          aria-label={`More options for ${doc.title}`}
+                          className="shrink-0 rounded p-0.5 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:text-foreground focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-wex-input-focus-ring"
+                        >
+                          <MoreVertical className="h-4 w-4" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48">
+                        {doc.status === "attached" ? (
+                          <DropdownMenuItem className="gap-2">
+                            <ClipboardList className="h-4 w-4 shrink-0 text-muted-foreground" />
+                            Edit Claim
+                          </DropdownMenuItem>
+                        ) : (
+                          <DropdownMenuItem className="gap-2">
+                            <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
+                            File Claim
+                          </DropdownMenuItem>
+                        )}
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="gap-2">
+                          <Download className="h-4 w-4 shrink-0 text-muted-foreground" />
+                          Download
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="gap-2">
+                          <Pencil className="h-4 w-4 shrink-0 text-muted-foreground" />
+                          Rename
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="gap-2">
+                          <Info className="h-4 w-4 shrink-0 text-muted-foreground" />
+                          See Details
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="gap-2 text-destructive focus:text-destructive">
+                          <Trash2 className="h-4 w-4 shrink-0 text-current" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
+                  <p className="text-xs leading-4 text-[#7c858e]">{doc.date} — 3mb</p>
                 </div>
               </div>
             ))}
@@ -863,6 +1047,8 @@ export function ClaimsPaymentsContent() {
         }}
         row={selectedClaimRow}
       />
+
+      <FilePreviewModal doc={previewDoc} onClose={() => setPreviewDoc(null)} />
     </div>
   )
 }

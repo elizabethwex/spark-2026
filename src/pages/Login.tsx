@@ -12,6 +12,7 @@ import {
   UserLock,
 } from "lucide-react"
 import { useAuth } from "@/context/AuthContext"
+import { usePrototype } from "@/context/PrototypeContext"
 import { cn } from "@/lib/utils"
 import { AccountLinkingIntro } from "@/components/login/AccountLinkingIntro"
 import { AccountLinkingVerifyAccess } from "@/components/login/AccountLinkingVerifyAccess"
@@ -42,16 +43,17 @@ interface LoginProps {
 }
 
 /** Prototype email for MFA when the code is sent via email; shown masked in the read-only Email field. */
-const MFA_EMAIL_DISPLAY_SOURCE = "ux-nicole@dundermifflin.com"
+const MFA_EMAIL_DISPLAY_SOURCE = "penny.smith@wexinc.com"
 
 /** Prototype destination for account-linking MFA (step 8); masked like primary MFA. */
-const LINK_MFA_EMAIL_DISPLAY_SOURCE = "nicole.jackson@gmail.com"
+const LINK_MFA_EMAIL_DISPLAY_SOURCE = "penny.smith@gmail.com"
 
 export default function Login({ onLoginSuccess }: LoginProps) {
   const { login } = useAuth()
+  const { logoMode } = usePrototype()
   const navigate = useNavigate()
   const location = useLocation()
-  const wexLogoUrl = `${import.meta.env.BASE_URL}WEX_Logo_Red_Vector.svg`
+  const wexLogoUrl = `${import.meta.env.BASE_URL}${logoMode === "acme" ? "acme-health-wex.svg" : "WEX_Logo_Red_Vector.svg"}`
   const loginBgUrl = `${import.meta.env.BASE_URL}wexbrand_loginbg.svg`
   const dunderMifflinLogoUrl = `${import.meta.env.BASE_URL}dundermifflin.png`
   const acmeLogoUrl = `${import.meta.env.BASE_URL}acme.png`
@@ -84,7 +86,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   const selectPrimaryRef = useRef<HTMLButtonElement>(null)
   const confirmAccountLinkingRef = useRef<HTMLButtonElement>(null)
   const [selectedPrimaryAccountId, setSelectedPrimaryAccountId] =
-    useState<PrimaryOptionId>("ux-nicole")
+    useState<PrimaryOptionId>("pennysmith")
   /** Matched account row ids successfully linked in this session — shown on account selector (step 5). */
   const [linkedAccountIdsForSelector, setLinkedAccountIdsForSelector] = useState<string[]>([])
   const [pendingLinkAccountIds, setPendingLinkAccountIds] = useState<string[]>([])
@@ -312,7 +314,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
     const trimmedUsername = username.trim()
     const usernameLower = trimmedUsername.toLowerCase()
     const isValidUsername =
-      usernameLower === "ux@wex.com" || usernameLower === "ux-nicole"
+      usernameLower === "ux@wex.com" || usernameLower === "pennysmith"
     const passwordLower = password.trim().toLowerCase()
     const passwordOk =
       passwordLower === "uxprototype123!" || passwordLower === "spark"
@@ -929,7 +931,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                 {/* Step 6: Account linking — Unlinked Accounts (Figma 27732:25237) */}
                 {step === 6 && (
                   <AccountLinkingIntro
-                    primaryUsername={username.trim() || "ux-nicole"}
+                    primaryUsername={username.trim() || "pennysmith"}
                     onContinue={handleAccountLinkingContinue}
                     onNotNow={handleAccountLinkingNotNow}
                     onAddAnotherAccount={() =>
@@ -1105,7 +1107,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
 
                 {step === 10 && (
                   <SelectPrimaryAccount
-                    sessionUsername={username.trim() || "ux-nicole"}
+                    sessionUsername={username.trim() || "pennysmith"}
                     onMakePrimary={handleSelectPrimaryMakePrimary}
                     onCancel={handleSelectPrimaryCancel}
                     makePrimaryRef={selectPrimaryRef}
@@ -1114,7 +1116,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
 
                 {step === 11 && (
                   <ConfirmAccountLinking
-                    sessionUsername={username.trim() || "ux-nicole"}
+                    sessionUsername={username.trim() || "pennysmith"}
                     selectedPrimary={selectedPrimaryAccountId}
                     onConfirm={handleConfirmAccountLinking}
                     onCancel={handleConfirmAccountLinkingCancel}

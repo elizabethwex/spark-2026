@@ -66,7 +66,7 @@ export function AccountsSection() {
           variant="link"
           size="md"
           className="h-auto p-0"
-          onClick={() => navigate("/account-overview")}
+          onClick={() => navigate("/")}
         >
           View All
           <ChevronRight className="h-4 w-4" />
@@ -79,7 +79,7 @@ export function AccountsSection() {
           {/* Header */}
           <div className="flex items-start px-6 pt-6">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-[#3958c3] transition-transform group-hover/card:scale-110">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--theme-secondary-ramp-50)] text-[var(--theme-secondary)] transition-transform group-hover/card:scale-110">
                 <PiggyBank className="h-5 w-5 transition-transform group-hover/card:rotate-12" />
               </div>
               <div className="flex flex-col">
@@ -204,7 +204,7 @@ export function AccountsSection() {
                 />
               </div>
               <p className="text-[10px] leading-[15px] text-[#5f6a94]">
-                {h.planYear} IRS limit: $4,300.00 (individual)
+                {h.planYear} IRS limit: {h.irsLimitFormatted} (individual)
               </p>
             </div>
           </div>
@@ -216,7 +216,7 @@ export function AccountsSection() {
           {/* Header */}
           <div className="flex items-start px-6 pt-6">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-[#3958c3] transition-transform group-hover/card:scale-110">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--theme-secondary-ramp-50)] text-[var(--theme-secondary)] transition-transform group-hover/card:scale-110">
                 <CalendarCheck2 className="h-5 w-5 transition-transform group-hover/card:rotate-12" />
               </div>
               <div className="flex flex-col">

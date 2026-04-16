@@ -25,6 +25,9 @@ import {
   type WhatHappensNextStep,
 } from "@/components/claims/claimTimeline"
 import { expenseStatusBadgeClass, type ExpenseRow } from "@/components/claims/expenseTypes"
+import { LETTERS, type LetterItem } from "@/components/claims/letterData"
+import { DOCUMENTS, type DocumentItem } from "@/components/documents/documentData"
+import { FilePreviewModal } from "@/components/documents/FilePreviewModal"
 import {
   AlertTriangle,
   Check,
@@ -32,13 +35,15 @@ import {
   CreditCard,
   FileEdit,
   FileText,
+  Mail,
   Paperclip,
   Upload,
+  X,
 } from "lucide-react"
 
 export interface ClaimExpenseDetailSheetProps {
   open: boolean
-  onOpenChange: (open: boolean) => void
+  onOpenChange: (_open: boolean) => void
   row: ExpenseRow | null
 }
 
@@ -48,8 +53,8 @@ export interface ClaimExpenseDetailSheetProps {
 
 function recipientFullName(initials: string): string {
   switch (initials.toUpperCase()) {
-    case "ES": return "Emily Smith"
-    case "JS": return "Julia Smith"
+    case "BS": return "Ben Smith"
+    case "JS": return "James Smith"
     default: return initials
   }
 }
@@ -68,14 +73,15 @@ type InlineToastConfig = {
   body: string
 }
 
-function getInlineToast(row: ExpenseRow): InlineToastConfig | null {
+function getInlineToast(row: ExpenseRow, stepDate?: string): InlineToastConfig | null {
   const label = row.status.label
+  const date = stepDate ?? row.dateOfService
 
   if (isDocumentationNeededStatus(label)) {
     return {
       variant: "red",
       headline: "Documentation Needed",
-      subtext: `Requested ${row.dateOfService}`,
+      subtext: `Requested ${date}`,
       tag: "28 Days Remaining",
       body: "Document is missing Date of Service. Please upload new documentation that includes all required info.",
     }
@@ -85,9 +91,9 @@ function getInlineToast(row: ExpenseRow): InlineToastConfig | null {
     return {
       variant: "red",
       headline: "Repayment Due",
-      subtext: `Requested ${row.dateOfService}`,
+      subtext: `Requested ${date}`,
       tag: "14 Days Remaining",
-      body: `Your previously approved claim has been reviewed and deemed ineligible under your plan rules. Please repay the claim amount of ${row.amount}.`,
+      body: `Goods or services deemed ineligible under your plan rules. Please repay the claim amount of ${row.amount}.`,
     }
   }
 
@@ -95,7 +101,7 @@ function getInlineToast(row: ExpenseRow): InlineToastConfig | null {
     return {
       variant: "amber",
       headline: "Claim On Hold",
-      subtext: `Placed on hold ${row.dateOfService}`,
+      subtext: `Placed on hold ${date}`,
       body: row.holdReason ?? "Your claim is on hold pending additional review.",
     }
   }
@@ -104,8 +110,7 @@ function getInlineToast(row: ExpenseRow): InlineToastConfig | null {
     return {
       variant: "amber",
       headline: "Claim Denied",
-      subtext: `Denied on ${row.dateOfService}`,
-      tag: "30 Days to Appeal",
+      subtext: `Denied on ${date}`,
       body: row.denialReason ?? "Expense is not eligible under your plan.",
     }
   }
@@ -113,19 +118,28 @@ function getInlineToast(row: ExpenseRow): InlineToastConfig | null {
   return null
 }
 
+/** Returns the step id whose date should appear in the inline toast for a given status. */
+function toastStepId(statusLabel: string): string | null {
+  if (isDocumentationNeededStatus(statusLabel)) return "documentation-needed"
+  if (isRepaymentDueStatus(statusLabel)) return "repayment-due"
+  if (isHoldStatus(statusLabel)) return "hold"
+  if (isDeniedStatus(statusLabel)) return "denied"
+  return null
+}
+
 // ---------------------------------------------------------------------------
 // Footer action type
 // ---------------------------------------------------------------------------
 
-type FooterActionType = "cancel-upload" | "edit-submit" | "repayment" | "none"
+type FooterActionType = "cancel-upload" | "cancel-only" | "edit-submit" | "repayment" | "none"
 
-function getFooterActionType(statusLabel: string): FooterActionType {
+function getFooterActionType(statusLabel: string, origin?: "card" | "manual"): FooterActionType {
   if (isNotSubmittedStatus(statusLabel)) return "edit-submit"
-  if (
-    isSubmittedStatus(statusLabel) ||
-    isDocumentationNeededStatus(statusLabel) ||
-    isDocumentationReviewStatus(statusLabel)
-  ) {
+  if (isDocumentationReviewStatus(statusLabel)) {
+    // Card-originated claims cannot be canceled; upload is always removed for doc review
+    return origin === "card" ? "none" : "cancel-only"
+  }
+  if (isSubmittedStatus(statusLabel) || isDocumentationNeededStatus(statusLabel)) {
     return "cancel-upload"
   }
   if (isRepaymentDueStatus(statusLabel)) return "repayment"
@@ -159,13 +173,57 @@ function DetailRow({
 }
 
 // ---------------------------------------------------------------------------
+// Timeline step date helpers
+// ---------------------------------------------------------------------------
+
+const MONTH_NAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+
+function offsetDate(dateStr: string, days: number): string {
+  const match = dateStr.match(/([A-Za-z]+)\s+(\d+),?\s+(\d+)/)
+  if (!match) return dateStr
+  const monthIdx = MONTH_NAMES.findIndex(m => m.toLowerCase() === match[1].toLowerCase().slice(0, 3))
+  if (monthIdx === -1) return dateStr
+  const d = new Date(parseInt(match[3]), monthIdx, parseInt(match[2]) + days)
+  return `${MONTH_NAMES[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`
+}
+
+/**
+ * Assigns a display date to every step. The first step anchors to
+ * `baseDate`, each subsequent step adds `intervalDays`, and the final
+ * step is pinned to `endDate` when provided (e.g. statusDate).
+ */
+function assignStepDates(
+  steps: WhatHappensNextStep[],
+  baseDate: string,
+  endDate?: string,
+  intervalDays = 4,
+): WhatHappensNextStep[] {
+  return steps.map((step, i) => {
+    const isLast = i === steps.length - 1
+    const date = isLast && endDate ? endDate : offsetDate(baseDate, i * intervalDays)
+    return { ...step, date }
+  })
+}
+
+// ---------------------------------------------------------------------------
 // Timeline step icon
 // ---------------------------------------------------------------------------
 
-function StepIcon({ step, isComplete }: { step: WhatHappensNextStep; isComplete: boolean }) {
+function StepIcon({
+  step,
+  isComplete,
+  isDenied = false,
+}: {
+  step: WhatHappensNextStep
+  isComplete: boolean
+  isDenied?: boolean
+}) {
   const cls = "h-3.5 w-3.5"
   if (!isComplete) {
     return <FileEdit className={cn(cls, "text-muted-foreground")} aria-hidden />
+  }
+  if (isDenied) {
+    return <X className={cn(cls, "text-amber-500")} aria-hidden />
   }
   switch (step.id) {
     case "card-payment":
@@ -189,21 +247,40 @@ export function ClaimExpenseDetailSheet({
   row,
 }: ClaimExpenseDetailSheetProps) {
   const [tab, setTab] = useState("overview")
+  const [previewDoc, setPreviewDoc] = useState<DocumentItem | null>(null)
 
   if (!row) return null
 
   const categoryLabel = row.category.toUpperCase()
-  const toast = getInlineToast(row)
-  const footerType = getFooterActionType(row.status.label)
-  const isDenied = isDeniedStatus(row.status.label)
+  const footerType = getFooterActionType(row.status.label, row.origin)
 
-  const timelineSteps = getWhatHappensNextSteps(row.status.label, {
-    origin: row.origin,
-    holdReason: row.holdReason,
-    denialReason: row.denialReason,
-  })
+  const timelineSteps = assignStepDates(
+    getWhatHappensNextSteps(row.status.label, {
+      origin: row.origin,
+      holdReason: row.holdReason,
+      denialReason: row.denialReason,
+    }),
+    row.dateOfService,
+    row.statusDate,
+  )
+
+  const toastStepDate = timelineSteps.find(s => s.id === toastStepId(row.status.label))?.date
+  const toast = getInlineToast(row, toastStepDate)
+
+  const claimDocs = row.documentIds
+    .map((id) => DOCUMENTS.find((d) => d.id === id))
+    .filter((d): d is DocumentItem => d !== undefined)
+
+  const claimLetters = row.letterIds
+    .map((id) => LETTERS.find((l) => l.id === id))
+    .filter((l): l is LetterItem => l !== undefined)
+
+  function letterAsDoc(letter: LetterItem): DocumentItem {
+    return { ...letter, status: "attached", folderId: null }
+  }
 
   return (
+  <>
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
@@ -239,7 +316,7 @@ export function ClaimExpenseDetailSheet({
                     )}
                   >
                     {row.status.icon && (
-                      <AlertTriangle className="h-3 w-3 shrink-0" aria-hidden />
+                      <AlertTriangle className="h-3 w-3 shrink-0 text-current" aria-hidden />
                     )}
                     <span className="min-w-0 truncate">{row.status.label}</span>
                   </span>
@@ -286,7 +363,7 @@ export function ClaimExpenseDetailSheet({
                         className="uppercase"
                       >
                         <span className="inline-flex items-center gap-1">
-                          <Clock className="h-3 w-3 shrink-0" aria-hidden />
+                          <Clock className="h-3 w-3 shrink-0 text-current" aria-hidden />
                           {toast.tag}
                         </span>
                       </Badge>
@@ -337,7 +414,7 @@ export function ClaimExpenseDetailSheet({
                     {timelineSteps.map((step, index) => {
                       const isLast = index === timelineSteps.length - 1
                       const isComplete = step.phase === "complete"
-                      const isDeniedStep = isDenied && step.id === "denied"
+                      const isDeniedStep = step.id === "denied"
 
                       return (
                         <li key={step.id} className="flex gap-2">
@@ -346,18 +423,20 @@ export function ClaimExpenseDetailSheet({
                             <span
                               className={cn(
                                 "flex shrink-0 items-center justify-center rounded-full border bg-background",
-                                isComplete
-                                  ? "h-6 w-6 border-emerald-600"
-                                  : "h-8 w-8 border-muted-foreground/40"
+                                isDeniedStep
+                                  ? "h-6 w-6 border-amber-500"
+                                  : isComplete
+                                    ? "h-6 w-6 border-emerald-600"
+                                    : "h-6 w-6 border-muted-foreground/40"
                               )}
                             >
-                              <StepIcon step={step} isComplete={isComplete} />
+                              <StepIcon step={step} isComplete={isComplete} isDenied={isDeniedStep} />
                             </span>
                             {!isLast && (
                               <span
                                 className={cn(
                                   "w-0.5 flex-1 bg-border",
-                                  isComplete ? "my-1 min-h-[12px]" : "mt-1 min-h-[32px]"
+                                  isComplete ? "my-1" : "mt-1"
                                 )}
                               />
                             )}
@@ -367,47 +446,44 @@ export function ClaimExpenseDetailSheet({
                           <div
                             className={cn(
                               "min-w-0 flex-1",
-                              isComplete ? "pb-0 pt-0.5" : "space-y-1 pb-4"
+                              isComplete ? "pb-6 pt-0.5" : "space-y-1 pb-6"
                             )}
                           >
                             {isDeniedStep ? (
-                              /* Denied step — inline Appeal button, no Now tag */
-                              <div className="space-y-2">
+                              /* Denied step — no Now tag */
+                              <div className="space-y-1">
                                 <div className="flex flex-wrap items-center justify-between gap-2">
-                                  <p className="text-base font-medium text-foreground">
+                                  <p className="text-sm font-medium text-foreground">
                                     {step.title}
                                   </p>
                                   <p className="text-[10px] text-muted-foreground">
-                                    {row.dateOfService}
+                                    {step.date}
                                   </p>
                                 </div>
                                 <p className="text-sm text-muted-foreground">
                                   {step.description}
                                 </p>
-                                <Button
-                                  type="button"
-                                  intent="secondary"
-                                  size="sm"
-                                  className="w-fit"
-                                >
-                                  Appeal
-                                </Button>
                               </div>
                             ) : isComplete ? (
-                              /* Completed step — condensed: title only, no description or date */
-                              <p className="text-sm font-medium text-muted-foreground">
-                                {step.title}
-                              </p>
+                              /* Completed step — title + date */
+                              <div className="flex flex-wrap items-center justify-between gap-2">
+                                <p className="text-sm font-medium text-muted-foreground">
+                                  {step.title}
+                                </p>
+                                <p className="text-[10px] text-muted-foreground">
+                                  {step.date}
+                                </p>
+                              </div>
                             ) : (
                               /* Current step — full detail */
                               <>
                                 <div className="flex flex-wrap items-center justify-between gap-2">
                                   <div className="flex flex-wrap items-center gap-2">
-                                    <p className="text-base font-medium text-foreground">
+                                    <p className="text-sm font-medium text-foreground">
                                       {step.title}
                                     </p>
                                     <Badge
-                                      intent="success"
+                                      intent="info"
                                       size="sm"
                                       pill
                                       className="text-[11px]"
@@ -416,7 +492,7 @@ export function ClaimExpenseDetailSheet({
                                     </Badge>
                                   </div>
                                   <p className="text-[10px] text-muted-foreground">
-                                    {row.dateOfService}
+                                    {step.date}
                                   </p>
                                 </div>
                                 <p className="text-sm text-muted-foreground">
@@ -436,20 +512,30 @@ export function ClaimExpenseDetailSheet({
                   <h3 className="text-base font-medium leading-6 text-foreground">
                     Documents
                   </h3>
-                  {row.attachments ? (
-                    <div className="flex items-center justify-between gap-3 rounded-lg border border-border bg-muted/30 px-2 py-2">
-                      <div className="flex min-w-0 items-center gap-2">
-                        <Paperclip className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                        <span className="truncate text-sm font-medium text-foreground">
-                          receipt_dec.jpg
-                        </span>
-                        <span className="text-sm text-muted-foreground">—</span>
-                        <span className="text-sm text-muted-foreground">3mb</span>
-                      </div>
-                      <span className="shrink-0 text-[10px] text-muted-foreground">
-                        {row.dateOfService}
-                      </span>
-                    </div>
+                  {claimDocs.length > 0 ? (
+                    <ul className="space-y-2">
+                      {claimDocs.map((doc) => (
+                        <li key={doc.id}>
+                          <button
+                            type="button"
+                            onClick={() => setPreviewDoc(doc)}
+                            className="flex w-full items-center justify-between gap-3 rounded-lg border border-border bg-muted/30 px-2 py-2 transition-colors hover:border-border/80 hover:bg-muted/60 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          >
+                            <div className="flex min-w-0 items-center gap-2">
+                              <Paperclip className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                              <span className="truncate text-sm font-medium text-foreground">
+                                {doc.title}
+                              </span>
+                              <span className="text-sm text-muted-foreground">—</span>
+                              <span className="text-sm text-muted-foreground">3mb</span>
+                            </div>
+                            <span className="shrink-0 text-[10px] text-muted-foreground">
+                              {doc.date}
+                            </span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
                   ) : (
                     <p className="text-sm text-muted-foreground">No documents uploaded.</p>
                   )}
@@ -491,9 +577,33 @@ export function ClaimExpenseDetailSheet({
               </TabsContent>
 
               <TabsContent value="letters" className="mt-4">
-                <p className="text-sm text-muted-foreground">
-                  No letters are available for this claim yet.
-                </p>
+                {claimLetters.length > 0 ? (
+                  <ul className="space-y-2">
+                    {claimLetters.map((letter) => (
+                      <li key={letter.id}>
+                        <button
+                          type="button"
+                          onClick={() => setPreviewDoc(letterAsDoc(letter))}
+                          className="flex w-full items-center justify-between gap-3 rounded-lg border border-border bg-muted/30 px-2 py-2 transition-colors hover:border-border/80 hover:bg-muted/60 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        >
+                          <div className="flex min-w-0 items-center gap-2">
+                            <Mail className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                            <span className="truncate text-sm font-medium text-foreground">
+                              {letter.title}
+                            </span>
+                          </div>
+                          <span className="shrink-0 text-[10px] text-muted-foreground">
+                            {letter.date}
+                          </span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    No letters are available for this claim yet.
+                  </p>
+                )}
               </TabsContent>
             </Tabs>
           </div>
@@ -518,8 +628,22 @@ export function ClaimExpenseDetailSheet({
               size="sm"
               className="gap-1.5"
             >
-              <Upload className="h-3.5 w-3.5" aria-hidden />
+              <Upload className="h-3.5 w-3.5 text-current" aria-hidden />
               Upload Documentation
+            </Button>
+          </div>
+        )}
+
+        {footerType === "cancel-only" && (
+          <div className="flex shrink-0 flex-wrap items-center justify-end gap-2 border-t border-border bg-background px-4 py-3.5 sm:px-[17.5px]">
+            <Button
+              type="button"
+              intent="destructive"
+              variant="outline"
+              size="sm"
+              onClick={() => onOpenChange(false)}
+            >
+              Cancel Claim
             </Button>
           </div>
         )}
@@ -528,11 +652,11 @@ export function ClaimExpenseDetailSheet({
           <div className="flex shrink-0 flex-wrap items-center justify-end gap-2 border-t border-border bg-background px-4 py-3.5 sm:px-[17.5px]">
             <Button
               type="button"
-              intent="primary"
+              intent="destructive"
               variant="outline"
               size="sm"
             >
-              Edit
+              Delete Draft
             </Button>
             <Button
               type="button"
@@ -540,21 +664,13 @@ export function ClaimExpenseDetailSheet({
               variant="solid"
               size="sm"
             >
-              Submit Claim
+              Continue Claim
             </Button>
           </div>
         )}
 
         {footerType === "repayment" && (
           <div className="flex shrink-0 flex-wrap items-center justify-end gap-2 border-t border-border bg-background px-4 py-3.5 sm:px-[17.5px]">
-            <Button
-              type="button"
-              intent="primary"
-              variant="outline"
-              size="sm"
-            >
-              Appeal
-            </Button>
             <Button
               type="button"
               intent="primary"
@@ -567,5 +683,8 @@ export function ClaimExpenseDetailSheet({
         )}
       </SheetContent>
     </Sheet>
+
+    <FilePreviewModal doc={previewDoc} onClose={() => setPreviewDoc(null)} />
+  </>
   )
 }

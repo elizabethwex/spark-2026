@@ -21,9 +21,37 @@ import {
 import { ConsumerFooter } from "@/components/layout/Footer";
 import { ConsumerNavigation } from "@/components/layout/ConsumerNavigation";
 import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground";
-import { Pencil, Info, Plus, Calendar, X, Trash2, MoreVertical, Eye, EyeOff, RefreshCw, AlertCircle, User, Users, HeartPlus, ShieldCheck, Landmark, CreditCard, Bell, UserLock, Lock, SquareArrowRight } from "lucide-react";
+import {
+  WEX_PROFILE_BANK_ACCOUNTS_KEY,
+  migrateLegacyEllaBankLabel,
+} from "@/lib/profileBankAccountsSession";
+import { ReimbursementMethodsContent } from "@/pages/ReimbursementMethodsContent";
+import {
+  Pencil,
+  Info,
+  Plus,
+  Calendar,
+  X,
+  Trash2,
+  MoreVertical,
+  Eye,
+  EyeOff,
+  RefreshCw,
+  AlertCircle,
+  User,
+  Users,
+  HeartPlus,
+  ShieldCheck,
+  Landmark,
+  CreditCard,
+  Bell,
+  UserLock,
+  Lock,
+  SquareArrowRight,
+  DollarSign,
+} from "lucide-react";
 
-type SubPage = "my-profile" | "dependents" | "beneficiaries" | "authorized-signers" | "banking" | "debit-card" | "login-security" | "communication" | "report-lost-stolen" | "order-replacement-card";
+type SubPage = "my-profile" | "dependents" | "beneficiaries" | "authorized-signers" | "banking" | "reimbursement-method" | "debit-card" | "login-security" | "communication" | "report-lost-stolen" | "order-replacement-card";
 
 type Dependent = {
   id: string;
@@ -129,17 +157,97 @@ type DebitCard = {
   purseStatuses?: PurseStatus[]; // Purse status information
 };
 
-const SESSION_STORAGE_DEPENDENTS_KEY = "wex_profile_dependents";
+const SESSION_STORAGE_DEPENDENTS_KEY = "wex_profile_dependents_v2";
 const SESSION_STORAGE_BENEFICIARIES_KEY = "wex_profile_beneficiaries";
-const SESSION_STORAGE_BANK_ACCOUNTS_KEY = "wex_profile_bank_accounts";
+
+/** First visit (no saved list): show one active account so Bank Accounts is not empty. */
+const DEFAULT_BANK_ACCOUNTS: BankAccount[] = [
+  {
+    id: "bank-default-1",
+    routingNumber: "021000021",
+    accountNumber: "0000000005423",
+    confirmAccountNumber: "0000000005423",
+    accountNickname: "",
+    accountType: "checking",
+    verificationMethod: "email",
+    selectedDirectDepositOptions: [],
+    bankName: "Wells Fargo Bank",
+    activationStatus: "active",
+  },
+];
+
+const DEFAULT_DEPENDENTS: Dependent[] = [
+  {
+    id: "dep-1",
+    firstName: "Ben",
+    lastName: "Smith",
+    ssn: "***-**-1234",
+    birthDate: "03/14/1986",
+    gender: "Male",
+    isFullTimeStudent: false,
+    relationship: "Spouse",
+  },
+  {
+    id: "dep-2",
+    firstName: "James",
+    lastName: "Smith",
+    ssn: "***-**-5678",
+    birthDate: "07/22/2012",
+    gender: "Male",
+    isFullTimeStudent: false,
+    relationship: "Child",
+  },
+];
+
+/** Must match FloatLabelSelect.Item values in the dependent modal; maps legacy/session casing. */
+const DEPENDENT_FORM_GENDERS = ["Male", "Female", "Other", "Prefer not to say"] as const;
+const DEPENDENT_FORM_RELATIONSHIPS = ["Spouse", "Child", "Other"] as const;
+
+function normalizeDependentFormGender(raw: string): string {
+  const t = raw.trim();
+  if (!t) return "";
+  if ((DEPENDENT_FORM_GENDERS as readonly string[]).includes(t)) return t;
+  const lower = t.toLowerCase();
+  const byLower: Record<string, string> = {
+    male: "Male",
+    female: "Female",
+    other: "Other",
+    "prefer not to say": "Prefer not to say",
+  };
+  return byLower[lower] ?? "";
+}
+
+function normalizeDependentFormRelationship(raw: string): string {
+  const t = raw.trim();
+  if (!t) return "";
+  if ((DEPENDENT_FORM_RELATIONSHIPS as readonly string[]).includes(t)) return t;
+  const lower = t.toLowerCase();
+  const byLower: Record<string, string> = {
+    spouse: "Spouse",
+    child: "Child",
+    other: "Other",
+  };
+  return byLower[lower] ?? "";
+}
+
+function normalizeDependentRecord(d: Dependent): Dependent {
+  return {
+    ...d,
+    gender: normalizeDependentFormGender(d.gender),
+    relationship: normalizeDependentFormRelationship(d.relationship),
+  };
+}
 
 function loadDependentsFromStorage(): Dependent[] {
-  if (typeof window === "undefined") return [];
+  if (typeof window === "undefined") return DEFAULT_DEPENDENTS;
   try {
     const stored = sessionStorage.getItem(SESSION_STORAGE_DEPENDENTS_KEY);
-    return stored ? JSON.parse(stored) : [];
+    if (!stored) return DEFAULT_DEPENDENTS;
+    const parsed: Dependent[] = JSON.parse(stored);
+    const mapped = parsed.map(normalizeDependentRecord);
+    return mapped.length > 0 ? mapped : DEFAULT_DEPENDENTS;
   } catch {
-    return [];
+    return DEFAULT_DEPENDENTS;
   }
 }
 
@@ -172,33 +280,36 @@ function saveBeneficiariesToStorage(beneficiaries: Beneficiary[]): void {
 }
 
 function loadBankAccountsFromStorage(): BankAccount[] {
-  if (typeof window === "undefined") return [];
+  if (typeof window === "undefined") return DEFAULT_BANK_ACCOUNTS;
   try {
-    const stored = sessionStorage.getItem(SESSION_STORAGE_BANK_ACCOUNTS_KEY);
-    if (!stored) return [];
+    const stored = sessionStorage.getItem(WEX_PROFILE_BANK_ACCOUNTS_KEY);
+    if (!stored) return DEFAULT_BANK_ACCOUNTS;
     const parsed: unknown = JSON.parse(stored);
-    if (!Array.isArray(parsed)) return [];
+    if (!Array.isArray(parsed)) return DEFAULT_BANK_ACCOUNTS;
+    if (parsed.length === 0) return DEFAULT_BANK_ACCOUNTS;
     return parsed.map((raw: BankAccount) => ({
       ...raw,
+      accountNickname: migrateLegacyEllaBankLabel(raw.accountNickname) ?? raw.accountNickname,
+      bankName: migrateLegacyEllaBankLabel(raw.bankName) ?? raw.bankName,
       activationStatus:
-        raw.activationStatus === "pending_deposit" ? "pending_deposit" : "active",
+        raw.activationStatus === "pending_deposit" ? ("pending_deposit" as const) : ("active" as const),
     }));
   } catch {
-    return [];
+    return DEFAULT_BANK_ACCOUNTS;
   }
 }
 
 function saveBankAccountsToStorage(bankAccounts: BankAccount[]): void {
   if (typeof window === "undefined") return;
   try {
-    sessionStorage.setItem(SESSION_STORAGE_BANK_ACCOUNTS_KEY, JSON.stringify(bankAccounts));
+    sessionStorage.setItem(WEX_PROFILE_BANK_ACCOUNTS_KEY, JSON.stringify(bankAccounts));
   } catch (e) {
     console.warn("Failed to save bank accounts to sessionStorage:", e);
   }
 }
 
 export default function MyProfile() {
-  const personalName = "Emily Rose Smith";
+  const personalName = "Penny Smith";
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
   
@@ -213,7 +324,7 @@ export default function MyProfile() {
   // Contact information state
   const [isContactInfoModalOpen, setIsContactInfoModalOpen] = useState(false);
   const [mobileNumber, setMobileNumber] = useState("123-456-7890");
-  const [emailAddress, setEmailAddress] = useState("emily.smith@exampleemail.com");
+  const [emailAddress, setEmailAddress] = useState("penny.smith@wexinc.com");
   
   // Contributions preferences state
   const [contributionPostedEmail, setContributionPostedEmail] = useState(true);
@@ -406,7 +517,7 @@ export default function MyProfile() {
   const [debitCards, setDebitCards] = useState<DebitCard[]>([
     {
       id: "1",
-      cardholderName: "John Johnson",
+      cardholderName: "Ben Smith",
       cardNumber: "3522",
       fullCardNumber: "1234 5678 9012 3522",
       status: "ready-to-activate",
@@ -420,30 +531,29 @@ export default function MyProfile() {
     },
     {
       id: "2",
-      cardholderName: "Emily Johnson",
+      cardholderName: "Penny Smith",
       cardNumber: "7741",
       fullCardNumber: "1234 5678 9012 7741",
+      status: "active",
+      expirationDate: "12/31/2027",
+      effectiveDate: "01/01/2024",
+      purseStatuses: [
+        { accountName: "FSA 2024", status: "Active" },
+        { accountName: "HRA 2024", status: "Active" },
+        { accountName: "FSA 2022", status: "Suspended" },
+      ],
+    },
+    {
+      id: "3",
+      cardholderName: "James Smith",
+      cardNumber: "8412",
+      fullCardNumber: "1234 5678 9012 8412",
       status: "deactivated",
       expirationDate: "03/31/2026",
       effectiveDate: "04/01/2022",
       purseStatuses: [
         { accountName: "FSA 2022", status: "Suspended" },
         { accountName: "HRA 2022", status: "Suspended" },
-      ],
-    },
-    {
-      id: "3",
-      cardholderName: "Michael Johnson",
-      cardNumber: "8412",
-      fullCardNumber: "1234 5678 9012 8412",
-      status: "active",
-      expirationDate: "12/31/2026",
-      effectiveDate: "01/01/2023",
-      purseStatuses: [
-        { accountName: "FSA 2023", status: "Active" },
-        { accountName: "HRA 2023", status: "Active" },
-        { accountName: "FSA 2021", status: "Suspended" },
-        { accountName: "FSA 2018-2026", status: "Suspended" },
       ],
     },
   ]);
@@ -479,7 +589,7 @@ export default function MyProfile() {
   // Report Lost/Stolen page state
   const [confirmationAnswer, setConfirmationAnswer] = useState<"yes" | "no" | "">("");
   const [mailingAddress, setMailingAddress] = useState({
-    name: "John Johnson",
+    name: "Ben Smith",
     street: "5050 Lincoln Dr",
     addressLine2: "",
     city: "Edina",
@@ -499,6 +609,8 @@ export default function MyProfile() {
   
   // Modal state
   const [isAddDependentModalOpen, setIsAddDependentModalOpen] = useState(false);
+  /** Bumped when the dependent modal opens so FloatLabelSelect remounts (Radix + dialog keep-alive). */
+  const [dependentModalFormKey, setDependentModalFormKey] = useState(0);
   const [editingDependentId, setEditingDependentId] = useState<string | null>(null);
   const [isViewDependentModalOpen, setIsViewDependentModalOpen] = useState(false);
   const [viewingDependent, setViewingDependent] = useState<Dependent | null>(null);
@@ -668,7 +780,7 @@ export default function MyProfile() {
 
   const [activeSubPage, setActiveSubPage] = useState<SubPage>(() => {
     const subPage = searchParams.get("subPage");
-    const validSubPages: SubPage[] = ["my-profile", "dependents", "beneficiaries", "authorized-signers", "banking", "debit-card", "login-security", "communication", "report-lost-stolen", "order-replacement-card"];
+    const validSubPages: SubPage[] = ["my-profile", "dependents", "beneficiaries", "authorized-signers", "banking", "reimbursement-method", "debit-card", "login-security", "communication", "report-lost-stolen", "order-replacement-card"];
     if (subPage && validSubPages.includes(subPage as SubPage)) {
       return subPage as SubPage;
     }
@@ -678,7 +790,7 @@ export default function MyProfile() {
   // Sync activeSubPage with URL params
   useEffect(() => {
     const subPage = searchParams.get("subPage");
-    const validSubPages: SubPage[] = ["my-profile", "dependents", "beneficiaries", "authorized-signers", "banking", "debit-card", "login-security", "communication", "report-lost-stolen", "order-replacement-card"];
+    const validSubPages: SubPage[] = ["my-profile", "dependents", "beneficiaries", "authorized-signers", "banking", "reimbursement-method", "debit-card", "login-security", "communication", "report-lost-stolen", "order-replacement-card"];
     queueMicrotask(() => {
       if (subPage && validSubPages.includes(subPage as SubPage)) {
         setActiveSubPage(subPage as SubPage);
@@ -751,12 +863,21 @@ export default function MyProfile() {
       lastName: dependent.lastName,
       ssn: dependent.ssn,
       birthDate: dependent.birthDate,
-      gender: dependent.gender,
+      gender: normalizeDependentFormGender(dependent.gender),
       isFullTimeStudent: dependent.isFullTimeStudent ? "yes" : "no",
-      relationship: dependent.relationship,
+      relationship: normalizeDependentFormRelationship(dependent.relationship),
     });
     setEditingDependentId(dependent.id);
+    setDependentModalFormKey((k) => k + 1);
     setIsAddDependentModalOpen(true);
+  };
+
+  const handleDependentDialogOpenChange = (open: boolean) => {
+    setIsAddDependentModalOpen(open);
+    if (!open) {
+      resetForm();
+      setEditingDependentId(null);
+    }
   };
 
   const handleViewDependent = (dependent: Dependent) => {
@@ -1541,7 +1662,6 @@ export default function MyProfile() {
         bankAccount.bankName?.trim() ||
         `${bankAccount.accountType.charAt(0).toUpperCase() + bankAccount.accountType.slice(1)} Account`
       : "Bank account";
-
     setBankAccounts((prev) => prev.filter((acc) => acc.id !== id));
     setIsRemoveBankAccountConfirmOpen(false);
     setIsRemoveBankAccountAuthModalOpen(false);
@@ -1583,14 +1703,6 @@ export default function MyProfile() {
     "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC",
     "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"
   ];
-
-  // Reset form when modal closes (only if not editing)
-  useEffect(() => {
-    if (!isAddDependentModalOpen && !editingDependentId) {
-      resetForm();
-      setEditingDependentId(null);
-    }
-  }, [isAddDependentModalOpen, editingDependentId]);
 
   // Reset beneficiary form when modal closes (only if not editing)
   useEffect(() => {
@@ -1735,6 +1847,7 @@ export default function MyProfile() {
       title: "PAYMENTS",
       items: [
         { label: "Bank Accounts", key: "banking", icon: Landmark },
+        { label: "Reimbursement Methods", key: "reimbursement-method", icon: DollarSign },
         { label: "Debit Card", key: "debit-card", icon: CreditCard },
       ],
     },
@@ -1788,7 +1901,7 @@ export default function MyProfile() {
                   </div>
                   <div className="flex gap-1.5 text-sm">
                     <span className="text-gray-500">Marital Status:</span>
-                    <span className="text-gray-800">Single</span>
+                    <span className="text-gray-800">Married</span>
                   </div>
                 </div>
               </div>
@@ -1811,11 +1924,11 @@ export default function MyProfile() {
                 <div className="space-y-2 text-sm">
                   <div className="flex gap-1.5">
                     <span className="text-gray-500">Primary email address:</span>
-                    <span className="text-gray-800">emily.grace@email.com</span>
+                    <span className="text-gray-800">penny.smith@wexinc.com</span>
                   </div>
                   <div className="flex gap-1.5">
                     <span className="text-gray-500">Secondary email address:</span>
-                    <span className="text-gray-800">emily.grace2@email.com</span>
+                    <span className="text-gray-800">pennysmith@gmail.com</span>
                   </div>
                   <div className="flex gap-1.5">
                     <span className="text-gray-500">Mobile Number:</span>
@@ -1843,30 +1956,16 @@ export default function MyProfile() {
                     Edit
                   </Button>
                 </div>
-                <div className="space-y-2 text-sm">
-                  <div className="flex gap-1.5">
+                <div className="space-y-3 text-sm">
+                  <div className="space-y-0.5">
                     <span className="text-gray-500">Home Address:</span>
-                    <span className="text-gray-800">123 Main Street</span>
+                    <div className="text-gray-800">123 Main Street</div>
+                    <div className="text-gray-800">Anytown, NY 12345</div>
+                    <div className="text-gray-800">United States</div>
                   </div>
-                  <div className="flex gap-1.5">
-                    <span className="text-gray-500">City:</span>
-                    <span className="text-gray-800">Anytown</span>
-                  </div>
-                  <div className="flex gap-1.5">
-                    <span className="text-gray-500">Province/State:</span>
-                    <span className="text-gray-800">NY</span>
-                  </div>
-                  <div className="flex gap-1.5">
-                    <span className="text-gray-500">Zip Code:</span>
-                    <span className="text-gray-800">123456</span>
-                  </div>
-                  <div className="flex gap-1.5">
-                    <span className="text-gray-500">Country:</span>
-                    <span className="text-gray-800">United States</span>
-                  </div>
-                  <div className="flex gap-1.5">
+                  <div className="space-y-0.5">
                     <span className="text-gray-500">Mailing Address:</span>
-                    <span className="text-gray-800">The same as my home address</span>
+                    <div className="text-gray-800">Same as home address</div>
                   </div>
                 </div>
               </div>
@@ -1884,14 +1983,15 @@ export default function MyProfile() {
                   intent="primary"
                   variant="outline"
                   size="sm"
-                  className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50"
+                  className="gap-0 w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50 [&_svg]:text-current"
                   onClick={() => {
                     resetForm();
                     setEditingDependentId(null);
+                    setDependentModalFormKey((k) => k + 1);
                     setIsAddDependentModalOpen(true);
                   }}
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-4 w-4 text-current" />
                   <span className="sm:ml-2">Add Dependent</span>
                 </Button>
               </div>
@@ -1919,10 +2019,11 @@ export default function MyProfile() {
                       onClick={() => {
                         resetForm();
                         setEditingDependentId(null);
+                        setDependentModalFormKey((k) => k + 1);
                         setIsAddDependentModalOpen(true);
                       }}
                     >
-                      <Plus className="h-4 w-4" />
+                      <Plus className="h-4 w-4 text-current" />
                       <span>Add Dependent</span>
                     </Button>
                   </EmptyContent>
@@ -2022,28 +2123,30 @@ export default function MyProfile() {
               <div className="px-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <h2 className="text-2xl font-semibold text-gray-800">Beneficiaries</h2>
                 <div className="flex gap-2 w-full sm:w-auto">
-                  <Button
-                    intent="primary"
-                    variant="ghost"
-                    size="sm"
-                    className="w-full sm:w-auto justify-center"
-                    onClick={() => {
-                      const initialShares: Record<string, string> = {};
-                      beneficiaries.forEach((ben) => {
-                        initialShares[ben.id] = ben.sharePercentage || (beneficiaries.length === 1 ? "100" : "0");
-                      });
-                      setEditPercentagesShares(initialShares);
-                      setEditPercentagesSplitEqually(false);
-                      setIsEditPercentagesModalOpen(true);
-                    }}
-                  >
-                    Edit Shares
-                  </Button>
+                  {beneficiaries.length >= 2 && (
+                    <Button
+                      intent="primary"
+                      variant="ghost"
+                      size="sm"
+                      className="w-full sm:w-auto justify-center"
+                      onClick={() => {
+                        const initialShares: Record<string, string> = {};
+                        beneficiaries.forEach((ben) => {
+                          initialShares[ben.id] = ben.sharePercentage || (beneficiaries.length === 1 ? "100" : "0");
+                        });
+                        setEditPercentagesShares(initialShares);
+                        setEditPercentagesSplitEqually(false);
+                        setIsEditPercentagesModalOpen(true);
+                      }}
+                    >
+                      Edit Shares
+                    </Button>
+                  )}
                   <Button
                     intent="primary"
                     variant="outline"
                     size="sm"
-                    className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50"
+                    className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50 [&_svg]:text-current"
                     onClick={() => {
                       resetBeneficiaryForm();
                       setEditingBeneficiaryId(null);
@@ -2051,7 +2154,7 @@ export default function MyProfile() {
                       setIsAddBeneficiaryWorkspaceOpen(true);
                     }}
                   >
-                    <Plus className="h-4 w-4" />
+                    <Plus className="h-4 w-4 text-current" />
                     <span>Add Beneficiary</span>
                   </Button>
                 </div>
@@ -2084,7 +2187,7 @@ export default function MyProfile() {
                         setIsAddBeneficiaryWorkspaceOpen(true);
                       }}
                     >
-                      <Plus className="h-4 w-4" />
+                      <Plus className="h-4 w-4 text-current" />
                       <span>Add Beneficiary</span>
                     </Button>
                   </EmptyContent>
@@ -2221,14 +2324,14 @@ export default function MyProfile() {
                   intent="primary"
                   variant="outline"
                   size="sm"
-                  className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50"
+                  className="w-full gap-0 sm:w-auto justify-center border-primary text-primary hover:bg-blue-50 [&_svg]:text-current"
                   onClick={() => {
                     resetAuthorizedSignerForm();
                     setEditingAuthorizedSignerId(null);
                     setIsAddAuthorizedSignerModalOpen(true);
                   }}
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-4 w-4 text-current" />
                   <span className="sm:ml-2">Add Authorized Signer</span>
                 </Button>
               </div>
@@ -2259,7 +2362,7 @@ export default function MyProfile() {
                         setIsAddAuthorizedSignerModalOpen(true);
                       }}
                     >
-                      <Plus className="h-4 w-4" />
+                      <Plus className="h-4 w-4 text-current" />
                       <span>Add Authorized Signer</span>
                     </Button>
                   </EmptyContent>
@@ -2312,7 +2415,7 @@ export default function MyProfile() {
                             className="flex items-center gap-2 px-3 py-2 cursor-pointer text-red-500"
                             onClick={() => handleRemoveAuthorizedSignerClick(signer)}
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-4 w-4 text-red-500" aria-hidden />
                             <span className="text-sm leading-none">Remove</span>
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -2325,6 +2428,9 @@ export default function MyProfile() {
           </>
         );
 
+      case "reimbursement-method":
+        return <ReimbursementMethodsContent />;
+
       case "banking":
         return (
           <>
@@ -2335,7 +2441,7 @@ export default function MyProfile() {
                   intent="primary"
                   variant="outline"
                   size="sm"
-                  className="w-full sm:w-auto justify-center border-primary text-primary hover:bg-blue-50"
+                  className="w-full gap-0 sm:w-auto justify-center border-primary text-primary hover:bg-blue-50 [&_svg]:text-current"
                   onClick={() => {
                     setBankAccountFormData({
                       verificationMethod: "",
@@ -2357,7 +2463,7 @@ export default function MyProfile() {
                     setIsAddBankAccountModalOpen(true);
                   }}
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-4 w-4 text-current" />
                   <span className="sm:ml-2">Add Bank Account</span>
                 </Button>
               </div>
@@ -2403,7 +2509,7 @@ export default function MyProfile() {
                         setIsAddBankAccountModalOpen(true);
                       }}
                     >
-                      <Plus className="h-4 w-4" />
+                      <Plus className="h-4 w-4 text-current" />
                       <span>Add Bank Account</span>
                     </Button>
                   </EmptyContent>
@@ -2423,56 +2529,61 @@ export default function MyProfile() {
                   const accountDigits = bankAccount.accountNumber.replace(/\D/g, "");
                   const last4 =
                     accountDigits.length >= 4 ? accountDigits.slice(-4) : accountDigits || "—";
-                  const accountTypeLabel = `${bankAccount.accountType.charAt(0).toUpperCase() + bankAccount.accountType.slice(1)} Account`;
+                  const accountTypeWord =
+                    bankAccount.accountType === "checking" ? "Checking" : "Saving";
+                  const bankNameForTypeLine = bankAccount.bankName?.trim() ?? "";
+                  const accountTypeLine = bankNameForTypeLine
+                    ? `${accountTypeWord} Account | ${bankNameForTypeLine}`
+                    : `${accountTypeWord} Account`;
                   const isPendingDeposit = bankAccount.activationStatus !== "active";
                   const isBankActivationLocked = (bankAccount.activationVerifyAttemptCount ?? 0) >= 2;
 
                   return (
                     <div
                       key={bankAccount.id}
-                      className="flex w-[325px] max-w-full shrink-0 flex-col gap-2 rounded-lg border border-[#e4e6e9] bg-white p-4 shadow-[0_1px_3px_0_rgba(0,0,0,0.1),0_1px_2px_0_rgba(0,0,0,0.1)]"
+                      className="flex w-[325px] max-w-full shrink-0 flex-col rounded-lg border border-[#e4e6e9] bg-white p-4 shadow-[0_1px_3px_0_rgba(0,0,0,0.1),0_1px_2px_0_rgba(0,0,0,0.1)]"
                     >
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0 flex-1">
-                          <p className="text-base font-semibold leading-6 tracking-[-0.176px] text-[#1d2c38]">
+                      <div className="mb-2 flex flex-col gap-1">
+                        <div className="flex min-h-[35px] items-center justify-between gap-2">
+                          <p className="min-w-0 flex-1 text-base font-semibold leading-6 tracking-[-0.176px] text-[#1d2c38]">
                             {displayTitle}
                           </p>
-                          <p className="text-[11px] font-normal leading-4 tracking-[0.055px] text-[#515f6b]">
-                            {accountTypeLabel}
-                          </p>
-                        </div>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-[35px] w-[35px] shrink-0 text-[#1d2c38]"
-                              aria-label="Bank account options"
-                            >
-                              <MoreVertical className="h-3.5 w-3.5" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="min-w-[160px]">
-                            {isPendingDeposit ? (
-                              <DropdownMenuItem
-                                className="flex cursor-pointer items-center gap-2 text-[#1d2c38] focus:text-[#1d2c38]"
-                                onClick={() => handleEditBankAccount(bankAccount)}
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-[35px] w-[35px] shrink-0 text-[#1d2c38]"
+                                aria-label="Bank account options"
                               >
-                                <Pencil className="h-4 w-4" />
-                                <span>Edit</span>
+                                <MoreVertical className="h-3.5 w-3.5" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="min-w-[160px]">
+                              {isPendingDeposit ? (
+                                <DropdownMenuItem
+                                  className="flex cursor-pointer items-center gap-2 text-[#1d2c38] focus:text-[#1d2c38]"
+                                  onClick={() => handleEditBankAccount(bankAccount)}
+                                >
+                                  <Pencil className="h-4 w-4" />
+                                  <span>Edit</span>
+                                </DropdownMenuItem>
+                              ) : null}
+                              <DropdownMenuItem
+                                className="flex cursor-pointer items-center gap-2 text-destructive focus:text-destructive"
+                                onClick={() => handleRemoveBankAccountClick(bankAccount)}
+                              >
+                                <Trash2 className="h-4 w-4 text-destructive" aria-hidden />
+                                <span>Remove</span>
                               </DropdownMenuItem>
-                            ) : null}
-                            <DropdownMenuItem
-                              className="flex cursor-pointer items-center gap-2 text-destructive focus:text-destructive"
-                              onClick={() => handleRemoveBankAccountClick(bankAccount)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                              <span>Remove</span>
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                        <p className="text-[13px] font-normal leading-5 tracking-[0.055px] text-[#515f6b]">
+                          {accountTypeLine}
+                        </p>
                       </div>
-                      <div className="flex flex-wrap items-center gap-2">
+                      <div className="mb-4 flex flex-wrap items-center gap-2">
                         <span className="whitespace-nowrap text-sm font-normal leading-6 tracking-[-0.084px] text-[#1d2c38]">
                           •••• {last4}
                         </span>
@@ -2496,7 +2607,7 @@ export default function MyProfile() {
                       {isPendingDeposit ? (
                         <Button
                           intent="primary"
-                          className="mt-0 w-full"
+                          className="w-full"
                           disabled={isBankActivationLocked}
                           title={
                             isBankActivationLocked
@@ -2514,7 +2625,7 @@ export default function MyProfile() {
                           className="h-auto w-full rounded-md border-[#0058a3] bg-transparent px-[13.25px] py-[9.75px] text-[15.75px] font-medium leading-normal text-[#0058a3] shadow-none hover:bg-[#0058a3]/10"
                           onClick={() => handleEditBankAccount(bankAccount)}
                         >
-                          Edit
+                          View
                         </Button>
                       )}
                     </div>
@@ -3245,12 +3356,12 @@ export default function MyProfile() {
                   <div className="flex items-center gap-4">
                     <div className="flex gap-1.5 text-sm">
                       <span className="text-gray-500">Username:</span>
-                      <span className="text-gray-800">ux@wex</span>
+                      <span className="text-gray-800">pennysmith</span>
                     </div>
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-primary hover:text-primary active:text-primary [&>svg]:text-primary"
+                      className="text-[color:var(--system-link)] hover:text-[color:var(--system-link)] active:text-[color:var(--system-link)] [&>svg]:text-[color:var(--system-link)]"
                     >
                       <Pencil />
                       Update Username
@@ -3267,7 +3378,7 @@ export default function MyProfile() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-primary hover:text-primary active:text-primary [&>svg]:text-primary"
+                      className="text-[color:var(--system-link)] hover:text-[color:var(--system-link)] active:text-[color:var(--system-link)] [&>svg]:text-[color:var(--system-link)]"
                     >
                       <Pencil />
                       Change Password
@@ -3292,7 +3403,7 @@ export default function MyProfile() {
                   </Button>
                 </div>
                 <div className="space-y-1 mb-4">
-                  <p className="text-sm text-gray-800">emily.grace@email.com</p>
+                  <p className="text-sm text-gray-800">penny.smith@wexinc.com</p>
                   <p className="text-xs text-gray-600">Last Used: Today</p>
                 </div>
                 <div className="flex items-center gap-4 mb-2">
@@ -3357,10 +3468,10 @@ export default function MyProfile() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="flex items-center gap-1.5 px-3 py-1 text-sm font-medium text-primary hover:bg-gray-100"
+                  className="flex items-center gap-1.5 px-3 py-1 text-sm font-medium text-[color:var(--system-link)] hover:bg-gray-100"
                   onClick={() => setIsContactInfoModalOpen(true)}
                 >
-                  <Pencil className="h-4 w-4 text-primary" />
+                  <Pencil className="h-4 w-4 text-[color:var(--system-link)]" />
                   Edit
                 </Button>
               </div>
@@ -3412,8 +3523,8 @@ export default function MyProfile() {
                       </h3>
                       <p className="text-sm font-normal leading-6 tracking-[-0.084px] text-foreground max-w-[1094px]">
                         Set how you want to receive your account documents. Select either Paper, Email, and/or Text for each statement type. Standard text message rates may apply. Disable text alerts by unchecking the boxes below. By opting into our text alerts, you agree to our{" "}
-                        <a href="#" className="text-primary hover:underline">terms of service</a>. Please review our{" "}
-                        <a href="#" className="text-primary hover:underline">privacy policy</a> for more information.
+                        <a href="#" className="text-[color:var(--system-link)] hover:underline">terms of service</a>. Please review our{" "}
+                        <a href="#" className="text-[color:var(--system-link)] hover:underline">privacy policy</a> for more information.
                       </p>
                       <div className="flex items-center justify-end gap-2 mt-2">
                         <span className="text-sm font-normal text-foreground">Go paperless</span>
@@ -3585,8 +3696,8 @@ export default function MyProfile() {
                       </h3>
                       <p className="text-sm font-normal leading-6 tracking-[-0.084px] text-foreground max-w-[1094px]">
                         Manage how you receive real-time alerts for account activity. You can enable Email and/or Text for each notification. Standard text message rates may apply. Disable text alerts by unchecking the boxes below. By opting into our text alerts, you agree to our{" "}
-                        <a href="#" className="text-primary hover:underline">terms of service</a>. Please review our{" "}
-                        <a href="#" className="text-primary hover:underline">privacy policy</a> for more information.
+                        <a href="#" className="text-[color:var(--system-link)] hover:underline">terms of service</a>. Please review our{" "}
+                        <a href="#" className="text-[color:var(--system-link)] hover:underline">privacy policy</a> for more information.
                       </p>
                       <div className="flex items-center justify-end gap-2 mt-2">
                         <span className="text-sm font-normal text-foreground">Go paperless</span>
@@ -3786,8 +3897,8 @@ export default function MyProfile() {
                       </h3>
                       <p className="text-sm font-normal leading-6 tracking-[-0.084px] text-foreground max-w-[1094px]">
                         Manage how you receive real-time alerts for account activity. You can enable Email and/or Text for each notification. Standard text message rates may apply. Disable text alerts by unchecking the boxes below. By opting into our text alerts, you agree to our{" "}
-                        <a href="#" className="text-primary hover:underline">terms of service</a>. Please review our{" "}
-                        <a href="#" className="text-primary hover:underline">privacy policy</a> for more information.
+                        <a href="#" className="text-[color:var(--system-link)] hover:underline">terms of service</a>. Please review our{" "}
+                        <a href="#" className="text-[color:var(--system-link)] hover:underline">privacy policy</a> for more information.
                       </p>
                       <div className="flex items-center justify-end gap-2 mt-2">
                         <span className="text-sm font-normal text-foreground">Go paperless</span>
@@ -3952,8 +4063,8 @@ export default function MyProfile() {
                       </h3>
                       <p className="text-sm font-normal leading-6 tracking-[-0.084px] text-foreground max-w-[1094px]">
                         Manage how you receive real-time alerts for account activity. You can enable Email and/or Text for each notification. Standard text message rates may apply. Disable text alerts by unchecking the boxes below. By opting into our text alerts, you agree to our{" "}
-                        <a href="#" className="text-primary hover:underline">terms of service</a>. Please review our{" "}
-                        <a href="#" className="text-primary hover:underline">privacy policy</a> for more information.
+                        <a href="#" className="text-[color:var(--system-link)] hover:underline">terms of service</a>. Please review our{" "}
+                        <a href="#" className="text-[color:var(--system-link)] hover:underline">privacy policy</a> for more information.
                       </p>
                       <div className="flex items-center justify-end gap-2 mt-2">
                         <span className="text-sm font-normal text-foreground">Go paperless</span>
@@ -4266,7 +4377,7 @@ export default function MyProfile() {
                   collapsible="none"
                   className="hidden md:flex w-[264px] border-r border-wex-card-border bg-wex-card-bg flex-col h-auto"
                 >
-                  <SidebarContent className="flex-1 h-full px-2 py-4">
+                  <SidebarContent className="flex-1 h-full px-2 py-4 w-[267px]">
                     <SidebarGroup className="flex-1 h-full">
                       <SidebarGroupContent className="flex-1 h-full">
                         <SidebarMenu className="flex-1 h-full">
@@ -4324,7 +4435,7 @@ export default function MyProfile() {
       <ConsumerFooter />
 
       {/* Add New Dependent Modal */}
-      <Dialog open={isAddDependentModalOpen} onOpenChange={setIsAddDependentModalOpen}>
+      <Dialog open={isAddDependentModalOpen} onOpenChange={handleDependentDialogOpenChange}>
         <DialogContent className="w-[448px] p-0 [&>div:last-child]:hidden">
           {/* Header */}
           <div className="flex items-center justify-between p-[17.5px]">
@@ -4418,19 +4529,20 @@ export default function MyProfile() {
               </PopoverContent>
             </Popover>
             
-            {/* Gender Select */}
+            {/* Gender — FloatLabelSelect: floating label + chevron (kit trigger); menu above dialog */}
             <FloatLabelSelect
-              value={formData.gender}
+              key={`dep-gender-${dependentModalFormKey}`}
+              value={formData.gender || undefined}
               onValueChange={(value) => handleFormChange("gender", value)}
             >
               <FloatLabelSelect.Trigger label="Gender" size="md">
                 <FloatLabelSelect.Value placeholder=" " />
               </FloatLabelSelect.Trigger>
-              <FloatLabelSelect.Content>
-                <FloatLabelSelect.Item value="male">Male</FloatLabelSelect.Item>
-                <FloatLabelSelect.Item value="female">Female</FloatLabelSelect.Item>
-                <FloatLabelSelect.Item value="other">Other</FloatLabelSelect.Item>
-                <FloatLabelSelect.Item value="prefer-not-to-say">Prefer not to say</FloatLabelSelect.Item>
+              <FloatLabelSelect.Content position="popper" className="z-[300]">
+                <FloatLabelSelect.Item value="Male">Male</FloatLabelSelect.Item>
+                <FloatLabelSelect.Item value="Female">Female</FloatLabelSelect.Item>
+                <FloatLabelSelect.Item value="Other">Other</FloatLabelSelect.Item>
+                <FloatLabelSelect.Item value="Prefer not to say">Prefer not to say</FloatLabelSelect.Item>
               </FloatLabelSelect.Content>
             </FloatLabelSelect>
 
@@ -4453,18 +4565,19 @@ export default function MyProfile() {
               </RadioGroup>
             </div>
 
-            {/* Relationship Select */}
+            {/* Relationship — same pattern as Gender */}
             <FloatLabelSelect
-              value={formData.relationship}
+              key={`dep-rel-${dependentModalFormKey}`}
+              value={formData.relationship || undefined}
               onValueChange={(value) => handleFormChange("relationship", value)}
             >
               <FloatLabelSelect.Trigger label="Relationship" size="md">
                 <FloatLabelSelect.Value placeholder=" " />
               </FloatLabelSelect.Trigger>
-              <FloatLabelSelect.Content>
-                <FloatLabelSelect.Item value="spouse">Spouse</FloatLabelSelect.Item>
-                <FloatLabelSelect.Item value="child">Child</FloatLabelSelect.Item>
-                <FloatLabelSelect.Item value="other">Other</FloatLabelSelect.Item>
+              <FloatLabelSelect.Content position="popper" className="z-[300]">
+                <FloatLabelSelect.Item value="Spouse">Spouse</FloatLabelSelect.Item>
+                <FloatLabelSelect.Item value="Child">Child</FloatLabelSelect.Item>
+                <FloatLabelSelect.Item value="Other">Other</FloatLabelSelect.Item>
               </FloatLabelSelect.Content>
             </FloatLabelSelect>
           </div>
@@ -4472,15 +4585,7 @@ export default function MyProfile() {
           {/* Footer */}
           <div className="flex gap-2 justify-end p-[17.5px] pt-0">
             <DialogClose asChild>
-              <Button
-                intent="secondary"
-                variant="outline"
-                onClick={() => {
-                  resetForm();
-                  setEditingDependentId(null);
-                  setIsAddDependentModalOpen(false);
-                }}
-              >
+              <Button intent="secondary" variant="outline">
                 Cancel
               </Button>
             </DialogClose>
@@ -5752,7 +5857,11 @@ export default function MyProfile() {
           </Button>
         }
         tertiaryButton={
-          <Button variant="ghost" onClick={() => setIsAddBankAccountWorkspaceOpen(false)}>
+          <Button
+            variant="ghost"
+            data-workspace-footer-cancel
+            onClick={() => setIsAddBankAccountWorkspaceOpen(false)}
+          >
             Cancel
           </Button>
         }
@@ -6648,7 +6757,11 @@ export default function MyProfile() {
           </Button>
         }
         tertiaryButton={
-          <Button variant="ghost" onClick={() => setIsAddBeneficiaryWorkspaceOpen(false)}>
+          <Button
+            variant="ghost"
+            data-workspace-footer-cancel
+            onClick={() => setIsAddBeneficiaryWorkspaceOpen(false)}
+          >
             Cancel
           </Button>
         }
@@ -6679,7 +6792,7 @@ export default function MyProfile() {
                 setIsAddBeneficiaryModalOpen(true);
               }}
             >
-              <Plus className="h-4 w-4" />
+              <Plus className="h-4 w-4 text-current" />
               <span>Add Beneficiary</span>
             </Button>
 
@@ -6792,7 +6905,7 @@ export default function MyProfile() {
                             className="h-8 w-8 text-destructive hover:bg-red-50"
                             onClick={() => handleRemoveWorkspaceBeneficiaryClick(beneficiary)}
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-4 w-4 text-destructive" aria-hidden />
                           </Button>
                         )}
                       </div>
@@ -7093,6 +7206,7 @@ export default function MyProfile() {
         tertiaryButton={
           <Button
             variant="ghost"
+            data-workspace-footer-cancel
             onClick={() => {
               setIsReportLostStolenWorkspaceOpen(false);
               setConfirmationAnswer("");
@@ -7343,6 +7457,7 @@ export default function MyProfile() {
         tertiaryButton={
           <Button
             variant="ghost"
+            data-workspace-footer-cancel
             onClick={() => {
               setIsOrderReplacementWorkspaceOpen(false);
               setCardBeingReplaced(null);

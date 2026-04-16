@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "motion/react";
 const PLACEHOLDER_PREFIX = "Ask me… ";
 
 const QUERIES = [
+  "Is toothpaste FSA eligible?",
   "Can I use my FSA for dental?",
   "why my claim needs attention",
   "what document I need to upload",
@@ -39,7 +40,13 @@ const letterVariants = {
   },
 };
 
-export function AiChatInput() {
+export function AiChatInput({ 
+  onSubmit,
+  autocompletePhrase 
+}: { 
+  onSubmit?: (value: string) => void;
+  autocompletePhrase?: string;
+}) {
   const [inputValue, setInputValue] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -49,6 +56,9 @@ export function AiChatInput() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const showPlaceholder = !isFocused && !inputValue && !isDropdownOpen;
+
+  const isPrefix = !!autocompletePhrase && inputValue.length > 0 && autocompletePhrase.toLowerCase().startsWith(inputValue.toLowerCase());
+  const prediction = isPrefix ? autocompletePhrase.slice(inputValue.length) : "";
 
   // Handle clicking outside to close
   useEffect(() => {
@@ -81,6 +91,15 @@ export function AiChatInput() {
     setIsDropdownOpen(false);
     setIsFocused(true);
     inputRef.current?.focus();
+    if (onSubmit) {
+      onSubmit(query);
+    }
+  };
+
+  const handleSubmit = () => {
+    if (inputValue.trim() && onSubmit) {
+      onSubmit(inputValue);
+    }
   };
 
   return (
@@ -99,7 +118,7 @@ export function AiChatInput() {
           isDropdownOpen ? "shadow-md" : ""
         }`}
       >
-        <div className="relative flex-1 min-h-[20px]">
+        <div className="relative flex-1 min-h-[20px] flex items-center">
           <input
             ref={inputRef}
             type="text"
@@ -116,8 +135,28 @@ export function AiChatInput() {
               setIsFocused(true);
               if (!inputValue) setIsDropdownOpen(true);
             }}
-            className="w-full border-0 bg-transparent text-[14px] text-[#14182c] outline-none placeholder-transparent"
+            onKeyDown={(e) => {
+              if (e.key === "Tab" && prediction) {
+                e.preventDefault();
+                setInputValue(autocompletePhrase!);
+              } else if (e.key === "Enter") {
+                e.preventDefault();
+                handleSubmit();
+              }
+            }}
+            className="relative z-10 w-full border-0 bg-transparent text-[14px] text-[#14182c] outline-none placeholder-transparent"
           />
+          
+          {prediction && (
+            <div className="pointer-events-none absolute inset-0 z-0 flex items-center overflow-hidden">
+              <span className="text-[14px] text-transparent whitespace-pre">{inputValue}</span>
+              <span className="text-[14px] text-[#7a87b2] whitespace-pre">{prediction}</span>
+              <span className="ml-2 flex items-center gap-[4px] rounded-[4px] border border-[#e3e7f4] bg-[#f8f9fe] px-[6px] py-[2px] text-[10px] font-bold text-[#7a87b2]">
+                Tab ⇥
+              </span>
+            </div>
+          )}
+
           {showPlaceholder && (
             <div
               className="pointer-events-none absolute inset-0 flex items-center overflow-hidden"
@@ -213,6 +252,7 @@ export function AiChatInput() {
               backgroundImage:
                 "linear-gradient(133.514deg, rgba(37, 20, 111, 0.1) 2.4625%, rgba(200, 16, 46, 0.1) 100%)",
             }}
+            onClick={handleSubmit}
           >
             <Send className="h-[14px] w-[14px] text-[#25146f]" />
           </div>

@@ -4,6 +4,7 @@ import { ChevronLeft, User, X } from "lucide-react";
 import type { ReactNode } from "react";
 import { useDeviceMockup } from "@/hooks/useDeviceMockup";
 import { useAppChrome } from "@/context/AppChromeContext";
+import { usePrototype } from "@/context/PrototypeContext";
 import { STATUS_BAR_HEIGHT } from "./AppStatusBar";
 import { APP_NAV_HOME_INNER_H } from "./appChromeLayout";
 import { APP_TOP_LIQUID_GLASS } from "./appChromeStyles";
@@ -119,10 +120,15 @@ function BackPill({ label, onClick }: { label: string; onClick: () => void }) {
 
 export function AppNavBar(props: AppNavBarProps) {
   const navigate = useNavigate();
-  const { deviceOn } = useDeviceMockup();
+  const { deviceOn, isMobileDevice } = useDeviceMockup();
   const { topChromeHidden, isScrolled } = useAppChrome();
+  const { logoMode } = usePrototype();
 
-  const hideY = deviceOn ? -(STATUS_BAR_HEIGHT + APP_NAV_HOME_INNER_H) : "-100%";
+  /** Desktop /app always uses AppShell’s status bar (mockup or frame-off). */
+  const shellMatchesFrame = deviceOn || !isMobileDevice;
+  const hideY = shellMatchesFrame
+    ? -(STATUS_BAR_HEIGHT + APP_NAV_HOME_INNER_H)
+    : "-100%";
 
   const fixedChrome: React.CSSProperties = {
     position: "fixed",
@@ -133,8 +139,8 @@ export function AppNavBar(props: AppNavBarProps) {
     width: "100%",
     zIndex: 49,
     fontFamily: "var(--app-font)",
-    paddingTop: deviceOn ? 0 : "env(safe-area-inset-top, 0px)",
-    top: deviceOn ? STATUS_BAR_HEIGHT : 0,
+    paddingTop: shellMatchesFrame ? 0 : "env(safe-area-inset-top, 0px)",
+    top: shellMatchesFrame ? STATUS_BAR_HEIGHT : 0,
     ...(isScrolled 
       ? APP_TOP_LIQUID_GLASS 
       : { 
@@ -174,11 +180,11 @@ export function AppNavBar(props: AppNavBarProps) {
       >
         <div style={{ ...rowStyle, justifyContent: "space-between" }}>
           <img
-            src={`${import.meta.env.BASE_URL}WEX_Logo_Red_Vector.svg`}
-            alt="WEX"
+            src={`${import.meta.env.BASE_URL}${logoMode === "acme" ? "acme-health-wex.svg" : "WEX_Logo_Red_Vector.svg"}`}
+            alt={logoMode === "acme" ? "ACME Health" : "WEX"}
             onClick={props.onLogoClick}
             style={{ 
-              height: 28, 
+              height: logoMode === "acme" ? 36 : 28, 
               width: "auto", 
               objectFit: "contain",
               cursor: props.onLogoClick ? "pointer" : "default"

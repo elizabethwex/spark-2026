@@ -424,10 +424,10 @@ export default function MessageCenter() {
                               <SidebarMenuButton
                                 isActive={selectedCategory === null}
                                 onClick={() => setSelectedCategory(null)}
-                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-primary/10 data-[active=true]:text-primary data-[active=false]:text-foreground hover:bg-muted data-[active=true]:hover:bg-primary/15"
+                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-[var(--theme-secondary-ramp-50)] data-[active=true]:text-[var(--theme-secondary)] data-[active=false]:text-foreground hover:bg-muted"
                               >
                                 <div className="flex items-center gap-2 w-full">
-                                  <Mails className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === null ? 'text-primary' : 'text-foreground'}`} />
+                                  <Mails className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === null ? 'text-[var(--theme-secondary)]' : 'text-foreground'}`} />
                                   <span className="text-sm tracking-[-0.084px]">All Messages</span>
                                 </div>
                               </SidebarMenuButton>
@@ -436,10 +436,10 @@ export default function MessageCenter() {
                               <SidebarMenuButton
                                 isActive={selectedCategory === "action-required"}
                                 onClick={() => setSelectedCategory("action-required")}
-                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-primary/10 data-[active=true]:text-primary data-[active=false]:text-foreground hover:bg-muted data-[active=true]:hover:bg-primary/15"
+                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-[var(--theme-secondary-ramp-50)] data-[active=true]:text-[var(--theme-secondary)] data-[active=false]:text-foreground hover:bg-muted"
                               >
                                 <div className="flex items-center gap-2 w-full">
-                                  <AlertTriangle className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === "action-required" ? 'text-primary' : 'text-foreground'}`} />
+                                  <AlertTriangle className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === "action-required" ? 'text-[var(--theme-secondary)]' : 'text-foreground'}`} />
                                   <span className="text-sm tracking-[0.07px]">Attention Needed</span>
                                 </div>
                               </SidebarMenuButton>
@@ -448,10 +448,10 @@ export default function MessageCenter() {
                               <SidebarMenuButton
                                 isActive={selectedCategory === "unread"}
                                 onClick={() => setSelectedCategory("unread")}
-                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-primary/10 data-[active=true]:text-primary data-[active=false]:text-foreground hover:bg-muted data-[active=true]:hover:bg-primary/15"
+                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-[var(--theme-secondary-ramp-50)] data-[active=true]:text-[var(--theme-secondary)] data-[active=false]:text-foreground hover:bg-muted"
                               >
                                 <div className="flex items-center gap-2 w-full">
-                                  <Mail className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === "unread" ? 'text-primary' : 'text-foreground'}`} />
+                                  <Mail className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === "unread" ? 'text-[var(--theme-secondary)]' : 'text-foreground'}`} />
                                   <span className="text-sm tracking-[0.07px]">Unread ({unreadCount})</span>
                                 </div>
                               </SidebarMenuButton>
@@ -460,10 +460,10 @@ export default function MessageCenter() {
                               <SidebarMenuButton
                                 isActive={selectedCategory === "starred"}
                                 onClick={() => setSelectedCategory("starred")}
-                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-primary/10 data-[active=true]:text-primary data-[active=false]:text-foreground hover:bg-muted data-[active=true]:hover:bg-primary/15"
+                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-[var(--theme-secondary-ramp-50)] data-[active=true]:text-[var(--theme-secondary)] data-[active=false]:text-foreground hover:bg-muted"
                               >
                                 <div className="flex items-center gap-2 w-full">
-                                  <Star className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === "starred" ? 'text-primary' : 'text-foreground'}`} />
+                                  <Star className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === "starred" ? 'text-[var(--theme-secondary)]' : 'text-foreground'}`} />
                                   <span className="text-sm tracking-[0.07px]">Starred</span>
                                 </div>
                               </SidebarMenuButton>
@@ -472,10 +472,10 @@ export default function MessageCenter() {
                               <SidebarMenuButton
                                 isActive={selectedCategory === "archive"}
                                 onClick={() => setSelectedCategory("archive")}
-                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-primary/10 data-[active=true]:text-primary data-[active=false]:text-foreground hover:bg-muted data-[active=true]:hover:bg-primary/15"
+                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-[var(--theme-secondary-ramp-50)] data-[active=true]:text-[var(--theme-secondary)] data-[active=false]:text-foreground hover:bg-muted"
                               >
                                 <div className="flex items-center gap-2 w-full">
-                                  <Archive className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === "archive" ? 'text-primary' : 'text-foreground'}`} />
+                                  <Archive className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === "archive" ? 'text-[var(--theme-secondary)]' : 'text-foreground'}`} />
                                   <span className="text-sm tracking-[0.07px]">Archived</span>
                                 </div>
                               </SidebarMenuButton>
@@ -492,10 +492,10 @@ export default function MessageCenter() {
                               <SidebarMenuButton
                                 isActive={selectedCategory === "Account & Security"}
                                 onClick={() => setSelectedCategory("Account & Security")}
-                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-primary/10 data-[active=true]:text-primary data-[active=false]:text-foreground hover:bg-muted data-[active=true]:hover:bg-primary/15"
+                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-[var(--theme-secondary-ramp-50)] data-[active=true]:text-[var(--theme-secondary)] data-[active=false]:text-foreground hover:bg-muted"
                               >
                                 <div className="flex items-center gap-2 w-full">
-                                  <Shield className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === "Account & Security" ? 'text-primary' : 'text-foreground'}`} />
+                                  <Shield className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === "Account & Security" ? 'text-[var(--theme-secondary)]' : 'text-foreground'}`} />
                                   <span className="text-sm tracking-[0.07px]">Account & Security</span>
                                 </div>
                               </SidebarMenuButton>
@@ -504,10 +504,10 @@ export default function MessageCenter() {
                               <SidebarMenuButton
                                 isActive={selectedCategory === "Money Activity"}
                                 onClick={() => setSelectedCategory("Money Activity")}
-                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-primary/10 data-[active=true]:text-primary data-[active=false]:text-foreground hover:bg-muted data-[active=true]:hover:bg-primary/15"
+                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-[var(--theme-secondary-ramp-50)] data-[active=true]:text-[var(--theme-secondary)] data-[active=false]:text-foreground hover:bg-muted"
                               >
                                 <div className="flex items-center gap-2 w-full">
-                                  <DollarSign className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === "Money Activity" ? 'text-primary' : 'text-foreground'}`} />
+                                  <DollarSign className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === "Money Activity" ? 'text-[var(--theme-secondary)]' : 'text-foreground'}`} />
                                   <span className="text-sm tracking-[0.07px]">Money Activity</span>
                                 </div>
                               </SidebarMenuButton>
@@ -516,10 +516,10 @@ export default function MessageCenter() {
                               <SidebarMenuButton
                                 isActive={selectedCategory === "Tax & Statements"}
                                 onClick={() => setSelectedCategory("Tax & Statements")}
-                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-primary/10 data-[active=true]:text-primary data-[active=false]:text-foreground hover:bg-muted data-[active=true]:hover:bg-primary/15"
+                                className="h-[32px] min-h-[32px] whitespace-normal px-3 py-1 rounded-md data-[active=true]:bg-[var(--theme-secondary-ramp-50)] data-[active=true]:text-[var(--theme-secondary)] data-[active=false]:text-foreground hover:bg-muted"
                               >
                                 <div className="flex items-center gap-2 w-full">
-                                  <FileSpreadsheet className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === "Tax & Statements" ? 'text-primary' : 'text-foreground'}`} />
+                                  <FileSpreadsheet className={`h-[14px] w-[14px] shrink-0 ${selectedCategory === "Tax & Statements" ? 'text-[var(--theme-secondary)]' : 'text-foreground'}`} />
                                   <span className="text-sm tracking-[0.07px]">Tax & Statements</span>
                                 </div>
                               </SidebarMenuButton>
@@ -1051,9 +1051,9 @@ export default function MessageCenter() {
                           {selectedMessage.hasAttachment && (
                             <div className="border border-border rounded-md h-[68px] px-4 bg-white flex items-center">
                               <div className="flex items-center gap-4 w-full">
-                                <FileText className="h-[22px] w-[22px] text-primary shrink-0" />
+                                <FileText className="h-[22px] w-[22px] text-[color:var(--system-link)] shrink-0" />
                                 <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-semibold text-primary tracking-[-0.084px] leading-6 truncate">
+                                  <p className="text-sm font-semibold text-[color:var(--system-link)] tracking-[-0.084px] leading-6 truncate">
                                     {selectedMessage.attachmentFileName || "Attachment.pdf"}
                                   </p>
                                 </div>

@@ -117,12 +117,12 @@ export function MessageCenterWidget() {
 
   const getIcon = (_iconType: string, isActionable: boolean) => {
     if (isActionable) {
-      return <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-        <CheckCircle2 className="h-4 w-4 text-blue-600" />
+      return <div className="w-8 h-8 rounded-full bg-[var(--app-secondary-50)] flex items-center justify-center">
+        <CheckCircle2 className="h-4 w-4 text-[var(--theme-secondary)]" />
       </div>;
     }
-    return <div className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center">
-      <FileText className="h-4 w-4 text-neutral-500" />
+    return <div className="w-8 h-8 rounded-full bg-[var(--app-secondary-50)] flex items-center justify-center">
+      <FileText className="h-4 w-4 text-[var(--theme-secondary)]" />
     </div>;
   };
 
@@ -173,7 +173,7 @@ export function MessageCenterWidget() {
             <h3 className="text-[13px] font-semibold tracking-tight text-foreground flex items-center gap-2 uppercase tracking-widest text-muted-foreground">
               Action Required
               {actionableItems.length > 0 && (
-                <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100 border-0 h-5 px-1.5 rounded-md font-bold text-[10px]">
+                <Badge className="bg-[var(--app-secondary-50)] text-[var(--theme-secondary)] hover:bg-[var(--app-secondary-50)] border-0 h-5 px-1.5 rounded-md font-bold text-[10px]">
                   {actionableItems.length}
                 </Badge>
               )}

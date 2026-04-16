@@ -42,8 +42,8 @@ interface Dependent {
 
 export default function HSABeneficiariesPage() {
   const availableDependents: Dependent[] = [
-    { id: "1", name: "John Doe" },
-    { id: "2", name: "Sarah Doe" },
+    { id: "1", name: "Ben Smith" },
+    { id: "2", name: "James Smith" },
   ];
 
   const [hasBeneficiaries, setHasBeneficiaries] = React.useState<string | null>(null);

@@ -191,7 +191,7 @@ export const transactionsData: Transaction[] = [
     amount: "- $146.00",
     status: "processing",
     category: "childcare",
-    member: "Emma D.",
+    member: "James S.",
     timeline: [
       { label: "Submitted", date: "01/14/2025", completed: true, active: false },
       { label: "Processing", date: "01/15/2025", completed: false, active: true },
@@ -308,11 +308,11 @@ export const navigationItems = [
     hasDropdown: true,
     subItems: [
       { label: "Health Savings Account (HSA)", href: "/hsa-details" },
-      { label: "Flexible Savings Account (FSA)", href: "/account-overview?account=fsa" },
-      { label: "Dependent Care", href: "/account-overview?account=dependent-care" },
-      { label: "Lifestyle Spending Account", href: "/account-overview?account=lifestyle" },
+      { label: "Flexible Savings Account (FSA)", href: "/fsa-account" },
+      { label: "Dependent Care", href: "/claims" },
+      { label: "Lifestyle Spending Account", href: "/" },
     ],
   },
-  { label: "Claims & Payments", href: "/claims", icon: "document", hasDropdown: false },
+  { label: "Claims", href: "/claims", icon: "document", hasDropdown: false },
   { label: "Messages", href: "/message-center", icon: "mail", hasDropdown: false },
 ];

@@ -34,7 +34,7 @@ const CLAIM_DATA: Record<string, ClaimDetail> = {
     displayDate: "February 24, 2026",
     account: "Flexible Spending 2025 (FSA)",
     transactionAmount: "$24.99",
-    careRecipient: "Nicole Moretti",
+    careRecipient: "Penny Smith",
     claimNumber: "01SMA251117P0000301",
     status: "approved",
     reimbursedAmount: "$24.99",
@@ -208,7 +208,7 @@ export default function AppClaimsDetail() {
         paddingBottom: "calc(var(--app-tabbar-height, 95px) + env(safe-area-inset-bottom, 0px) + 64px)",
       }}
     >
-      <AppTopSpacer variant="home" />
+      <AppTopSpacer variant="page" />
       <AppNavBar variant="sub-page" title="Claim details" backTo="/app/claims" backLabel="Back" />
 
       <div style={{ padding: "16px 16px 32px", display: "flex", flexDirection: "column", gap: 16 }}>

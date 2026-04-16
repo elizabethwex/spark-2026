@@ -18,7 +18,7 @@ import {
 
 export interface AccountLinkingIntroProps {
   primaryUsername: string
-  onContinue: (selectedAccountIds: string[]) => void
+  onContinue: (_selectedAccountIds: string[]) => void
   onNotNow: () => void
   onAddAnotherAccount: () => void
   continueRef: RefObject<HTMLButtonElement | null>
@@ -55,7 +55,7 @@ export function AccountLinkingIntro({
       <div className="w-full rounded-xl border border-[#E3E7F4] p-4">
         <div className="flex flex-wrap items-center gap-1 gap-x-2">
           <span className="flex-1 text-left text-base font-bold leading-6 tracking-[-0.176px] text-[#12181d]">
-            {primaryUsername || "ux-nicole"}
+            {primaryUsername || "pennysmith"}
           </span>
           <span className="inline-flex items-center gap-1 text-[12px] font-bold leading-4 text-muted-foreground">
             <Lock className="h-3 w-3 shrink-0" aria-hidden />

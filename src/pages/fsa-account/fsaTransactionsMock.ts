@@ -1,125 +1,104 @@
+export type FsaTransactionStatus = "Complete" | "Denied" | "Paid";
+
 export type FsaTransactionRow = {
   id: string;
   date: string;
-  status: "Complete" | "Pending";
-  account: string;
+  status: FsaTransactionStatus;
   description: string;
-  category: string;
+  planYear: string;
+  /** Display string including minus for outflows, e.g. "-$60.00" */
   amount: string;
-  runningBalance: string;
-  isPositive?: boolean;
+  /** True when amount is an outflow / negative display */
+  amountIsNegative?: boolean;
+  /** When set, show an action control in the Actions column */
+  action?: "upload_receipt";
 };
 
-/** Mock FSA transactions aligned with the Consumer Experience FSA account design. */
+/** Mock FSA transactions — matches Consumer Experience Transactions table reference. */
 export const fsaTransactionsData: FsaTransactionRow[] = [
   {
     id: "1",
-    date: "04/27/2026",
+    date: "03/01/2026",
     status: "Complete",
-    account: "FSA",
-    description: "Prescription Medicine",
-    category: "Pharmacy",
-    amount: "$42.50",
-    runningBalance: "$765.00",
-    isPositive: true,
+    description: "Payroll Deduction",
+    planYear: "01/01/2026 - 12/31/2026",
+    amount: "$75.76",
   },
   {
     id: "2",
-    date: "04/25/2026",
-    status: "Complete",
-    account: "FSA",
-    description: "OTC Medicine",
-    category: "Pharmacy",
-    amount: "$28.10",
-    runningBalance: "$807.50",
-    isPositive: true,
+    date: "02/28/2026",
+    status: "Denied",
+    description: "Walgreens",
+    planYear: "01/01/2026 - 12/31/2026",
+    amount: "-$60.00",
+    amountIsNegative: true,
+    action: "upload_receipt",
   },
   {
     id: "3",
-    date: "04/20/2026",
+    date: "02/15/2026",
     status: "Complete",
-    account: "FSA",
-    description: "Health Products",
-    category: "Retail",
-    amount: "$34.99",
-    runningBalance: "$835.60",
-    isPositive: true,
+    description: "Payroll Deduction",
+    planYear: "01/01/2026 - 12/31/2026",
+    amount: "$75.76",
   },
   {
     id: "4",
-    date: "04/18/2026",
-    status: "Pending",
-    account: "FSA",
-    description: "Prescription Medicine",
-    category: "Pharmacy",
-    amount: "$19.50",
-    runningBalance: "$870.59",
-    isPositive: true,
+    date: "01/30/2026",
+    status: "Complete",
+    description: "Payroll Deduction",
+    planYear: "01/01/2026 - 12/31/2026",
+    amount: "$75.76",
   },
   {
     id: "5",
-    date: "03/18/2026",
+    date: "01/15/2026",
     status: "Complete",
-    account: "FSA",
-    description: "Primary Care Visit",
-    category: "Medical",
-    amount: "$30.00",
-    runningBalance: "$890.09",
-    isPositive: true,
+    description: "Payroll Deduction",
+    planYear: "01/01/2026 - 12/31/2026",
+    amount: "$75.76",
   },
   {
     id: "6",
-    date: "03/05/2026",
-    status: "Complete",
-    account: "FSA",
-    description: "Dental Cleaning",
-    category: "Dental",
-    amount: "$125.00",
-    runningBalance: "$920.09",
-    isPositive: true,
+    date: "01/10/2026",
+    status: "Paid",
+    description: "Pearl Vision",
+    planYear: "01/01/2026 - 12/31/2026",
+    amount: "-$215.00",
+    amountIsNegative: true,
   },
   {
     id: "7",
-    date: "02/22/2026",
+    date: "01/01/2026",
     status: "Complete",
-    account: "FSA",
-    description: "Vision Exam",
-    category: "Vision",
-    amount: "$75.00",
-    runningBalance: "$1,045.09",
-    isPositive: true,
+    description: "Payroll Deduction",
+    planYear: "01/01/2026 - 12/31/2026",
+    amount: "$75.76",
   },
   {
     id: "8",
-    date: "02/10/2026",
+    date: "01/01/2026",
     status: "Complete",
-    account: "FSA",
-    description: "Lab Services",
-    category: "Medical",
-    amount: "$48.33",
-    runningBalance: "$1,120.09",
-    isPositive: true,
+    description: "Participant Election",
+    planYear: "01/01/2026 - 12/31/2026",
+    amount: "$2,500.00",
   },
   {
     id: "9",
-    date: "01/28/2026",
+    date: "12/17/2025",
     status: "Complete",
-    account: "FSA",
-    description: "Specialist Visit",
-    category: "Medical",
-    amount: "$200.00",
-    runningBalance: "$1,168.42",
-    isPositive: true,
+    description: "SMILE Dental",
+    planYear: "01/01/2025 - 12/31/2025",
+    amount: "-$67.25",
+    amountIsNegative: true,
   },
   {
     id: "10",
-    date: "01/15/2026",
+    date: "12/10/2025",
     status: "Complete",
-    account: "FSA",
-    description: "Urgent Care Copay",
-    category: "Medical",
-    amount: "$60.00",
-    runningBalance: "$1,368.42",
-    isPositive: true,
+    description: "SMILE Dental",
+    planYear: "01/01/2025 - 12/31/2025",
+    amount: "-$1,027.55",
+    amountIsNegative: true,
   },
 ];
