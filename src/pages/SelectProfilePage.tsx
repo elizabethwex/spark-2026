@@ -9,6 +9,7 @@ import {
 } from "@/components/login/accountSelectorConfig"
 import { SelectAccountScreen } from "@/components/login/SelectAccountScreen"
 import { useAuth } from "@/context/AuthContext"
+import { usePrototype } from "@/context/PrototypeContext"
 import type { LoginRouteState } from "@/components/login/loginFlowTypes"
 import { cn } from "@/lib/utils"
 import { loginFlowFooterBgClass } from "@/components/login/loginFlowTheme"
@@ -32,8 +33,9 @@ function readLinkedAccountIdsFromSession(): string[] {
 export default function SelectProfilePage() {
   const navigate = useNavigate()
   const { login } = useAuth()
+  const { logoMode } = usePrototype()
   const accountContinueRef = useRef<HTMLButtonElement>(null)
-  const wexLogoUrl = `${import.meta.env.BASE_URL}WEX_Logo_Red_Vector.svg`
+  const wexLogoUrl = `${import.meta.env.BASE_URL}${logoMode === "acme" ? "acme-health-wex.svg" : "WEX_Logo_Red_Vector.svg"}`
   const loginBgUrl = `${import.meta.env.BASE_URL}wexbrand_loginbg.svg`
   const dunderMifflinLogoUrl = `${import.meta.env.BASE_URL}dundermifflin.png`
   const acmeLogoUrl = `${import.meta.env.BASE_URL}acme.png`

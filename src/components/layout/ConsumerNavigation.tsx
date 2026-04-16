@@ -37,7 +37,6 @@ import { getAccountsSubItems } from "@/data/consumerAccountsNav";
 import { getUnreadCount, UNREAD_COUNT_CHANGED_EVENT } from "@/data/messageCenterUtils";
 import { useAuth } from "@/context/AuthContext";
 import { usePrototype } from "@/context/PrototypeContext";
-import { PrototypeFloatingControls } from "@/components/PrototypeFloatingControls";
 
 // Icon mapping for navigation items
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -83,7 +82,7 @@ export function ConsumerNavigation({
   const location = useLocation();
   const navigate = useNavigate();
   const { logout } = useAuth();
-  const { sparkActiveView } = usePrototype();
+  const { logoMode, sparkActiveView } = usePrototype();
 
   const navItemsForView = useMemo(
     () =>
@@ -312,9 +311,9 @@ export function ConsumerNavigation({
         {/* Left: Logo */}
         <Link to="/" className="flex items-center hover:opacity-80 transition-opacity shrink-0">
           <img
-            src={`${import.meta.env.BASE_URL}WEX_Logo_Red_Vector.svg`}
-            alt="WEX"
-            className="h-[32px] w-[108.5px] object-contain"
+            src={`${import.meta.env.BASE_URL}${logoMode === "acme" ? "acme-health-wex.svg" : "WEX_Logo_Red_Vector.svg"}`}
+            alt={logoMode === "acme" ? "ACME Health" : "WEX"}
+            className={logoMode === "acme" ? "h-[52px] w-auto object-contain" : "h-[32px] w-[108.5px] object-contain"}
           />
         </Link>
 

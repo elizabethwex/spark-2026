@@ -2,6 +2,7 @@ import * as React from "react";
 
 const HOMEPAGE_MODE_STORAGE_KEY = "portal-prototype-homepage-mode";
 const HOME_LAYOUT_STORAGE_KEY = "portal-prototype-home-layout";
+const LOGO_MODE_STORAGE_KEY = "portal-prototype-logo-mode";
 const SPARK_ACTIVE_VIEW_STORAGE_KEY = "portal-prototype-spark-active-view";
 
 export type SparkActiveView = 1 | 2 | 3;
@@ -9,6 +10,8 @@ export type SparkActiveView = 1 | 2 | 3;
 export type HomepageMode = "partner-safe" | "ai-forward";
 
 export type HomeLayoutMode = "full" | "planner";
+
+export type LogoMode = "wex" | "acme";
 
 const HOME_LAYOUT_ORDER: HomeLayoutMode[] = ["full", "planner"];
 
@@ -22,6 +25,8 @@ export type PrototypeContextValue = {
   setHomepageMode: (mode: HomepageMode) => void;
   homeLayoutMode: HomeLayoutMode;
   cycleHomeLayout: () => void;
+  logoMode: LogoMode;
+  toggleLogoMode: () => void;
   sparkActiveView: SparkActiveView;
   setSparkActiveView: (view: SparkActiveView) => void;
 };
@@ -48,6 +53,16 @@ function readStoredHomeLayout(): HomeLayoutMode {
   return "full";
 }
 
+function readStoredLogoMode(): LogoMode {
+  try {
+    const v = window.localStorage.getItem(LOGO_MODE_STORAGE_KEY);
+    if (v === "wex" || v === "acme") return v;
+  } catch {
+    /* ignore */
+  }
+  return "acme";
+}
+
 function readStoredSparkActiveView(): SparkActiveView {
   try {
     const v = window.localStorage.getItem(SPARK_ACTIVE_VIEW_STORAGE_KEY);
@@ -65,6 +80,10 @@ export function PrototypeProvider({ children }: { children: React.ReactNode }) {
 
   const [homeLayoutMode, setHomeLayoutModeState] = React.useState<HomeLayoutMode>(() =>
     typeof window !== "undefined" ? readStoredHomeLayout() : "full"
+  );
+
+  const [logoMode, setLogoModeState] = React.useState<LogoMode>(() =>
+    typeof window !== "undefined" ? readStoredLogoMode() : "acme"
   );
 
   const [sparkActiveView, setSparkActiveViewState] = React.useState<SparkActiveView>(() =>
@@ -89,6 +108,14 @@ export function PrototypeProvider({ children }: { children: React.ReactNode }) {
 
   React.useEffect(() => {
     try {
+      window.localStorage.setItem(LOGO_MODE_STORAGE_KEY, logoMode);
+    } catch {
+      /* ignore */
+    }
+  }, [logoMode]);
+
+  React.useEffect(() => {
+    try {
       window.localStorage.setItem(SPARK_ACTIVE_VIEW_STORAGE_KEY, String(sparkActiveView));
     } catch {
       /* ignore */
@@ -106,6 +133,10 @@ export function PrototypeProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  const toggleLogoMode = React.useCallback(() => {
+    setLogoModeState((prev) => (prev === "wex" ? "acme" : "wex"));
+  }, []);
+
   const setSparkActiveView = React.useCallback((view: SparkActiveView) => {
     setSparkActiveViewState(view);
   }, []);
@@ -114,12 +145,19 @@ export function PrototypeProvider({ children }: { children: React.ReactNode }) {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Ignore keypresses if the user is typing in an input
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (e.target instanceof HTMLElement && e.target.isContentEditable) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
       
-      if (e.key === 'p' || e.key === 'P') {
+      const key = e.key.toLowerCase();
+      
+      if (key === 'p') {
         setHomepageModeState("partner-safe");
       }
-      if (e.key === 'm' || e.key === 'M') {
+      if (key === 'm') {
         setHomepageModeState("ai-forward");
+      }
+      if (key === 'l') {
+        setLogoModeState((prev) => (prev === "wex" ? "acme" : "wex"));
       }
       if (e.key === "1") setSparkActiveViewState(1);
       if (e.key === "2") setSparkActiveViewState(2);
@@ -136,10 +174,12 @@ export function PrototypeProvider({ children }: { children: React.ReactNode }) {
       setHomepageMode,
       homeLayoutMode,
       cycleHomeLayout,
+      logoMode,
+      toggleLogoMode,
       sparkActiveView,
       setSparkActiveView,
     }),
-    [homepageMode, setHomepageMode, homeLayoutMode, cycleHomeLayout, sparkActiveView, setSparkActiveView]
+    [homepageMode, setHomepageMode, homeLayoutMode, cycleHomeLayout, logoMode, toggleLogoMode, sparkActiveView, setSparkActiveView]
   );
 
   return <PrototypeContext.Provider value={value}>{children}</PrototypeContext.Provider>;

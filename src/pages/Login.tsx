@@ -12,6 +12,7 @@ import {
   UserLock,
 } from "lucide-react"
 import { useAuth } from "@/context/AuthContext"
+import { usePrototype } from "@/context/PrototypeContext"
 import { cn } from "@/lib/utils"
 import { AccountLinkingIntro } from "@/components/login/AccountLinkingIntro"
 import { AccountLinkingVerifyAccess } from "@/components/login/AccountLinkingVerifyAccess"
@@ -49,9 +50,10 @@ const LINK_MFA_EMAIL_DISPLAY_SOURCE = "penny.smith@gmail.com"
 
 export default function Login({ onLoginSuccess }: LoginProps) {
   const { login } = useAuth()
+  const { logoMode } = usePrototype()
   const navigate = useNavigate()
   const location = useLocation()
-  const wexLogoUrl = `${import.meta.env.BASE_URL}WEX_Logo_Red_Vector.svg`
+  const wexLogoUrl = `${import.meta.env.BASE_URL}${logoMode === "acme" ? "acme-health-wex.svg" : "WEX_Logo_Red_Vector.svg"}`
   const loginBgUrl = `${import.meta.env.BASE_URL}wexbrand_loginbg.svg`
   const dunderMifflinLogoUrl = `${import.meta.env.BASE_URL}dundermifflin.png`
   const acmeLogoUrl = `${import.meta.env.BASE_URL}acme.png`

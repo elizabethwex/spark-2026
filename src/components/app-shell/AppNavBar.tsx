@@ -4,6 +4,7 @@ import { ChevronLeft, User, X } from "lucide-react";
 import type { ReactNode } from "react";
 import { useDeviceMockup } from "@/hooks/useDeviceMockup";
 import { useAppChrome } from "@/context/AppChromeContext";
+import { usePrototype } from "@/context/PrototypeContext";
 import { STATUS_BAR_HEIGHT } from "./AppStatusBar";
 import { APP_NAV_HOME_INNER_H } from "./appChromeLayout";
 import { APP_TOP_LIQUID_GLASS } from "./appChromeStyles";
@@ -121,6 +122,7 @@ export function AppNavBar(props: AppNavBarProps) {
   const navigate = useNavigate();
   const { deviceOn, isMobileDevice } = useDeviceMockup();
   const { topChromeHidden, isScrolled } = useAppChrome();
+  const { logoMode } = usePrototype();
 
   /** Desktop /app always uses AppShell’s status bar (mockup or frame-off). */
   const shellMatchesFrame = deviceOn || !isMobileDevice;
@@ -178,11 +180,11 @@ export function AppNavBar(props: AppNavBarProps) {
       >
         <div style={{ ...rowStyle, justifyContent: "space-between" }}>
           <img
-            src={`${import.meta.env.BASE_URL}WEX_Logo_Red_Vector.svg`}
-            alt="WEX"
+            src={`${import.meta.env.BASE_URL}${logoMode === "acme" ? "acme-health-wex.svg" : "WEX_Logo_Red_Vector.svg"}`}
+            alt={logoMode === "acme" ? "ACME Health" : "WEX"}
             onClick={props.onLogoClick}
             style={{ 
-              height: 28, 
+              height: logoMode === "acme" ? 36 : 28, 
               width: "auto", 
               objectFit: "contain",
               cursor: props.onLogoClick ? "pointer" : "default"
