@@ -16,16 +16,15 @@ import {
   type SparkActivityRow,
 } from "@/data/sparkAiForwardMock";
 
-function statusStyles(status: SparkActivityStatus): string {
+function statusStyles(status: SparkActivityStatus): { wrapper: string; text: string } {
   switch (status) {
     case "approved":
-      return "text-[#009966]";
-    case "needs_attention":
-      return "text-[#996e00]";
     case "completed":
-      return "text-[#009966]";
+      return { wrapper: "border-[#e6f5f0] bg-[#e6f5f0]", text: "text-[#009966]" };
+    case "needs_attention":
+      return { wrapper: "border-[#fff9e6] bg-[#fffbeb]", text: "text-[#bf8a00]" };
     default:
-      return "text-[#5f6a94]";
+      return { wrapper: "border-[#f1f3fb] bg-[#f1f3fb]", text: "text-[#5f6a94]" };
   }
 }
 
@@ -105,19 +104,19 @@ export function TransactionsAndLinks({ activeView = 1 }: { activeView?: 1 | 2 | 
 
   const displayActivity = sparkRecentActivity.map((row) => {
     if (activeView === 2) {
-      if (row.meta.includes("LPFSA")) {
-        return { ...row, meta: row.meta.replace("LPFSA", "FSA") };
+      if (row.meta.includes("Limited Purpose FSA")) {
+        return { ...row, meta: row.meta.replace("Limited Purpose FSA", "Healthcare FSA") };
       }
       if (row.merchant === "Vanguard Invest") {
         return {
           ...row,
           merchant: "Bright Horizons Daycare",
-          meta: "12/14/25 • DCFSA Account",
+          meta: "12/14/25 • DCFSA",
         };
       }
     } else if (activeView === 3) {
-      if (row.meta.includes("LPFSA")) {
-        return { ...row, meta: row.meta.replace("LPFSA", "HSA") };
+      if (row.meta.includes("Limited Purpose FSA")) {
+        return { ...row, meta: row.meta.replace("Limited Purpose FSA", "HSA") };
       }
     }
     return row;
@@ -130,7 +129,7 @@ export function TransactionsAndLinks({ activeView = 1 }: { activeView?: 1 | 2 | 
           <SectionHeader
             title="Recent Transactions"
             actionLabel="View All Transactions"
-            actionHref="/account-overview"
+            actionHref="/claims"
           />
 
           <div className="flex flex-col gap-[12px]">
@@ -151,8 +150,8 @@ export function TransactionsAndLinks({ activeView = 1 }: { activeView?: 1 | 2 | 
                   <div className="relative w-full bg-white/40">
                     <div className="flex w-full items-center justify-between p-[16px]">
                       <div className="flex items-center gap-[16px]">
-                        <div className="flex h-[40px] w-[40px] shrink-0 items-center justify-center rounded-[12px] bg-[var(--theme-secondary-ramp-50)] text-[var(--theme-secondary)]">
-                          <Clock className="h-[18px] w-[18px]" />
+                        <div className="flex h-[40px] w-[40px] shrink-0 items-center justify-center rounded-[12px] bg-[var(--app-secondary-50)] text-[var(--theme-secondary)]">
+                          <Clock className="h-[18px] w-[18px] text-[var(--theme-secondary)]" />
                         </div>
                         <div className="flex flex-col items-start">
                           <p className="text-[14px] font-bold leading-[20px] text-[#14182c]">
@@ -165,18 +164,25 @@ export function TransactionsAndLinks({ activeView = 1 }: { activeView?: 1 | 2 | 
                       </div>
                       
                       <div className="flex items-center gap-[24px]">
-                        <div className="flex flex-col items-end">
+                        <div className="flex flex-col items-end gap-1">
                           <p className="text-[14px] font-bold leading-[20px] text-[#14182c]">
                             {row.amount}
                           </p>
-                          <p
+                          <div
                             className={cn(
-                              "text-[12px] font-bold uppercase tracking-[1.2px] leading-[16px]",
-                              statusStyles(row.status)
+                              "flex items-center rounded-full border px-[7px] py-[3px]",
+                              statusStyles(row.status).wrapper
                             )}
                           >
-                            {row.statusLabel}
-                          </p>
+                            <span
+                              className={cn(
+                                "text-[10px] font-bold leading-[15px] capitalize",
+                                statusStyles(row.status).text
+                              )}
+                            >
+                              {row.statusLabel.toLowerCase()}
+                            </span>
+                          </div>
                         </div>
                         {hasTimeline ? (
                           <ChevronDown 

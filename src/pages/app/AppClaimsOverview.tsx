@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, SlidersHorizontal, Mic, ChevronRight, Check, Clock, X, AlertCircle } from "lucide-react";
 import { AppNavBar } from "@/components/app-shell/AppNavBar";
+import { APP_TABBAR_END_SCROLL_PADDING } from "@/components/app-shell/appChromeLayout";
 import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
 import { AppBadge } from "@/components/app-shell/primitives/AppBadge";
 import {
@@ -105,7 +106,6 @@ export default function AppClaimsOverview() {
         minHeight: "100%",
         background: CLAIMS_PAGE_BACKGROUND,
         fontFamily: "var(--app-font)",
-        paddingBottom: "calc(var(--app-tabbar-height, 95px) + env(safe-area-inset-bottom, 0px) + 64px)",
       }}
     >
       <AppTopSpacer variant="home" />
@@ -162,7 +162,17 @@ export default function AppClaimsOverview() {
         </button>
       </div>
 
-      <div style={{ padding: "16px 16px 24px", display: "flex", flexDirection: "column", gap: 8 }}>
+      <div
+        style={{
+          paddingLeft: 16,
+          paddingRight: 16,
+          paddingTop: 16,
+          paddingBottom: APP_TABBAR_END_SCROLL_PADDING,
+          display: "flex",
+          flexDirection: "column",
+          gap: 8,
+        }}
+      >
         {filtered.length === 0 ? (
           <div
             style={{

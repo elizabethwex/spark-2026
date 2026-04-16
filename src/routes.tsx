@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
+import { DocumentViewLayout } from "@/components/documents/DocumentViewContext";
 import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
@@ -29,8 +30,8 @@ const AppReimburseFlowPage  = React.lazy(() => import("@/pages/app/AppReimburseF
 // Consumer Experience page - standalone route
 const HomePage = React.lazy(() => import("@/pages/HomePage"));
 
-// Account Overview page - standalone route
-const AccountOverviewPage = React.lazy(() => import("@/pages/AccountOverview"));
+// FSA account dashboard (consumer)
+const FsaAccountPage = React.lazy(() => import("@/pages/fsa-account/FsaAccountPage"));
 
 // HSA account details — /hsa-details
 const HsaDetailsPage = React.lazy(() =>
@@ -51,6 +52,12 @@ const ClaimsPage = React.lazy(() => import("@/pages/Claims"));
 
 // Account Documents page - standalone route
 const AccountDocumentsPage = React.lazy(() => import("@/pages/AccountDocuments"));
+
+// Document Organizer page - standalone route
+const DocumentOrganizerPage = React.lazy(() => import("@/pages/DocumentOrganizer"));
+
+// Document Folder page - standalone route
+const DocumentFolderPage = React.lazy(() => import("@/pages/DocumentFolder"));
 
 const ReimburseWorkspaceRouteBridge = React.lazy(
   () => import("@/pages/reimburse/ReimburseWorkspaceRouteBridge")
@@ -128,8 +135,8 @@ export function AppRoutes() {
         {/* Home */}
         <Route index element={withConsumerLight(<HomePage />)} />
         
-        {/* Account Overview */}
-        <Route path="account-overview" element={withConsumerLight(<AccountOverviewPage />)} />
+        {/* FSA account dashboard (consumer) */}
+        <Route path="fsa-account" element={withConsumerLight(<FsaAccountPage />)} />
 
         {/* HSA account details (consumer) */}
         <Route path="hsa-details" element={withConsumerLight(<HsaDetailsPage />)} />
@@ -148,6 +155,12 @@ export function AppRoutes() {
 
         {/* Account Documents */}
         <Route path="account-documents" element={withConsumerLight(<AccountDocumentsPage />)} />
+
+        {/* Document Organizer — shared layout preserves view-mode state across sub-pages */}
+        <Route element={<DocumentViewLayout />}>
+          <Route path="document-org" element={withConsumerLight(<DocumentOrganizerPage />)} />
+          <Route path="document-org/:folderId" element={withConsumerLight(<DocumentFolderPage />)} />
+        </Route>
 
         {/* Select an Account (authenticated; login wizard step 5 remains on /login) */}
         <Route path="select-profile" element={withConsumerLight(<SelectProfilePage />)} />

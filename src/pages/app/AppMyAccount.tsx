@@ -73,7 +73,7 @@ export default function AppMyAccount() {
         paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 64px)",
       }}
     >
-      <AppTopSpacer variant="home" />
+      <AppTopSpacer variant="page" />
       <AppNavBar variant="sub-page" title="My Account" backTo={-1} backLabel="Back" />
 
       <div style={{ padding: "16px", display: "flex", flexDirection: "column", gap: 16, width: "100%", boxSizing: "border-box" }}>

@@ -308,9 +308,9 @@ export const navigationItems = [
     hasDropdown: true,
     subItems: [
       { label: "Health Savings Account (HSA)", href: "/hsa-details" },
-      { label: "Flexible Savings Account (FSA)", href: "/account-overview?account=fsa" },
-      { label: "Dependent Care", href: "/account-overview?account=dependent-care" },
-      { label: "Lifestyle Spending Account", href: "/account-overview?account=lifestyle" },
+      { label: "Flexible Savings Account (FSA)", href: "/fsa-account" },
+      { label: "Dependent Care", href: "/claims" },
+      { label: "Lifestyle Spending Account", href: "/" },
     ],
   },
   { label: "Claims", href: "/claims", icon: "document", hasDropdown: false },
