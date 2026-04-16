@@ -37,6 +37,7 @@ import { getAccountsSubItems } from "@/data/consumerAccountsNav";
 import { getUnreadCount, UNREAD_COUNT_CHANGED_EVENT } from "@/data/messageCenterUtils";
 import { useAuth } from "@/context/AuthContext";
 import { usePrototype } from "@/context/PrototypeContext";
+import { PrototypeFloatingControls } from "@/components/PrototypeFloatingControls";
 
 // Icon mapping for navigation items
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
