@@ -460,6 +460,7 @@ code[class*="language-"] {
   z-index: 50;
 }
 
+
 /* Tabs component - make tablist full width and use primary color for active tab */
 [role="tablist"].inline-flex.h-10.items-center.gap-1.border-b.border-wex-tabs-divider {
   width: 100% !important;
