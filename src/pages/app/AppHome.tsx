@@ -19,6 +19,7 @@ import { TaskCardStack } from "@/components/app-shell/TaskCardStack";
 import { PullToRefresh } from "@/components/app-shell/PullToRefresh";
 import { useDeviceMockup } from "@/hooks/useDeviceMockup";
 import { FsaStoreBrowser } from "@/components/app-shell/FsaStoreBrowser";
+import { ScheduledMaintenanceMessage } from "@/components/app-shell/ScheduledMaintenanceMessage";
 import { useAppVariant, type AppVariant } from "@/context/AppVariantContext";
 import { TransactionDetailSheet, type TransactionRow as TransactionData } from "./AppAccountOverview";
 
@@ -338,6 +339,11 @@ export default function AppHome() {
       >
         {/* ── Missing document (debit card / Bigtown Dentistry) ── */}
         <TaskCardStack key={refreshKey} />
+
+        {/* ── Scheduled Maintenance Notice ── */}
+        <div style={{ padding: "0 16px" }}>
+          <ScheduledMaintenanceMessage />
+        </div>
 
         {/* ── Your Accounts ── */}
         <div style={{ padding: "0 16px" }}>

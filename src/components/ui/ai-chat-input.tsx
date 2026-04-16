@@ -4,19 +4,6 @@ import { motion, AnimatePresence } from "motion/react";
 
 const PLACEHOLDER_PREFIX = "Ask me… ";
 
-const QUERIES = [
-  "Is toothpaste FSA eligible?",
-  "Can I use my FSA for dental?",
-  "why my claim needs attention",
-  "what document I need to upload",
-  "how to get reimbursed",
-  "what I can use my FSA for",
-  "how much I have left to spend",
-  "what expenses are eligible",
-  "how long reimbursements take",
-  "what happens if I don't use my FSA",
-];
-
 const placeholderContainerVariants = {
   initial: {},
   animate: { transition: { staggerChildren: 0.025 } },
@@ -42,11 +29,28 @@ const letterVariants = {
 
 export function AiChatInput({ 
   onSubmit,
-  autocompletePhrase 
+  autocompletePhrase,
+  accountType = "FSA"
 }: { 
   onSubmit?: (value: string) => void;
   autocompletePhrase?: string;
+  accountType?: "FSA" | "HSA" | "LPFSA";
 }) {
+  const displayAccountType = accountType === "LPFSA" ? "FSA" : accountType;
+  
+  const QUERIES = [
+    `Is toothpaste ${displayAccountType} eligible?`,
+    `Can I use my ${displayAccountType} for dental?`,
+    "why my claim needs attention",
+    "what document I need to upload",
+    "how to get reimbursed",
+    `what I can use my ${displayAccountType} for`,
+    "how much I have left to spend",
+    "what expenses are eligible",
+    "how long reimbursements take",
+    `what happens if I don't use my ${displayAccountType}`,
+  ];
+
   const [inputValue, setInputValue] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);

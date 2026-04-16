@@ -5,6 +5,7 @@ import { ConsumerFooter } from "@/components/layout/Footer";
 import { SparkAiForwardHero } from "@/components/spark/SparkAiForwardHero";
 import { SparkAccountsSection } from "@/components/spark/SparkAccountsSection";
 import { SparkRecentActivity } from "@/components/spark/SparkRecentActivity";
+import { ScheduledMaintenanceMessage } from "@/components/app-shell/ScheduledMaintenanceMessage";
 import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground";
 import { PageFadeIn, FadeInItem } from "@/components/layout/PageFadeIn";
 
@@ -30,6 +31,7 @@ function HomePageAiForward() {
           <main id="main-content" className="mx-auto w-full max-w-[1200px] px-4 py-8 sm:px-6 sm:py-10 @5xl:px-8 transition-all duration-300">
             <PageFadeIn className="space-y-10">
               <FadeInItem><SparkAiForwardHero activeView={activeView} /></FadeInItem>
+              <FadeInItem><ScheduledMaintenanceMessage /></FadeInItem>
               {activeView === 3 ? (
                 <FadeInItem className="grid grid-cols-1 gap-x-10 gap-y-10 @5xl:grid-cols-2 pl-2">
                   <SparkAccountsSection activeView={activeView} />

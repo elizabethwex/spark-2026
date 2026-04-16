@@ -345,9 +345,14 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
 
         <motion.div variants={inputVariants}>
           <AiChatInput 
+            accountType={activeView === 3 ? "HSA" : activeView === 1 ? "LPFSA" : "FSA"}
             autocompletePhrase="Help me with my claims"
             onSubmit={(val) => {
-              if (val.toLowerCase().includes("help me with my claims")) {
+              if (
+                val.toLowerCase().includes("help me with my claims") ||
+                val.toLowerCase().includes("toothpaste fsa eligible") ||
+                val.toLowerCase().includes("toothpaste hsa eligible")
+              ) {
                 setAssistInitialMessage(val);
                 setUploadClaimAssistOpen(true);
               }
@@ -916,6 +921,7 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
         open={uploadClaimAssistOpen}
         onOpenChange={setUploadClaimAssistOpen}
         initialMessage={assistInitialMessage}
+        accountType={activeView === 3 ? "HSA" : activeView === 1 ? "LPFSA" : "FSA"}
       />
     </motion.div>
   );
