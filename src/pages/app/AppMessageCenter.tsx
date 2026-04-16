@@ -26,6 +26,7 @@ import { useAppChrome } from "@/context/AppChromeContext";
 import { APP_NAV_HOME_INNER_H } from "@/components/app-shell/appChromeLayout";
 import { STATUS_BAR_HEIGHT } from "@/components/app-shell/AppStatusBar";
 import { AppCard } from "@/components/app-shell/primitives/AppCard";
+import { formatAppInboxRowDateLabel } from "@/data/messageCenterPrototypeDates";
 import {
   getPrototypeInboxEntries,
   MESSAGE_BODY_WITH_ATTACHMENT,
@@ -112,11 +113,10 @@ function buildInboxRows(variant: AppVariant): MessageRow[] {
   const entries = getPrototypeInboxEntries(variant);
   return entries.map((entry, i) => {
     const archived = i === MAX_MESSAGES - 1;
-    const day = Math.max(1, 28 - (i % 20));
     return {
       id: `m${i + 1}`,
       title: entry.title,
-      date: `April ${day}`,
+      date: formatAppInboxRowDateLabel(i),
       read: i % 3 !== 0,
       attentionNeeded: entry.attentionNeeded,
       pdfAttached: entry.pdfAttached ?? false,
