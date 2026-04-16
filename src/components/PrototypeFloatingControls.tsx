@@ -17,7 +17,7 @@ export function PrototypeFloatingControls() {
 
   return (
     <div
-      className="fixed bottom-4 right-4 z-50 flex w-[min(calc(100vw-2rem),14rem)] flex-col gap-2 rounded-xl border border-slate-200 bg-white/95 p-2.5 shadow-lg backdrop-blur-md"
+      className="fixed bottom-4 left-4 z-50 flex w-[min(calc(100vw-2rem),14rem)] flex-col gap-2 rounded-xl border border-slate-200 bg-white/95 p-2.5 shadow-lg backdrop-blur-md"
       role="region"
       aria-label="Prototype controls"
     >
