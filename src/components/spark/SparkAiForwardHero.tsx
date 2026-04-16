@@ -45,6 +45,8 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
   });
   const [uploadClaimAssistOpen, setUploadClaimAssistOpen] = useState(false);
   const [assistInitialMessage, setAssistInitialMessage] = useState("Upload Claim Documents");
+  const [animationKey, setAnimationKey] = useState(0);
+  const [forceAnimate, setForceAnimate] = useState(false);
 
   useEffect(() => {
     sessionStorage.setItem("sparkHeroTaskVisible", JSON.stringify(isTaskVisible));
@@ -64,9 +66,26 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
       setIsDismissed(false);
       setIsHeroExpanded(false);
       setUploadPhase("default");
+      setAnimationKey((prev) => prev + 1);
+      setForceAnimate(true);
     };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        e.key.toLowerCase() === "n" &&
+        !(e.target instanceof HTMLInputElement) &&
+        !(e.target instanceof HTMLTextAreaElement)
+      ) {
+        handleReset();
+      }
+    };
+
     window.addEventListener("sparkHeroReset", handleReset);
-    return () => window.removeEventListener("sparkHeroReset", handleReset);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("sparkHeroReset", handleReset);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   }, []);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -121,7 +140,7 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
     }
   }, [isFirstVisit]);
 
-  const shouldAnimate = isFirstVisit && !prefersReducedMotion;
+  const shouldAnimate = (isFirstVisit || forceAnimate) && !prefersReducedMotion;
 
   const restrainedSpring = {
     type: "spring" as const,
@@ -265,6 +284,7 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
 
   return (
     <motion.div
+      key={animationKey}
       layout
       transition={{ layout: layoutSpring }}
       initial={shouldAnimate ? "hidden" : "instant"}
@@ -515,22 +535,6 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
                 >
                   <p className="text-[16px] leading-[24.75px] text-[#5f6a94]">
                     Reviewing your documentation…
-                  </p>
-                </motion.div>
-              )}
-
-              {uploadPhase === "success" && (
-                <motion.div
-                  key="card-header-success"
-                  layout
-                  {...phasePresenceMotion}
-                  className="flex flex-col gap-[4px]"
-                >
-                  <p className="text-[16px] font-semibold leading-[24.75px] text-[#16a34a]">
-                    Documentation uploaded
-                  </p>
-                  <p className="text-[14px] leading-[22px] text-[#5f6a94]">
-                    We've added it to this claim.
                   </p>
                 </motion.div>
               )}

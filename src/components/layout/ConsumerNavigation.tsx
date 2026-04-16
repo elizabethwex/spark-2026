@@ -313,12 +313,6 @@ export function ConsumerNavigation({
         <Link 
           to="/" 
           className="flex items-center hover:opacity-80 transition-opacity shrink-0"
-          onClick={() => {
-            sessionStorage.removeItem("sparkHeroTaskVisible");
-            sessionStorage.removeItem("sparkHeroDismissed");
-            sessionStorage.removeItem("sparkHeroExpanded");
-            window.dispatchEvent(new Event("sparkHeroReset"));
-          }}
         >
           <img
             src={`${import.meta.env.BASE_URL}${logoMode === "acme" ? "acme-health-wex.svg" : "WEX_Logo_Red_Vector.svg"}`}

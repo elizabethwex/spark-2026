@@ -7,7 +7,7 @@ import { IOSActionSheet, CameraViewfinder } from "./UploadFlowComponents";
 const TEXT_PRIMARY = "#000";
 const TEXT_SECONDARY = "rgba(60, 60, 67, 0.6)";
 const CARD_SHADOW = "0px 3px 9px rgba(43, 49, 78, 0.04), 0px 6px 18px rgba(43, 49, 78, 0.06)";
-const PRIMARY_BTN = "#25146f";
+const PRIMARY_BTN = "var(--app-primary, #25146f)";
 const SUCCESS_BG = "#e6f9f0";
 const SUCCESS_TEXT = "#1a6b45";
 
@@ -33,7 +33,7 @@ export interface TaskCardData {
 const MOCK_TASKS: TaskCardData[] = [
   {
     id: "task-1",
-    title: "Missing Document Required",
+    title: "Missing Documentation Required",
     description: "Upload your document to complete this claim for Bigtown Dentistry.",
     provider: "Bigtown Dentistry",
     dateAndAccount: "4/26/2027 · Limited Purpose FSA",
@@ -62,7 +62,13 @@ export function TaskCardStack() {
     const saved = sessionStorage.getItem("taskCards");
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        // Force update the title if it's the old one
+        return parsed.map((card: TaskCardData) => 
+          card.id === "task-1" && card.title === "Missing Document Required" 
+            ? { ...card, title: "Missing Documentation Required" } 
+            : card
+        );
       } catch {
         return MOCK_TASKS;
       }
@@ -794,7 +800,7 @@ function SwipeableCard({
                       background: PRIMARY_BTN,
                       border: "none",
                       cursor: "pointer",
-                      color: "#fff",
+                      color: "var(--app-text-on-primary, #fff)",
                       fontSize: 15,
                       fontWeight: 600,
                       letterSpacing: -0.1,
@@ -805,7 +811,7 @@ function SwipeableCard({
                       gap: 6,
                     }}
                   >
-                    <Upload size={16} />
+                    <Upload size={16} color="var(--app-text-on-primary, #fff)" />
                     Submit documentation
                   </motion.button>
                 )}
