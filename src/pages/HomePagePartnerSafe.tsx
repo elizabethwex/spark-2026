@@ -12,6 +12,7 @@ import { MobileAppBanner } from "@/components/sections/MobileAppBanner";
 import { QuickActionsSection } from "@/components/sections/QuickActionsSection";
 import { ConsumerFooter } from "@/components/layout/Footer";
 import { HSAPlannerCard } from "@/components/HSAPlannerCard";
+import { ScheduledMaintenanceMessage } from "@/components/app-shell/ScheduledMaintenanceMessage";
 import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground";
 import { AssistIQUploadClaimModal } from "@/components/spark/AssistIQUploadClaimModal";
 
@@ -32,6 +33,10 @@ export default function HomePagePartnerSafe() {
         <PageFadeIn className="space-y-8">
         <FadeInItem>
           <MobileAppBanner />
+        </FadeInItem>
+
+        <FadeInItem>
+          <ScheduledMaintenanceMessage />
         </FadeInItem>
 
         <FadeInItem>
