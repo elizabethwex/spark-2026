@@ -484,7 +484,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
     | "final_approval"
     | "see_all_typing"
     | "see_all_results"
-  >("typing");
+  >("new_chat");
   const [selectedClaim, setSelectedClaim] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -647,17 +647,20 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
   };
 
   if (!open) {
-    if (chatPhase !== "new_chat") {
+    const hasStarted = chatPhase !== "new_chat";
+    const isNotResolved = chatPhase !== "final_approval";
+
+    if (hasStarted && isNotResolved) {
       const resumeButton = (
         <motion.button
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.8 }}
           onClick={() => onOpenChange(true)}
-          className="fixed bottom-6 right-6 z-[300] flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-[0_4px_20px_rgba(43,49,78,0.15)] hover:scale-105 transition-transform"
+          className="fixed bottom-6 right-6 z-[300] flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-[0_4px_20px_rgba(43,49,78,0.15)] hover:scale-105 transition-transform overflow-hidden"
           aria-label="Resume chat"
         >
-          <AssistIQAvatar size={40} />
+          <AssistIQAvatar size={64} />
         </motion.button>
       );
       return createPortal(resumeButton, document.body);

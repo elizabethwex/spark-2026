@@ -32,6 +32,7 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
   const prefersReducedMotion = useReducedMotion();
   const [uploadPhase, setUploadPhase] = useState<UploadPhase>("default");
   const [isTaskVisible, setIsTaskVisible] = useState(true);
+  const [isDismissed, setIsDismissed] = useState(false);
   const [isHeroExpanded, setIsHeroExpanded] = useState(false);
   const [uploadClaimAssistOpen, setUploadClaimAssistOpen] = useState(false);
   const [assistInitialMessage, setAssistInitialMessage] = useState("Upload Claim Documents");
@@ -423,17 +424,17 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
                   key="card-header-default"
                   layout
                   {...phasePresenceMotion}
-                  className="flex flex-col gap-[12px]"
+                  className="flex flex-col gap-[8px]"
                 >
                   <div className="self-start rounded-[6px] bg-[#ffbf00] px-[12px] py-[4px]">
                     <span className="text-[11px] font-extrabold uppercase leading-[16.5px] tracking-[0.275px] text-black">
                       28 days left to file
                     </span>
                   </div>
-                  <h2 className="text-[24px] font-bold leading-[32px] tracking-[-0.456px] text-black">
+                  <h2 className="text-[20px] font-bold leading-[32px] tracking-[-0.456px] text-black">
                     Missing Documentation Required
                   </h2>
-                  <p className="text-[16px] leading-[24.75px] text-[#5f6a94]">
+                  <p className="text-[14px] leading-[24.75px] text-[#5f6a94]">
                     Upload your documentation for Bigtown Dentistry in under a minute.
                   </p>
                 </motion.div>
@@ -562,6 +563,10 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
                   </Button>
                   <button
                     type="button"
+                    onClick={() => {
+                      setIsDismissed(true);
+                      setIsTaskVisible(false);
+                    }}
                     className="text-[12px] font-medium leading-[16px] text-[#7a87b2] hover:underline"
                   >
                     Remind me tomorrow
@@ -841,10 +846,10 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
               </div>
               <div className="flex flex-col gap-[4px]">
                 <p className="text-[16px] font-semibold text-foreground">
-                  You're all caught up!
+                  {isDismissed ? "Reminder set" : "You're all caught up!"}
                 </p>
                 <p className="text-[14px] text-[#5f6a94]">
-                  No pending tasks at the moment.
+                  {isDismissed ? "You have no other actions." : "No pending tasks at the moment."}
                 </p>
               </div>
             </motion.div>
