@@ -30,6 +30,10 @@ import {
 import { STATUS_BAR_HEIGHT } from "@/components/app-shell/AppStatusBar";
 import { AppCard } from "@/components/app-shell/primitives/AppCard";
 import {
+  formatAppInboxRowDateLabel,
+  formatDetailSheetTime,
+} from "@/data/messageCenterPrototypeDates";
+import {
   getPrototypeInboxEntries,
   MESSAGE_BODY_WITH_ATTACHMENT,
   type MessageTag,
@@ -50,6 +54,8 @@ interface MessageRow {
   id: string;
   title: string;
   date: string;
+  /** Matches row index — detail sheet timestamp (varied time of day). */
+  detailTime12h: string;
   read: boolean;
   attentionNeeded: boolean;
   pdfAttached: boolean;
@@ -115,11 +121,11 @@ function buildInboxRows(variant: AppVariant): MessageRow[] {
   const entries = getPrototypeInboxEntries(variant);
   return entries.map((entry, i) => {
     const archived = i === MAX_MESSAGES - 1;
-    const day = Math.max(1, 28 - (i % 20));
     return {
       id: `m${i + 1}`,
       title: entry.title,
-      date: `April ${day}`,
+      date: formatAppInboxRowDateLabel(i),
+      detailTime12h: formatDetailSheetTime(i),
       read: i % 3 !== 0,
       attentionNeeded: entry.attentionNeeded,
       pdfAttached: entry.pdfAttached ?? false,
@@ -164,9 +170,9 @@ function pdfFileNameFromTitle(title: string): string {
   return `${slug || "message"}.pdf`;
 }
 
-/** Detail sheet timestamp — Figma: 11/23/25 11:05AM style */
-function formatDetailTimestamp(dateLabel: string): string {
-  return `${dateLabel}, 2026 · 11:05 AM`;
+/** Detail sheet timestamp — date label + per-row delivery time */
+function formatDetailTimestamp(dateLabel: string, time12h: string): string {
+  return `${dateLabel}, 2026 · ${time12h}`;
 }
 
 function filterMessages(list: MessageRow[], filter: FilterId): MessageRow[] {
@@ -1187,7 +1193,7 @@ export default function AppMessageCenter() {
                     color: "var(--app-text-secondary)",
                   }}
                 >
-                  {formatDetailTimestamp(selected.date)}
+                  {formatDetailTimestamp(selected.date, selected.detailTime12h)}
                 </p>
               </div>
             </div>

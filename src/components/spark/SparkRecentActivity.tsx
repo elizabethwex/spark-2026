@@ -104,15 +104,18 @@ export function SparkRecentActivity({ activeView = 1 }: { activeView?: 1 | 2 | 3
 
   const displayActivity = sparkRecentActivity.map((row) => {
     if (activeView === 2) {
-      if (row.meta.includes("Limited Purpose FSA")) {
-        return { ...row, meta: row.meta.replace("Limited Purpose FSA", "Healthcare FSA") };
-      }
       if (row.merchant === "Vanguard Invest") {
         return {
           ...row,
           merchant: "Bright Horizons Daycare",
-          meta: "12/14/25 • DCFSA",
+          meta: "12/14/26 • DCFSA",
         };
+      }
+      if (row.meta.includes("Limited Purpose FSA")) {
+        return { ...row, meta: row.meta.replace("Limited Purpose FSA", "Healthcare FSA") };
+      }
+      if (row.meta.includes("HSA") && !row.meta.includes("DCFSA")) {
+        return { ...row, meta: row.meta.replace("HSA", "Healthcare FSA") };
       }
     } else if (activeView === 3) {
       if (row.meta.includes("Limited Purpose FSA")) {

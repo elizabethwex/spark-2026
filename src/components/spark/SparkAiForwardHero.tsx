@@ -31,10 +31,62 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
   const { openReimburseWorkspace } = useReimburseWorkspace();
   const prefersReducedMotion = useReducedMotion();
   const [uploadPhase, setUploadPhase] = useState<UploadPhase>("default");
-  const [isTaskVisible, setIsTaskVisible] = useState(true);
-  const [isHeroExpanded, setIsHeroExpanded] = useState(false);
+  const [isTaskVisible, setIsTaskVisible] = useState(() => {
+    const saved = sessionStorage.getItem("sparkHeroTaskVisible");
+    return saved ? JSON.parse(saved) : true;
+  });
+  const [isDismissed, setIsDismissed] = useState(() => {
+    const saved = sessionStorage.getItem("sparkHeroDismissed");
+    return saved ? JSON.parse(saved) : false;
+  });
+  const [isHeroExpanded, setIsHeroExpanded] = useState(() => {
+    const saved = sessionStorage.getItem("sparkHeroExpanded");
+    return saved ? JSON.parse(saved) : false;
+  });
   const [uploadClaimAssistOpen, setUploadClaimAssistOpen] = useState(false);
   const [assistInitialMessage, setAssistInitialMessage] = useState("Upload Claim Documents");
+  const [animationKey, setAnimationKey] = useState(0);
+  const [forceAnimate, setForceAnimate] = useState(false);
+
+  useEffect(() => {
+    sessionStorage.setItem("sparkHeroTaskVisible", JSON.stringify(isTaskVisible));
+  }, [isTaskVisible]);
+
+  useEffect(() => {
+    sessionStorage.setItem("sparkHeroDismissed", JSON.stringify(isDismissed));
+  }, [isDismissed]);
+
+  useEffect(() => {
+    sessionStorage.setItem("sparkHeroExpanded", JSON.stringify(isHeroExpanded));
+  }, [isHeroExpanded]);
+
+  useEffect(() => {
+    const handleReset = () => {
+      setIsTaskVisible(true);
+      setIsDismissed(false);
+      setIsHeroExpanded(false);
+      setUploadPhase("default");
+      setAnimationKey((prev) => prev + 1);
+      setForceAnimate(true);
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        e.key.toLowerCase() === "n" &&
+        !(e.target instanceof HTMLInputElement) &&
+        !(e.target instanceof HTMLTextAreaElement)
+      ) {
+        handleReset();
+      }
+    };
+
+    window.addEventListener("sparkHeroReset", handleReset);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("sparkHeroReset", handleReset);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -88,7 +140,7 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
     }
   }, [isFirstVisit]);
 
-  const shouldAnimate = isFirstVisit && !prefersReducedMotion;
+  const shouldAnimate = (isFirstVisit || forceAnimate) && !prefersReducedMotion;
 
   const restrainedSpring = {
     type: "spring" as const,
@@ -232,12 +284,13 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
 
   return (
     <motion.div
+      key={animationKey}
       layout
       transition={{ layout: layoutSpring }}
       initial={shouldAnimate ? "hidden" : "instant"}
       animate={animateState}
       variants={containerVariants}
-      className="spark-hero-root group relative isolate z-40 flex flex-col lg:group-[.is-docked]:flex-col lg:flex-row w-full items-center lg:items-stretch lg:group-[.is-docked]:items-center justify-center gap-6 lg:gap-[32px] lg:group-[.is-docked]:gap-6 rounded-[24px] lg:rounded-[32px] lg:group-[.is-docked]:rounded-[24px] border border-[#e3e7f4] p-6 sm:p-8 lg:p-[41px] lg:group-[.is-docked]:p-6 lg:group-[.is-docked]:sm:p-8 shadow-[0_1.5px_4.5px_rgba(43,49,78,0.04)] bg-white [filter:drop-shadow(0_0_0_transparent)]"
+      className="spark-hero-root group relative isolate z-40 flex flex-col lg:flex-row lg:group-[.is-docked]:flex-col xl:group-[.is-docked]:flex-row w-full items-center lg:items-stretch justify-center gap-6 lg:gap-[32px] lg:group-[.is-docked]:gap-6 xl:group-[.is-docked]:gap-[32px] rounded-[24px] lg:rounded-[32px] lg:group-[.is-docked]:rounded-[24px] xl:group-[.is-docked]:rounded-[32px] border border-[#e3e7f4] p-6 sm:p-8 lg:p-[41px] lg:group-[.is-docked]:p-6 lg:group-[.is-docked]:sm:p-8 xl:group-[.is-docked]:p-[41px] shadow-[0_1.5px_4.5px_rgba(43,49,78,0.04)] bg-white [filter:drop-shadow(0_0_0_transparent)]"
       style={{
         backgroundImage:
           "url('data:image/svg+xml;utf8,<svg viewBox=\\'0 0 1200 523.5\\' xmlns=\\'http://www.w3.org/2000/svg\\' preserveAspectRatio=\\'none\\'><rect x=\\'0\\' y=\\'0\\' height=\\'100%\\' width=\\'100%\\' fill=\\'url(%23grad)\\' opacity=\\'1\\'/><defs><radialGradient id=\\'grad\\' gradientUnits=\\'userSpaceOnUse\\' cx=\\'0\\' cy=\\'0\\' r=\\'10\\' gradientTransform=\\'matrix(176.49 0 0 51.824 -48 157.05)\\'><stop stop-color=\\'rgba(23,45,161,0.09)\\' offset=\\'0\\'/><stop stop-color=\\'rgba(23,45,161,0)\\' offset=\\'0.5\\'/></radialGradient></defs></svg>'), url('data:image/svg+xml;utf8,<svg viewBox=\\'0 0 1200 523.5\\' xmlns=\\'http://www.w3.org/2000/svg\\' preserveAspectRatio=\\'none\\'><rect x=\\'0\\' y=\\'0\\' height=\\'100%\\' width=\\'100%\\' fill=\\'url(%23grad)\\' opacity=\\'1\\'/><defs><radialGradient id=\\'grad\\' gradientUnits=\\'userSpaceOnUse\\' cx=\\'0\\' cy=\\'0\\' r=\\'10\\' gradientTransform=\\'matrix(176.49 0 0 55.526 1248 392.62)\\'><stop stop-color=\\'rgba(200,16,46,0.07)\\' offset=\\'0\\'/><stop stop-color=\\'rgba(200,16,46,0)\\' offset=\\'0.45\\'/></radialGradient></defs></svg>'), url('data:image/svg+xml;utf8,<svg viewBox=\\'0 0 1200 523.5\\' xmlns=\\'http://www.w3.org/2000/svg\\' preserveAspectRatio=\\'none\\'><rect x=\\'0\\' y=\\'0\\' height=\\'100%\\' width=\\'100%\\' fill=\\'url(%23grad)\\' opacity=\\'1\\'/><defs><radialGradient id=\\'grad\\' gradientUnits=\\'userSpaceOnUse\\' cx=\\'0\\' cy=\\'0\\' r=\\'10\\' gradientTransform=\\'matrix(93.338 0 0 103.65 660 732.9)\\'><stop stop-color=\\'rgba(23,45,161,0.04)\\' offset=\\'0\\'/><stop stop-color=\\'rgba(23,45,161,0)\\' offset=\\'0.4\\'/></radialGradient></defs></svg>'), linear-gradient(90deg, rgba(255, 255, 255, 0.93) 0%, rgba(255, 255, 255, 0.93) 100%)",
@@ -247,7 +300,7 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
         borderWidth={1.5}
         duration={18}
         color={["#25146f", "#c8102e", "#25146f"]}
-        className="absolute inset-0 pointer-events-none p-0 border-none bg-transparent dark:bg-transparent shadow-none z-50 rounded-[24px] lg:rounded-[32px] lg:group-[.is-docked]:rounded-[24px]"
+        className="absolute inset-0 pointer-events-none p-0 border-none bg-transparent dark:bg-transparent shadow-none z-50 rounded-[24px] lg:rounded-[32px] lg:group-[.is-docked]:rounded-[24px] xl:group-[.is-docked]:rounded-[32px]"
       >
         {null}
       </ShineBorder>
@@ -255,7 +308,7 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
       <motion.div
         layout
         transition={{ layout: layoutSpring }}
-        className="flex w-full lg:flex-1 lg:group-[.is-docked]:flex-none flex-col gap-[24px]"
+        className="flex w-full lg:flex-1 lg:group-[.is-docked]:flex-none xl:group-[.is-docked]:flex-1 flex-col gap-[24px]"
       >
         <motion.div
           variants={greetingVariants}
@@ -292,6 +345,7 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
 
         <motion.div variants={inputVariants}>
           <AiChatInput 
+            autocompletePhrase="Help me with my claims"
             onSubmit={(val) => {
               if (val.toLowerCase().includes("help me with my claims")) {
                 setAssistInitialMessage(val);
@@ -366,25 +420,25 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
               overflow: "hidden",
               transition: { duration: 0.42, ease: softEaseOut },
             }}
-            className="flex flex-col lg:flex-row lg:group-[.is-docked]:flex-col gap-6 lg:gap-[32px] lg:group-[.is-docked]:gap-6 items-center lg:items-stretch lg:group-[.is-docked]:items-center"
+            className="flex flex-col lg:flex-row lg:group-[.is-docked]:flex-col xl:group-[.is-docked]:flex-row lg:group-[.is-docked]:w-full xl:group-[.is-docked]:w-auto gap-6 lg:gap-[32px] lg:group-[.is-docked]:gap-6 xl:group-[.is-docked]:gap-[32px] items-center lg:items-stretch"
           >
             {/* Divider */}
             <motion.div
               variants={dividerDesktopVariants}
               style={{ originY: 0 }}
-              className="hidden lg:block lg:group-[.is-docked]:hidden w-[1.5px] self-stretch shrink-0 bg-[#e3e7f4]"
+              className="hidden lg:block lg:group-[.is-docked]:hidden xl:group-[.is-docked]:block w-[1.5px] self-stretch shrink-0 bg-[#e3e7f4]"
             />
             <motion.div
               variants={dividerMobileVariants}
               style={{ originX: 0 }}
-              className="block lg:hidden lg:group-[.is-docked]:block w-full h-[1.5px] shrink-0 bg-[#e3e7f4]"
+              className="block lg:hidden lg:group-[.is-docked]:block xl:group-[.is-docked]:hidden w-full h-[1.5px] shrink-0 bg-[#e3e7f4]"
             />
 
             {/* Right Column: Next Steps */}
             <motion.div
               layout
               transition={{ layout: layoutSpring }}
-              className="flex w-full lg:w-[376px] lg:group-[.is-docked]:w-full shrink-0 flex-col gap-[8px]"
+              className="flex w-full lg:w-[376px] lg:group-[.is-docked]:w-full xl:group-[.is-docked]:w-[376px] shrink-0 flex-col gap-[8px]"
             >
               <motion.div
                 layout="position"
@@ -422,17 +476,17 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
                   key="card-header-default"
                   layout
                   {...phasePresenceMotion}
-                  className="flex flex-col gap-[12px]"
+                  className="flex flex-col gap-[8px]"
                 >
                   <div className="self-start rounded-[6px] bg-[#ffbf00] px-[12px] py-[4px]">
                     <span className="text-[11px] font-extrabold uppercase leading-[16.5px] tracking-[0.275px] text-black">
                       28 days left to file
                     </span>
                   </div>
-                  <h2 className="text-[24px] font-bold leading-[32px] tracking-[-0.456px] text-black">
+                  <h2 className="text-[20px] font-bold leading-[32px] tracking-[-0.456px] text-black">
                     Missing Documentation Required
                   </h2>
-                  <p className="text-[16px] leading-[24.75px] text-[#5f6a94]">
+                  <p className="text-[14px] leading-[24.75px] text-[#5f6a94]">
                     Upload your documentation for Bigtown Dentistry in under a minute.
                   </p>
                 </motion.div>
@@ -484,22 +538,6 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
                   </p>
                 </motion.div>
               )}
-
-              {uploadPhase === "success" && (
-                <motion.div
-                  key="card-header-success"
-                  layout
-                  {...phasePresenceMotion}
-                  className="flex flex-col gap-[4px]"
-                >
-                  <p className="text-[16px] font-semibold leading-[24.75px] text-[#16a34a]">
-                    Documentation uploaded
-                  </p>
-                  <p className="text-[14px] leading-[22px] text-[#5f6a94]">
-                    We've added it to this claim.
-                  </p>
-                </motion.div>
-              )}
             </AnimatePresence>
           </motion.div>
 
@@ -510,7 +548,7 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
                 key="claim-summary"
                 layout
                 {...phasePresenceMotion}
-                className="flex items-center justify-between rounded-[24px] bg-[#f8f9fe] border border-[#f8f9fe] p-[17px]"
+                className="flex items-center justify-between rounded-[24px] bg-[#f8f9fe] border border-[#f8f9fe] py-[12px] px-[16px]"
               >
                 <div className="flex items-center gap-[16px]">
                   <div className="flex h-[48px] w-[48px] shrink-0 items-center justify-center rounded-[12px] border border-[#e2e8f0] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
@@ -521,7 +559,10 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
                       Bigtown Dentistry
                     </p>
                     <p className="text-[12px] font-medium leading-[20px] text-[#5f6a94]">
-                      4/27/26 • {claimAccountText}
+                      {claimAccountText}
+                    </p>
+                    <p className="text-[12px] font-medium leading-[20px] text-[#5f6a94]">
+                      4/27/26
                     </p>
                   </div>
                 </div>
@@ -558,6 +599,10 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
                   </Button>
                   <button
                     type="button"
+                    onClick={() => {
+                      setIsDismissed(true);
+                      setIsTaskVisible(false);
+                    }}
                     className="text-[12px] font-medium leading-[16px] text-[#7a87b2] hover:underline"
                   >
                     Remind me tomorrow
@@ -837,10 +882,10 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
               </div>
               <div className="flex flex-col gap-[4px]">
                 <p className="text-[16px] font-semibold text-foreground">
-                  You're all caught up!
+                  {isDismissed ? "Reminder set" : "You're all caught up!"}
                 </p>
                 <p className="text-[14px] text-[#5f6a94]">
-                  No pending tasks at the moment.
+                  {isDismissed ? "You have no other actions." : "No pending tasks at the moment."}
                 </p>
               </div>
             </motion.div>

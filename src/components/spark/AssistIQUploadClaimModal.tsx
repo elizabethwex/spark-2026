@@ -83,7 +83,7 @@ function ClaimPreviewCard({
       animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={{ type: "spring", stiffness: 280, damping: 28, delay }}
       className={`mt-2 w-full overflow-hidden rounded-2xl bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1),0_1px_2px_rgba(0,0,0,0.08),0_0_0_1px_rgba(0,0,0,0.04)] ${
-        isDocked ? "max-w-[85%]" : "max-w-[358px]"
+        isDocked ? "w-full" : "max-w-[358px]"
       }`}
     >
       <div
@@ -159,7 +159,7 @@ function DocumentUploadCard({
       animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={{ type: "spring", stiffness: 280, damping: 28 }}
       className={`mt-2 w-full overflow-hidden rounded-2xl bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1),0_1px_2px_rgba(0,0,0,0.08),0_0_0_1px_rgba(0,0,0,0.04)] ${
-        isDocked ? "max-w-[85%]" : "max-w-[358px]"
+        isDocked ? "w-full" : "max-w-[358px]"
       }`}
     >
       <div
@@ -457,12 +457,14 @@ type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   initialMessage?: string;
+  alwaysShowFloatingButton?: boolean;
+  hideRecentConversations?: boolean;
 };
 
 /**
  * Assist IQ popup for “Upload Claim Documents” (SPARK-2026 Figma: Assist IQ Popup — Claim Doc request).
  */
-export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = "Help me with my claims" }: Props) {
+export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = "Help me with my claims", alwaysShowFloatingButton = false, hideRecentConversations = false }: Props) {
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -484,7 +486,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
     | "final_approval"
     | "see_all_typing"
     | "see_all_results"
-  >("typing");
+  >("new_chat");
   const [selectedClaim, setSelectedClaim] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -647,17 +649,20 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
   };
 
   if (!open) {
-    if (chatPhase !== "new_chat") {
+    const hasStarted = chatPhase !== "new_chat";
+    const isNotResolved = chatPhase !== "final_approval";
+
+    if (alwaysShowFloatingButton || (hasStarted && isNotResolved)) {
       const resumeButton = (
         <motion.button
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.8 }}
           onClick={() => onOpenChange(true)}
-          className="fixed bottom-6 right-6 z-[300] flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-[0_4px_20px_rgba(43,49,78,0.15)] hover:scale-105 transition-transform"
+          className="fixed bottom-6 right-6 z-[300] flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-[0_4px_20px_rgba(43,49,78,0.15)] hover:scale-105 transition-transform overflow-hidden"
           aria-label="Resume chat"
         >
-          <AssistIQAvatar size={40} />
+          <AssistIQAvatar size={64} />
         </motion.button>
       );
       return createPortal(resumeButton, document.body);
@@ -695,7 +700,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
         className={`relative flex h-full w-full flex-col overflow-hidden outline-none lg:flex-row transition-all duration-300 ${
           isDocked
             ? "max-w-[400px] rounded-none border-l border-[#e3e7f4] shadow-none bg-white"
-            : "mx-auto max-w-[1376px] rounded-t-[32px] border-x border-t border-[#e3e7f4] shadow-[0_8px_16px_rgba(2,13,36,0.15),0_0px_1px_rgba(2,13,36,0.3)]"
+            : "mx-auto max-w-[1376px] rounded-t-[24px] border-x border-t border-[#e3e7f4] shadow-[0_8px_16px_rgba(2,13,36,0.15),0_0px_1px_rgba(2,13,36,0.3)]"
         }`}
         style={{
           backgroundImage: isDocked
@@ -914,9 +919,9 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
             </div>
           </header>
 
-          <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-            <div ref={scrollRef} className={`min-h-0 flex-1 overflow-y-auto py-6 transition-all duration-300 ${isDocked ? "px-4" : "px-4 sm:px-8"}`}>
-              <div className={`mx-auto max-w-[722px] ${chatPhase === "new_chat" ? "flex h-full flex-col justify-center pb-12" : ""}`}>
+          <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
+            <div ref={scrollRef} className={`min-h-0 flex-1 overflow-y-auto pt-6 pb-[140px] transition-all duration-300 ${isDocked ? "px-4" : "px-4 sm:px-8"}`}>
+              <div className={`mx-auto w-full max-w-[722px] ${chatPhase === "new_chat" ? "flex h-full flex-col justify-start items-center pb-0" : ""}`}>
                 {chatPhase === "new_chat" ? (
                   <motion.div 
                     initial={{ opacity: 0, y: 10 }}
@@ -948,33 +953,35 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
                     </div>
 
                     {/* Recent Conversations */}
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3, delay: 0.1 }}
-                      className="w-full"
-                    >
-                      <div className="mb-3 flex items-center justify-between">
-                        <h3 className="text-[14px] font-semibold text-[#444c72]">Recent conversations:</h3>
-                        <button className="text-[13px] font-medium text-[#3958c3] hover:underline">View all</button>
-                      </div>
-                      <div className="flex flex-col gap-2">
-                        <button className="group flex items-center justify-between rounded-xl border border-[#e3e7f4] bg-white p-4 text-left transition-all hover:-translate-y-[1px] hover:bg-[#f8f9fe] hover:shadow-sm">
-                          <div className="flex items-center gap-3 text-[#3958c3]">
-                            <Clock className="h-4 w-4" />
-                            <span className="text-[14px]">Claim status for my family doctor visit</span>
-                          </div>
-                          <ChevronRight className="h-4 w-4 text-[#a5aeb4] transition-colors group-hover:text-[#3958c3]" />
-                        </button>
-                        <button className="group flex items-center justify-between rounded-xl border border-[#e3e7f4] bg-white p-4 text-left transition-all hover:-translate-y-[1px] hover:bg-[#f8f9fe] hover:shadow-sm">
-                          <div className="flex items-center gap-3 text-[#3958c3]">
-                            <Clock className="h-4 w-4" />
-                            <span className="text-[14px]">Why was my claim denied?</span>
-                          </div>
-                          <ChevronRight className="h-4 w-4 text-[#a5aeb4] transition-colors group-hover:text-[#3958c3]" />
-                        </button>
-                      </div>
-                    </motion.div>
+                    {!hideRecentConversations && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: 0.1 }}
+                        className="w-full"
+                      >
+                        <div className="mb-3 flex items-center justify-between">
+                          <h3 className="text-[14px] font-semibold text-[#444c72]">Recent conversations:</h3>
+                          <button className="text-[13px] font-medium text-[#3958c3] hover:underline">View all</button>
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          <button className="group flex items-center justify-between rounded-xl border border-[#e3e7f4] bg-white p-4 text-left transition-all hover:-translate-y-[1px] hover:bg-[#f8f9fe] hover:shadow-sm">
+                            <div className="flex items-center gap-3 text-[#3958c3]">
+                              <Clock className="h-4 w-4" />
+                              <span className="text-[14px]">Claim status for my family doctor visit</span>
+                            </div>
+                            <ChevronRight className="h-4 w-4 text-[#a5aeb4] transition-colors group-hover:text-[#3958c3]" />
+                          </button>
+                          <button className="group flex items-center justify-between rounded-xl border border-[#e3e7f4] bg-white p-4 text-left transition-all hover:-translate-y-[1px] hover:bg-[#f8f9fe] hover:shadow-sm">
+                            <div className="flex items-center gap-3 text-[#3958c3]">
+                              <Clock className="h-4 w-4" />
+                              <span className="text-[14px]">Why was my claim denied?</span>
+                            </div>
+                            <ChevronRight className="h-4 w-4 text-[#a5aeb4] transition-colors group-hover:text-[#3958c3]" />
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
                   </motion.div>
                 ) : (
                   <>
@@ -1007,7 +1014,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
                         <span className="text-[#243746]">{SPARK_MEMBER_FIRST_NAME}</span>
                         <span className="text-[#a5aeb4]">{timeLabel}</span>
                       </div>
-                      <div className={`rounded-tl-[24px] rounded-tr-[24px] rounded-bl-[24px] border border-[#e3e7f4] bg-[#e3e7f4] p-4 ${isDocked ? "max-w-[85%]" : "max-w-[358px]"}`}>
+                      <div className={`rounded-tl-[24px] rounded-tr-[24px] rounded-bl-[24px] border border-[#e3e7f4] bg-[#e3e7f4] p-4 ${isDocked ? "w-full" : "max-w-[358px]"}`}>
                         <p className="text-[14px] leading-[24px] tracking-[-0.084px] text-[#1d2c38]">
                           {currentMessage}
                         </p>
@@ -1049,13 +1056,14 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
                         transition={{ type: "spring", stiffness: 340, damping: 28 }}
                         className="flex flex-col gap-3"
                       >
-                        <div className={`pb-2 ${isDocked ? "max-w-[85%]" : "max-w-[358px]"}`}>
+                        <div className={`pb-2 ${isDocked ? "w-full" : "max-w-[358px]"}`}>
                           <p className="text-[14px] leading-[24px] tracking-[-0.084px] text-[#253341]">
                             Sure! I found 2 claims that require you to submit
                             additional documentation:
                           </p>
                         </div>
                         <ClaimPreviewCard
+                          isDocked={isDocked}
                           provider="Bigtown Dentistry"
                           amount="$210.00"
                           date="Apr 26, 2026"
@@ -1064,6 +1072,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
                           onWorkOnClaim={() => handleWorkOnClaim("#123456")}
                         />
                         <ClaimPreviewCard
+                          isDocked={isDocked}
                           provider="Dr. Smith Vision"
                           amount="$120.00"
                           date="Nov 15, 2025"
@@ -1102,7 +1111,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
                           <span className="text-[#243746]">{SPARK_MEMBER_FIRST_NAME}</span>
                           <span className="text-[#a5aeb4]">{timeLabel}</span>
                         </div>
-                        <div className={`rounded-tl-[24px] rounded-tr-[24px] rounded-bl-[24px] border border-[#e3e7f4] bg-[#e3e7f4] p-4 ${isDocked ? "max-w-[85%]" : "max-w-[358px]"}`}>
+                        <div className={`rounded-tl-[24px] rounded-tr-[24px] rounded-bl-[24px] border border-[#e3e7f4] bg-[#e3e7f4] p-4 ${isDocked ? "w-full" : "max-w-[358px]"}`}>
                           <p className="text-[14px] leading-[24px] tracking-[-0.084px] text-[#1d2c38]">
                             See all claims
                           </p>
@@ -1144,12 +1153,13 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
                               transition={{ type: "spring", stiffness: 340, damping: 28 }}
                               className="flex flex-col gap-3"
                             >
-                              <div className={`pb-2 ${isDocked ? "max-w-[85%]" : "max-w-[358px]"}`}>
+                              <div className={`pb-2 ${isDocked ? "w-full" : "max-w-[358px]"}`}>
                                 <p className="text-[14px] leading-[24px] tracking-[-0.084px] text-[#253341]">
                                   Here are your recent claims:
                                 </p>
                               </div>
                               <ClaimPreviewCard
+                          isDocked={isDocked}
                                 provider="Bigtown Dentistry"
                                 amount="$210.00"
                                 date="Apr 26, 2026"
@@ -1158,6 +1168,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
                                 onWorkOnClaim={() => handleWorkOnClaim("#123456")}
                               />
                               <ClaimPreviewCard
+                          isDocked={isDocked}
                                 provider="Dr. Smith Vision"
                                 amount="$120.00"
                                 date="Nov 15, 2025"
@@ -1166,6 +1177,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
                                 onWorkOnClaim={() => handleWorkOnClaim("#789012")}
                               />
                               <ClaimPreviewCard
+                          isDocked={isDocked}
                                 provider="City Hospital"
                                 amount="$450.00"
                                 date="Oct 02, 2025"
@@ -1174,6 +1186,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
                                 onWorkOnClaim={() => handleWorkOnClaim("#345678")}
                               />
                               <ClaimPreviewCard
+                          isDocked={isDocked}
                                 provider="Main St Pharmacy"
                                 amount="$45.00"
                                 date="Sep 18, 2025"
@@ -1190,6 +1203,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
                                     className="flex flex-col gap-3"
                                   >
                                     <ClaimPreviewCard
+                          isDocked={isDocked}
                                       provider="Valley Orthopedics"
                                       amount="$350.00"
                                       date="Aug 12, 2025"
@@ -1198,6 +1212,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
                                       onWorkOnClaim={() => handleWorkOnClaim("#456789")}
                                     />
                                     <ClaimPreviewCard
+                          isDocked={isDocked}
                                       provider="Downtown Clinic"
                                       amount="$85.00"
                                       date="Jul 30, 2025"
@@ -1262,7 +1277,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
                           <span className="text-[#243746]">{SPARK_MEMBER_FIRST_NAME}</span>
                           <span className="text-[#a5aeb4]">{timeLabel}</span>
                         </div>
-                        <div className={`rounded-tl-[24px] rounded-tr-[24px] rounded-bl-[24px] border border-[#e3e7f4] bg-[#e3e7f4] p-4 ${isDocked ? "max-w-[85%]" : "max-w-[358px]"}`}>
+                        <div className={`rounded-tl-[24px] rounded-tr-[24px] rounded-bl-[24px] border border-[#e3e7f4] bg-[#e3e7f4] p-4 ${isDocked ? "w-full" : "max-w-[358px]"}`}>
                           <p className="text-[14px] leading-[24px] tracking-[-0.084px] text-[#1d2c38]">
                             Work on claim {selectedClaim}
                           </p>
@@ -1301,12 +1316,13 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
                               transition={{ type: "spring", stiffness: 340, damping: 28 }}
                               className="flex flex-col gap-3"
                             >
-                              <div className={`pb-2 ${isDocked ? "max-w-[85%]" : "max-w-[358px]"}`}>
+                              <div className={`pb-2 ${isDocked ? "w-full" : "max-w-[358px]"}`}>
                                 <p className="text-[14px] leading-[24px] tracking-[-0.084px] text-[#253341]">
                                   Sounds good! You can upload your document here:
                                 </p>
                               </div>
                               <DocumentUploadCard
+                                isDocked={isDocked}
                                 claimId={selectedClaim!}
                                 onUpload={handleUploadClick}
                                 onSubmit={handleSubmit}
@@ -1331,7 +1347,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
                       transition={{ duration: 0.3 }}
                       className="mt-6 flex w-full flex-col items-start gap-4"
                     >
-                      <div className={`flex flex-col gap-2 pb-2 ${isDocked ? "max-w-[85%]" : "max-w-[358px]"}`}>
+                      <div className={`flex flex-col gap-2 pb-2 ${isDocked ? "w-full" : "max-w-[358px]"}`}>
                         <p className="text-[14px] leading-[24px] tracking-[-0.084px] text-[#1d2c38]">
                           {selectedClaim === "#123456"
                             ? "Documentation uploaded! Once your claim is approved it will be paid out to your account."
@@ -1347,8 +1363,8 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
             </div>
 
             {/* Composer */}
-            <div className="shrink-0 px-6 py-4">
-              <div className="mx-auto max-w-[722px]">
+            <div className="absolute bottom-0 left-0 right-0 z-10 shrink-0 px-6 pb-4 pt-12 bg-gradient-to-t from-white via-white/95 to-transparent">
+              <div className="mx-auto w-full max-w-[722px]">
                 {/* Suggested Actions (Only show on new chat) */}
                 <AnimatePresence>
                   {chatPhase === "new_chat" && (
@@ -1402,21 +1418,27 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
                       }
                     }}
                   />
-                  <button
-                    type="button"
-                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[#5f6a94] hover:bg-[#f8f9fe]"
-                    aria-label="Voice input"
-                  >
-                    <Mic className="h-4 w-4" />
-                  </button>
-                  <button
-                    type="button"
-                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[24px] bg-[#5f6a94] text-white"
-                    aria-label="Send"
-                    onClick={handleChatSubmit}
-                  >
-                    <Send className="h-4 w-4" />
-                  </button>
+                  <div className="flex items-center gap-[8px]">
+                    <button
+                      type="button"
+                      className="flex h-[35px] w-[35px] shrink-0 items-center justify-center rounded-[28px] border border-[#eef2ff] bg-[#eef2ff] transition-colors hover:bg-[#e0e7ff]"
+                      aria-label="Voice input"
+                    >
+                      <Mic className="h-[14px] w-[14px] text-[#3958c3]" />
+                    </button>
+                    <button
+                      type="button"
+                      className="flex h-[35px] w-[35px] shrink-0 items-center justify-center rounded-[28px] border border-[#25146f] transition-all hover:bg-[rgba(37,20,111,0.2)]"
+                      style={{
+                        backgroundImage:
+                          "linear-gradient(133.514deg, rgba(37, 20, 111, 0.1) 2.4625%, rgba(200, 16, 46, 0.1) 100%)",
+                      }}
+                      aria-label="Send"
+                      onClick={handleChatSubmit}
+                    >
+                      <Send className="h-[14px] w-[14px] text-[#25146f]" />
+                    </button>
+                  </div>
                 </div>
                 <p className="mt-3 text-center text-[12px] leading-[21px] text-[#515e6c]">
                   WEXly may make mistakes.{" "}

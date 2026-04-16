@@ -298,6 +298,9 @@ export default function AppHome() {
     // Simulate a quick network request delay for the UI
     await new Promise(resolve => setTimeout(resolve, 800));
     
+    // Clear the persisted cards from sessionStorage so they reset
+    sessionStorage.removeItem("taskCards");
+    
     // Incrementing the key forces TaskCardStack to remount and reset!
     setRefreshKey(prev => prev + 1);
   };
@@ -670,6 +673,7 @@ export default function AppHome() {
           </div>
         </div>
       </motion.div>
+      </PullToRefresh>
 
       {showFsaStore && (
         <div style={{ position: "fixed", inset: 0, zIndex: 60 }}>
@@ -682,7 +686,6 @@ export default function AppHome() {
         transaction={selectedTransaction}
         onClose={() => setSelectedTransaction(null)}
       />
-      </PullToRefresh>
     </div>
   );
 }

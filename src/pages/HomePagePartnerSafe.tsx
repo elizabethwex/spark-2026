@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { ConsumerNavigation } from "@/components/layout/ConsumerNavigation";
 import { usePrototype } from "@/context/PrototypeContext";
 import { PageFadeIn, FadeInItem } from "@/components/layout/PageFadeIn";
@@ -12,12 +13,14 @@ import { QuickActionsSection } from "@/components/sections/QuickActionsSection";
 import { ConsumerFooter } from "@/components/layout/Footer";
 import { HSAPlannerCard } from "@/components/HSAPlannerCard";
 import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground";
+import { AssistIQUploadClaimModal } from "@/components/spark/AssistIQUploadClaimModal";
 
 /**
  * Partner-safe homepage: traditional dashboard without the prominent AI chat bar.
  */
 export default function HomePagePartnerSafe() {
   const { homeLayoutMode: layoutMode, sparkActiveView: activeView } = usePrototype();
+  const [isAssistIQOpen, setIsAssistIQOpen] = useState(false);
 
   const effectiveLayoutMode = activeView === 2 ? "standard" : layoutMode;
 
@@ -88,6 +91,14 @@ export default function HomePagePartnerSafe() {
       </main>
 
       <ConsumerFooter />
+      
+      <AssistIQUploadClaimModal
+        open={isAssistIQOpen}
+        onOpenChange={setIsAssistIQOpen}
+        alwaysShowFloatingButton={true}
+        initialMessage=""
+        hideRecentConversations={true}
+      />
     </div>
   );
 }

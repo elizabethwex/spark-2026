@@ -4,6 +4,9 @@
 /* iOS app mode tokens — must come after kit so --wex-* vars are defined */
 @import './styles/app-tokens.css';
 
+/* Fallback tokens for IDE autocomplete */
+@import './styles/theme-fallbacks.css';
+
 @import "tailwindcss";
 @config "../tailwind.config.ts";
 
@@ -459,6 +462,7 @@ code[class*="language-"] {
 [role="dialog"] > button[type="button"].absolute:first-of-type {
   z-index: 50;
 }
+
 
 /* Tabs component - make tablist full width and use primary color for active tab */
 [role="tablist"].inline-flex.h-10.items-center.gap-1.border-b.border-wex-tabs-divider {
