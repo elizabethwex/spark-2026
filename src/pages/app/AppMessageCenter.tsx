@@ -22,8 +22,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { AppNavBar } from "@/components/app-shell/AppNavBar";
 import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
 import { useDeviceMockup } from "@/hooks/useDeviceMockup";
-import { useAppChrome } from "@/context/AppChromeContext";
 import {
+  APP_LIST_SCROLL_END_PADDING_MOBILE,
   APP_NAV_HOME_INNER_H,
   APP_TABBAR_END_SCROLL_PADDING,
 } from "@/components/app-shell/appChromeLayout";
@@ -683,24 +683,18 @@ export default function AppMessageCenter() {
 
   const closeSheet = useCallback(() => setSelected(null), []);
   const { deviceOn, isMobileDevice } = useDeviceMockup();
-  const { topChromeHidden } = useAppChrome();
 
   /** Desktop /app uses the same shell as the device mockup (status bar in AppShell). */
   const shellMatchesFrame = deviceOn || !isMobileDevice;
-  const hideY = shellMatchesFrame
-    ? -(STATUS_BAR_HEIGHT + APP_NAV_HOME_INNER_H)
-    : "-100%";
 
   const pageRootStyle: CSSProperties = useMemo(
     () => ({
       display: "flex",
       flexDirection: "column",
-      minHeight: isMobileDevice
-        ? "calc(100dvh - var(--app-tabbar-height) - env(safe-area-inset-bottom, 0px))"
-        : "calc(var(--app-screen-height, 100dvh) - var(--app-tabbar-height) - env(safe-area-inset-bottom, 0px))",
+      minHeight: "auto",
       fontFamily: "var(--app-font)",
     }),
-    [isMobileDevice]
+    []
   );
 
   return (
@@ -710,7 +704,7 @@ export default function AppMessageCenter() {
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: topChromeHidden ? hideY : 0 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, ease: "easeOut" }}
         style={{
           position: "sticky",
@@ -766,7 +760,9 @@ export default function AppMessageCenter() {
           paddingLeft: 16,
           paddingRight: 16,
           paddingTop: 16,
-          paddingBottom: APP_TABBAR_END_SCROLL_PADDING,
+          paddingBottom: isMobileDevice
+            ? APP_LIST_SCROLL_END_PADDING_MOBILE
+            : APP_TABBAR_END_SCROLL_PADDING,
           display: "flex",
           flexDirection: "column",
           gap: 8,

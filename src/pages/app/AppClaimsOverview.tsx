@@ -4,8 +4,12 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, SlidersHorizontal, Mic, ChevronRight, Check, Clock, X, AlertCircle } from "lucide-react";
 import { AppNavBar } from "@/components/app-shell/AppNavBar";
-import { APP_TABBAR_END_SCROLL_PADDING } from "@/components/app-shell/appChromeLayout";
+import {
+  APP_LIST_SCROLL_END_PADDING_MOBILE,
+  APP_TABBAR_END_SCROLL_PADDING,
+} from "@/components/app-shell/appChromeLayout";
 import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
+import { useDeviceMockup } from "@/hooks/useDeviceMockup";
 import { AppBadge } from "@/components/app-shell/primitives/AppBadge";
 import {
   CLAIMS_PAGE_BACKGROUND,
@@ -91,6 +95,7 @@ function matchesSearch(claim: Claim, q: string): boolean {
 
 export default function AppClaimsOverview() {
   const navigate = useNavigate();
+  const { isMobileDevice } = useDeviceMockup();
   const [filter, setFilter] = useState<ClaimStatus | "all">("all");
   const [search, setSearch] = useState("");
   const [filterSheetOpen, setFilterSheetOpen] = useState(false);
@@ -167,7 +172,9 @@ export default function AppClaimsOverview() {
           paddingLeft: 16,
           paddingRight: 16,
           paddingTop: 16,
-          paddingBottom: APP_TABBAR_END_SCROLL_PADDING,
+          paddingBottom: isMobileDevice
+            ? APP_LIST_SCROLL_END_PADDING_MOBILE
+            : APP_TABBAR_END_SCROLL_PADDING,
           display: "flex",
           flexDirection: "column",
           gap: 8,
