@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { AppTabBar } from "./AppTabBar";
 import { IPhoneMockup, SCREEN_HEIGHT } from "./IPhoneMockup";
@@ -19,8 +19,10 @@ const CONTENT_HEIGHT = SCREEN_HEIGHT - STATUS_BAR_HEIGHT; // 790px
  *     AppTabBar is contained inside the phone frame rather than the viewport
  *   - `--app-screen-height: 790px` so child screens know their available height
  *
- * Device OFF (real mobile default):
- *   - Original full-viewport 430px column, unchanged
+ * Device OFF:
+ *   - Desktop: same inner layout as device ON (430×844, status bar, single inner scroll, tab bar)
+ *     so scroll physics match the mockup; outer page is centered in 100dvh.
+ *   - Real mobile: 100dvh column with overflow hidden + inner scroll (not the whole column scrolling)
  *
  * Keyboard shortcut: Cmd+Shift+D (Mac) / Ctrl+Shift+D (Win)
  */
@@ -117,6 +119,7 @@ export function AppShell() {
 
               {/* Route content */}
               <div
+                id="app-scroll-container"
                 ref={scrollRefCallback}
                 style={{
                   flex: 1,
@@ -180,7 +183,73 @@ export function AppShell() {
     );
   }
 
-  // ── Device OFF — original layout ─────────────────────────────────────────────
+  // ── Device OFF ───────────────────────────────────────────────────────────────
+  const screenShellShared: CSSProperties = {
+    width: "100%",
+    maxWidth: 430,
+    display: "flex",
+    flexDirection: "column",
+    overflow: "hidden",
+    transform: "translateZ(0)",
+    position: "relative",
+    background:
+      "linear-gradient(182.7628652606358deg, rgb(238, 242, 255) 50.004%, rgb(165, 180, 252) 140.09%)",
+    fontFamily: "var(--app-font)",
+  };
+
+  // Real phone: inner scroll only (avoid scrolling the full 100dvh wrapper).
+  if (isMobileDevice) {
+    return (
+      <div
+        style={{
+          minHeight: "100dvh",
+          background: "var(--app-bg)",
+          display: "flex",
+          justifyContent: "center",
+          fontFamily: "var(--app-font)",
+        }}
+      >
+        <AppChromeProvider value={chromeValue}>
+          <div
+            style={{
+              ...screenShellShared,
+              height: "100dvh",
+              maxHeight: "100dvh",
+              // @ts-expect-error custom CSS property — approximate content height for /app pages
+              "--app-screen-height":
+                "calc(100dvh - var(--app-tabbar-height) - env(safe-area-inset-bottom, 0px))",
+            }}
+          >
+            <div
+              ref={scrollRefCallback}
+              id="app-scroll-container"
+              data-app-mobile-scroll
+              style={{
+                flex: 1,
+                minHeight: 0,
+                display: "flex",
+                flexDirection: "column",
+                overflowY: "auto",
+                overflowX: "hidden",
+              }}
+            >
+              <div
+                style={{
+                  paddingBottom:
+                    "calc(var(--app-tabbar-height) + env(safe-area-inset-bottom, 0px))",
+                }}
+              >
+                <Outlet />
+              </div>
+            </div>
+            <AppTabBar />
+          </div>
+        </AppChromeProvider>
+      </div>
+    );
+  }
+
+  // Desktop frame hidden: match device-ON inner screen (844px) + same scroll port as mockup
   return (
     <div
       style={{
@@ -189,30 +258,38 @@ export function AppShell() {
         fontFamily: "var(--app-font)",
         display: "flex",
         justifyContent: "center",
+        alignItems: "center",
       }}
     >
       <AppChromeProvider value={chromeValue}>
         <div
-          ref={scrollRefCallback}
-          data-app-mobile-scroll
           style={{
-            width: "100%",
-            maxWidth: 430,
-            height: "100dvh",
-            maxHeight: "100dvh",
-            position: "relative",
-            background: "linear-gradient(182.7628652606358deg, rgb(238, 242, 255) 50.004%, rgb(165, 180, 252) 140.09%)",
-            overflowX: "hidden",
-            overflowY: "auto",
+            ...screenShellShared,
+            height: SCREEN_HEIGHT,
+            maxHeight: "min(100dvh, 844px)",
+            // @ts-expect-error custom CSS property — same as device ON
+            "--app-screen-height": `${CONTENT_HEIGHT}px`,
           }}
         >
+          <AppStatusBar />
+
           <div
+            ref={scrollRefCallback}
+            id="app-scroll-container"
+            data-app-mobile-scroll
             style={{
-              paddingBottom: "calc(var(--app-tabbar-height) + env(safe-area-inset-bottom, 0px))",
+              flex: 1,
+              minHeight: 0,
+              display: "flex",
+              flexDirection: "column",
+              overflowY: "auto",
+              paddingTop:
+                location.pathname === "/app/lock-screen" ? 0 : STATUS_BAR_HEIGHT,
             }}
           >
             <Outlet />
           </div>
+
           <AppTabBar />
         </div>
       </AppChromeProvider>

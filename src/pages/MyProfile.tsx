@@ -199,13 +199,53 @@ const DEFAULT_DEPENDENTS: Dependent[] = [
   },
 ];
 
+/** Must match FloatLabelSelect.Item values in the dependent modal; maps legacy/session casing. */
+const DEPENDENT_FORM_GENDERS = ["Male", "Female", "Other", "Prefer not to say"] as const;
+const DEPENDENT_FORM_RELATIONSHIPS = ["Spouse", "Child", "Other"] as const;
+
+function normalizeDependentFormGender(raw: string): string {
+  const t = raw.trim();
+  if (!t) return "";
+  if ((DEPENDENT_FORM_GENDERS as readonly string[]).includes(t)) return t;
+  const lower = t.toLowerCase();
+  const byLower: Record<string, string> = {
+    male: "Male",
+    female: "Female",
+    other: "Other",
+    "prefer not to say": "Prefer not to say",
+  };
+  return byLower[lower] ?? "";
+}
+
+function normalizeDependentFormRelationship(raw: string): string {
+  const t = raw.trim();
+  if (!t) return "";
+  if ((DEPENDENT_FORM_RELATIONSHIPS as readonly string[]).includes(t)) return t;
+  const lower = t.toLowerCase();
+  const byLower: Record<string, string> = {
+    spouse: "Spouse",
+    child: "Child",
+    other: "Other",
+  };
+  return byLower[lower] ?? "";
+}
+
+function normalizeDependentRecord(d: Dependent): Dependent {
+  return {
+    ...d,
+    gender: normalizeDependentFormGender(d.gender),
+    relationship: normalizeDependentFormRelationship(d.relationship),
+  };
+}
+
 function loadDependentsFromStorage(): Dependent[] {
   if (typeof window === "undefined") return DEFAULT_DEPENDENTS;
   try {
     const stored = sessionStorage.getItem(SESSION_STORAGE_DEPENDENTS_KEY);
     if (!stored) return DEFAULT_DEPENDENTS;
     const parsed: Dependent[] = JSON.parse(stored);
-    return parsed.length > 0 ? parsed : DEFAULT_DEPENDENTS;
+    const mapped = parsed.map(normalizeDependentRecord);
+    return mapped.length > 0 ? mapped : DEFAULT_DEPENDENTS;
   } catch {
     return DEFAULT_DEPENDENTS;
   }
@@ -569,6 +609,8 @@ export default function MyProfile() {
   
   // Modal state
   const [isAddDependentModalOpen, setIsAddDependentModalOpen] = useState(false);
+  /** Bumped when the dependent modal opens so FloatLabelSelect remounts (Radix + dialog keep-alive). */
+  const [dependentModalFormKey, setDependentModalFormKey] = useState(0);
   const [editingDependentId, setEditingDependentId] = useState<string | null>(null);
   const [isViewDependentModalOpen, setIsViewDependentModalOpen] = useState(false);
   const [viewingDependent, setViewingDependent] = useState<Dependent | null>(null);
@@ -821,12 +863,21 @@ export default function MyProfile() {
       lastName: dependent.lastName,
       ssn: dependent.ssn,
       birthDate: dependent.birthDate,
-      gender: dependent.gender,
+      gender: normalizeDependentFormGender(dependent.gender),
       isFullTimeStudent: dependent.isFullTimeStudent ? "yes" : "no",
-      relationship: dependent.relationship,
+      relationship: normalizeDependentFormRelationship(dependent.relationship),
     });
     setEditingDependentId(dependent.id);
+    setDependentModalFormKey((k) => k + 1);
     setIsAddDependentModalOpen(true);
+  };
+
+  const handleDependentDialogOpenChange = (open: boolean) => {
+    setIsAddDependentModalOpen(open);
+    if (!open) {
+      resetForm();
+      setEditingDependentId(null);
+    }
   };
 
   const handleViewDependent = (dependent: Dependent) => {
@@ -1653,14 +1704,6 @@ export default function MyProfile() {
     "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"
   ];
 
-  // Reset form when modal closes (only if not editing)
-  useEffect(() => {
-    if (!isAddDependentModalOpen && !editingDependentId) {
-      resetForm();
-      setEditingDependentId(null);
-    }
-  }, [isAddDependentModalOpen, editingDependentId]);
-
   // Reset beneficiary form when modal closes (only if not editing)
   useEffect(() => {
     if (!isAddBeneficiaryModalOpen && !editingBeneficiaryId) {
@@ -1944,6 +1987,7 @@ export default function MyProfile() {
                   onClick={() => {
                     resetForm();
                     setEditingDependentId(null);
+                    setDependentModalFormKey((k) => k + 1);
                     setIsAddDependentModalOpen(true);
                   }}
                 >
@@ -1975,6 +2019,7 @@ export default function MyProfile() {
                       onClick={() => {
                         resetForm();
                         setEditingDependentId(null);
+                        setDependentModalFormKey((k) => k + 1);
                         setIsAddDependentModalOpen(true);
                       }}
                     >
@@ -4390,7 +4435,7 @@ export default function MyProfile() {
       <ConsumerFooter />
 
       {/* Add New Dependent Modal */}
-      <Dialog open={isAddDependentModalOpen} onOpenChange={setIsAddDependentModalOpen}>
+      <Dialog open={isAddDependentModalOpen} onOpenChange={handleDependentDialogOpenChange}>
         <DialogContent className="w-[448px] p-0 [&>div:last-child]:hidden">
           {/* Header */}
           <div className="flex items-center justify-between p-[17.5px]">
@@ -4484,19 +4529,20 @@ export default function MyProfile() {
               </PopoverContent>
             </Popover>
             
-            {/* Gender Select */}
+            {/* Gender — FloatLabelSelect: floating label + chevron (kit trigger); menu above dialog */}
             <FloatLabelSelect
-              value={formData.gender}
+              key={`dep-gender-${dependentModalFormKey}`}
+              value={formData.gender || undefined}
               onValueChange={(value) => handleFormChange("gender", value)}
             >
               <FloatLabelSelect.Trigger label="Gender" size="md">
                 <FloatLabelSelect.Value placeholder=" " />
               </FloatLabelSelect.Trigger>
-              <FloatLabelSelect.Content>
-                <FloatLabelSelect.Item value="male">Male</FloatLabelSelect.Item>
-                <FloatLabelSelect.Item value="female">Female</FloatLabelSelect.Item>
-                <FloatLabelSelect.Item value="other">Other</FloatLabelSelect.Item>
-                <FloatLabelSelect.Item value="prefer-not-to-say">Prefer not to say</FloatLabelSelect.Item>
+              <FloatLabelSelect.Content position="popper" className="z-[300]">
+                <FloatLabelSelect.Item value="Male">Male</FloatLabelSelect.Item>
+                <FloatLabelSelect.Item value="Female">Female</FloatLabelSelect.Item>
+                <FloatLabelSelect.Item value="Other">Other</FloatLabelSelect.Item>
+                <FloatLabelSelect.Item value="Prefer not to say">Prefer not to say</FloatLabelSelect.Item>
               </FloatLabelSelect.Content>
             </FloatLabelSelect>
 
@@ -4519,18 +4565,19 @@ export default function MyProfile() {
               </RadioGroup>
             </div>
 
-            {/* Relationship Select */}
+            {/* Relationship — same pattern as Gender */}
             <FloatLabelSelect
-              value={formData.relationship}
+              key={`dep-rel-${dependentModalFormKey}`}
+              value={formData.relationship || undefined}
               onValueChange={(value) => handleFormChange("relationship", value)}
             >
               <FloatLabelSelect.Trigger label="Relationship" size="md">
                 <FloatLabelSelect.Value placeholder=" " />
               </FloatLabelSelect.Trigger>
-              <FloatLabelSelect.Content>
-                <FloatLabelSelect.Item value="spouse">Spouse</FloatLabelSelect.Item>
-                <FloatLabelSelect.Item value="child">Child</FloatLabelSelect.Item>
-                <FloatLabelSelect.Item value="other">Other</FloatLabelSelect.Item>
+              <FloatLabelSelect.Content position="popper" className="z-[300]">
+                <FloatLabelSelect.Item value="Spouse">Spouse</FloatLabelSelect.Item>
+                <FloatLabelSelect.Item value="Child">Child</FloatLabelSelect.Item>
+                <FloatLabelSelect.Item value="Other">Other</FloatLabelSelect.Item>
               </FloatLabelSelect.Content>
             </FloatLabelSelect>
           </div>
@@ -4538,15 +4585,7 @@ export default function MyProfile() {
           {/* Footer */}
           <div className="flex gap-2 justify-end p-[17.5px] pt-0">
             <DialogClose asChild>
-              <Button
-                intent="secondary"
-                variant="outline"
-                onClick={() => {
-                  resetForm();
-                  setEditingDependentId(null);
-                  setIsAddDependentModalOpen(false);
-                }}
-              >
+              <Button intent="secondary" variant="outline">
                 Cancel
               </Button>
             </DialogClose>

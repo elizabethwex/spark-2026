@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Clock, ChevronDown, Check } from "lucide-react";
 import {
   Tooltip,
@@ -130,6 +131,12 @@ export function SparkRecentActivity({ activeView = 1 }: { activeView?: 1 | 2 | 3
         <h2 id="spark-activity-heading" className="text-[12px] font-black uppercase tracking-[3px] text-[#5f6a94] leading-[16px]">
           Recent Activity
         </h2>
+        <Link
+          to="/claims"
+          className="text-[12px] font-bold uppercase tracking-[1.2px] text-[color:var(--system-link,#1c6eff)] leading-[16px] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
+        >
+          View All
+        </Link>
       </div>
 
       <div className="flex flex-col gap-[12px]">

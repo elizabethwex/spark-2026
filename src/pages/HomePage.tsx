@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { ConsumerNavigation } from "@/components/layout/ConsumerNavigation";
 import { usePrototype } from "@/context/PrototypeContext";
 import HomePagePartnerSafe from "@/pages/HomePagePartnerSafe";
@@ -20,21 +19,7 @@ export default function HomePage() {
 }
 
 function HomePageAiForward() {
-  const [activeView, setActiveView] = useState<1 | 2 | 3>(1);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Ignore keypresses if the user is typing in an input
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-      
-      if (e.key === '1') setActiveView(1);
-      if (e.key === '2') setActiveView(2);
-      if (e.key === '3') setActiveView(3);
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  const { sparkActiveView: activeView } = usePrototype();
 
   return (
     <div className="min-h-screen font-['Inter']" style={consumerPageBackgroundStyle}>
