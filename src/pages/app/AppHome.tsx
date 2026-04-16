@@ -679,6 +679,7 @@ export default function AppHome() {
           </div>
         </div>
       </motion.div>
+      </PullToRefresh>
 
       {showFsaStore && (
         <div style={{ position: "fixed", inset: 0, zIndex: 60 }}>
@@ -691,7 +692,6 @@ export default function AppHome() {
         transaction={selectedTransaction}
         onClose={() => setSelectedTransaction(null)}
       />
-      </PullToRefresh>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Link } from "react-router-dom"
 import {
   Badge,
@@ -54,7 +54,7 @@ import {
   Upload,
 } from "lucide-react"
 import { ClaimExpenseDetailSheet } from "@/components/claims/ClaimExpenseDetailSheet"
-import { expenseStatusBadgeClass, type ExpenseRow } from "@/components/claims/expenseTypes"
+import { attachmentLabel, expenseStatusBadgeClass, type ExpenseRow } from "@/components/claims/expenseTypes"
 import { DOCUMENTS, type DocumentItem } from "@/components/documents/documentData"
 import { FilePreviewModal } from "@/components/documents/FilePreviewModal"
 
@@ -100,7 +100,8 @@ const EXPENSE_ROWS: ExpenseRow[] = [
     category: "Medical",
     categoryType: "Office Visit",
     payTo: { cardholderName: "Ben Smith", last4: "4523" },
-    attachments: "2 Documents",
+    documentIds: ["1"],
+    letterIds: ["LTR-4"],
     amount: "$150.00",
   },
   {
@@ -109,13 +110,14 @@ const EXPENSE_ROWS: ExpenseRow[] = [
     status: { label: "Documentation Review", tone: "blue" },
     origin: "card",
     account: "Healthcare FSA",
-    provider: "Dr. John Doe",
+    provider: "1-800-CONTACTS",
     recipient: "BS",
     category: "Medical",
     categoryType: "Specialist Visit",
     payTo: { cardholderName: "Ben Smith", last4: "4523" },
-    attachments: "2 Documents",
-    amount: "$60.00",
+    documentIds: ["14"],
+    letterIds: ["LTR-2"],
+    amount: "$144.67",
   },
   {
     id: "3",
@@ -128,7 +130,8 @@ const EXPENSE_ROWS: ExpenseRow[] = [
     category: "Medical",
     categoryType: "Office Visit",
     payTo: { cardholderName: "Ben Smith", last4: "4523" },
-    attachments: "2 Documents",
+    documentIds: ["4", "5"],
+    letterIds: ["LTR-4"],
     amount: "$88.00",
   },
   {
@@ -143,12 +146,15 @@ const EXPENSE_ROWS: ExpenseRow[] = [
     category: "Prescription",
     categoryType: "OTC Item",
     payTo: { cardholderName: "Ben Smith", last4: "4523" },
-    attachments: "2 Documents",
+    // doc 11 "Walgreens" (provider match), doc 8 "EOB"
+    documentIds: ["11", "8"],
+    letterIds: ["LTR-1"],
     amount: "$16.00",
   },
   {
     id: "5",
     dateOfService: "Feb 20–21, 2026",
+    statusDate: "Feb 23, 2025",
     status: { label: "Repayment Due", tone: "red", icon: true },
     origin: "card",
     denialReason: "Dependent care expense is not eligible under this plan.",
@@ -158,7 +164,8 @@ const EXPENSE_ROWS: ExpenseRow[] = [
     category: "Dependent Care",
     categoryType: "Overnight Camp",
     payTo: { cardholderName: "James Smith", last4: "4523" },
-    attachments: "1 Document",
+    documentIds: ["12"],
+    letterIds: ["LTR-1"],
     amount: "$210.00",
   },
   {
@@ -173,7 +180,8 @@ const EXPENSE_ROWS: ExpenseRow[] = [
     category: "Prescription",
     categoryType: "Generic Drug",
     payTo: { cardholderName: "James Smith", last4: "4523" },
-    attachments: "2 Documents",
+    documentIds: ["6", "7"],
+    letterIds: ["LTR-4"],
     amount: "$150.00",
   },
   {
@@ -187,7 +195,9 @@ const EXPENSE_ROWS: ExpenseRow[] = [
     category: "Medical",
     categoryType: "Office Visit",
     payTo: { cardholderName: "James Smith", last4: "4523" },
-    attachments: "2 Documents",
+    // doc 3 "Bright Smiles Dental" (attached), doc 10 "Quest Labs"
+    documentIds: ["3", "10"],
+    letterIds: [],
     amount: "$45.00",
   },
   {
@@ -201,7 +211,8 @@ const EXPENSE_ROWS: ExpenseRow[] = [
     category: "Dental",
     categoryType: "Dental Exam",
     payTo: { cardholderName: "Ben Smith", last4: "4523" },
-    attachments: null,
+    documentIds: [],
+    letterIds: ["LTR-3", "LTR-4"],
     amount: "$85.00",
   },
   {
@@ -215,8 +226,10 @@ const EXPENSE_ROWS: ExpenseRow[] = [
     category: "Vision",
     categoryType: "Eye Exam",
     payTo: { cardholderName: "Ben Smith", last4: "4523" },
-    attachments: "1 Document",
-    amount: "$150.00",
+    // doc 15 "Target Optical" (provider + date match)
+    documentIds: ["15"],
+    letterIds: ["LTR-4"],
+    amount: "$123.98",
   },
   {
     id: "10",
@@ -229,7 +242,8 @@ const EXPENSE_ROWS: ExpenseRow[] = [
     category: "Prescription",
     categoryType: "Brand Name Drug",
     payTo: { cardholderName: "Ben Smith", last4: "4523" },
-    attachments: "2 Documents",
+    documentIds: ["9", "10"],
+    letterIds: [],
     amount: "$36.00",
   },
   {
@@ -243,7 +257,8 @@ const EXPENSE_ROWS: ExpenseRow[] = [
     category: "Medical",
     categoryType: "Urgent Care",
     payTo: { cardholderName: "Ben Smith", last4: "4523" },
-    attachments: null,
+    documentIds: [],
+    letterIds: ["LTR-4"],
     amount: "$220.00",
   },
 ]
@@ -313,7 +328,7 @@ function matchesExpenseSearch(row: ExpenseRow, query: string) {
     row.recipient,
     row.category,
     row.amount,
-    row.attachments ?? "",
+    attachmentLabel(row.documentIds.length) ?? "",
   ]
     .join(" ")
     .toLowerCase()
@@ -344,7 +359,7 @@ function parseDateOfServiceForSort(s: string): number {
 function formatDateOfService(s: string): string {
   const pad = (n: number) => String(n).padStart(2, "0")
   const fmt = (d: Date) => `${pad(d.getMonth() + 1)}/${pad(d.getDate())}/${d.getFullYear()}`
-  let t = s.replace(/\bSept\b/g, "Sep")
+  const t = s.replace(/\bSept\b/g, "Sep")
   const rangeMatch = /^(\w+)\s+(\d{1,2})[–—](\d{1,2}),\s*(\d{4})$/.exec(t)
   if (rangeMatch) {
     const [, month, d1, d2, year] = rangeMatch
@@ -378,11 +393,8 @@ function compareExpenseRowsAsc(a: ExpenseRow, b: ExpenseRow, key: ExpenseSortKey
       return a.recipient.localeCompare(b.recipient, undefined, { sensitivity: "base" })
     case "category":
       return a.category.localeCompare(b.category, undefined, { sensitivity: "base" })
-    case "attachments": {
-      const as = a.attachments?.trim() ?? ""
-      const bs = b.attachments?.trim() ?? ""
-      return as.localeCompare(bs, undefined, { sensitivity: "base" })
-    }
+    case "attachments":
+      return a.documentIds.length - b.documentIds.length
     case "amount":
       return parseAmountForSort(a.amount) - parseAmountForSort(b.amount)
     default:
@@ -397,8 +409,8 @@ function sortExpenseRows(
 ): ExpenseRow[] {
   return [...rows].sort((a, b) => {
     if (key === "attachments") {
-      const ae = !a.attachments?.trim()
-      const be = !b.attachments?.trim()
+      const ae = a.documentIds.length === 0
+      const be = b.documentIds.length === 0
       if (ae && be) return 0
       if (ae) return 1
       if (be) return -1
@@ -439,15 +451,27 @@ export function ClaimsPaymentsContent() {
   }>({ key: "dateOfService", dir: "desc" })
   const [selectedClaimRow, setSelectedClaimRow] = useState<ExpenseRow | null>(null)
   const [previewDoc, setPreviewDoc] = useState<DocumentItem | null>(null)
+  const [caughtUp, setCaughtUp] = useState(false)
+
+  useEffect(() => {
+    function handleKey(e: KeyboardEvent) {
+      const tag = (e.target as HTMLElement).tagName
+      if (tag === "INPUT" || tag === "TEXTAREA" || (e.target as HTMLElement).isContentEditable) return
+      if (e.key === "c" || e.key === "C") setCaughtUp((v) => !v)
+    }
+    window.addEventListener("keydown", handleKey)
+    return () => window.removeEventListener("keydown", handleKey)
+  }, [])
 
   const filteredExpenseRows = useMemo(() => {
     return EXPENSE_ROWS.filter((row) => {
+      if (caughtUp && getExpenseBucket(row.status.label) === "actionRequired") return false
       if (expenseFilter !== "all" && getExpenseBucket(row.status.label) !== expenseFilter) {
         return false
       }
       return matchesExpenseSearch(row, expenseSearch)
     })
-  }, [expenseFilter, expenseSearch])
+  }, [expenseFilter, expenseSearch, caughtUp])
 
   const sortedFilteredExpenseRows = useMemo(
     () => sortExpenseRows(filteredExpenseRows, expenseSort.key, expenseSort.dir),
@@ -493,7 +517,7 @@ export function ClaimsPaymentsContent() {
             size="md"
             asChild
           >
-            <Link to="/reimburse">Reimburse Myself</Link>
+            <Link to="/reimburse" state={{ from: "/claims" }}>Reimburse Myself</Link>
           </Button>
         </div>
       </div>
@@ -504,12 +528,28 @@ export function ClaimsPaymentsContent() {
           {/* Section header */}
           <div className="flex items-center gap-2 px-6 pt-5 pb-4">
             <h2 className="text-xl font-semibold text-foreground">Action Required</h2>
-            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-[11px] font-bold leading-none text-white">
-              2
-            </span>
+            {!caughtUp && (
+              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-[11px] font-bold leading-none text-white">
+                2
+              </span>
+            )}
           </div>
 
-          {/* Action items — nested cards inset to align with section title */}
+          {caughtUp ? (
+            /* Empty / caught-up state */
+            <div className="flex flex-col items-center justify-center gap-4 px-6 pb-10 pt-2">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#EEF2FF]">
+                <div className="flex h-7 w-7 items-center justify-center rounded-full border-[2.5px] border-[#3958C3]">
+                  <Check className="h-4 w-4 text-[#3958C3]" strokeWidth={3.5} aria-hidden />
+                </div>
+              </div>
+              <div className="flex flex-col items-center gap-2 text-center">
+                <p className="text-xl font-semibold text-foreground">You're all caught up!</p>
+                <p className="text-sm text-muted-foreground">No pending tasks at the moment.</p>
+              </div>
+            </div>
+          ) : (
+          /* Action items — nested cards inset to align with section title */
           <div className="flex flex-col gap-4 px-6 pb-6 pt-0">
             {ACTION_ITEMS.map((item) => {
               const actionRow = EXPENSE_ROWS.find((r) => r.id === item.rowId) ?? null
@@ -603,6 +643,7 @@ export function ClaimsPaymentsContent() {
               )
             })}
           </div>
+          )}
         </CardContent>
       </Card>
 
@@ -767,10 +808,10 @@ export function ClaimsPaymentsContent() {
                       </span>
                     </TableCell>
                     <TableCell className="min-w-0 px-2 py-2.5 text-sm text-muted-foreground">
-                      {row.attachments ? (
+                      {row.documentIds.length > 0 ? (
                         <span className="inline-flex min-w-0 max-w-full items-center gap-1.5 truncate">
                           <Paperclip className="h-3.5 w-3.5 shrink-0 text-current" aria-hidden />
-                          <span className="min-w-0 truncate">{row.attachments}</span>
+                          <span className="min-w-0 truncate">{attachmentLabel(row.documentIds.length)}</span>
                         </span>
                       ) : (
                         <span className="text-muted-foreground/50">—</span>

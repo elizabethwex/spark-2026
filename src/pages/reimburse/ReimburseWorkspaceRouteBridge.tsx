@@ -8,9 +8,10 @@ export default function ReimburseWorkspaceRouteBridge() {
   const { openReimburseWorkspaceFromPath } = useReimburseWorkspace();
 
   useEffect(() => {
+    const returnTo = (location.state as { from?: string } | null)?.from ?? "/";
     openReimburseWorkspaceFromPath(location.pathname);
-    navigate("/", { replace: true });
-  }, [location.pathname, navigate, openReimburseWorkspaceFromPath]);
+    navigate(returnTo, { replace: true });
+  }, [location.pathname, location.state, navigate, openReimburseWorkspaceFromPath]);
 
   return null;
 }

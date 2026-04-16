@@ -12,7 +12,10 @@ export type ExpenseRow = {
   category: string
   /** Descriptor shown alongside category in the Details tab, e.g. "Office Visit" */
   categoryType?: string
-  attachments: string | null
+  /** IDs of documents from the shared DOCUMENTS store attached to this claim. */
+  documentIds: string[]
+  /** IDs of system-generated letters (denial notices, receipt requests, etc.) for this claim. */
+  letterIds: string[]
   amount: string
   /** Payment method the reimbursement is sent to */
   payTo?: {
@@ -23,6 +26,14 @@ export type ExpenseRow = {
   origin?: "card" | "manual"
   holdReason?: string
   denialReason?: string
+  /** Date the current status was set — shown on the active timeline step. Distinct from dateOfService. */
+  statusDate?: string
+}
+
+/** Returns a human-readable attachment label, or null when there are no documents. */
+export function attachmentLabel(count: number): string | null {
+  if (count === 0) return null
+  return count === 1 ? "1 Document" : `${count} Documents`
 }
 
 export function expenseStatusBadgeClass(tone: ExpenseRow["status"]["tone"]): string {

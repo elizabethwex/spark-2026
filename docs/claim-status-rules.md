@@ -20,7 +20,7 @@ In all timeline diagrams below, `[first step]` is a placeholder for whichever va
 ### "Now" indicator
 
 - The **last step** in every active-state timeline is tagged **Now**.
-- **Final states** (Denied, Paid) have **no Now tag** — the claim has reached its end state and no further progress is expected unless the member takes action (e.g. Appeal).
+- **Final states** (Denied, Paid) have **no Now tag** — the claim has reached its end state.
 
 ### Badge color palette
 
@@ -36,10 +36,8 @@ In all timeline diagrams below, `[first step]` is a placeholder for whichever va
 
 | Variant label | Usage |
 |---------------|-------|
-| `primary solid` | Primary call to action (Submit Claim, Upload Documentation, Repay) |
-| `primary outline` | Secondary call to action with equal visual weight to destructive (Edit, Appeal on Repayment Due) |
-| `secondary` | Low-emphasis action (Appeal on Denied) |
-| `destructive outline` | Irreversible or negative action (Cancel Claim) |
+| `primary solid` | Primary call to action (Continue Claim, Upload Documentation, Repay) |
+| `destructive outline` | Irreversible or negative action (Cancel Claim, Delete Draft) |
 
 ### Inline toast structure
 
@@ -67,10 +65,14 @@ The Details tab shows the following fields for every claim, with no truncation:
 | Pay from | `account` | The FSA/HSA account the funds are drawn from |
 | Pay to | `bankAccount` | Member's bank account on file (e.g. "Chase Checking ••••4523") |
 | Recipient | `recipient` | Full name expanded from initials — ES → Emily Smith, JS → Julia Smith |
-| Date of Service | `dateOfService` | As entered on the claim |
+| Date of Service | `dateOfService` | As entered on the claim — also shown in the claims table |
 | Category & Type | `category — categoryType` | e.g. "Medical — Office Visit", "Dental — Dental Exam" |
 | Provider | `provider` | Full provider/service name |
 | Amount | `amount` | Claim amount |
+
+### Timeline step date vs. Date of Service
+
+The date shown beside the **active (current) timeline step** reflects when that status was set — this may differ from the claim's Date of Service. Use the optional `statusDate` field on a claim row to provide this value; if absent, `dateOfService` is used as a fallback. The Date of Service in the Details tab always shows `dateOfService` regardless.
 
 ---
 
@@ -96,8 +98,8 @@ Claim Draft Created  [Now]
 
 | Button | Variant |
 |--------|---------|
-| Edit | primary outline |
-| Submit Claim | primary solid |
+| Delete Draft | destructive outline |
+| Continue Claim | primary solid |
 
 ---
 
@@ -221,6 +223,8 @@ that includes all required info.
 
 > The member has uploaded documentation and it is now being reviewed.
 
+> **Cancel rules:** Card-originated claims (first timeline step = Card Payment) cannot be canceled — no footer is shown. Manual claims show a Cancel Claim button only. Upload Documentation is never shown for this status.
+
 | Field | Value |
 |-------|-------|
 | Badge | Blue / Info |
@@ -235,10 +239,10 @@ that includes all required info.
 
 **Actions**
 
-| Button | Variant |
-|--------|---------|
-| Cancel Claim | destructive outline |
-| Upload Documentation | primary solid |
+| Origin | Button | Variant |
+|--------|--------|---------|
+| Manual | Cancel Claim | destructive outline |
+| Card | *(none — cannot cancel a card claim)* | — |
 
 ---
 
@@ -257,7 +261,6 @@ that includes all required info.
 ```
 Claim Denied
 Denied on [date]
-Tag: [N] Days to Appeal
 ────────────────────────────────────
 [denial reason from system]
 ```
@@ -269,15 +272,11 @@ Tag: [N] Days to Appeal
                                                                                           └─ [denial reason]
 ```
 
-> The Denied step is rendered as complete (green/filled) rather than active, reflecting that the decision has been made.
+> The Denied step uses a yellow/amber circle border with an **X icon** (not a green checkmark) to distinguish an unfavorable outcome from a successful completed step.
 
 **Actions**
 
-The Appeal button is displayed inline beneath the Denied step in the timeline, not in the sheet footer.
-
-| Button | Variant |
-|--------|---------|
-| Appeal | secondary |
+None.
 
 ---
 
@@ -342,22 +341,21 @@ Repayment Due
 Requested [date]
 Tag: [N] Days Remaining
 ────────────────────────────────────
-Your previously approved claim has been reviewed and deemed ineligible
-under your plan rules. Please repay the claim amount of [amount] by [date].
+Goods or services deemed ineligible under your plan rules.
+Please repay the claim amount of [amount].
 ```
 
 **Timeline**
 
 ```
-[first step]  ──►  Reviewed  ──►  Approved  ──►  Payment Processing  ──►  Paid  ──►  Denied  ──►  Repayment Due  [Now]
-                                                                                      └─ [denial reason]           └─ Repay [amount] by [date]
+Card Payment  ──►  Denied  ──►  Repayment Due  [Now]
+                   └─ [denial reason]
 ```
 
 **Actions**
 
 | Button | Variant |
 |--------|---------|
-| Appeal | primary outline |
 | Repay | primary solid |
 
 > **Design / Engineering note — Repayment lifecycle:** A repayment obligation arises when a claim is paid out (or a card swipe is approved) but is later re-reviewed and found to be ineligible under plan rules. This is uncommon but is a real scenario in FSA/HSA claims adjudication. The Denied step in the Repayment Due timeline represents this re-review decision, not the original adjudication.
@@ -368,13 +366,13 @@ under your plan rules. Please repay the claim amount of [amount] by [date].
 
 | # | Status | Badge | Action Required | Drafts | In Progress | All Claims | Toast | Actions |
 |---|--------|-------|:--------------:|:------:|:-----------:|:----------:|-------|---------|
-| 1 | Not Submitted | Gray / Neutral | — | ✓ | — | ✓ | — | Edit, Submit Claim |
+| 1 | Not Submitted | Gray / Neutral | — | ✓ | — | ✓ | — | Delete Draft, Continue Claim |
 | 2 | Submitted | Blue / Info | — | — | ✓ | ✓ | — | Cancel Claim, Upload Documentation |
 | 3 | Approved | Green / Success | — | — | — | ✓ | — | — |
 | 4 | Hold | Yellow / Warning | — | — | — | ✓ | ✓ | — |
 | 5 | Documentation Needed | Red / Critical | ✓ | — | — | ✓ | ✓ | Cancel Claim, Upload Documentation |
-| 6 | Documentation Review | Blue / Info | — | — | — | ✓ | — | Cancel Claim, Upload Documentation |
-| 7 | Denied | Yellow / Warning | — | — | — | ✓ | ✓ | Appeal |
+| 6 | Documentation Review | Blue / Info | — | — | — | ✓ | — | Cancel Claim *(manual only)*; none for card |
+| 7 | Denied | Yellow / Warning | — | — | — | ✓ | ✓ | — |
 | 8 | Payment Processing | Blue / Info | — | — | — | ✓ | — | — |
 | 9 | Paid | Green / Success | — | — | — | ✓ | — | — |
-| 10 | Repayment Due | Red / Critical | ✓ | — | — | ✓ | ✓ | Appeal, Repay |
+| 10 | Repayment Due | Red / Critical | ✓ | — | — | ✓ | ✓ | Repay |
