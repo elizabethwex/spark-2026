@@ -8,7 +8,7 @@ import { usePrototype, HOME_LAYOUT_LABELS } from "@/context/PrototypeContext";
 export function PrototypeFloatingControls() {
   const location = useLocation();
   const isHome = location.pathname === "/" || location.pathname === "";
-  const { homepageMode, homeLayoutMode, cycleHomeLayout } = usePrototype();
+  const { homepageMode, homeLayoutMode, cycleHomeLayout, logoMode, toggleLogoMode } = usePrototype();
   const showLayoutOnHome = isHome && homepageMode === "partner-safe";
 
   if (!showLayoutOnHome) {
@@ -34,6 +34,18 @@ export function PrototypeFloatingControls() {
       >
         Layout: {HOME_LAYOUT_LABELS[homeLayoutMode]}
       </Button>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        className="h-auto min-h-8 w-full justify-center whitespace-normal px-2 py-1.5 text-center text-[11px] font-semibold leading-tight mt-1"
+        onClick={toggleLogoMode}
+      >
+        Toggle Logo (L)
+      </Button>
+      <div className="text-center text-[10px] text-muted-foreground mt-1">
+        Logo: {logoMode}
+      </div>
     </div>
   );
 }

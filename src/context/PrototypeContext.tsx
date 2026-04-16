@@ -2,10 +2,13 @@ import * as React from "react";
 
 const HOMEPAGE_MODE_STORAGE_KEY = "portal-prototype-homepage-mode";
 const HOME_LAYOUT_STORAGE_KEY = "portal-prototype-home-layout";
+const LOGO_MODE_STORAGE_KEY = "portal-prototype-logo-mode";
 
 export type HomepageMode = "partner-safe" | "ai-forward";
 
 export type HomeLayoutMode = "full" | "planner";
+
+export type LogoMode = "wex" | "acme";
 
 const HOME_LAYOUT_ORDER: HomeLayoutMode[] = ["full", "planner"];
 
@@ -19,6 +22,8 @@ export type PrototypeContextValue = {
   setHomepageMode: (mode: HomepageMode) => void;
   homeLayoutMode: HomeLayoutMode;
   cycleHomeLayout: () => void;
+  logoMode: LogoMode;
+  toggleLogoMode: () => void;
 };
 
 const PrototypeContext = React.createContext<PrototypeContextValue | null>(null);
@@ -43,6 +48,16 @@ function readStoredHomeLayout(): HomeLayoutMode {
   return "full";
 }
 
+function readStoredLogoMode(): LogoMode {
+  try {
+    const v = window.localStorage.getItem(LOGO_MODE_STORAGE_KEY);
+    if (v === "wex" || v === "acme") return v;
+  } catch {
+    /* ignore */
+  }
+  return "acme";
+}
+
 export function PrototypeProvider({ children }: { children: React.ReactNode }) {
   const [homepageMode, setHomepageModeState] = React.useState<HomepageMode>(() =>
     typeof window !== "undefined" ? readStoredHomepageMode() : "ai-forward"
@@ -50,6 +65,10 @@ export function PrototypeProvider({ children }: { children: React.ReactNode }) {
 
   const [homeLayoutMode, setHomeLayoutModeState] = React.useState<HomeLayoutMode>(() =>
     typeof window !== "undefined" ? readStoredHomeLayout() : "full"
+  );
+
+  const [logoMode, setLogoModeState] = React.useState<LogoMode>(() =>
+    typeof window !== "undefined" ? readStoredLogoMode() : "acme"
   );
 
   React.useEffect(() => {
@@ -68,6 +87,14 @@ export function PrototypeProvider({ children }: { children: React.ReactNode }) {
     }
   }, [homeLayoutMode]);
 
+  React.useEffect(() => {
+    try {
+      window.localStorage.setItem(LOGO_MODE_STORAGE_KEY, logoMode);
+    } catch {
+      /* ignore */
+    }
+  }, [logoMode]);
+
   const setHomepageMode = React.useCallback((mode: HomepageMode) => {
     setHomepageModeState(mode);
   }, []);
@@ -79,16 +106,27 @@ export function PrototypeProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  const toggleLogoMode = React.useCallback(() => {
+    setLogoModeState((prev) => (prev === "wex" ? "acme" : "wex"));
+  }, []);
+
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Ignore keypresses if the user is typing in an input
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (e.target instanceof HTMLElement && e.target.isContentEditable) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
       
-      if (e.key === 'p' || e.key === 'P') {
+      const key = e.key.toLowerCase();
+      
+      if (key === 'p') {
         setHomepageModeState("partner-safe");
       }
-      if (e.key === 'm' || e.key === 'M') {
+      if (key === 'm') {
         setHomepageModeState("ai-forward");
+      }
+      if (key === 'l') {
+        setLogoModeState((prev) => (prev === "wex" ? "acme" : "wex"));
       }
     };
 
@@ -102,8 +140,10 @@ export function PrototypeProvider({ children }: { children: React.ReactNode }) {
       setHomepageMode,
       homeLayoutMode,
       cycleHomeLayout,
+      logoMode,
+      toggleLogoMode,
     }),
-    [homepageMode, setHomepageMode, homeLayoutMode, cycleHomeLayout]
+    [homepageMode, setHomepageMode, homeLayoutMode, cycleHomeLayout, logoMode, toggleLogoMode]
   );
 
   return <PrototypeContext.Provider value={value}>{children}</PrototypeContext.Provider>;

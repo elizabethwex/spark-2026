@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { usePrototype } from "@/context/PrototypeContext";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Phase = "lock" | "splash" | "faceIdScanning" | "faceIdSuccess" | "loading";
 const ALL_PHASES: Phase[] = ["lock", "splash", "faceIdScanning", "faceIdSuccess", "loading"];
 
 const WEX_APP_ICON = "/wex-app-icon.png";
-const WEX_LOGO_RED_VECTOR = "/WEX_Logo_Red_Vector.svg";
 const FACE_ID_SVG = "/app-ui/face-id.svg";
 const FACE_ID_SUCCESS_SVG = "/app-ui/face-id-success.svg";
 
@@ -22,6 +22,9 @@ const T_LOADING  = 900;
 
 // ─── WEX Splash ───────────────────────────────────────────────────────────────
 function WexSplash() {
+  const { logoMode } = usePrototype();
+  const logoUrl = logoMode === "acme" ? "/acme-health-wex.svg" : "/WEX_Logo_Red_Vector.svg";
+
   return (
     <div
       style={{
@@ -45,8 +48,8 @@ function WexSplash() {
         }}
       >
         <img
-          src={WEX_LOGO_RED_VECTOR}
-          alt="WEX"
+          src={logoUrl}
+          alt={logoMode === "acme" ? "ACME Health" : "WEX"}
           width={250}
           height={74}
           style={{ width: "100%", height: "auto", display: "block" }}
