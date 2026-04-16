@@ -253,7 +253,6 @@ export function ClaimExpenseDetailSheet({
 
   const categoryLabel = row.category.toUpperCase()
   const footerType = getFooterActionType(row.status.label, row.origin)
-  const isDenied = isDeniedStatus(row.status.label)
 
   const timelineSteps = assignStepDates(
     getWhatHappensNextSteps(row.status.label, {

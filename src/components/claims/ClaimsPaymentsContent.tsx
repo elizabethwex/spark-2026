@@ -359,7 +359,7 @@ function parseDateOfServiceForSort(s: string): number {
 function formatDateOfService(s: string): string {
   const pad = (n: number) => String(n).padStart(2, "0")
   const fmt = (d: Date) => `${pad(d.getMonth() + 1)}/${pad(d.getDate())}/${d.getFullYear()}`
-  let t = s.replace(/\bSept\b/g, "Sep")
+  const t = s.replace(/\bSept\b/g, "Sep")
   const rangeMatch = /^(\w+)\s+(\d{1,2})[–—](\d{1,2}),\s*(\d{4})$/.exec(t)
   if (rangeMatch) {
     const [, month, d1, d2, year] = rangeMatch
