@@ -48,16 +48,8 @@ function formatTime(): string {
   });
 }
 
-const RECENT_CHATS = [
-  { label: "Help me with my claims", active: true },
-  { label: "Claim status for family doctor vis…", active: false },
-  { label: "Why was my claim denied?", active: false },
-];
-
 const PREVIOUS_CHATS = [
   { label: "My HSA balance", active: false },
-  { label: "Find Medical FSA eligible expens…", active: false },
-  { label: "What is my deductible?", active: false },
 ];
 
 function ClaimPreviewCard({
@@ -128,9 +120,9 @@ function ClaimPreviewCard({
         <button
           type="button"
           onClick={onWorkOnClaim}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#25146f] px-4 py-2.5 text-[15px] font-medium text-white transition-opacity hover:opacity-90"
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-[15px] font-medium text-primary-foreground transition-opacity hover:opacity-90"
         >
-          <FileText className="h-4 w-4" />
+          <FileText className="h-4 w-4 text-primary-foreground" />
           Work on this claim
         </button>
       </div>
@@ -320,7 +312,7 @@ function DocumentUploadCard({
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             onClick={onSubmit}
-            className="mt-3 flex w-full items-center justify-center rounded-xl bg-[#25146f] px-4 py-3 text-[15px] font-semibold text-white transition-opacity hover:opacity-90"
+            className="mt-3 flex w-full items-center justify-center rounded-xl bg-primary px-4 py-3 text-[15px] font-semibold text-primary-foreground transition-opacity hover:opacity-90"
           >
             Submit documentation
           </motion.button>
@@ -459,12 +451,13 @@ type Props = {
   initialMessage?: string;
   alwaysShowFloatingButton?: boolean;
   hideRecentConversations?: boolean;
+  accountType?: "FSA" | "HSA" | "LPFSA";
 };
 
 /**
  * Assist IQ popup for “Upload Claim Documents” (SPARK-2026 Figma: Assist IQ Popup — Claim Doc request).
  */
-export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = "Help me with my claims", alwaysShowFloatingButton = false, hideRecentConversations = false }: Props) {
+export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = "Help me with my claims", alwaysShowFloatingButton = false, hideRecentConversations = false, accountType = "FSA" }: Props) {
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -487,11 +480,27 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
     | "see_all_typing"
     | "see_all_results"
   >("new_chat");
+  const [chatHistory, setChatHistory] = useState<string[]>([
+    `Is toothpaste ${accountType} eligible?`,
+  ]);
   const [selectedClaim, setSelectedClaim] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasLoadedMore, setHasLoadedMore] = useState(false);
   const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const isFsaQuery = currentMessage.toLowerCase().includes("toothpaste fsa eligible") || currentMessage.toLowerCase().includes("toothpaste hsa eligible") || currentMessage.toLowerCase().includes("toothpaste lpfsa eligible");
+
+  useEffect(() => {
+    setChatHistory([`Is toothpaste ${accountType === "LPFSA" ? "FSA" : accountType} eligible?`]);
+  }, [accountType]);
+
+  const addToHistory = (newMessage: string) => {
+    setChatHistory((prev) => {
+      const filtered = prev.filter((msg) => msg !== newMessage);
+      return [newMessage, ...filtered];
+    });
+  };
 
   // Auto-scroll to bottom when chatPhase or uploadProgress changes
   useEffect(() => {
@@ -544,6 +553,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
         setHasLoadedMore(false);
         setChatInput("");
         setCurrentMessage(initialMessage);
+        addToHistory(initialMessage);
         if (progressIntervalRef.current) {
           clearInterval(progressIntervalRef.current);
           progressIntervalRef.current = null;
@@ -628,8 +638,14 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
   };
 
   const handleChatSubmit = () => {
-    if (chatInput.trim().toLowerCase().includes("help me with my claims")) {
+    const lowerInput = chatInput.trim().toLowerCase();
+    if (
+      lowerInput.includes("help me with my claims") ||
+      lowerInput.includes("toothpaste fsa eligible") ||
+      lowerInput.includes("toothpaste hsa eligible")
+    ) {
       setCurrentMessage(chatInput);
+      addToHistory(chatInput);
       setChatInput("");
       setChatPhase("typing");
     }
@@ -768,20 +784,29 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
                     Recent
                   </p>
                   <div className="flex flex-col gap-1">
-                    {RECENT_CHATS.map((row) => (
-                      <button
-                        key={row.label}
-                        type="button"
-                        className={`flex items-center gap-2 rounded-lg px-3 py-2 text-left text-[13px] leading-snug transition-colors ${
-                          row.active
-                            ? "bg-[#e1e8ff] font-semibold text-[#25146f]"
-                            : "text-[#5f6a94] hover:bg-[#f8f9fe]"
-                        }`}
-                      >
-                        <Clock className="h-3.5 w-3.5 shrink-0" />
-                        {row.label}
-                      </button>
-                    ))}
+                    {chatHistory.map((msg, idx) => {
+                      const isActive = msg === currentMessage && chatPhase !== "new_chat";
+                      return (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => {
+                            setCurrentMessage(msg);
+                            addToHistory(msg);
+                            setChatPhase("typing");
+                            setIsSidebarOpen(false);
+                          }}
+                          className={`flex items-center gap-2 rounded-lg px-3 py-2 text-left text-[13px] leading-snug transition-colors ${
+                            isActive
+                              ? "bg-[#e1e8ff] font-semibold text-[#25146f]"
+                              : "text-[#5f6a94] hover:bg-[#f8f9fe]"
+                          }`}
+                        >
+                          <Clock className="h-3.5 w-3.5 shrink-0" />
+                          {msg}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -806,7 +831,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
               </div>
 
               {/* Footer */}
-              <div className="px-4 pt-4 w-[308px]">
+              <div className="px-4 pt-4 w-[308px] hidden">
                 <button
                   type="button"
                   className="flex w-full items-center gap-2 text-left text-[13px] font-medium text-[#5f6a94] transition-colors hover:text-[#3958c3]"
@@ -958,7 +983,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.3, delay: 0.1 }}
-                        className="w-full"
+                        className="w-full hidden"
                       >
                         <div className="mb-3 flex items-center justify-between">
                           <h3 className="text-[14px] font-semibold text-[#444c72]">Recent conversations:</h3>
@@ -1046,7 +1071,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
                           ))}
                         </div>
                         <p className="text-[12px] italic leading-[16px] text-[#7a87b2]">
-                          Looking up your claims...
+                          {isFsaQuery ? "Checking eligibility..." : "Looking up your claims..."}
                         </p>
                       </div>
                     ) : (
@@ -1056,13 +1081,35 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
                         transition={{ type: "spring", stiffness: 340, damping: 28 }}
                         className="flex flex-col gap-3"
                       >
-                        <div className={`pb-2 ${isDocked ? "w-full" : "max-w-[358px]"}`}>
-                          <p className="text-[14px] leading-[24px] tracking-[-0.084px] text-[#253341]">
-                            Sure! I found 2 claims that require you to submit
-                            additional documentation:
-                          </p>
-                        </div>
-                        <ClaimPreviewCard
+                        {isFsaQuery ? (
+                          <div className={`pb-2 ${isDocked ? "w-full" : "max-w-[358px]"}`}>
+                            <p className="text-[14px] leading-[24px] tracking-[-0.084px] text-[#253341]">
+                              Eligibility depends on the plan you’re enrolled in, and eligible items can vary by plan.
+                            </p>
+                            <ul className="mt-2 flex flex-col gap-2 text-[14px] leading-[24px] tracking-[-0.084px] text-[#253341]">
+                              <li className="flex items-start gap-2">
+                                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#253341]" />
+                                <span>Check the eligible expenses guide for common categories and examples.</span>
+                              </li>
+                              <li className="flex items-start gap-2">
+                                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#253341]" />
+                                <span>Use the Eligible Expense Scanner in the mobile app to check a specific product.</span>
+                              </li>
+                              <li className="flex items-start gap-2">
+                                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#253341]" />
+                                <span>If your card doesn’t work for an item, you can often pay out of pocket and submit a claim (if your plan allows).</span>
+                              </li>
+                            </ul>
+                          </div>
+                        ) : (
+                          <>
+                            <div className={`pb-2 ${isDocked ? "w-full" : "max-w-[358px]"}`}>
+                              <p className="text-[14px] leading-[24px] tracking-[-0.084px] text-[#253341]">
+                                Sure! I found 2 claims that require you to submit
+                                additional documentation:
+                              </p>
+                            </div>
+                            <ClaimPreviewCard
                           isDocked={isDocked}
                           provider="Bigtown Dentistry"
                           amount="$210.00"
@@ -1087,11 +1134,13 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
                               setChatPhase("see_all_typing");
                               setTimeout(() => setChatPhase("see_all_results"), 1500);
                             }}
-                            className="flex items-center justify-center rounded-full border border-[#25146f] bg-white px-5 py-2 text-[14px] font-medium text-[#25146f] transition-colors hover:bg-[#f8f9fe]"
+                            className="flex items-center justify-center rounded-full border border-primary bg-white px-5 py-2 text-[14px] font-medium text-primary transition-colors hover:bg-[#f8f9fe]"
                           >
                             See all claims
                           </button>
                         </div>
+                          </>
+                        )}
                       </motion.div>
                     )}
                   </div>
@@ -1236,11 +1285,11 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
                                       }, 1000);
                                     }}
                                     disabled={isLoadingMore}
-                                    className="flex items-center justify-center rounded-full border border-[#25146f] bg-white px-5 py-2 text-[14px] font-medium text-[#25146f] transition-colors hover:bg-[#f8f9fe] disabled:opacity-70"
+                                    className="flex items-center justify-center rounded-full border border-primary bg-white px-5 py-2 text-[14px] font-medium text-primary transition-colors hover:bg-[#f8f9fe] disabled:opacity-70"
                                   >
                                     {isLoadingMore ? (
                                       <div className="flex items-center gap-2">
-                                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#25146f] border-t-transparent" />
+                                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
                                         <span>Loading...</span>
                                       </div>
                                     ) : (
@@ -1392,7 +1441,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
                         </button>
                         <button className="flex items-center gap-2 rounded-full border border-[#e3e7f4] bg-white px-4 py-2 text-[14px] font-medium text-[#25146f] transition-all hover:-translate-y-[1px] hover:bg-[#f8f9fe] hover:shadow-sm">
                           <Receipt className="h-4 w-4 text-[#9b2b5e]" />
-                          Find Medical FSA eligible expenses
+                          Find {accountType === "HSA" ? "HSA" : accountType === "LPFSA" ? "Limited Purpose FSA" : "Medical FSA"} eligible expenses
                         </button>
                         <button className="flex items-center gap-2 rounded-full border border-[#e3e7f4] bg-white px-4 py-2 text-[14px] font-medium text-[#25146f] transition-all hover:-translate-y-[1px] hover:bg-[#f8f9fe] hover:shadow-sm">
                           <Wallet className="h-4 w-4 text-[#9b2b5e]" />

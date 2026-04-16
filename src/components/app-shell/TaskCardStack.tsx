@@ -4,6 +4,8 @@ import { motion, useMotionValue, useTransform, AnimatePresence } from "framer-mo
 import { Receipt, Check, Paperclip, FileText, X, Upload } from "lucide-react";
 import { IOSActionSheet, CameraViewfinder } from "./UploadFlowComponents";
 
+import { useAppVariant } from "@/context/AppVariantContext";
+
 const TEXT_PRIMARY = "#000";
 const TEXT_SECONDARY = "rgba(60, 60, 67, 0.6)";
 const CARD_SHADOW = "0px 3px 9px rgba(43, 49, 78, 0.04), 0px 6px 18px rgba(43, 49, 78, 0.06)";
@@ -58,6 +60,8 @@ const MOCK_TASKS: TaskCardData[] = [
 ];
 
 export function TaskCardStack() {
+  const { variant } = useAppVariant();
+  
   const [cards, setCards] = useState<TaskCardData[]>(() => {
     const saved = sessionStorage.getItem("taskCards");
     if (saved) {
@@ -200,6 +204,7 @@ export function TaskCardStack() {
                     onSwipe={handleSwipe}
                     onDismiss={() => handleDismiss(card.id)}
                     onPhaseChange={isTop ? setTopCardPhase : undefined}
+                    variant={variant}
                   />
                 );
               })
@@ -326,6 +331,7 @@ function SwipeableCard({
   onSwipe,
   onDismiss,
   onPhaseChange,
+  variant,
 }: {
   card: TaskCardData;
   index: number;
@@ -333,6 +339,7 @@ function SwipeableCard({
   onSwipe: () => void;
   onDismiss: () => void;
   onPhaseChange?: (phase: CardPhase) => void;
+  variant: number;
 }) {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -581,7 +588,22 @@ function SwipeableCard({
                   lineHeight: "18px",
                 }}
               >
-                {card.dateAndAccount}
+                {card.dateAndAccount.includes(' · ') ? (
+                  <>
+                    <div>
+                      {card.dateAndAccount.split(' · ')[1] === "Limited Purpose FSA"
+                        ? variant === 3 
+                          ? "HSA" 
+                          : variant === 2 
+                            ? "Healthcare FSA" 
+                            : "Limited Purpose FSA"
+                        : card.dateAndAccount.split(' · ')[1]}
+                    </div>
+                    <div>{card.dateAndAccount.split(' · ')[0]}</div>
+                  </>
+                ) : (
+                  card.dateAndAccount
+                )}
               </div>
             </div>
           </div>

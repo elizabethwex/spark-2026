@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { Outlet, useLocation } from "react-router-dom";
-import { AppTabBar } from "./AppTabBar";
+import { AppTabBar, isFullScreenRoute } from "./AppTabBar";
 import { IPhoneMockup, SCREEN_HEIGHT } from "./IPhoneMockup";
 import { AppStatusBar, STATUS_BAR_HEIGHT } from "./AppStatusBar";
 import { useDeviceMockup } from "@/hooks/useDeviceMockup";
@@ -199,6 +199,8 @@ export function AppShell() {
 
   // Real phone: inner scroll only (avoid scrolling the full 100dvh wrapper).
   if (isMobileDevice) {
+    const isFullScreen = isFullScreenRoute(location.pathname);
+    
     return (
       <div
         style={{
@@ -216,8 +218,9 @@ export function AppShell() {
               height: "100dvh",
               maxHeight: "100dvh",
               // @ts-expect-error custom CSS property — approximate content height for /app pages
-              "--app-screen-height":
-                "calc(100dvh - var(--app-tabbar-height) - env(safe-area-inset-bottom, 0px))",
+              "--app-screen-height": isFullScreen
+                ? "100dvh"
+                : "calc(100dvh - var(--app-tabbar-height) - env(safe-area-inset-bottom, 0px))",
             }}
           >
             <div
@@ -235,8 +238,9 @@ export function AppShell() {
             >
               <div
                 style={{
-                  paddingBottom:
-                    "calc(var(--app-tabbar-height) + env(safe-area-inset-bottom, 0px))",
+                  paddingBottom: isFullScreen
+                    ? "env(safe-area-inset-bottom, 0px)"
+                    : "calc(var(--app-tabbar-height) + env(safe-area-inset-bottom, 0px))",
                 }}
               >
                 <Outlet />

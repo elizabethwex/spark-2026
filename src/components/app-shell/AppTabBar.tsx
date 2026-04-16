@@ -15,15 +15,19 @@ const TABS: Tab[] = [
   { label: "Messages", to: "/app/messages",    icon: Mail },
 ];
 
+export function isFullScreenRoute(pathname: string) {
+  return (
+    ["/app/assist-iq", "/app/penny", "/app/lock-screen"].includes(pathname) ||
+    pathname.startsWith("/app/my-account") ||
+    pathname.startsWith("/app/reimburse")
+  );
+}
+
 export function AppTabBar() {
   const location = useLocation();
 
   // WEXly takes over the full screen — hide the tab bar
-  if (
-    ["/app/assist-iq", "/app/penny", "/app/lock-screen"].includes(location.pathname) ||
-    location.pathname.startsWith("/app/my-account") ||
-    location.pathname.startsWith("/app/reimburse")
-  ) {
+  if (isFullScreenRoute(location.pathname)) {
     return null;
   }
 
