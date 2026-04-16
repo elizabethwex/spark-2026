@@ -1,0 +1,46 @@
+/* 
+  These are static fallbacks purely to enable IDE autocomplete (IntelliSense) 
+  for developers mapping UI elements to theme tokens. 
+  At runtime, themeToCssVars.ts overrides these values.
+*/
+:root {
+  /* User-Configurable Brand Colors */
+  --theme-primary: #0073C2;
+  --theme-secondary: #E2E5EA;
+  --theme-page-bg: #F7F7F7;
+  --theme-header-bg: #253746;
+  --theme-illustration: #0EA5E9;
+  --theme-ai-color: #C8102E;
+
+  /* Auto-Computed Variables */
+  --theme-header-text: #FFFFFF;
+  --theme-primary-hover: #0062a5;
+  --theme-primary-surface: rgba(0, 115, 194, 0.10);
+  --theme-focus-ring: #14182C;
+
+  /* Primary Ramp */
+  --theme-primary-ramp-50: #edf2ff;
+  --theme-primary-ramp-100: #dee8ff;
+  --theme-primary-ramp-200: #c2d4fe;
+  --theme-primary-ramp-300: #9cb7fd;
+  --theme-primary-ramp-400: #7898f0;
+  --theme-primary-ramp-500: #587add;
+  --theme-primary-ramp-600: #3958c3;
+  --theme-primary-ramp-700: #192ca0;
+  --theme-primary-ramp-800: #13237e;
+  --theme-primary-ramp-900: #0c1a5c;
+  --theme-primary-ramp-950: #060f3a;
+
+  /* Secondary Ramp */
+  --theme-secondary-ramp-50: #f2f2f3;
+  --theme-secondary-ramp-100: #e7e8e9;
+  --theme-secondary-ramp-200: #d3d4d6;
+  --theme-secondary-ramp-300: #b7b9bc;
+  --theme-secondary-ramp-400: #9a9da0;
+  --theme-secondary-ramp-500: #7f8185;
+  --theme-secondary-ramp-600: #e2e5ea;
+  --theme-secondary-ramp-700: #3e4145;
+  --theme-secondary-ramp-800: #303236;
+  --theme-secondary-ramp-900: #232427;
+  --theme-secondary-ramp-950: #141517;
+}

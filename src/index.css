@@ -4,6 +4,9 @@
 /* iOS app mode tokens — must come after kit so --wex-* vars are defined */
 @import './styles/app-tokens.css';
 
+/* Fallback tokens for IDE autocomplete */
+@import './styles/theme-fallbacks.css';
+
 @import "tailwindcss";
 @config "../tailwind.config.ts";
 
