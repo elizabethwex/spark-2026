@@ -21,7 +21,7 @@ export const FOLDERS: FolderItem[] = [
 ]
 
 export const DOCUMENTS: DocumentItem[] = [
-  { id: "1",  title: "EOB",                  date: "Dec 12, 2025", status: "unattached", folderId: "2025", imageUrl: "/documents/optum-rx.jpg"    },
+  { id: "1",  title: "EOB",                  date: "Dec 12, 2025", status: "attached",   folderId: "2025", imageUrl: "/documents/optum-rx.jpg"    },
   { id: "2",  title: "Rite Aid",              date: "Dec 12, 2025", status: "unattached", folderId: "2025", imageUrl: "/documents/walgreens.png"   },
   { id: "3",  title: "Bright Smiles Dental", date: "Dec 12, 2025", status: "attached",   folderId: "2025", imageUrl: "/documents/huggins.png"     },
   { id: "4",  title: "EOB",                  date: "Dec 12, 2025", status: "unattached", folderId: "2025", imageUrl: "/documents/optum-rx2.jpg"   },

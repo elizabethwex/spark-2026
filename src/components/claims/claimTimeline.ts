@@ -10,6 +10,8 @@ export type WhatHappensNextStep = {
   title: string
   description: string
   phase: TimelineStepPhase
+  /** Display date shown beside this step in the timeline. */
+  date?: string
 }
 
 // ---------------------------------------------------------------------------
@@ -229,43 +231,19 @@ function paidTimeline(origin: "card" | "manual"): WhatHappensNextStep[] {
   ]
 }
 
-function repaymentDueTimeline(origin: "card" | "manual", denialReason?: string): WhatHappensNextStep[] {
+function repaymentDueTimeline(denialReason?: string): WhatHappensNextStep[] {
   return [
-    { ...firstStep(origin) },
-    {
-      id: "reviewed",
-      title: "Reviewed",
-      description: "We checked the details.",
-      phase: "complete",
-    },
-    {
-      id: "approved",
-      title: "Approved",
-      description: "Your claim was approved.",
-      phase: "complete",
-    },
-    {
-      id: "payment-processing",
-      title: "Payment Processing",
-      description: "Payment was prepared.",
-      phase: "complete",
-    },
-    {
-      id: "paid",
-      title: "Paid",
-      description: "Payment was issued.",
-      phase: "complete",
-    },
+    { ...cardFirstStep() },
     {
       id: "denied",
       title: "Denied",
-      description: denialReason ?? "Expense was found ineligible upon re-review.",
+      description: denialReason ?? "Goods or services deemed ineligible under your plan rules.",
       phase: "complete",
     },
     {
       id: "repayment-due",
       title: "Repayment Due",
-      description: "Please repay the claim amount.",
+      description: "A repayment is required.",
       phase: "current",
     },
   ]
@@ -338,7 +316,7 @@ export function getWhatHappensNextSteps(
   if (isDeniedStatus(statusLabel)) return deniedTimeline(origin, denialReason)
   if (isPaymentProcessingStatus(statusLabel)) return paymentProcessingTimeline()
   if (isPaidStatus(statusLabel)) return paidTimeline(origin)
-  if (isRepaymentDueStatus(statusLabel)) return repaymentDueTimeline(origin, denialReason)
+  if (isRepaymentDueStatus(statusLabel)) return repaymentDueTimeline(denialReason)
 
   return [
     { id: "submitted", title: "Submitted", description: "We received your claim.", phase: "complete" },
