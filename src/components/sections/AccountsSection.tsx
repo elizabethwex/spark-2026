@@ -112,7 +112,7 @@ export function AccountsSection() {
                 {/* Balances Box */}
                 <div className="flex flex-col gap-3 rounded-xl bg-[#f1f3fb] px-4 py-3">
                   <div className="flex h-[44px] items-center gap-3">
-                    <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
+                    <div className="flex h-6 w-6 shrink-0 items-center justify-center text-neutral-700">
                       <TrendingUp className="h-5 w-5" />
                     </div>
                     <div className="flex flex-1 items-center justify-between">
@@ -133,7 +133,7 @@ export function AccountsSection() {
                   <div className="h-px w-full bg-[#d1d5db]" />
                   
                   <div className="flex h-[44px] items-center gap-3">
-                    <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
+                    <div className="flex h-6 w-6 shrink-0 items-center justify-center text-neutral-700">
                       <CircleDollarSign className="h-5 w-5" />
                     </div>
                     <div className="flex flex-1 items-center justify-between">
@@ -161,7 +161,7 @@ export function AccountsSection() {
                 {/* Promo Box */}
                 <div className="flex items-center justify-between rounded-xl bg-[#f1f3fb] px-4 py-2">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
+                    <div className="flex h-6 w-6 shrink-0 items-center justify-center text-neutral-700">
                       <TrendingUp className="h-5 w-5" />
                     </div>
                     <div className="flex flex-col gap-[2px]">
@@ -175,7 +175,7 @@ export function AccountsSection() {
                   </div>
                   <button
                     type="button"
-                    className="flex items-center gap-2 text-[14px] leading-[20px] text-[#3958c3] hover:underline"
+                    className="flex items-center gap-2 text-[14px] leading-[20px] text-neutral-700 hover:underline"
                   >
                     Start Investing
                     <ChevronRight className="h-4 w-4" />
@@ -265,7 +265,7 @@ export function AccountsSection() {
                     cy="56"
                     r="48"
                     fill="none"
-                    stroke="#3958c3"
+                    stroke="var(--neutral-700)"
                     strokeWidth="10"
                     strokeLinecap="round"
                     strokeDasharray={`${2 * Math.PI * 48}`}
@@ -296,7 +296,7 @@ export function AccountsSection() {
             {/* Info Box */}
             <div className="flex w-full items-center justify-between rounded-xl bg-[#3958c3]/5 p-4">
               <div className="flex items-center gap-3">
-                <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
+                <div className="flex h-6 w-6 shrink-0 items-center justify-center text-neutral-700">
                   <Lightbulb className="h-5 w-5" />
                 </div>
                 <div className="flex flex-col gap-[2px]">
@@ -310,7 +310,7 @@ export function AccountsSection() {
               </div>
               <button
                 type="button"
-                className="flex items-center gap-2 text-[14px] leading-[20px] text-[#3958c3] hover:underline"
+                className="flex items-center gap-2 text-[14px] leading-[20px] text-neutral-700 hover:underline"
               >
                 View Eligible Expenses
                 <ChevronRight className="h-4 w-4" />

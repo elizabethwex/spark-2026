@@ -248,7 +248,7 @@ export function AiChatInput({
         </div>
         <div className="flex items-center gap-[8px]">
           <div className="flex h-[35px] w-[35px] shrink-0 cursor-pointer items-center justify-center rounded-[28px] border border-[#eef2ff] bg-[#eef2ff] transition-colors hover:bg-[#e0e7ff]">
-            <Mic className="h-[14px] w-[14px] text-[#3958c3]" />
+            <Mic className="h-[14px] w-[14px] text-neutral-700" />
           </div>
           <div
             className="flex h-[35px] w-[35px] shrink-0 cursor-pointer items-center justify-center rounded-[28px] border border-[#25146f] transition-all hover:bg-[rgba(37,20,111,0.2)]"
@@ -296,7 +296,7 @@ export function AiChatInput({
                 className="flex w-full items-center gap-3 px-6 py-3 text-left transition-colors hover:bg-[#f8f9fe]"
                 onClick={() => handleSuggestionClick(query)}
               >
-                <Sparkles className="h-4 w-4 shrink-0 text-[#3958c3]" />
+                <Sparkles className="h-4 w-4 shrink-0 text-neutral-700" />
                 <span className="truncate text-[14px] text-[#5f6a94]">
                   {query}
                 </span>

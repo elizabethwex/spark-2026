@@ -263,7 +263,7 @@ function HsaCard({ annualCents, isFamilyCoverage, isInView, onNavigate, spentCen
         {/* Balances Box */}
         <div className="flex flex-col gap-3 rounded-xl bg-[#f1f3fb] px-4 py-3">
           <div className="flex h-[44px] items-center gap-3">
-            <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
+            <div className="flex h-6 w-6 shrink-0 items-center justify-center text-neutral-700">
               <TrendingUp className="h-5 w-5" />
             </div>
             <div className="flex flex-1 items-center justify-between">
@@ -279,7 +279,7 @@ function HsaCard({ annualCents, isFamilyCoverage, isInView, onNavigate, spentCen
           <div className="h-px w-full bg-[#d1d5db]" />
 
           <div className="flex h-[44px] items-center gap-3">
-            <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
+            <div className="flex h-6 w-6 shrink-0 items-center justify-center text-neutral-700">
               <CircleDollarSign className="h-5 w-5" />
             </div>
             <div className="flex flex-1 items-center justify-between">
@@ -354,7 +354,7 @@ function HsaCard({ annualCents, isFamilyCoverage, isInView, onNavigate, spentCen
       <div className="px-6 pb-6 mt-auto">
         <button
           type="button"
-          className="w-full rounded-xl border border-[#3958c3] py-[9.75px] text-[15.75px] font-medium text-[#3958c3] hover:bg-[#3958c3]/5 transition-colors"
+          className="w-full rounded-xl border border-[#3958c3] py-[9.75px] text-[15.75px] font-medium text-neutral-700 hover:bg-[#3958c3]/5 transition-colors"
           onClick={onNavigate}
         >
           Set Up Investments
@@ -443,7 +443,7 @@ function FsaRingCard({
               </p>
               {hasSpent ? (
                 <div className="flex items-center rounded-full border border-[#3958c3]/20 bg-[#eef2ff] px-[7px] py-[3px]">
-                  <span className="text-[10px] font-bold leading-[15px] text-[#3958c3]">
+                  <span className="text-[10px] font-bold leading-[15px] text-neutral-700">
                     {fmt(spentCents)} spent · {fmt(annualCents - spentCents)} remaining
                   </span>
                 </div>
@@ -470,7 +470,7 @@ function FsaRingCard({
                   cy="56"
                   r="48"
                   fill="none"
-                  stroke="#3958c3"
+                  stroke="var(--neutral-700)"
                   strokeWidth="10"
                   strokeLinecap="round"
                   strokeDasharray={ringCircumference}
@@ -495,7 +495,7 @@ function FsaRingCard({
         {/* Info Box */}
         <div className="flex w-full items-center justify-between rounded-xl bg-[#3958c3]/5 p-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
+            <div className="flex h-6 w-6 shrink-0 items-center justify-center text-neutral-700">
               <Lightbulb className="h-5 w-5" />
             </div>
             <div className="flex flex-col gap-[2px]">
@@ -509,7 +509,7 @@ function FsaRingCard({
           </div>
           <button
             type="button"
-            className="flex items-center gap-2 text-[14px] leading-[20px] text-[#3958c3] hover:underline"
+            className="flex items-center gap-2 text-[14px] leading-[20px] text-neutral-700 hover:underline"
           >
             View Eligible Expenses
             <ChevronRight className="h-4 w-4" />
@@ -521,7 +521,7 @@ function FsaRingCard({
       <div className="px-6 pb-6 mt-auto">
         <button
           type="button"
-          className="w-full rounded-xl border border-[#3958c3] py-[9.75px] text-[15.75px] font-medium text-[#3958c3] hover:bg-[#3958c3]/5 transition-colors"
+          className="w-full rounded-xl border border-[#3958c3] py-[9.75px] text-[15.75px] font-medium text-neutral-700 hover:bg-[#3958c3]/5 transition-colors"
           onClick={onReimburse}
         >
           Reimburse Myself
@@ -592,7 +592,7 @@ function SimpleAccountCard({
 
         <div className="flex flex-col gap-3 rounded-xl bg-[#f1f3fb] px-4 py-3">
           <div className="flex h-[44px] items-center gap-3">
-            <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
+            <div className="flex h-6 w-6 shrink-0 items-center justify-center text-neutral-700">
               <CircleDollarSign className="h-5 w-5" />
             </div>
             <div className="flex flex-1 items-center justify-between">
@@ -609,7 +609,7 @@ function SimpleAccountCard({
         {hasSpent && (
           <div className="flex flex-col gap-[6px]">
             <div className="flex items-center justify-between">
-              <p className="text-[12px] font-semibold leading-[16px] text-[#3958c3]">
+              <p className="text-[12px] font-semibold leading-[16px] text-neutral-700">
                 {spentPct}% used ({fmt(spentCents)})
               </p>
               <p className="text-[12px] leading-[16px] text-[#14182c]">
