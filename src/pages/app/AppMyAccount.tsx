@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   User,
   Users,
@@ -59,7 +58,6 @@ const PROFILE_SECTIONS: { header: string; items: SectionItem[] }[] = [
 const VARIANT_KEYS: AppVariant[] = [1, 2, 3];
 
 export default function AppMyAccount() {
-  const navigate = useNavigate();
   const { variant, setVariant } = useAppVariant();
   const [variantOpen, setVariantOpen] = useState(false);
 
