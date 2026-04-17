@@ -267,7 +267,7 @@ export function AssistantIQHero({ memberName, showHsaInvestCta, simulationMode =
             />
             <div className="flex items-center gap-[8px]">
               <div className="flex h-[35px] w-[35px] shrink-0 cursor-pointer items-center justify-center rounded-[28px] border border-[#eef2ff] bg-[#eef2ff] transition-colors hover:bg-[#e0e7ff]">
-                <Mic className="h-[14px] w-[14px] text-[#3958c3]" />
+                <Mic className="h-[14px] w-[14px] text-neutral-700" />
               </div>
               <div
                 className="flex h-[35px] w-[35px] shrink-0 cursor-pointer items-center justify-center rounded-[28px] border border-[#25146f] transition-all hover:bg-[rgba(37,20,111,0.2)]"
@@ -532,7 +532,7 @@ export function AssistantIQHero({ memberName, showHsaInvestCta, simulationMode =
                     className="flex flex-col items-center justify-center gap-[16px] rounded-[32px] border border-[#e2e8f0] bg-white p-[32px] text-center min-h-[200px]"
                   >
                     <div className="flex h-[48px] w-[48px] items-center justify-center rounded-full bg-[#eef2ff]">
-                      <CheckCircle2 className="h-[24px] w-[24px] text-[#3958c3]" />
+                      <CheckCircle2 className="h-[24px] w-[24px] text-neutral-700" />
                     </div>
                     <div className="flex flex-col gap-[4px]">
                       <p className="text-[16px] font-semibold text-[#14182c]">

@@ -215,7 +215,7 @@ export function FsaPreviousPlanYearDetailSheet({
                   <div className="flex items-center justify-between gap-4 border-b border-[#b7c0da] py-3">
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 text-sm font-medium text-[#14182c]">
-                        <RefreshCw className="h-4 w-4 shrink-0 text-[#3958c3]" aria-hidden />
+                        <RefreshCw className="h-4 w-4 shrink-0 text-neutral-700" aria-hidden />
                         <span>Rolled Over</span>
                       </div>
                       <p className="mt-0.5 text-xs text-[#5f6a94]">Moved to next year</p>
