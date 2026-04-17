@@ -16,9 +16,7 @@ const MODE_LABELS: Record<SimulationMode, string> = {
   cobra: "COBRA",
 };
 
-const POST_ENROLLMENT_MODES: SimulationMode[] = ["modern", "simulated", "cobraEnroll", "cobra"];
-
-export function PrototypeToggle({ mode, onChange, hasSubmission = true }: Props) {
+export function PrototypeToggle({ mode, onChange, hasSubmission: _hasSubmission = true }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 

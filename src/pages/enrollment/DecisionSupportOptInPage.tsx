@@ -1,6 +1,5 @@
 
 import { useNavigate } from "react-router-dom";
-import { Sparkles } from "lucide-react";
 
 import EnrollmentLayout from "./EnrollmentLayout";
 import { WexButton } from "@wex/components-react/actions";

@@ -18,7 +18,7 @@ import { PrototypeToggle } from "@/components/enrollment/home/PrototypeToggle";
 import { type SimulationMode } from "@/lib/simulatedExpenses";
 import { clearEnrollmentStorage } from "@/lib/clearEnrollmentStorage";
 import svgPaths from "@/imports/svg-i1hhvy1f50";
-import { Bell, ChevronRight, CheckCircle2, Sparkles } from "lucide-react";
+import { Bell, ChevronRight, CheckCircle2 } from "lucide-react";
 
 function getGreeting(): string {
   const hour = new Date().getHours();

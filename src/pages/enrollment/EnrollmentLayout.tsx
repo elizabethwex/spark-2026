@@ -4,10 +4,6 @@ import { getEnrollmentSteps, flattenEnrollmentStepIds } from "../../components/e
 import { WexButton } from "@wex/components-react/actions";
 import { WexDialog } from "@wex/components-react/overlays";
 import { ScrollIndicator } from "../../components/enrollment/ScrollIndicator";
-import { Sparkles } from "lucide-react";
-
-const BRAND_LINEAR_GRADIENT =
-  'linear-gradient(172.91deg, rgb(37, 20, 111) 2.4625%, rgb(200, 16, 46) 100%)';
 
 type EnrollmentLayoutProps = {
   currentStepId?: string;
