@@ -557,7 +557,7 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
               >
                 <div className="flex items-center gap-[16px]">
                   <div className="flex h-[48px] w-[48px] shrink-0 items-center justify-center rounded-[12px] border border-[#e2e8f0] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
-                    <FileText className="h-[18px] w-[18px] text-[#3958c3]" />
+                    <FileText className="h-[18px] w-[18px] text-neutral-700" />
                   </div>
                   <div className="flex flex-col">
                     <p className="text-[14px] font-bold leading-[24px] text-foreground">
@@ -752,7 +752,7 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
                           cx="28"
                           cy="28"
                           r="24"
-                          stroke="#3958c3"
+                          stroke="var(--neutral-700)"
                           strokeWidth="3"
                           fill="none"
                           strokeLinecap="round"
@@ -859,7 +859,7 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.24, delay: 0.24, ease: softEaseOut }}
-                    className="mt-[8px] rounded-[12px] bg-[#f8f9fe] border border-[#e3e7f4] px-[16px] py-[8px] text-[14px] font-medium text-[#5f6a94] hover:bg-[#eef2ff] hover:text-[#3958c3] transition-colors"
+                    className="mt-[8px] rounded-[12px] bg-[#f8f9fe] border border-[#e3e7f4] px-[16px] py-[8px] text-[14px] font-medium text-[#5f6a94] hover:bg-[#eef2ff] hover:text-neutral-700 transition-colors"
                   >
                     Close
                   </motion.button>
@@ -883,7 +883,7 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
               className="flex flex-col items-center justify-center gap-[16px] rounded-[32px] border border-[#e2e8f0] bg-white p-[32px] text-center min-h-[200px]"
             >
               <div className="flex h-[48px] w-[48px] items-center justify-center rounded-full bg-[#eef2ff]">
-                <CheckCircle2 className="h-[24px] w-[24px] text-[#3958c3]" />
+                <CheckCircle2 className="h-[24px] w-[24px] text-neutral-700" />
               </div>
               <div className="flex flex-col gap-[4px]">
                 <p className="text-[16px] font-semibold text-foreground">

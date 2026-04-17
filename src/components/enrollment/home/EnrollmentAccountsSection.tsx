@@ -1,10 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   AlertTriangle,
   CalendarCheck2,
   CalendarClock,
-  ChevronRight,
   CircleDollarSign,
   ClockAlert,
   Info,
@@ -84,7 +82,6 @@ export function EnrollmentAccountsSection({
 }: Props) {
   const isSimulated = simulationMode === "simulated";
   const isCobra = simulationMode === "cobra";
-  const navigate = useNavigate();
   const { ref, isInView } = useInView({ threshold: 0.3, rootMargin: "0px 0px -15% 0px" });
 
   const hsaCents = (elections as Elections & { hsa?: { electionCents: number } }).hsa?.electionCents ?? 0;
@@ -103,7 +100,6 @@ export function EnrollmentAccountsSection({
         annualCents={hsaCents}
         isFamilyCoverage={isFamilyCoverage}
         isInView={isInView}
-        onNavigate={() => navigate("/hsa-details")}
         spentCents={isCobra ? Math.round(hsaCents * 0.75) : isSimulated ? Math.round(hsaCents * 0.35) : 0}
         contributionsFrozen={isCobra}
       />
@@ -121,7 +117,6 @@ export function EnrollmentAccountsSection({
         eligibleLabel="Vision & Dental"
         eligibleDescription="Covers dental & vision expenses only"
         isInView={isInView}
-        onReimburse={() => navigate("/reimburse")}
         spentCents={isCobra ? Math.round(elections.lpfsa.electionCents * 0.8) : isSimulated ? Math.round(elections.lpfsa.electionCents * 0.45) : 0}
         daysOverride={isCobra ? 30 : undefined}
       />
@@ -139,7 +134,6 @@ export function EnrollmentAccountsSection({
         eligibleLabel="Medical, Dental & Vision"
         eligibleDescription="Covers most eligible medical expenses"
         isInView={isInView}
-        onReimburse={() => navigate("/reimburse")}
         spentCents={isCobra ? Math.round(elections.fsa.electionCents * 0.8) : isSimulated ? Math.round(elections.fsa.electionCents * 0.45) : 0}
         daysOverride={isCobra ? 30 : undefined}
       />
@@ -211,12 +205,11 @@ interface HsaCardProps {
   annualCents: number;
   isFamilyCoverage: boolean;
   isInView: boolean;
-  onNavigate: () => void;
   spentCents?: number;
   contributionsFrozen?: boolean;
 }
 
-function HsaCard({ annualCents, isFamilyCoverage, isInView, onNavigate, spentCents = 0, contributionsFrozen = false }: HsaCardProps) {
+function HsaCard({ annualCents, isFamilyCoverage, isInView, spentCents = 0, contributionsFrozen = false }: HsaCardProps) {
   const irsLimit = isFamilyCoverage ? 8550 : 4300;
   const irsLimitLabel = isFamilyCoverage ? "$8,550.00 (family)" : "$4,300.00 (individual)";
   const annualDollars = annualCents / 100;
@@ -369,7 +362,6 @@ interface FsaRingCardProps {
   eligibleLabel: string;
   eligibleDescription: string;
   isInView: boolean;
-  onReimburse: () => void;
   spentCents?: number;
   daysOverride?: number;
 }
@@ -394,7 +386,6 @@ function FsaRingCard({
   annualCents,
   coveragePeriod,
   isInView,
-  onReimburse,
   spentCents = 0,
 }: FsaRingCardProps) {
   const hasSpent = spentCents > 0;

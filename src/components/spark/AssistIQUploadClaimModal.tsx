@@ -282,7 +282,7 @@ function DocumentUploadCard({
 
         {(phase === "uploading" || phase === "uploaded") && (
           <div className="flex w-full items-center gap-3 rounded-xl border border-[#e3e7f4] bg-[#f8f9fe] p-3">
-            <FileText className="h-6 w-6 shrink-0 text-[#3958c3]" />
+            <FileText className="h-6 w-6 shrink-0 text-neutral-700" />
             <div className="flex flex-1 flex-col gap-1.5">
               <div className="flex justify-between text-[12px] font-medium text-[#14182c]">
                 <span>dentist-eob.pdf</span>
@@ -772,7 +772,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
                 <button
                   type="button"
                   onClick={handleStartNewChat}
-                  className="flex h-8 w-full items-center justify-center gap-2 rounded-lg border border-[#e3e7f4] bg-[#f8f9fe] text-[14px] font-medium text-[#3958c3] transition-colors hover:bg-[#eef2ff]"
+                  className="flex h-8 w-full items-center justify-center gap-2 rounded-lg border border-[#e3e7f4] bg-[#f8f9fe] text-[14px] font-medium text-neutral-700 transition-colors hover:bg-[#eef2ff]"
                 >
                   <Plus className="h-3.5 w-3.5" />
                   Start new chat
@@ -834,7 +834,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
               <div className="px-4 pt-4 w-[308px] hidden">
                 <button
                   type="button"
-                  className="flex w-full items-center gap-2 text-left text-[13px] font-medium text-[#5f6a94] transition-colors hover:text-[#3958c3]"
+                  className="flex w-full items-center gap-2 text-left text-[13px] font-medium text-[#5f6a94] transition-colors hover:text-neutral-700"
                 >
                   <Download className="h-3.5 w-3.5 shrink-0" />
                   Export this transcript in PDF
@@ -987,22 +987,22 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
                       >
                         <div className="mb-3 flex items-center justify-between">
                           <h3 className="text-[14px] font-semibold text-[#444c72]">Recent conversations:</h3>
-                          <button className="text-[13px] font-medium text-[#3958c3] hover:underline">View all</button>
+                          <button className="text-[13px] font-medium text-neutral-700 hover:underline">View all</button>
                         </div>
                         <div className="flex flex-col gap-2">
                           <button className="group flex items-center justify-between rounded-xl border border-[#e3e7f4] bg-white p-4 text-left transition-all hover:-translate-y-[1px] hover:bg-[#f8f9fe] hover:shadow-sm">
-                            <div className="flex items-center gap-3 text-[#3958c3]">
+                            <div className="flex items-center gap-3 text-neutral-700">
                               <Clock className="h-4 w-4" />
                               <span className="text-[14px]">Claim status for my family doctor visit</span>
                             </div>
-                            <ChevronRight className="h-4 w-4 text-[#a5aeb4] transition-colors group-hover:text-[#3958c3]" />
+                            <ChevronRight className="h-4 w-4 text-[#a5aeb4] transition-colors group-hover:text-neutral-700" />
                           </button>
                           <button className="group flex items-center justify-between rounded-xl border border-[#e3e7f4] bg-white p-4 text-left transition-all hover:-translate-y-[1px] hover:bg-[#f8f9fe] hover:shadow-sm">
-                            <div className="flex items-center gap-3 text-[#3958c3]">
+                            <div className="flex items-center gap-3 text-neutral-700">
                               <Clock className="h-4 w-4" />
                               <span className="text-[14px]">Why was my claim denied?</span>
                             </div>
-                            <ChevronRight className="h-4 w-4 text-[#a5aeb4] transition-colors group-hover:text-[#3958c3]" />
+                            <ChevronRight className="h-4 w-4 text-[#a5aeb4] transition-colors group-hover:text-neutral-700" />
                           </button>
                         </div>
                       </motion.div>
@@ -1473,7 +1473,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
                       className="flex h-[35px] w-[35px] shrink-0 items-center justify-center rounded-[28px] border border-[#eef2ff] bg-[#eef2ff] transition-colors hover:bg-[#e0e7ff]"
                       aria-label="Voice input"
                     >
-                      <Mic className="h-[14px] w-[14px] text-[#3958c3]" />
+                      <Mic className="h-[14px] w-[14px] text-neutral-700" />
                     </button>
                     <button
                       type="button"

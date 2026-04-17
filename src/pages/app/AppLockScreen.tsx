@@ -7,7 +7,7 @@ import { usePrototype } from "@/context/PrototypeContext";
 type Phase = "lock" | "splash" | "faceIdScanning" | "faceIdSuccess" | "loading";
 const ALL_PHASES: Phase[] = ["lock", "splash", "faceIdScanning", "faceIdSuccess", "loading"];
 
-const WEX_APP_ICON = "/wex-app-icon.png";
+const WEX_APP_ICON = `${import.meta.env.BASE_URL}wex-app-icon.png`;
 const FACE_ID_SVG = "/app-ui/face-id.svg";
 const FACE_ID_SUCCESS_SVG = "/app-ui/face-id-success.svg";
 

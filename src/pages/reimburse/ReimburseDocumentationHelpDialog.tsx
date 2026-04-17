@@ -107,7 +107,7 @@ export function ReimburseDocumentationHelpDialog({
             variant="outline"
             disabled={pageIndex >= PAGE_COUNT - 1}
             onClick={() => setPageIndex((p) => Math.min(PAGE_COUNT - 1, p + 1))}
-            className="gap-1.5 border-[#3958c3] text-[#3958c3] hover:bg-[#3958c3]/5 disabled:opacity-40"
+            className="gap-1.5 border-[#3958c3] text-neutral-700 hover:bg-[#3958c3]/5 disabled:opacity-40"
           >
             Next
             <ChevronRight className="h-4 w-4 text-current" />

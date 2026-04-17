@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { CalendarCheck2, TrendingUp, CircleDollarSign, Info, ChevronRight, HeartPulse, Baby, RotateCw, ClockAlert, CalendarClock, Calendar, ChartNoAxesCombined, Landmark, Lightbulb } from "lucide-react";
+import { CalendarCheck2, TrendingUp, CircleDollarSign, Info, ChevronRight, HeartPulse, Baby, RotateCw, ClockAlert, CalendarClock, Calendar, ChartNoAxesCombined, Landmark } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@wexinc-healthbenefits/ben-ui-kit";
