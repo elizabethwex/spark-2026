@@ -409,16 +409,9 @@ export function SparkAccountsSection({
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[color:var(--system-link,#1c6eff)] -mr-3 cursor-default">
-                View Eligible Expenses
-                <ChevronRight className="h-4 w-4" />
-              </div>
             </div>
           </div>
 
-          {/* Footer */}
-          <div className="px-6 pb-6 mt-auto">
-          </div>
         </div>
         )}
         </>
@@ -665,26 +658,6 @@ export function SparkAccountsSection({
                 </div>
               </div>
 
-                {/* Info Box */}
-                <div className="flex w-full items-center justify-between rounded-xl bg-[#3958c3]/5 p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
-                      <Lightbulb className="h-5 w-5" />
-                    </div>
-                    <div className="flex flex-col gap-[2px]">
-                      <p className="text-[14px] font-bold leading-[20px] text-foreground">
-                        {dcfsa.eligibleLabel}
-                      </p>
-                      <p className="text-[12px] leading-[16px] text-[#5f6a94]">
-                        {dcfsa.eligibleDesc}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[color:var(--system-link,#1c6eff)] -mr-3 cursor-default">
-                    View Eligible Expenses
-                    <ChevronRight className="h-4 w-4" />
-                  </div>
-                </div>
             </div>
 
             {/* Gray box */}

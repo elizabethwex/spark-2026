@@ -365,6 +365,7 @@ export default function BeneficiariesPage({
           setAddOpen(false);
         }}
         primaryDisabled={hasPrimary}
+        isEnrollmentFlow={true}
       />
 
       {/* Remove confirmation: only for non-dependent (newly added) beneficiaries */}

@@ -27,6 +27,37 @@ function getGreeting(): string {
   return "Good evening";
 }
 
+const MOCK_SUBMISSION: EnrollmentSubmissionV1 = {
+  version: 1,
+  submittedAtIso: new Date().toISOString(),
+  snapshot: {
+    plans: {
+      medical: { enrollees: ["myself"], selectedPlanId: "acme-hdhp" },
+      dental: { enrollees: ["myself"], selectedPlanId: "premium" },
+      vision: { enrollees: ["myself"], selectedPlanId: "basic" },
+    },
+    spendingAccounts: {
+      selected: ["hsa", "lpfsa"],
+      elections: {
+        fsa: { electionCents: 0, acknowledgedRules: true },
+        lpfsa: { electionCents: 150000, acknowledgedRules: true }, // $1,500
+        dcfsa: { electionCents: 0, acknowledgedRules: true },
+        hra: { electionCents: 0, acknowledgedRules: true },
+      },
+    },
+    supplemental: { accidentInsurance: null, hospitalIndemnity: null },
+    household: { dependents: [], selectedIds: [], selfOnly: true },
+    hsaRelated: { electionCents: 350000 }, // $3,500
+  },
+  totals: {
+    plansBiWeeklyCents: 0,
+    spendingAnnualCents: 500000,
+    spendingTaxSavingsAnnualCents: 150000,
+    spendingPerPayDeductionCents: 19230,
+    supplementalMonthlyCents: 0,
+  },
+};
+
 export default function EnrollmentHomePage() {
   const navigate = useNavigate();
   const greeting = getGreeting();
@@ -49,9 +80,18 @@ export default function EnrollmentHomePage() {
     setSimulationMode(newMode);
   };
 
-  if (!submission) {
+  const effectiveSubmission = submission || (simulationMode !== "preEnrollment" ? MOCK_SUBMISSION : null);
+
+  if (!effectiveSubmission) {
     return (
-      <div className="min-h-screen bg-[hsl(228,53%,96%)] flex flex-col">
+      <div
+        className="min-h-screen flex flex-col"
+        style={{
+          backgroundImage:
+            "linear-gradient(18.89deg, rgb(255,255,255) 17.85%, hsl(228,53%,96%) 86.81%, hsl(229,76%,89%) 103.68%)",
+          backgroundAttachment: "fixed",
+        }}
+      >
         <Navigation />
 
         <main className="flex-1 relative pt-16">
@@ -67,14 +107,23 @@ export default function EnrollmentHomePage() {
 
               {/* ── Left: Assistant IQ ── */}
               <div className="flex flex-col gap-8 p-8 sm:p-10 lg:min-h-[520px]">
-                <div className="relative shrink-0 size-[52px] rounded-full overflow-hidden shadow-sm ring-1 ring-white/80">
-                  <div
-                    className="absolute inset-0 rounded-full"
-                    style={{ background: 'linear-gradient(172.91deg, rgb(37, 20, 111) 2.4625%, rgb(200, 16, 46) 100%)' }}
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Sparkles className="size-6 text-white drop-shadow-sm" strokeWidth={2} />
-                  </div>
+                <div
+                  className="flex h-[40px] w-[40px] shrink-0 items-center justify-center rounded-full shadow-[0_1.057px_3.17px_rgba(2,13,36,0.2),0_0_0.528px_rgba(2,13,36,0.3)]"
+                  style={{
+                    backgroundImage:
+                      "linear-gradient(133.514deg, rgb(37, 20, 111) 2.4625%, rgb(200, 16, 46) 100%)",
+                  }}
+                >
+                  <svg
+                    width="16.9"
+                    height="16.9"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    className="shrink-0"
+                  >
+                    <path d="M13.913 13.9149L11.9997 24.0033L10.087 13.9149L0 12.0013L10.087 10.0884L12.0003 0L13.913 10.0884L24 12.0013L13.913 13.9149Z" fill="white"/>
+                    <path d="M20.2758 19.7969L19.5994 23.3628L18.923 19.7969L15.3569 19.1204L18.923 18.4439L19.5994 14.8781L20.2752 18.4439L23.8412 19.1204L20.2758 19.7969Z" fill="white"/>
+                  </svg>
                 </div>
 
                 <div className="flex flex-col gap-2 max-w-xl">
@@ -178,18 +227,21 @@ export default function EnrollmentHomePage() {
   }
 
   // Enrolled state -- derive data
-  const plans = submission.snapshot.plans;
-  const elections = submission.snapshot.spendingAccounts.elections as Elections;
+  const plans = effectiveSubmission.snapshot.plans;
+  const elections = {
+    ...effectiveSubmission.snapshot.spendingAccounts.elections,
+    hsa: effectiveSubmission.snapshot.hsaRelated
+  } as Elections;
   const medicalPlanId = plans.medical?.selectedPlanId ?? null;
 
-  const savedAccounts = submission.snapshot.spendingAccounts.selected ?? [];
+  const savedAccounts = effectiveSubmission.snapshot.spendingAccounts.selected ?? [];
   const hsaElection = (elections as Elections & { hsa?: { electionCents: number } }).hsa;
   const isHdhp = medicalPlanId === "acme-hdhp";
   const selectedAccounts =
     isHdhp && hsaElection && hsaElection.electionCents > 0 && !savedAccounts.includes("hsa")
       ? [...savedAccounts, "hsa"]
       : savedAccounts;
-  const isFamilyCoverage = !submission.snapshot.household?.selfOnly;
+  const isFamilyCoverage = !effectiveSubmission.snapshot.household?.selfOnly;
   const isCobraEnroll = simulationMode === "cobraEnroll";
 
   return (
@@ -220,7 +272,7 @@ export default function EnrollmentHomePage() {
               (plans.dental?.selectedPlanId && plans.dental.selectedPlanId !== "waive") ||
               (plans.vision?.selectedPlanId && plans.vision.selectedPlanId !== "waive")) && (
               <FadeInItem>
-                <PlanPerformanceCard submission={submission} simulationMode={isCobraEnroll ? "simulated" : simulationMode} />
+                <PlanPerformanceCard submission={effectiveSubmission} simulationMode={isCobraEnroll ? "simulated" : simulationMode} />
               </FadeInItem>
             )}
 

@@ -23,8 +23,6 @@ export function PrototypeToggle({ mode, onChange, hasSubmission = true }: Props)
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const handleSelect = (newMode: SimulationMode) => {
-    const isPostEnrollment = POST_ENROLLMENT_MODES.includes(newMode);
-    if (isPostEnrollment && !hasSubmission) return;
     onChange(newMode);
     setIsOpen(false);
   };
@@ -62,8 +60,7 @@ export function PrototypeToggle({ mode, onChange, hasSubmission = true }: Props)
           <div className="absolute bottom-full right-0 mb-2 min-w-[160px] rounded-lg border border-border bg-background shadow-lg">
             <div className="py-1">
               {(Object.keys(MODE_LABELS) as SimulationMode[]).map((modeOption) => {
-                const isPostEnrollment = POST_ENROLLMENT_MODES.includes(modeOption);
-                const isDisabled = isPostEnrollment && !hasSubmission;
+                const isDisabled = false;
 
                 return (
                   <button

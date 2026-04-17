@@ -742,7 +742,7 @@ export default function EnrollmentStatementPage() {
         {/* ============================================================ */}
         <section className="mt-6">
           <h3 className="text-[20px] font-bold text-foreground mb-4">Plans</h3>
-          <div className="rounded-2xl border border-border bg-background elevation-3 overflow-hidden">
+          <div className="rounded-2xl border border-border bg-background elevation-3 shadow-md overflow-hidden">
             <BenefitTableHeader />
             <PlanRow
               icon={<Heart className="h-5 w-5 text-primary" />}
@@ -808,7 +808,7 @@ export default function EnrollmentStatementPage() {
             <h3 className="text-[20px] font-bold text-foreground mb-4">
               Spending Accounts
             </h3>
-            <div className="rounded-2xl border border-border bg-background elevation-3 overflow-hidden">
+            <div className="rounded-2xl border border-border bg-background elevation-3 shadow-md overflow-hidden">
               <SpendingTableHeader />
               {spending.selected.includes("fsa") &&
                 fsa.electionCents > 0 && (
@@ -846,7 +846,7 @@ export default function EnrollmentStatementPage() {
           <h3 className="text-[20px] font-bold text-foreground mb-4">
             Supplemental Benefits
           </h3>
-          <div className="rounded-2xl border border-border bg-background elevation-3 overflow-hidden">
+          <div className="rounded-2xl border border-border bg-background elevation-3 shadow-md overflow-hidden">
             <BenefitTableHeader />
             <SupplementalRow
               icon={<ShieldCheck className="h-5 w-5 text-success-text" />}
