@@ -87,7 +87,7 @@ export function FsaTransactionDetailSheet({
                 <span className="text-sm text-[#5f6a94]">Total paid</span>
                 <Badge
                   intent="warning"
-                  className="rounded-2xl bg-[#fff9e6] px-2 py-1 text-xs font-bold text-[#4a3500]"
+                  className="rounded-2xl bg-[#FEE2E2] px-2 py-1 text-xs font-bold text-[#C8102E] border-transparent"
                 >
                   Denied
                 </Badge>
@@ -146,7 +146,7 @@ export function FsaTransactionDetailSheet({
                   valueNode={
                     <Badge
                       intent="warning"
-                      className="rounded-2xl bg-[#fff9e6] px-2 py-1 text-xs font-bold text-[#4a3500]"
+                      className="rounded-2xl bg-[#FFF1BF] px-2 py-1 text-xs font-bold text-[#735300] border-transparent"
                     >
                       New Needed
                     </Badge>

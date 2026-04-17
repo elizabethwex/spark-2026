@@ -20,11 +20,11 @@ function statusStyles(status: SparkActivityStatus): { wrapper: string; text: str
   switch (status) {
     case "approved":
     case "completed":
-      return { wrapper: "border-[#e6f5f0] bg-[#e6f5f0]", text: "text-[#009966]" };
+      return { wrapper: "border-[#D0FAE5] bg-[#D0FAE5]", text: "text-[#006045]" };
     case "needs_attention":
-      return { wrapper: "border-[#fff9e6] bg-[#fffbeb]", text: "text-[#bf8a00]" };
+      return { wrapper: "border-[#FFF1BF] bg-[#FFF1BF]", text: "text-[#735300]" };
     default:
-      return { wrapper: "border-[#f1f3fb] bg-[#f1f3fb]", text: "text-[#5f6a94]" };
+      return { wrapper: "border-[#F1F3FB] bg-[#F1F3FB]", text: "text-[#444C72]" };
   }
 }
 

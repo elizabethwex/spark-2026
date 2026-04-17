@@ -448,6 +448,31 @@ code[class*="language-"] {
 }
 
 /* ============================================================
+   THEME-PRIMARY OUTLINE BUTTON
+   ============================================================
+   Applied to outline buttons that use --theme-primary for border/text.
+   Overrides the design system's default background tokens and provides
+   the same hover surface tint used on the FSA/HSA pages (primary/10).
+   ============================================================ */
+.btn-primary-theme {
+  background-color: var(--theme-primary) !important;
+  border-color: var(--theme-primary) !important;
+  transition: background-color 150ms ease, border-color 150ms ease !important;
+}
+.btn-primary-theme:hover:not(:disabled) {
+  background-color: var(--theme-primary-hover) !important;
+  border-color: var(--theme-primary-hover) !important;
+}
+
+.btn-outline-theme {
+  background-color: transparent !important;
+  transition: background-color 150ms ease !important;
+}
+.btn-outline-theme:hover:not(:disabled) {
+  background-color: var(--theme-primary-surface) !important;
+}
+
+/* ============================================================
    BEN-UI-KIT COMPONENT OVERRIDES
    ============================================================
    Ensures ben-ui-kit components work correctly with Tailwind.
