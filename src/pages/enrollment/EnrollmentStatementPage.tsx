@@ -713,7 +713,7 @@ export default function EnrollmentStatementPage() {
               Go Home
             </WexButton>
             <WexButton intent="primary" onClick={() => window.print()}>
-              <Printer className="h-4 w-4" />
+              <Printer className="h-4 w-4 text-current" />
               Print
             </WexButton>
           </div>
