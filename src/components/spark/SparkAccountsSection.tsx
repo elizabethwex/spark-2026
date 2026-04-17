@@ -15,6 +15,11 @@ import {
   sparkDcfsaPrimarySummary,
 } from "@/data/sparkAiForwardMock";
 
+const fmtUsd = (n: number) =>
+  n.toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 });
+
+const parseUsd = (s: string) => Number(s.replace(/[^0-9.-]+/g, ""));
+
 function useInView(options?: IntersectionObserverInit) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [isInView, setIsInView] = useState(false);
