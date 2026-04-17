@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { CalendarCheck2, TrendingUp, CircleDollarSign, Info, ChevronRight, HeartPulse, Baby, RotateCw, ClockAlert, CalendarClock, Calendar, ChartNoAxesCombined, Landmark } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@wexinc-healthbenefits/ben-ui-kit";
 import {
   sparkHsaSummary,
@@ -141,7 +142,7 @@ export function SparkAccountsSection({
                     </p>
                   </div>
                   <p className="text-[40px] font-bold leading-[56px] tracking-[-0.88px] text-[#14182c]">
-                    {h.totalValue}
+                    <AnimatedNumber value={parseUsd(h.totalValue)} format={fmtUsd} durationMs={1200} />
                   </p>
                 </div>
 
@@ -190,7 +191,7 @@ export function SparkAccountsSection({
                     Cash Balance
                   </p>
                   <p className="text-[40px] font-bold leading-[56px] tracking-[-0.88px] text-[#14182c]">
-                    {h.cashBalance}
+                    <AnimatedNumber value={parseUsd(h.cashBalance)} format={fmtUsd} durationMs={1200} />
                   </p>
                 </div>
 
@@ -308,7 +309,7 @@ export function SparkAccountsSection({
                   </Tooltip>
                 </div>
                 <p className="text-[40px] font-bold leading-[56px] tracking-[-0.88px] text-[#14182c]">
-                  {l.balance}
+                  <AnimatedNumber value={parseUsd(l.balance)} format={fmtUsd} durationMs={1200} />
                 </p>
               </div>
 
@@ -474,7 +475,7 @@ export function SparkAccountsSection({
                   </Tooltip>
                 </div>
                 <p className="text-[40px] font-bold leading-[56px] tracking-[-0.88px] text-[#14182c]">
-                  {fsa.balance}
+                  <AnimatedNumber value={parseUsd(fsa.balance)} format={fmtUsd} durationMs={1200} />
                 </p>
               </div>
 
@@ -632,7 +633,7 @@ export function SparkAccountsSection({
                   </Tooltip>
                 </div>
                 <p className="text-[40px] font-bold leading-[56px] tracking-[-0.88px] text-[#14182c]">
-                  {dcfsa.balance}
+                  <AnimatedNumber value={parseUsd(dcfsa.balance)} format={fmtUsd} durationMs={1200} />
                 </p>
               </div>
 
