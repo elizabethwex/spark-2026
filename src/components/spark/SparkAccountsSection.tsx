@@ -1,8 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { CalendarCheck2, TrendingUp, CircleDollarSign, Info, ChevronRight, HeartPulse, Baby, RotateCw, ClockAlert, CalendarClock, Calendar, ChartNoAxesCombined, Landmark, Lightbulb } from "lucide-react";
+import { CalendarCheck2, TrendingUp, CircleDollarSign, Info, ChevronRight, HeartPulse, Baby, RotateCw, ClockAlert, CalendarClock, Calendar, ChartNoAxesCombined, Landmark } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@wexinc-healthbenefits/ben-ui-kit";
 import {
   sparkHsaSummary,
@@ -14,12 +15,10 @@ import {
   sparkDcfsaPrimarySummary,
 } from "@/data/sparkAiForwardMock";
 
-import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
-
 const fmtUsd = (n: number) =>
   n.toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 });
 
-const parseUsd = (s: string) => Number(s.replace(/[^0-9.-]+/g,""));
+const parseUsd = (s: string) => Number(s.replace(/[^0-9.-]+/g, ""));
 
 function useInView(options?: IntersectionObserverInit) {
   const ref = useRef<HTMLDivElement | null>(null);
@@ -127,7 +126,7 @@ export function SparkAccountsSection({
             <button
               type="button"
               onClick={() => navigate("/hsa-details")}
-              className="flex items-center gap-1 rounded-[6px] px-[12px] py-[8px] text-[14px] whitespace-nowrap font-medium text-[color:var(--system-link,#1c6eff)] hover:underline transition-colors -mr-3"
+              className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[color:var(--system-link,#1c6eff)] hover:underline transition-colors -mr-3"
             >
               View Details
               <ChevronRight className="h-4 w-4" />
@@ -155,7 +154,7 @@ export function SparkAccountsSection({
                 {/* Balances Box */}
                 <div className="flex flex-col gap-3 rounded-xl bg-[#f1f3fb] px-4 py-3 w-full">
                   <div className="flex h-[44px] items-center gap-3 w-full">
-                    <div className="flex h-6 w-6 shrink-0 items-center justify-center text-neutral-700">
+                    <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
                       <CircleDollarSign className="h-5 w-5" />
                     </div>
                     <div className="flex flex-1 items-center justify-between">
@@ -171,7 +170,7 @@ export function SparkAccountsSection({
                   <div className="h-px w-full bg-[#d1d5db]" />
                   
                   <div className="flex h-[44px] items-center gap-3 w-full">
-                    <div className="flex h-6 w-6 shrink-0 items-center justify-center text-neutral-700">
+                    <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
                       <ChartNoAxesCombined className="h-5 w-5" />
                     </div>
                     <div className="flex flex-1 items-center justify-between">
@@ -197,14 +196,14 @@ export function SparkAccountsSection({
                     Cash Balance
                   </p>
                   <p className="text-[40px] font-bold leading-[56px] tracking-[-0.88px] text-[#14182c]">
-                    {h.cashBalance}
+                    <AnimatedNumber value={parseUsd(h.cashBalance)} format={fmtUsd} durationMs={1200} />
                   </p>
                 </div>
 
                 {/* Promo Box */}
                 <div className="flex items-center justify-between rounded-xl bg-[#f1f3fb] px-4 py-2 w-full">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-6 w-6 shrink-0 items-center justify-center text-neutral-700">
+                    <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
                       <TrendingUp className="h-5 w-5" />
                     </div>
                     <div className="flex flex-col gap-[2px]">
@@ -218,7 +217,7 @@ export function SparkAccountsSection({
                   </div>
                   <button
                     type="button"
-                    className="flex items-center gap-1 rounded-[6px] px-[12px] py-[8px] text-[14px] whitespace-nowrap font-medium text-[color:var(--system-link,#1c6eff)] hover:underline transition-colors -mr-3"
+                    className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[color:var(--system-link,#1c6eff)] hover:underline transition-colors -mr-3"
                   >
                     Start Investing
                     <ChevronRight className="h-4 w-4" />
@@ -286,7 +285,7 @@ export function SparkAccountsSection({
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-1 rounded-[6px] px-[12px] py-[8px] text-[14px] whitespace-nowrap font-medium text-[color:var(--system-link,#1c6eff)] -mr-3 cursor-default">
+            <div className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[color:var(--system-link,#1c6eff)] -mr-3 cursor-default">
               View Details
               <ChevronRight className="h-4 w-4" />
             </div>
@@ -346,7 +345,7 @@ export function SparkAccountsSection({
             <div className="flex flex-col gap-3 rounded-xl bg-[#f1f3fb] px-4 py-3 w-full">
               {/* Row 1 */}
               <div className="flex h-[44px] items-center gap-3 w-full">
-                <div className="flex h-6 w-6 shrink-0 items-center justify-center text-neutral-700">
+                <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
                   <RotateCw className="h-5 w-5" />
                 </div>
                 <div className="flex flex-1 items-center justify-between">
@@ -377,7 +376,7 @@ export function SparkAccountsSection({
               
               {/* Row 2 */}
               <div className="flex h-[44px] items-center gap-3 w-full">
-                <div className="flex h-6 w-6 shrink-0 items-center justify-center text-neutral-700">
+                <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
                   <ClockAlert className="h-5 w-5" />
                 </div>
                 <div className="flex flex-1 items-center justify-between">
@@ -404,7 +403,7 @@ export function SparkAccountsSection({
 
               {/* Row 3 */}
               <div className="flex h-[44px] items-center gap-3 w-full">
-                <div className="flex h-6 w-6 shrink-0 items-center justify-center text-neutral-700">
+                <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
                   <CalendarClock className="h-5 w-5" />
                 </div>
                 <div className="flex flex-1 items-center justify-between">
@@ -416,16 +415,9 @@ export function SparkAccountsSection({
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-1 rounded-[6px] px-[12px] py-[8px] text-[14px] whitespace-nowrap font-medium text-[color:var(--system-link,#1c6eff)] -mr-3 cursor-default">
-                View Eligible Expenses
-                <ChevronRight className="h-4 w-4" />
-              </div>
             </div>
           </div>
 
-          {/* Footer */}
-          <div className="px-6 pb-6 mt-auto">
-          </div>
         </div>
         )}
         </>
@@ -457,8 +449,8 @@ export function SparkAccountsSection({
                 </div>
                 <button
                   type="button"
-                  onClick={() => navigate("/fsa-account")}
-                  className="flex items-center gap-1 rounded-[6px] px-[12px] py-[8px] text-[14px] whitespace-nowrap font-medium text-[color:var(--system-link,#1c6eff)] hover:underline transition-colors -mr-3"
+                  onClick={() => navigate("/account-overview?account=fsa")}
+                  className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[color:var(--system-link,#1c6eff)] hover:underline transition-colors -mr-3"
                 >
                   View Details
                   <ChevronRight className="h-4 w-4" />
@@ -519,7 +511,7 @@ export function SparkAccountsSection({
             <div className="flex flex-col gap-3 rounded-xl bg-[#f1f3fb] px-4 py-3 w-full">
               {/* Row 1 */}
               <div className="flex h-[44px] items-center gap-3 w-full">
-                <div className="flex h-6 w-6 shrink-0 items-center justify-center text-neutral-700">
+                <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
                   <RotateCw className="h-5 w-5" />
                 </div>
                 <div className="flex flex-1 items-center justify-between">
@@ -550,7 +542,7 @@ export function SparkAccountsSection({
               
               {/* Row 2 */}
               <div className="flex h-[44px] items-center gap-3 w-full">
-                <div className="flex h-6 w-6 shrink-0 items-center justify-center text-neutral-700">
+                <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
                   <ClockAlert className="h-5 w-5" />
                 </div>
                 <div className="flex flex-1 items-center justify-between">
@@ -577,7 +569,7 @@ export function SparkAccountsSection({
 
               {/* Row 3 */}
               <div className="flex h-[44px] items-center gap-3 w-full">
-                <div className="flex h-6 w-6 shrink-0 items-center justify-center text-neutral-700">
+                <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
                   <CalendarClock className="h-5 w-5" />
                 </div>
                 <div className="flex flex-1 items-center justify-between">
@@ -617,7 +609,7 @@ export function SparkAccountsSection({
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-1 rounded-[6px] px-[12px] py-[8px] text-[14px] whitespace-nowrap font-medium text-[color:var(--system-link,#1c6eff)] -mr-3 cursor-default">
+                <div className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[color:var(--system-link,#1c6eff)] -mr-3 cursor-default">
                   View Details
                   <ChevronRight className="h-4 w-4" />
                 </div>
@@ -672,33 +664,13 @@ export function SparkAccountsSection({
                 </div>
               </div>
 
-                {/* Info Box */}
-                <div className="flex w-full items-center justify-between rounded-xl bg-[#3958c3]/5 p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-6 w-6 shrink-0 items-center justify-center text-neutral-700">
-                      <Lightbulb className="h-5 w-5" />
-                    </div>
-                    <div className="flex flex-col gap-[2px]">
-                      <p className="text-[14px] font-bold leading-[20px] text-foreground">
-                        {dcfsa.eligibleLabel}
-                      </p>
-                      <p className="text-[12px] leading-[16px] text-[#5f6a94]">
-                        {dcfsa.eligibleDesc}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 rounded-[6px] px-[12px] py-[8px] text-[14px] whitespace-nowrap font-medium text-[color:var(--system-link,#1c6eff)] -mr-3 cursor-default">
-                    View Eligible Expenses
-                    <ChevronRight className="h-4 w-4" />
-                  </div>
-                </div>
             </div>
 
             {/* Gray box */}
             <div className="flex flex-col gap-3 rounded-xl bg-[#f1f3fb] px-4 py-3 w-full">
               {/* Row 1 */}
               <div className="flex h-[44px] items-center gap-3 w-full">
-                <div className="flex h-6 w-6 shrink-0 items-center justify-center text-neutral-700">
+                <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
                   <ClockAlert className="h-5 w-5" />
                 </div>
                 <div className="flex flex-1 items-center justify-between">
@@ -725,7 +697,7 @@ export function SparkAccountsSection({
 
               {/* Row 2 */}
               <div className="flex h-[44px] items-center gap-3 w-full">
-                <div className="flex h-6 w-6 shrink-0 items-center justify-center text-neutral-700">
+                <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
                   <CalendarClock className="h-5 w-5" />
                 </div>
                 <div className="flex flex-1 items-center justify-between">

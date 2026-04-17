@@ -1,6 +1,5 @@
 
 import { useNavigate } from "react-router-dom";
-import { Sparkles } from "lucide-react";
 
 import EnrollmentLayout from "./EnrollmentLayout";
 import { WexButton } from "@wex/components-react/actions";
@@ -58,16 +57,23 @@ export default function DecisionSupportOptInPage() {
         <div className="max-w-[560px] w-full px-6">
           {/* Icon */}
           <div className="flex justify-center mb-8">
-            <div className="relative shrink-0 size-[64px] rounded-full overflow-hidden shadow-lg ring-1 ring-white/80">
-              <div
-                className="absolute inset-0 rounded-full"
-                style={{
-                  background: 'linear-gradient(172.91deg, rgb(37, 20, 111) 2.4625%, rgb(200, 16, 46) 100%)',
-                }}
-              />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Sparkles className="size-7 text-white drop-shadow-sm" strokeWidth={2} />
-              </div>
+            <div
+              className="flex h-[64px] w-[64px] shrink-0 items-center justify-center rounded-full shadow-[0_1.057px_3.17px_rgba(2,13,36,0.2),0_0_0.528px_rgba(2,13,36,0.3)]"
+              style={{
+                backgroundImage:
+                  "linear-gradient(133.514deg, rgb(37, 20, 111) 2.4625%, rgb(200, 16, 46) 100%)",
+              }}
+            >
+              <svg
+                width="26"
+                height="26"
+                viewBox="0 0 24 24"
+                fill="none"
+                className="shrink-0"
+              >
+                <path d="M13.913 13.9149L11.9997 24.0033L10.087 13.9149L0 12.0013L10.087 10.0884L12.0003 0L13.913 10.0884L24 12.0013L13.913 13.9149Z" fill="white"/>
+                <path d="M20.2758 19.7969L19.5994 23.3628L18.923 19.7969L15.3569 19.1204L18.923 18.4439L19.5994 14.8781L20.2752 18.4439L23.8412 19.1204L20.2758 19.7969Z" fill="white"/>
+              </svg>
             </div>
           </div>
 
