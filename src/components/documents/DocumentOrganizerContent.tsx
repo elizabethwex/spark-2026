@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { useDocumentViewMode } from "./DocumentViewContext"
+import { useDocumentViewMode, useDocumentFolders } from "./DocumentViewContext"
 import { useNavigate } from "react-router-dom"
 import {
   Button,
@@ -47,7 +47,7 @@ import {
   Trash2,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { DOCUMENTS, FOLDERS, type DocStatus, type DocumentItem } from "./documentData"
+import { DOCUMENTS, type DocStatus, type DocumentItem } from "./documentData"
 import { FilePreviewModal } from "./FilePreviewModal"
 
 export function DocumentOrganizerContent() {
@@ -56,9 +56,7 @@ export function DocumentOrganizerContent() {
   const [typeFilter, setTypeFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
   const { viewMode, setViewMode } = useDocumentViewMode()
-  const [folderNames, setFolderNames] = useState<Record<string, string>>(
-    Object.fromEntries(FOLDERS.map((f) => [f.id, f.name]))
-  )
+  const { folders, setFolders, folderNames, setFolderNames } = useDocumentFolders()
 
   const handleAddFolder = () => {
     const name = newFolderValue.trim()
@@ -69,8 +67,8 @@ export function DocumentOrganizerContent() {
     setFolderNames((prev) => ({ ...prev, [id]: name }))
     setNewFolderValue("")
     setNewFolderOpen(false)
+    navigate(`/document-org/${id}`)
   }
-  const [folders, setFolders] = useState<{ id: string; name: string; lastModified?: string }[]>(FOLDERS)
   const [renamingFolderId, setRenamingFolderId] = useState<string | null>(null)
   const [renameValue, setRenameValue] = useState("")
   const [newFolderOpen, setNewFolderOpen] = useState(false)
@@ -119,7 +117,7 @@ export function DocumentOrganizerContent() {
         </h1>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button type="button" intent="primary" size="md" className="gap-2">
+            <Button type="button" intent="primary" size="md" className="gap-2 btn-primary-theme">
               <Plus className="h-4 w-4 shrink-0 text-white" aria-hidden />
               New
             </Button>
@@ -314,6 +312,8 @@ export function DocumentOrganizerContent() {
               intent="primary"
               variant="outline"
               size="md"
+              className="btn-outline-theme"
+              style={{ borderColor: "var(--theme-primary)", color: "var(--theme-primary)" }}
               onClick={() => { setNewFolderOpen(false); setNewFolderValue("") }}
             >
               Cancel
@@ -323,6 +323,7 @@ export function DocumentOrganizerContent() {
               intent="primary"
               size="md"
               disabled={!newFolderValue.trim()}
+              className="btn-primary-theme"
               onClick={handleAddFolder}
             >
               Create Folder
@@ -356,6 +357,8 @@ export function DocumentOrganizerContent() {
               intent="primary"
               variant="outline"
               size="md"
+              className="btn-outline-theme"
+              style={{ borderColor: "var(--theme-primary)", color: "var(--theme-primary)" }}
               onClick={() => setRenamingFolderId(null)}
             >
               Cancel
@@ -365,6 +368,7 @@ export function DocumentOrganizerContent() {
               intent="primary"
               size="md"
               disabled={!renameValue.trim()}
+              className="btn-primary-theme"
               onClick={handleRenameConfirm}
             >
               Save
@@ -652,7 +656,7 @@ function StatusBadge({ status, className }: { status: DocStatus; className?: str
     return (
       <span
         className={cn(
-          "inline-flex items-center gap-1 rounded-full bg-[#dcfce7] px-[7px] py-[3.5px] text-[12px] font-bold text-[#008375]",
+          "inline-flex items-center gap-1 rounded-full bg-[#D0FAE5] px-[7px] py-[3.5px] text-[12px] font-bold text-[#006045]",
           className
         )}
       >
@@ -664,7 +668,7 @@ function StatusBadge({ status, className }: { status: DocStatus; className?: str
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full bg-[#f7f7f7] px-[7px] py-[3.5px] text-[12px] font-bold text-[#515f6b]",
+        "inline-flex items-center rounded-full bg-[#F1F3FB] px-[7px] py-[3.5px] text-[12px] font-bold text-[#444C72]",
         className
       )}
     >

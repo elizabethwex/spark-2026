@@ -39,8 +39,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { DOCUMENTS, FOLDERS, type DocStatus, type DocumentItem } from "./documentData"
-import { useDocumentViewMode } from "./DocumentViewContext"
+import { DOCUMENTS, type DocStatus, type DocumentItem } from "./documentData"
+import { useDocumentViewMode, useDocumentFolders } from "./DocumentViewContext"
 import { FilePreviewModal } from "./FilePreviewModal"
 
 interface Props {
@@ -52,9 +52,11 @@ export function DocumentFolderContent({ folderId }: Props) {
   const [typeFilter, setTypeFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
   const { viewMode, setViewMode } = useDocumentViewMode()
+  const { folders, folderNames } = useDocumentFolders()
   const [previewDoc, setPreviewDoc] = useState<DocumentItem | null>(null)
 
-  const folder = FOLDERS.find((f) => f.id === folderId)
+  const folder = folders.find((f) => f.id === folderId)
+  const displayName = folderNames[folderId] ?? folder?.name
   const folderDocs = DOCUMENTS.filter((d) => d.folderId === folderId)
 
   const filtered = folderDocs.filter((doc) => {
@@ -100,11 +102,11 @@ export function DocumentFolderContent({ folderId }: Props) {
           <div className="flex items-center gap-2">
             <FolderOpen className="h-6 w-6 shrink-0 text-amber-500" aria-hidden />
             <h1 className="text-3xl font-semibold tracking-tight text-foreground">
-              {folder.name}
+              {displayName}
             </h1>
           </div>
         </div>
-        <Button type="button" intent="primary" size="md" className="gap-2">
+        <Button type="button" intent="primary" size="md" className="gap-2 btn-primary-theme">
           <Plus className="h-4 w-4 shrink-0 text-white" aria-hidden />
           Upload
         </Button>
@@ -399,7 +401,7 @@ function StatusBadge({ status, className }: { status: DocStatus; className?: str
     return (
       <span
         className={cn(
-          "inline-flex items-center gap-1 rounded-full bg-[#dcfce7] px-[7px] py-[3.5px] text-[12px] font-bold text-[#008375]",
+          "inline-flex items-center gap-1 rounded-full bg-[#D0FAE5] px-[7px] py-[3.5px] text-[12px] font-bold text-[#006045]",
           className
         )}
       >
@@ -411,7 +413,7 @@ function StatusBadge({ status, className }: { status: DocStatus; className?: str
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full bg-[#f7f7f7] px-[7px] py-[3.5px] text-[12px] font-bold text-[#515f6b]",
+        "inline-flex items-center rounded-full bg-[#F1F3FB] px-[7px] py-[3.5px] text-[12px] font-bold text-[#444C72]",
         className
       )}
     >

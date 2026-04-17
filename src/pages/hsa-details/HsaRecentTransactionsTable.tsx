@@ -120,7 +120,11 @@ export function HsaRecentTransactionsTable({ transactions }: HsaRecentTransactio
                     <TableCell>
                       <Badge
                         intent={transaction.status === "Pending" ? "warning" : "success"}
-                        className="text-xs"
+                        size="sm"
+                        pill
+                        className={transaction.status === "Pending"
+                          ? "bg-[#FFF1BF] text-[#735300] border-transparent"
+                          : "bg-[#D0FAE5] text-[#006045] border-transparent"}
                       >
                         {transaction.status}
                       </Badge>

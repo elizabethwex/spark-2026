@@ -870,13 +870,20 @@ function FsaTransactionTableRow({
   const statusCell =
     row.status === "Denied" ? (
       <Badge
-        intent="warning"
-        className="rounded-full bg-[#fff7ed] px-2.5 py-0.5 text-xs font-semibold text-[#9a3412]"
+        intent="destructive"
+        size="sm"
+        pill
+        className="bg-[#FEE2E2] text-[#C8102E] border-transparent"
       >
         {row.status}
       </Badge>
     ) : (
-      <Badge intent="success" className="text-xs">
+      <Badge
+        intent="success"
+        size="sm"
+        pill
+        className="bg-[#D0FAE5] text-[#006045] border-transparent"
+      >
         {row.status}
       </Badge>
     );

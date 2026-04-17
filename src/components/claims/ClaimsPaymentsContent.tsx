@@ -54,7 +54,7 @@ import {
   Upload,
 } from "lucide-react"
 import { ClaimExpenseDetailSheet } from "@/components/claims/ClaimExpenseDetailSheet"
-import { attachmentLabel, expenseStatusBadgeClass, type ExpenseRow } from "@/components/claims/expenseTypes"
+import { attachmentLabel, expenseStatusBadgeClass, expenseStatusBadgeIntent, type ExpenseRow } from "@/components/claims/expenseTypes"
 import { DOCUMENTS, type DocumentItem } from "@/components/documents/documentData"
 import { FilePreviewModal } from "@/components/documents/FilePreviewModal"
 
@@ -497,6 +497,7 @@ export function ClaimsPaymentsContent() {
   return (
     <div className="mx-auto w-full max-w-[1376px] space-y-6">
 
+
       {/* Page title + primary actions */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-3xl font-semibold tracking-tight text-foreground">
@@ -508,6 +509,8 @@ export function ClaimsPaymentsContent() {
             intent="primary"
             variant="outline"
             size="md"
+            className="btn-outline-theme"
+            style={{ borderColor: "var(--theme-primary)", color: "var(--theme-primary)" }}
           >
             Add / Pay Expense
           </Button>
@@ -516,6 +519,7 @@ export function ClaimsPaymentsContent() {
             intent="primary"
             size="md"
             asChild
+            className="btn-primary-theme"
           >
             <Link to="/reimburse" state={{ from: "/claims" }}>Reimburse Myself</Link>
           </Button>
@@ -570,19 +574,19 @@ export function ClaimsPaymentsContent() {
                 >
                   <CardContent className="p-0">
                     {/* Alert banner */}
-                    <div className="flex items-center justify-between gap-4 bg-red-50 px-4 py-3 sm:px-5">
+                    <div className="flex items-center justify-between gap-4 bg-red-50 px-4 py-3 text-[#C8102E] sm:px-5">
                       <div className="flex min-w-0 items-start gap-3">
-                        <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-600" aria-hidden />
+                        <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-[#C8102E]" aria-hidden />
                         <div className="min-w-0">
-                          <p className="text-sm font-semibold text-red-700">{item.alertTitle}</p>
-                          <p className="text-sm text-red-600/80">{item.alertDescription}</p>
+                          <p className="text-sm font-semibold text-[#C8102E]">{item.alertTitle}</p>
+                          <p className="text-sm text-[#C8102E]/80">{item.alertDescription}</p>
                         </div>
                       </div>
                       <Badge
                         intent="destructive"
                         size="md"
                         pill
-                        className="shrink-0 whitespace-nowrap"
+                        className="shrink-0 whitespace-nowrap bg-[#FEE2E2] text-[#C8102E] border-transparent"
                       >
                         <span className="inline-flex items-center gap-1.5">
                           <Clock className="h-3.5 w-3.5 shrink-0 text-current" aria-hidden />
@@ -613,7 +617,7 @@ export function ClaimsPaymentsContent() {
                           intent="primary"
                           variant="solid"
                           size="sm"
-                          className="gap-1.5"
+                          className="gap-1.5 btn-primary-theme"
                           onClick={(e) => e.stopPropagation()}
                         >
                           {item.primaryAction.icon === "upload" && (
@@ -629,6 +633,8 @@ export function ClaimsPaymentsContent() {
                           intent="primary"
                           variant="outline"
                           size="sm"
+                          className="btn-outline-theme"
+                          style={{ borderColor: "var(--theme-primary)", color: "var(--theme-primary)" }}
                           onClick={(e) => {
                             e.stopPropagation()
                             if (actionRow) setSelectedClaimRow(actionRow)
@@ -778,15 +784,17 @@ export function ClaimsPaymentsContent() {
                       <span className="line-clamp-2 break-words">{formatDateOfService(row.dateOfService)}</span>
                     </TableCell>
                     <TableCell className="min-w-0 px-2 py-2.5">
-                      <span
-                        className={cn(
-                          "inline-flex max-w-full items-center gap-1 truncate rounded-full px-2 py-0.5 text-xs font-medium",
-                          expenseStatusBadgeClass(row.status.tone)
-                        )}
+                      <Badge
+                        intent={expenseStatusBadgeIntent(row.status.tone)}
+                        size="sm"
+                        pill
+                        className={cn("max-w-full", expenseStatusBadgeClass(row.status.tone))}
                       >
-                        {row.status.icon && <AlertTriangle className="h-3 w-3 shrink-0 text-current" aria-hidden />}
-                        <span className="min-w-0 truncate">{row.status.label}</span>
-                      </span>
+                        <span className="inline-flex items-center gap-1 overflow-hidden">
+                          {row.status.icon && <AlertTriangle className="h-3 w-3 shrink-0 text-current" aria-hidden />}
+                          <span className="truncate">{row.status.label}</span>
+                        </span>
+                      </Badge>
                     </TableCell>
                     <TableCell className="min-w-0 px-2 py-4 text-sm text-foreground">
                       <span className="block truncate">{row.account}</span>
@@ -925,7 +933,7 @@ export function ClaimsPaymentsContent() {
           {/* Section header */}
           <div className="flex items-center justify-between px-6 py-4">
             <h2 className="text-xl font-semibold text-foreground">Document Organizer</h2>
-            <Button type="button" intent="primary" variant="outline" size="md" asChild>
+            <Button type="button" intent="primary" variant="outline" size="md" asChild className="btn-outline-theme" style={{ borderColor: "var(--theme-primary)", color: "var(--theme-primary)" }}>
               <Link to="/document-org">See All Documents</Link>
             </Button>
           </div>
@@ -944,7 +952,8 @@ export function ClaimsPaymentsContent() {
                 intent="primary"
                 variant="outline"
                 size="sm"
-                className="mt-5"
+                className="btn-outline-theme mt-5"
+                style={{ borderColor: "var(--theme-primary)", color: "var(--theme-primary)" }}
               >
                 Choose File
               </Button>
@@ -967,12 +976,12 @@ export function ClaimsPaymentsContent() {
                     <img src={doc.imageUrl} alt={doc.title} className="h-full w-full object-cover" />
                   )}
                   {doc.status === "attached" ? (
-                    <span className="absolute bottom-2 right-2 inline-flex items-center gap-1 rounded-full bg-[#dcfce7] px-[7px] py-[3.5px] text-[12px] font-bold text-[#008375]">
+                    <span className="absolute bottom-2 right-2 inline-flex items-center gap-1 rounded-full bg-[#D0FAE5] px-[7px] py-[3.5px] text-[12px] font-bold text-[#006045]">
                       <Check className="h-[10.5px] w-[10.5px] shrink-0 text-current" aria-hidden />
                       Attached
                     </span>
                   ) : (
-                    <span className="absolute bottom-2 right-2 inline-flex items-center rounded-full bg-[#f7f7f7] px-[7px] py-[3.5px] text-[12px] font-bold text-[#515f6b]">
+                    <span className="absolute bottom-2 right-2 inline-flex items-center rounded-full bg-[#F1F3FB] px-[7px] py-[3.5px] text-[12px] font-bold text-[#444C72]">
                       Unattached
                     </span>
                   )}
