@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   User,
   Users,
@@ -28,14 +27,13 @@ interface SectionItem {
   icon: React.ComponentType<{ size?: number; strokeWidth?: number; style?: React.CSSProperties }>;
   iconBg: string;
   iconColor: string;
-  href?: string;
 }
 
 const PROFILE_SECTIONS: { header: string; items: SectionItem[] }[] = [
   {
     header: "",
     items: [
-      { label: "Profile",              icon: User,      iconBg: "transparent", iconColor: "#5f6a94", href: "/app/my-account/profile" },
+      { label: "Profile",              icon: User,      iconBg: "transparent", iconColor: "#5f6a94" },
       { label: "Dependents",           icon: Users,     iconBg: "transparent", iconColor: "#5f6a94" },
       { label: "Beneficiaries",        icon: UserCheck, iconBg: "transparent", iconColor: "#5f6a94" },
     ],
@@ -60,7 +58,6 @@ const PROFILE_SECTIONS: { header: string; items: SectionItem[] }[] = [
 const VARIANT_KEYS: AppVariant[] = [1, 2, 3];
 
 export default function AppMyAccount() {
-  const navigate = useNavigate();
   const { variant, setVariant } = useAppVariant();
   const [variantOpen, setVariantOpen] = useState(false);
 
@@ -202,8 +199,6 @@ export default function AppMyAccount() {
                   label={item.label}
                   sublabel={item.sublabel}
                   last={i === section.items.length - 1}
-                  disclosure
-                  onClick={() => item.href && navigate(item.href)}
                   icon={
                     <div
                       style={{
@@ -226,14 +221,13 @@ export default function AppMyAccount() {
         {/* Sign out */}
         <div>
           <button
-            onClick={() => navigate("/login")}
             style={{
               width: "100%",
               padding: "16px 20px",
               borderRadius: "var(--app-radius-pill)",
               background: "var(--app-info-surface)",
               border: "none",
-              cursor: "pointer",
+              cursor: "default",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",

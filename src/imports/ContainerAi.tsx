@@ -180,23 +180,23 @@ function NavQuickActions() {
       <div className="bg-clip-padding border-0 border-[transparent] border-solid content-start flex flex-wrap gap-[0px_8px] items-start px-[4px] relative w-full">
         <div className="content-stretch flex gap-[7px] items-center px-[13.25px] py-[9.75px] relative rounded-[28px] shrink-0" data-name="button-large">
           <div aria-hidden="true" className="absolute border border-[#3958c3] border-solid inset-0 pointer-events-none rounded-[28px]" />
-          <p className="font-['Inter:Medium',sans-serif] leading-[normal] not-italic relative shrink-0 text-[#3958c3] text-[15.75px] whitespace-nowrap">Reimburse Myself</p>
+          <p className="font-['Inter:Medium',sans-serif] leading-[normal] not-italic relative shrink-0 text-neutral-700 text-[15.75px] whitespace-nowrap">Reimburse Myself</p>
         </div>
         <div className="content-stretch flex gap-[7px] items-center px-[13.25px] py-[9.75px] relative rounded-[28px] shrink-0" data-name="button-large">
           <div aria-hidden="true" className="absolute border border-[#3958c3] border-solid inset-0 pointer-events-none rounded-[28px]" />
-          <p className="font-['Inter:Medium',sans-serif] leading-[normal] not-italic relative shrink-0 text-[#3958c3] text-[15.75px] whitespace-nowrap">Send Payment</p>
+          <p className="font-['Inter:Medium',sans-serif] leading-[normal] not-italic relative shrink-0 text-neutral-700 text-[15.75px] whitespace-nowrap">Send Payment</p>
         </div>
         <div className="content-stretch flex gap-[7px] items-center px-[13.25px] py-[9.75px] relative rounded-[28px] shrink-0" data-name="button-large">
           <div aria-hidden="true" className="absolute border border-[#3958c3] border-solid inset-0 pointer-events-none rounded-[28px]" />
-          <p className="font-['Inter:Medium',sans-serif] leading-[normal] not-italic relative shrink-0 text-[#3958c3] text-[15.75px] whitespace-nowrap">Contribute to HSA</p>
+          <p className="font-['Inter:Medium',sans-serif] leading-[normal] not-italic relative shrink-0 text-neutral-700 text-[15.75px] whitespace-nowrap">Contribute to HSA</p>
         </div>
         <div className="content-stretch flex gap-[7px] items-center px-[13.25px] py-[9.75px] relative rounded-[28px] shrink-0" data-name="button-large">
           <div aria-hidden="true" className="absolute border border-[#3958c3] border-solid inset-0 pointer-events-none rounded-[28px]" />
-          <p className="font-['Inter:Medium',sans-serif] leading-[normal] not-italic relative shrink-0 text-[#3958c3] text-[15.75px] whitespace-nowrap">Manage My Expenses</p>
+          <p className="font-['Inter:Medium',sans-serif] leading-[normal] not-italic relative shrink-0 text-neutral-700 text-[15.75px] whitespace-nowrap">Manage My Expenses</p>
         </div>
         <div className="content-stretch flex gap-[7px] items-center px-[13.25px] py-[9.75px] relative rounded-[28px] shrink-0" data-name="button-large">
           <div aria-hidden="true" className="absolute border border-[#3958c3] border-solid inset-0 pointer-events-none rounded-[28px]" />
-          <p className="font-['Inter:Medium',sans-serif] leading-[normal] not-italic relative shrink-0 text-[#3958c3] text-[15.75px] whitespace-nowrap">Enroll in HSA</p>
+          <p className="font-['Inter:Medium',sans-serif] leading-[normal] not-italic relative shrink-0 text-neutral-700 text-[15.75px] whitespace-nowrap">Enroll in HSA</p>
         </div>
       </div>
     </div>

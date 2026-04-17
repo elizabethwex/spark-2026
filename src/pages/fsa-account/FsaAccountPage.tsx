@@ -59,6 +59,10 @@ import { cn, homepageAccountSurfaceClass } from "@/lib/utils";
 import { FsaPreviousPlanYearDetailSheet } from "./FsaPreviousPlanYearDetailSheet";
 import { FsaTransactionDetailSheet } from "./FsaTransactionDetailSheet";
 import { fsaTransactionsData, type FsaTransactionRow } from "./fsaTransactionsMock";
+import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
+
+const fmt = (n: number) =>
+  n.toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 });
 
 const ELEV_SHADOW =
   "shadow-[0px_3.017px_9.051px_0px_rgba(43,49,78,0.04),0px_6.034px_18.101px_0px_rgba(43,49,78,0.06)]";
@@ -185,7 +189,7 @@ export default function FsaAccountPage() {
             <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-12">
               <div className="min-w-0 flex-1 space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-[#3958c3]">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-neutral-700">
                     <Landmark className="h-5 w-5" aria-hidden />
                   </div>
                   <h2 className="text-[20px] font-bold leading-8 text-[#14182c] md:text-2xl">
@@ -202,7 +206,7 @@ export default function FsaAccountPage() {
                     </InfoTip>
                   </div>
                   <p className="mt-1 text-[40px] font-bold leading-[56px] tracking-tight text-[#14182c]">
-                    $2,225.00
+                    <AnimatedNumber value={2225} format={fmt} durationMs={1200} />
                   </p>
                 </div>
 
@@ -229,7 +233,7 @@ export default function FsaAccountPage() {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between gap-4 text-base">
                       <div className="flex min-w-0 items-center gap-3">
-                        <CalendarDays className="h-4 w-4 shrink-0 text-[#3958c3]" aria-hidden />
+                        <CalendarDays className="h-4 w-4 shrink-0 text-neutral-700" aria-hidden />
                         <span className="font-medium text-[#5f6a94]">Plan Year</span>
                       </div>
                       <span className="shrink-0 font-semibold text-[#14182c]">
@@ -239,7 +243,7 @@ export default function FsaAccountPage() {
                     <div className="h-px w-full bg-[#b7c0da]" />
                     <div className="flex items-center justify-between gap-4 text-base">
                       <div className="flex min-w-0 items-center gap-3">
-                        <CircleDollarSign className="h-4 w-4 shrink-0 text-[#3958c3]" aria-hidden />
+                        <CircleDollarSign className="h-4 w-4 shrink-0 text-neutral-700" aria-hidden />
                         <span className="font-medium text-[#5f6a94]">Eligible Amount</span>
                       </div>
                       <span className="shrink-0 font-semibold text-[#14182c]">$2,500.00</span>
@@ -247,7 +251,7 @@ export default function FsaAccountPage() {
                     <div className="h-px w-full bg-[#b7c0da]" />
                     <div className="flex items-center justify-between gap-4 text-base">
                       <div className="flex min-w-0 items-center gap-2">
-                        <DollarSign className="h-4 w-4 shrink-0 text-[#3958c3]" aria-hidden />
+                        <DollarSign className="h-4 w-4 shrink-0 text-neutral-700" aria-hidden />
                         <span className="font-medium text-[#5f6a94]">Plan Year Balance</span>
                         <InfoTip label="About plan year balance">
                           Your plan year balance reflects the total funds currently available for
@@ -304,7 +308,7 @@ export default function FsaAccountPage() {
                     <div className="flex flex-col gap-6 rounded-3xl border border-[#f8f9fe] bg-[#f8f9fe] p-[17px]">
                       <div className="flex gap-4">
                         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-[#e2e8f0] bg-white shadow-sm">
-                          <ReceiptText className="h-6 w-6 text-[#3958c3]" aria-hidden />
+                          <ReceiptText className="h-6 w-6 text-neutral-700" aria-hidden />
                         </div>
                         <div className="min-w-0 space-y-1">
                           <p className="text-sm font-bold text-[#14182c]">Request Reimbursement</p>
@@ -325,7 +329,7 @@ export default function FsaAccountPage() {
                     <div className="flex flex-col gap-6 rounded-3xl border border-[#f8f9fe] bg-[#f8f9fe] p-[17px]">
                       <div className="flex gap-4">
                         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-[#e2e8f0] bg-white shadow-sm">
-                          <ShoppingBag className="h-5 w-5 text-[#3958c3]" aria-hidden />
+                          <ShoppingBag className="h-5 w-5 text-neutral-700" aria-hidden />
                         </div>
                         <div className="min-w-0 space-y-1">
                           <p className="text-sm font-bold text-[#14182c]">Shop FSA Store</p>
@@ -356,7 +360,7 @@ export default function FsaAccountPage() {
             <SectionCard>
               <div className="space-y-6">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-[#3958c3]">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-neutral-700">
                     <ReceiptText className="h-5 w-5" aria-hidden />
                   </div>
                   <h2 className="text-[20px] font-bold leading-8 text-[#14182c] md:text-2xl">
@@ -374,7 +378,7 @@ export default function FsaAccountPage() {
             <SectionCard>
               <div className="space-y-6">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-[#3958c3]">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-neutral-700">
                     <WalletCards className="h-5 w-5" aria-hidden />
                   </div>
                   <h2 className="text-[20px] font-bold leading-8 text-[#14182c] md:text-2xl">
@@ -657,7 +661,7 @@ export default function FsaAccountPage() {
                     <span className="text-[40px] font-bold leading-none text-[#14182c]">$2,500.00</span>
                     <Badge
                       intent="secondary"
-                      className="rounded-md bg-[#eef2ff] px-2 py-0.5 text-xs font-bold text-[#3958c3]"
+                      className="rounded-md bg-[#eef2ff] px-2 py-0.5 text-xs font-bold text-neutral-700"
                     >
                       100%
                     </Badge>
@@ -684,14 +688,14 @@ export default function FsaAccountPage() {
                 <div className="flex flex-wrap items-center gap-x-8 gap-y-2">
                   <button
                     type="button"
-                    className="text-base font-medium text-[#3958c3] underline-offset-2 hover:underline focus-visible:outline focus-visible:ring-2 focus-visible:ring-primary"
+                    className="text-base font-medium text-neutral-700 underline-offset-2 hover:underline focus-visible:outline focus-visible:ring-2 focus-visible:ring-primary"
                     onClick={() => setPreviousPlanYearDetailOpen(true)}
                   >
                     View More Details
                   </button>
                   <a
                     href="#"
-                    className="text-base font-medium text-[#3958c3] underline-offset-2 hover:underline focus-visible:outline focus-visible:ring-2 focus-visible:ring-primary"
+                    className="text-base font-medium text-neutral-700 underline-offset-2 hover:underline focus-visible:outline focus-visible:ring-2 focus-visible:ring-primary"
                     onClick={(e) => e.preventDefault()}
                   >
                     View All Claims
@@ -931,7 +935,7 @@ function FsaTransactionTableRow({
         {row.action === "upload_receipt" ? (
           <button
             type="button"
-            className="font-medium text-[#3958c3] underline-offset-2 hover:underline focus-visible:outline focus-visible:ring-2 focus-visible:ring-primary"
+            className="font-medium text-neutral-700 underline-offset-2 hover:underline focus-visible:outline focus-visible:ring-2 focus-visible:ring-primary"
             onClick={(e) => {
               e.stopPropagation();
               openReimburseWorkspace();

@@ -22,13 +22,17 @@ import { AnimatePresence, motion } from "framer-motion";
 import { AppNavBar } from "@/components/app-shell/AppNavBar";
 import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
 import { useDeviceMockup } from "@/hooks/useDeviceMockup";
-import { useAppChrome } from "@/context/AppChromeContext";
 import {
+  APP_LIST_SCROLL_END_PADDING_MOBILE,
   APP_NAV_HOME_INNER_H,
   APP_TABBAR_END_SCROLL_PADDING,
 } from "@/components/app-shell/appChromeLayout";
 import { STATUS_BAR_HEIGHT } from "@/components/app-shell/AppStatusBar";
 import { AppCard } from "@/components/app-shell/primitives/AppCard";
+import {
+  formatAppInboxRowDateLabel,
+  formatDetailSheetTime,
+} from "@/data/messageCenterPrototypeDates";
 import {
   getPrototypeInboxEntries,
   MESSAGE_BODY_WITH_ATTACHMENT,
@@ -50,6 +54,8 @@ interface MessageRow {
   id: string;
   title: string;
   date: string;
+  /** Matches row index — detail sheet timestamp (varied time of day). */
+  detailTime12h: string;
   read: boolean;
   attentionNeeded: boolean;
   pdfAttached: boolean;
@@ -115,11 +121,11 @@ function buildInboxRows(variant: AppVariant): MessageRow[] {
   const entries = getPrototypeInboxEntries(variant);
   return entries.map((entry, i) => {
     const archived = i === MAX_MESSAGES - 1;
-    const day = Math.max(1, 28 - (i % 20));
     return {
       id: `m${i + 1}`,
       title: entry.title,
-      date: `April ${day}`,
+      date: formatAppInboxRowDateLabel(i),
+      detailTime12h: formatDetailSheetTime(i),
       read: i % 3 !== 0,
       attentionNeeded: entry.attentionNeeded,
       pdfAttached: entry.pdfAttached ?? false,
@@ -164,9 +170,9 @@ function pdfFileNameFromTitle(title: string): string {
   return `${slug || "message"}.pdf`;
 }
 
-/** Detail sheet timestamp — Figma: 11/23/25 11:05AM style */
-function formatDetailTimestamp(dateLabel: string): string {
-  return `${dateLabel}, 2026 · 11:05 AM`;
+/** Detail sheet timestamp — date label + per-row delivery time */
+function formatDetailTimestamp(dateLabel: string, time12h: string): string {
+  return `${dateLabel}, 2026 · ${time12h}`;
 }
 
 function filterMessages(list: MessageRow[], filter: FilterId): MessageRow[] {
@@ -677,24 +683,18 @@ export default function AppMessageCenter() {
 
   const closeSheet = useCallback(() => setSelected(null), []);
   const { deviceOn, isMobileDevice } = useDeviceMockup();
-  const { topChromeHidden } = useAppChrome();
 
   /** Desktop /app uses the same shell as the device mockup (status bar in AppShell). */
   const shellMatchesFrame = deviceOn || !isMobileDevice;
-  const hideY = shellMatchesFrame
-    ? -(STATUS_BAR_HEIGHT + APP_NAV_HOME_INNER_H)
-    : "-100%";
 
   const pageRootStyle: CSSProperties = useMemo(
     () => ({
       display: "flex",
       flexDirection: "column",
-      minHeight: isMobileDevice
-        ? "calc(100dvh - var(--app-tabbar-height) - env(safe-area-inset-bottom, 0px))"
-        : "calc(var(--app-screen-height, 100dvh) - var(--app-tabbar-height) - env(safe-area-inset-bottom, 0px))",
+      minHeight: "auto",
       fontFamily: "var(--app-font)",
     }),
-    [isMobileDevice]
+    []
   );
 
   return (
@@ -704,7 +704,7 @@ export default function AppMessageCenter() {
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: topChromeHidden ? hideY : 0 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, ease: "easeOut" }}
         style={{
           position: "sticky",
@@ -760,7 +760,9 @@ export default function AppMessageCenter() {
           paddingLeft: 16,
           paddingRight: 16,
           paddingTop: 16,
-          paddingBottom: APP_TABBAR_END_SCROLL_PADDING,
+          paddingBottom: isMobileDevice
+            ? APP_LIST_SCROLL_END_PADDING_MOBILE
+            : APP_TABBAR_END_SCROLL_PADDING,
           display: "flex",
           flexDirection: "column",
           gap: 8,
@@ -1191,7 +1193,7 @@ export default function AppMessageCenter() {
                     color: "var(--app-text-secondary)",
                   }}
                 >
-                  {formatDetailTimestamp(selected.date)}
+                  {formatDetailTimestamp(selected.date, selected.detailTime12h)}
                 </p>
               </div>
             </div>

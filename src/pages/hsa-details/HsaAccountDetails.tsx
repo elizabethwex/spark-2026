@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   Badge,
   Button,
@@ -29,6 +29,7 @@ import { HsaContributeWorkspaceHost } from "./HsaContributeWorkspaceHost";
 import { HsaRecentTransactionsTable } from "./HsaRecentTransactionsTable";
 import { HSA_2026_CONTRIBUTION_MOCK } from "@/data/hsaSharedContributions";
 import { hsaDetailTransactions, hsaInvestmentChartPoints } from "./hsaDetailMockData";
+import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 
 const fmt = (n: number) =>
   n.toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 });
@@ -36,9 +37,9 @@ const fmt = (n: number) =>
 const INVESTMENT_RANGES = ["1W", "1M", "3M", "1Y", "3Y", "All"] as const;
 
 const RANGE_WEEKS: Record<(typeof INVESTMENT_RANGES)[number], number> = {
-  "1W":  2,
-  "1M":  5,
-  "3M":  13,
+  "1W":  7,
+  "1M":  12,
+  "3M":  24,
   "1Y":  52,
   "3Y":  52,
   "All": 52,
@@ -56,6 +57,13 @@ export function HsaAccountDetails() {
   const [plannerTab, setPlannerTab] = useState<"2026" | "longterm">("2026");
   const [investRange, setInvestRange] = useState<(typeof INVESTMENT_RANGES)[number]>("1W");
   const [isContributeOpen, setIsContributeOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [hoveredContrib, setHoveredContrib] = useState<"your" | "employer" | "left" | null>(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setMounted(true), 50);
+    return () => clearTimeout(timer);
+  }, []);
 
   const filteredChartPoints = useMemo(
     () => hsaInvestmentChartPoints.slice(-RANGE_WEEKS[investRange]),
@@ -115,7 +123,7 @@ export function HsaAccountDetails() {
                     <p className="text-xs leading-4">Cash + Invested Assets</p>
                   </div>
                   <p className="mt-2 text-[42px] font-bold leading-none tracking-tight text-[#14182c]">
-                    $15,900.00
+                    <AnimatedNumber value={15900} format={fmt} durationMs={1200} />
                   </p>
                 </div>
 
@@ -124,12 +132,14 @@ export function HsaAccountDetails() {
                   {/* Cash Balance */}
                   <div className="flex items-center justify-between px-4 py-4">
                     <div className="flex items-center gap-2">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center text-[#3958c3]">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center text-neutral-700">
                         <CircleDollarSign className="h-[24px] w-[24px]" />
                       </div>
                       <span className="text-[16px] font-bold leading-5 text-[#14182c]">Cash Balance</span>
                     </div>
-                    <span className="text-[16px] font-regular text-[#14182c]">$3,200.00</span>
+                    <span className="text-[16px] font-regular text-[#14182c]">
+                      $3,200.00
+                    </span>
                   </div>
 
                   <div className="mx-4 h-px bg-[#e8ecf8]" />
@@ -137,14 +147,16 @@ export function HsaAccountDetails() {
                   {/* Invested assets */}
                   <div className="flex items-center justify-between px-4 py-4">
                     <div className="flex items-center gap-2">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center text-[#3958c3]">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center text-neutral-700">
                         <TrendingUp className="h-[24px] w-[24px] text-current" aria-hidden />
                       </div>
                       <span className="text-[16px] font-bold leading-5 text-[#14182c]">Invested assets</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="text-[13px] font-semibold text-green-600">+12.5% YTD</span>
-                      <span className="text-[16px] font-regular text-[#14182c]">$12,700.00</span>
+                      <span className="text-[16px] font-regular text-[#14182c]">
+                        $12,700.00
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -189,7 +201,9 @@ export function HsaAccountDetails() {
                   <div className="min-w-0 flex w-full flex-col gap-1">
                     <p className="text-sm text-muted-foreground">Total Contributed YTD</p>
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="text-3xl font-bold text-foreground">{fmt(totalContribYtd)}</p>
+                      <p className="text-3xl font-bold text-foreground">
+                        <AnimatedNumber value={totalContribYtd} format={fmt} durationMs={1000} />
+                      </p>
                       <Badge intent="success" size="sm" className="shrink-0">
                         {pctLimitUsed}% of limit used
                       </Badge>
@@ -220,20 +234,32 @@ export function HsaAccountDetails() {
                 </div>
                 <div className="h-6 w-full overflow-hidden rounded-full bg-muted flex">
                   <div
-                    className="h-full bg-primary"
-                    style={{ width: `${(yourContrib / contributionLimit) * 100}%` }}
+                    className={`h-full bg-primary transition-all duration-1000 ease-out ${
+                      hoveredContrib && hoveredContrib !== "your" ? "opacity-30" : "opacity-100"
+                    }`}
+                    style={{ width: mounted ? `${(yourContrib / contributionLimit) * 100}%` : "0%" }}
                   />
                   <div
-                    className="h-full bg-primary/40"
-                    style={{ width: `${(employerContrib / contributionLimit) * 100}%` }}
+                    className={`h-full bg-primary/40 transition-all duration-1000 ease-out ${
+                      hoveredContrib && hoveredContrib !== "employer" ? "opacity-30" : "opacity-100"
+                    }`}
+                    style={{ width: mounted ? `${(employerContrib / contributionLimit) * 100}%` : "0%" }}
                   />
                   <div
-                    className="h-full bg-muted-foreground/25"
-                    style={{ width: `${(leftToContribute / contributionLimit) * 100}%` }}
+                    className={`h-full bg-muted-foreground/25 transition-all duration-1000 ease-out ${
+                      hoveredContrib && hoveredContrib !== "left" ? "opacity-30" : "opacity-100"
+                    }`}
+                    style={{ width: mounted ? `${(leftToContribute / contributionLimit) * 100}%` : "0%" }}
                   />
                 </div>
                 <ul className="m-0 flex list-none flex-wrap gap-8 p-0">
-                  <li className="flex items-start gap-2">
+                  <li 
+                    className={`flex items-start gap-2 transition-opacity duration-300 cursor-default ${
+                      hoveredContrib && hoveredContrib !== "your" ? "opacity-50" : "opacity-100"
+                    }`}
+                    onMouseEnter={() => setHoveredContrib("your")}
+                    onMouseLeave={() => setHoveredContrib(null)}
+                  >
                     <span
                       className="size-[14px] shrink-0 rounded-full bg-primary"
                       aria-hidden
@@ -247,7 +273,13 @@ export function HsaAccountDetails() {
                       </span>
                     </div>
                   </li>
-                  <li className="flex items-start gap-2">
+                  <li 
+                    className={`flex items-start gap-2 transition-opacity duration-300 cursor-default ${
+                      hoveredContrib && hoveredContrib !== "employer" ? "opacity-50" : "opacity-100"
+                    }`}
+                    onMouseEnter={() => setHoveredContrib("employer")}
+                    onMouseLeave={() => setHoveredContrib(null)}
+                  >
                     <span
                       className="size-[14px] shrink-0 rounded-full bg-primary/40"
                       aria-hidden
@@ -261,7 +293,13 @@ export function HsaAccountDetails() {
                       </span>
                     </div>
                   </li>
-                  <li className="flex items-start gap-2">
+                  <li 
+                    className={`flex items-start gap-2 transition-opacity duration-300 cursor-default ${
+                      hoveredContrib && hoveredContrib !== "left" ? "opacity-50" : "opacity-100"
+                    }`}
+                    onMouseEnter={() => setHoveredContrib("left")}
+                    onMouseLeave={() => setHoveredContrib(null)}
+                  >
                     <span
                       className="size-[14px] shrink-0 rounded-full bg-muted-foreground/25"
                       aria-hidden
@@ -306,7 +344,9 @@ export function HsaAccountDetails() {
                 <div className="flex items-center justify-center gap-4">
                   <div className="w-full">
                     <p className="text-base text-muted-foreground">HSA Investment Balance</p>
-                    <p className="text-3xl font-bold text-foreground">$12,700.00</p>
+                    <p className="text-3xl font-bold text-foreground">
+                      <AnimatedNumber value={12700} format={fmt} durationMs={1100} />
+                    </p>
                     <Badge intent="success" size="sm" className="mt-1">
                       + $2.50 today
                     </Badge>
@@ -344,7 +384,7 @@ export function HsaAccountDetails() {
                         contentStyle={{ borderRadius: 8 }}
                       />
                       <Area
-                        type="monotone"
+                        type="natural"
                         dataKey="v"
                         stroke="hsl(142 71% 36%)"
                         strokeWidth={2}
@@ -392,7 +432,7 @@ export function HsaAccountDetails() {
                   <div className="min-w-0 flex-1 space-y-3">
                     <div>
                       <p className="text-3xl font-bold text-foreground">
-                        {fmt(plannerCurrent.contributed)}
+                        <AnimatedNumber value={plannerCurrent.contributed} format={fmt} durationMs={1000} />
                       </p>
                       <p className="text-sm text-muted-foreground">of {fmt(plannerCurrent.target)}</p>
                     </div>

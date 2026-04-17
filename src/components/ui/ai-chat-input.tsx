@@ -4,19 +4,6 @@ import { motion, AnimatePresence } from "motion/react";
 
 const PLACEHOLDER_PREFIX = "Ask me… ";
 
-const QUERIES = [
-  "Is toothpaste FSA eligible?",
-  "Can I use my FSA for dental?",
-  "why my claim needs attention",
-  "what document I need to upload",
-  "how to get reimbursed",
-  "what I can use my FSA for",
-  "how much I have left to spend",
-  "what expenses are eligible",
-  "how long reimbursements take",
-  "what happens if I don't use my FSA",
-];
-
 const placeholderContainerVariants = {
   initial: {},
   animate: { transition: { staggerChildren: 0.025 } },
@@ -42,11 +29,28 @@ const letterVariants = {
 
 export function AiChatInput({ 
   onSubmit,
-  autocompletePhrase 
+  autocompletePhrase,
+  accountType = "FSA"
 }: { 
   onSubmit?: (value: string) => void;
   autocompletePhrase?: string;
+  accountType?: "FSA" | "HSA" | "LPFSA";
 }) {
+  const displayAccountType = accountType === "LPFSA" ? "FSA" : accountType;
+  
+  const QUERIES = [
+    `Is toothpaste ${displayAccountType} eligible?`,
+    `Can I use my ${displayAccountType} for dental?`,
+    "why my claim needs attention",
+    "what document I need to upload",
+    "how to get reimbursed",
+    `what I can use my ${displayAccountType} for`,
+    "how much I have left to spend",
+    "what expenses are eligible",
+    "how long reimbursements take",
+    `what happens if I don't use my ${displayAccountType}`,
+  ];
+
   const [inputValue, setInputValue] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -244,7 +248,7 @@ export function AiChatInput({
         </div>
         <div className="flex items-center gap-[8px]">
           <div className="flex h-[35px] w-[35px] shrink-0 cursor-pointer items-center justify-center rounded-[28px] border border-[#eef2ff] bg-[#eef2ff] transition-colors hover:bg-[#e0e7ff]">
-            <Mic className="h-[14px] w-[14px] text-[#3958c3]" />
+            <Mic className="h-[14px] w-[14px] text-neutral-700" />
           </div>
           <div
             className="flex h-[35px] w-[35px] shrink-0 cursor-pointer items-center justify-center rounded-[28px] border border-[#25146f] transition-all hover:bg-[rgba(37,20,111,0.2)]"
@@ -292,7 +296,7 @@ export function AiChatInput({
                 className="flex w-full items-center gap-3 px-6 py-3 text-left transition-colors hover:bg-[#f8f9fe]"
                 onClick={() => handleSuggestionClick(query)}
               >
-                <Sparkles className="h-4 w-4 shrink-0 text-[#3958c3]" />
+                <Sparkles className="h-4 w-4 shrink-0 text-neutral-700" />
                 <span className="truncate text-[14px] text-[#5f6a94]">
                   {query}
                 </span>

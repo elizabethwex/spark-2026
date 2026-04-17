@@ -1,5 +1,6 @@
 import type { AppVariant } from "@/context/AppVariantContext";
 import type { Message } from "@/data/messageCenterUtils";
+import { formatDesktopMessageDeliveryDate } from "@/data/messageCenterPrototypeDates";
 import {
   getPrototypeInboxEntries,
   MESSAGE_BODY_WITH_ATTACHMENT,
@@ -41,7 +42,6 @@ export function buildDesktopMessagesFromVariant(variant: AppVariant): Message[] 
   return entries.map((entry, i) => {
     const cat = TAG_CATEGORY[entry.tag];
     const read = i % 3 !== 0;
-    const day = Math.max(1, 28 - (i % 20));
     const archived = i === entries.length - 1;
     return {
       id: `proto-${variant}-${i + 1}`,
@@ -51,7 +51,7 @@ export function buildDesktopMessagesFromVariant(variant: AppVariant): Message[] 
       category: cat.category,
       categoryColor: cat.categoryColor,
       categoryTextColor: cat.categoryTextColor,
-      deliveryDate: `11/${String(day).padStart(2, "0")}/25 11:05AM`,
+      deliveryDate: formatDesktopMessageDeliveryDate(i),
       isStarred: i === 4,
       isBold: !read,
       isRead: read,
