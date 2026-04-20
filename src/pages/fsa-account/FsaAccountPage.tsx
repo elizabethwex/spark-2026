@@ -56,8 +56,9 @@ import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground"
 import { usePrototype } from "@/context/PrototypeContext";
 import { useReimburseWorkspace } from "@/context/ReimburseWorkspaceContext";
 import { cn, homepageAccountSurfaceClass } from "@/lib/utils";
+import { ClaimExpenseDetailSheet } from "@/components/claims/ClaimExpenseDetailSheet";
 import { FsaPreviousPlanYearDetailSheet } from "./FsaPreviousPlanYearDetailSheet";
-import { FsaTransactionDetailSheet } from "./FsaTransactionDetailSheet";
+import { fsaTransactionToExpenseRow } from "./fsaTransactionToExpenseRow";
 import { fsaTransactionsData, type FsaTransactionRow } from "./fsaTransactionsMock";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 
@@ -122,8 +123,7 @@ export default function FsaAccountPage() {
   const [filterActionsOnly, setFilterActionsOnly] = useState(false);
   /** Animates FSA usage bar from 0 → 11% on first paint. */
   const [usageBarPct, setUsageBarPct] = useState(0);
-  /** Denied transaction row opened in the details slideout (Figma 30062:11931). */
-  const [transactionDetailRow, setTransactionDetailRow] = useState<FsaTransactionRow | null>(null);
+  const [selectedFsaTx, setSelectedFsaTx] = useState<FsaTransactionRow | null>(null);
   /** Previous Plan Year “View more details” slideout (Figma 29641:15455). */
   const [previousPlanYearDetailOpen, setPreviousPlanYearDetailOpen] = useState(false);
 
@@ -489,13 +489,7 @@ export default function FsaAccountPage() {
                   </TableHeader>
                   <TableBody>
                     {pageRows.map((t) => (
-                      <FsaTransactionTableRow
-                        key={t.id}
-                        row={t}
-                        onDeniedRowClick={
-                          t.status === "Denied" ? (r) => setTransactionDetailRow(r) : undefined
-                        }
-                      />
+                      <FsaTransactionTableRow key={t.id} row={t} onRowClick={setSelectedFsaTx} />
                     ))}
                   </TableBody>
                 </Table>
@@ -737,12 +731,14 @@ export default function FsaAccountPage() {
 
       <ConsumerFooter />
 
-      <FsaTransactionDetailSheet
-        open={transactionDetailRow !== null}
+      <ClaimExpenseDetailSheet
+        key={selectedFsaTx?.id ?? "closed"}
+        open={selectedFsaTx !== null}
         onOpenChange={(open) => {
-          if (!open) setTransactionDetailRow(null);
+          if (!open) setSelectedFsaTx(null);
         }}
-        row={transactionDetailRow}
+        row={selectedFsaTx ? fsaTransactionToExpenseRow(selectedFsaTx) : null}
+        variant="fsa"
       />
 
       <FsaPreviousPlanYearDetailSheet
@@ -863,13 +859,12 @@ function PlanDeadlineRows() {
 
 function FsaTransactionTableRow({
   row,
-  onDeniedRowClick,
+  onRowClick,
 }: {
   row: FsaTransactionRow;
-  onDeniedRowClick?: (_row: FsaTransactionRow) => void;
+  onRowClick: (_row: FsaTransactionRow) => void;
 }) {
   const { openReimburseWorkspace } = useReimburseWorkspace();
-  const isDeniedInteractive = row.status === "Denied" && onDeniedRowClick != null;
 
   const statusCell =
     row.status === "Denied" ? (
@@ -894,33 +889,17 @@ function FsaTransactionTableRow({
 
   return (
     <TableRow
-      className={cn(
-        "h-[49px]",
-        isDeniedInteractive && "cursor-pointer hover:bg-muted/40"
-      )}
-      tabIndex={isDeniedInteractive ? 0 : undefined}
-      aria-label={
-        isDeniedInteractive
-          ? `View transaction details, ${row.description}, ${row.date}`
-          : undefined
-      }
-      onClick={
-        isDeniedInteractive
-          ? () => {
-              onDeniedRowClick?.(row);
-            }
-          : undefined
-      }
-      onKeyDown={
-        isDeniedInteractive
-          ? (e: React.KeyboardEvent<HTMLTableRowElement>) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                onDeniedRowClick?.(row);
-              }
-            }
-          : undefined
-      }
+      className="h-[49px] cursor-pointer hover:bg-muted/40"
+      role="button"
+      tabIndex={0}
+      aria-label={`View transaction details, ${row.description}, ${row.date}`}
+      onClick={() => onRowClick(row)}
+      onKeyDown={(e: React.KeyboardEvent<HTMLTableRowElement>) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onRowClick(row);
+        }
+      }}
     >
       <TableCell className="whitespace-nowrap">{row.date}</TableCell>
       <TableCell>{statusCell}</TableCell>

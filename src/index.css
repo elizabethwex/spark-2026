@@ -531,16 +531,20 @@ code[class*="language-"] {
    Scoped with :has(.bg-wex-workspace-bg) so other fixed overlays / dialogs are unchanged. */
 div.fixed.inset-0.z-50.flex:has(.bg-wex-workspace-bg) {
   align-items: flex-end;
-  justify-content: center;
+  /* Full-width bottom sheet: do not center the panel in the viewport */
+  justify-content: flex-start;
   box-sizing: border-box;
   padding-top: 1.5rem;
-  padding-right: 1.5rem;
+  padding-right: 0;
   padding-bottom: 0;
-  padding-left: 1.5rem;
+  padding-left: 0;
 }
 
 /* Outer workspace surface: rounded top only, flush to viewport bottom; cap height for top inset */
 div.fixed.inset-0.z-50.flex:has(.bg-wex-workspace-bg) .bg-wex-workspace-bg {
+  width: 100% !important;
+  max-width: 100% !important;
+  align-self: stretch;
   border-bottom-left-radius: 0 !important;
   border-bottom-right-radius: 0 !important;
   border-top-left-radius: 0.75rem !important;

@@ -293,9 +293,74 @@ export function isRepaymentDueStatus(s: string): boolean {
   return s.trim().toLowerCase() === "repayment due"
 }
 
+function fsaTransactionCompleteTimeline(): WhatHappensNextStep[] {
+  return [
+    {
+      id: "fsa-request",
+      title: "Request Date",
+      description: "We received the request.",
+      phase: "complete",
+    },
+    {
+      id: "fsa-in-process",
+      title: "In Process",
+      description: "Finalizing details with your plan.",
+      phase: "complete",
+    },
+    {
+      id: "fsa-complete",
+      title: "Complete",
+      description: "Transaction completed.",
+      phase: "complete",
+    },
+  ]
+}
+
+function fsaTransactionPaidTimeline(): WhatHappensNextStep[] {
+  return [
+    {
+      id: "fsa-request",
+      title: "Request Date",
+      description: "We received the request.",
+      phase: "complete",
+    },
+    {
+      id: "fsa-processing",
+      title: "Processing",
+      description: "Your reimbursement is being prepared.",
+      phase: "complete",
+    },
+    {
+      id: "fsa-paid",
+      title: "Paid",
+      description: "Payment has been issued.",
+      phase: "complete",
+    },
+  ]
+}
+
+function fsaTransactionDeniedTimeline(): WhatHappensNextStep[] {
+  return [
+    {
+      id: "fsa-request",
+      title: "Request Date",
+      description: "We received the request.",
+      phase: "complete",
+    },
+    {
+      id: "denied",
+      title: "Denied",
+      description: "This transaction was not approved for reimbursement.",
+      phase: "complete",
+    },
+  ]
+}
+
 // ---------------------------------------------------------------------------
 // Main dispatcher
 // ---------------------------------------------------------------------------
+
+export type ClaimTimelineSheetKind = "claim" | "hsa" | "fsa"
 
 export function getWhatHappensNextSteps(
   statusLabel: string,
@@ -303,9 +368,38 @@ export function getWhatHappensNextSteps(
     origin?: "card" | "manual"
     holdReason?: string
     denialReason?: string
+    /** When not `claim`, skips claim-status routing and uses account-transaction timelines. */
+    sheetKind?: ClaimTimelineSheetKind
   } = {}
 ): WhatHappensNextStep[] {
-  const { origin = "manual", holdReason, denialReason } = options
+  const { origin = "manual", holdReason, denialReason, sheetKind = "claim" } = options
+  const normalized = statusLabel.trim().toLowerCase()
+
+  if (sheetKind === "hsa") {
+    if (normalized === "processed") return hsaTransactionProcessedTimeline()
+    if (normalized === "pending") return hsaTransactionPendingTimeline()
+    return [
+      {
+        id: "hsa-request",
+        title: "Request Date",
+        description: "We received the request.",
+        phase: "complete",
+      },
+      {
+        id: "hsa-in-process",
+        title: "In Process",
+        description: "Finalizing details with your bank.",
+        phase: "current",
+      },
+    ]
+  }
+
+  if (sheetKind === "fsa") {
+    if (normalized === "complete") return fsaTransactionCompleteTimeline()
+    if (normalized === "paid") return fsaTransactionPaidTimeline()
+    if (normalized === "denied") return fsaTransactionDeniedTimeline()
+    return fsaTransactionCompleteTimeline()
+  }
 
   if (isNotSubmittedStatus(statusLabel)) return notSubmittedTimeline()
   if (isSubmittedStatus(statusLabel)) return submittedTimeline(origin)
@@ -321,5 +415,45 @@ export function getWhatHappensNextSteps(
   return [
     { id: "submitted", title: "Submitted", description: "We received your claim.", phase: "complete" },
     { id: "current", title: statusLabel, description: "Your claim is being processed.", phase: "current" },
+  ]
+}
+
+function hsaTransactionProcessedTimeline(): WhatHappensNextStep[] {
+  return [
+    {
+      id: "hsa-request",
+      title: "Request Date",
+      description: "We received the request.",
+      phase: "complete",
+    },
+    {
+      id: "hsa-in-process",
+      title: "In Process",
+      description: "Finalizing details with your bank.",
+      phase: "complete",
+    },
+    {
+      id: "hsa-processed",
+      title: "Processed",
+      description: "Transaction completed.",
+      phase: "complete",
+    },
+  ]
+}
+
+function hsaTransactionPendingTimeline(): WhatHappensNextStep[] {
+  return [
+    {
+      id: "hsa-request",
+      title: "Request Date",
+      description: "We received the request.",
+      phase: "complete",
+    },
+    {
+      id: "hsa-in-process",
+      title: "In Process",
+      description: "Finalizing details with your bank.",
+      phase: "current",
+    },
   ]
 }

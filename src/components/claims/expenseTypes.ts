@@ -28,6 +28,18 @@ export type ExpenseRow = {
   denialReason?: string
   /** Date the current status was set — shown on the active timeline step. Distinct from dateOfService. */
   statusDate?: string
+  /** When reusing {@link ClaimExpenseDetailSheet} for HSA transactions (`variant="hsa"`). */
+  hsaMeta?: {
+    tableDate: string
+    taxYear: string
+    paymentNumber: string
+  }
+  /** When reusing {@link ClaimExpenseDetailSheet} for FSA transactions (`variant="fsa"`). */
+  fsaMeta?: {
+    tableDate: string
+    planYear: string
+    paymentNumber: string
+  }
 }
 
 /** Returns a human-readable attachment label, or null when there are no documents. */
