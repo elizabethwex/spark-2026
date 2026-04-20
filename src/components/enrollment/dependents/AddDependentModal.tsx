@@ -12,6 +12,7 @@ type AddDependentModalProps = {
   onAdd: (dependent: Dependent) => void;
   editDependent?: Dependent | null;
   onUpdate?: (dependent: Dependent) => void;
+  isEnrollmentFlow?: boolean;
 };
 
 type FormState = {
@@ -67,7 +68,7 @@ function formStateFromDependent(ed: Dependent): FormState {
   };
 }
 
-export default function AddDependentModal({ open, onOpenChange, onAdd, editDependent = null, onUpdate }: AddDependentModalProps) {
+export default function AddDependentModal({ open, onOpenChange, onAdd, editDependent = null, onUpdate, isEnrollmentFlow }: AddDependentModalProps) {
   const [state, setState] = React.useState<FormState>(initialState);
   const [submitted, setSubmitted] = React.useState(false);
 
@@ -130,6 +131,165 @@ export default function AddDependentModal({ open, onOpenChange, onAdd, editDepen
 
   const isEditMode = Boolean(editDependent);
 
+  const formContent = (
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-1">
+        <WexLabel className="text-[14px] text-muted-foreground">First Name</WexLabel>
+        <WexInput
+          inputSize="lg"
+          placeholder="First Name"
+          value={state.firstName}
+          onChange={(e) => setState((s) => ({ ...s, firstName: e.target.value }))}
+        />
+        {submitted && !state.firstName.trim() && (
+          <div className="mt-1 text-xs text-destructive">First name is required.</div>
+        )}
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <WexLabel className="text-[14px] text-muted-foreground">Middle Name</WexLabel>
+        <WexInput
+          inputSize="lg"
+          placeholder="Middle Name"
+          value={state.middleName}
+          onChange={(e) => setState((s) => ({ ...s, middleName: e.target.value }))}
+        />
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <WexLabel className="text-[14px] text-muted-foreground">Last Name</WexLabel>
+        <WexInput
+          inputSize="lg"
+          placeholder="Last Name"
+          value={state.lastName}
+          onChange={(e) => setState((s) => ({ ...s, lastName: e.target.value }))}
+        />
+        {submitted && !state.lastName.trim() && (
+          <div className="mt-1 text-xs text-destructive">Last name is required.</div>
+        )}
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <WexLabel className="text-[14px] text-muted-foreground">Social Security Number</WexLabel>
+        <WexInput
+          inputSize="lg"
+          placeholder="Social Security Number"
+          inputMode="numeric"
+          value={state.ssn}
+          onChange={(e) => setState((s) => ({ ...s, ssn: e.target.value }))}
+        />
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <WexLabel className="text-[14px] text-muted-foreground">Birth Date</WexLabel>
+        <WexDatePicker
+          date={state.birthDate}
+          onDateChange={(d) => setState((s) => ({ ...s, birthDate: d }))}
+          placeholder="Select birth date"
+          className="w-full [&_button]:w-full [&_button]:h-12 [&_button]:border [&_button]:border-input [&_button]:rounded-md"
+        />
+        {submitted && !state.birthDate && (
+          <div className="text-xs text-destructive">Birth date is required.</div>
+        )}
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <WexLabel className="text-[14px] text-muted-foreground">Gender</WexLabel>
+        <WexSelect value={state.gender} onValueChange={(v) => setState((s) => ({ ...s, gender: v }))}>
+          <WexSelect.Trigger className="w-full h-12 border border-input rounded-md">
+            <WexSelect.Value placeholder="Select gender" />
+          </WexSelect.Trigger>
+          <WexSelect.Content>
+            <WexSelect.Item value="female">Female</WexSelect.Item>
+            <WexSelect.Item value="male">Male</WexSelect.Item>
+            <WexSelect.Item value="nonbinary">Non-binary</WexSelect.Item>
+            <WexSelect.Item value="prefer-not">Prefer not to say</WexSelect.Item>
+          </WexSelect.Content>
+        </WexSelect>
+        {submitted && !state.gender && (
+          <div className="text-xs text-destructive">Gender is required.</div>
+        )}
+      </div>
+
+      <div className="flex items-center gap-2">
+        <WexLabel className="w-[146px] text-[16px] leading-6 tracking-[0.32px] text-muted-foreground">
+          Full Time Student:
+        </WexLabel>
+        <WexRadioGroup
+          value={state.fullTimeStudent}
+          onValueChange={(v) => setState((s) => ({ ...s, fullTimeStudent: v as "yes" | "no" }))}
+          className="flex items-center gap-4"
+        >
+          <div className="flex items-center gap-2">
+            <WexRadioGroup.Item value="yes" id="fts-yes" />
+            <WexLabel htmlFor="fts-yes" className="text-[14px] text-foreground">Yes</WexLabel>
+          </div>
+          <div className="flex items-center gap-2">
+            <WexRadioGroup.Item value="no" id="fts-no" />
+            <WexLabel htmlFor="fts-no" className="text-[14px] text-foreground">No</WexLabel>
+          </div>
+        </WexRadioGroup>
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <WexLabel className="text-[14px] text-muted-foreground">Relationship</WexLabel>
+        <WexSelect value={state.relationship} onValueChange={(v) => setState((s) => ({ ...s, relationship: v }))}>
+          <WexSelect.Trigger className="w-full h-12 border border-input rounded-md">
+            <WexSelect.Value placeholder="Select relationship" />
+          </WexSelect.Trigger>
+          <WexSelect.Content>
+            <WexSelect.Item value="spouse">Spouse</WexSelect.Item>
+            <WexSelect.Item value="child">Child</WexSelect.Item>
+            <WexSelect.Item value="domestic-partner">Domestic Partner</WexSelect.Item>
+            <WexSelect.Item value="other">Other</WexSelect.Item>
+          </WexSelect.Content>
+        </WexSelect>
+        {submitted && !state.relationship && (
+          <div className="text-xs text-destructive">Relationship is required.</div>
+        )}
+      </div>
+    </div>
+  );
+
+  if (isEnrollmentFlow) {
+    if (!open) return null;
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+        <div className="w-[min(512px,90vw)] max-h-[90vh] flex flex-col rounded-xl bg-background p-6 shadow-xl">
+          <h3 className="text-[20px] font-bold text-foreground mb-4">
+            {isEditMode ? "Edit Dependent Information" : "Add Dependent Information"}
+          </h3>
+          
+          <div className="overflow-y-auto pr-2 -mr-2">
+            <div className="pb-4">
+              {formContent}
+            </div>
+          </div>
+
+          <div className="mt-6 flex justify-between gap-2">
+            <WexButton
+              variant="ghost"
+              className="text-foreground"
+              onClick={() => onOpenChange(false)}
+            >
+              Cancel
+            </WexButton>
+            <WexButton intent="primary" onClick={handleSubmit} disabled={!canSubmit && submitted}>
+              {isEditMode ? (
+                "Save changes"
+              ) : (
+                <>
+                  <Plus className="h-4 w-4" />
+                  Add Dependent
+                </>
+              )}
+            </WexButton>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <WexDialog open={open} onOpenChange={onOpenChange}>
       <WexDialog.Content aria-describedby={undefined}>
@@ -140,123 +300,7 @@ export default function AddDependentModal({ open, onOpenChange, onAdd, editDepen
         </WexDialog.Header>
 
         <div className="px-6 pt-4 pb-2">
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-1">
-              <WexLabel className="text-[14px] text-muted-foreground">First Name</WexLabel>
-              <WexInput
-                inputSize="lg"
-                placeholder="First Name"
-                value={state.firstName}
-                onChange={(e) => setState((s) => ({ ...s, firstName: e.target.value }))}
-              />
-              {submitted && !state.firstName.trim() && (
-                <div className="mt-1 text-xs text-destructive">First name is required.</div>
-              )}
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <WexLabel className="text-[14px] text-muted-foreground">Middle Name</WexLabel>
-              <WexInput
-                inputSize="lg"
-                placeholder="Middle Name"
-                value={state.middleName}
-                onChange={(e) => setState((s) => ({ ...s, middleName: e.target.value }))}
-              />
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <WexLabel className="text-[14px] text-muted-foreground">Last Name</WexLabel>
-              <WexInput
-                inputSize="lg"
-                placeholder="Last Name"
-                value={state.lastName}
-                onChange={(e) => setState((s) => ({ ...s, lastName: e.target.value }))}
-              />
-              {submitted && !state.lastName.trim() && (
-                <div className="mt-1 text-xs text-destructive">Last name is required.</div>
-              )}
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <WexLabel className="text-[14px] text-muted-foreground">Social Security Number</WexLabel>
-              <WexInput
-                inputSize="lg"
-                placeholder="Social Security Number"
-                inputMode="numeric"
-                value={state.ssn}
-                onChange={(e) => setState((s) => ({ ...s, ssn: e.target.value }))}
-              />
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <WexLabel className="text-[14px] text-muted-foreground">Birth Date</WexLabel>
-              <WexDatePicker
-                date={state.birthDate}
-                onDateChange={(d) => setState((s) => ({ ...s, birthDate: d }))}
-                placeholder="Select birth date"
-                className="w-full [&_button]:w-full [&_button]:h-12 [&_button]:border [&_button]:border-input [&_button]:rounded-md"
-              />
-              {submitted && !state.birthDate && (
-                <div className="text-xs text-destructive">Birth date is required.</div>
-              )}
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <WexLabel className="text-[14px] text-muted-foreground">Gender</WexLabel>
-              <WexSelect value={state.gender} onValueChange={(v) => setState((s) => ({ ...s, gender: v }))}>
-                <WexSelect.Trigger className="w-full h-12 border border-input rounded-md">
-                  <WexSelect.Value placeholder="Select gender" />
-                </WexSelect.Trigger>
-                <WexSelect.Content>
-                  <WexSelect.Item value="female">Female</WexSelect.Item>
-                  <WexSelect.Item value="male">Male</WexSelect.Item>
-                  <WexSelect.Item value="nonbinary">Non-binary</WexSelect.Item>
-                  <WexSelect.Item value="prefer-not">Prefer not to say</WexSelect.Item>
-                </WexSelect.Content>
-              </WexSelect>
-              {submitted && !state.gender && (
-                <div className="text-xs text-destructive">Gender is required.</div>
-              )}
-            </div>
-
-            <div className="flex items-center gap-2">
-              <WexLabel className="w-[146px] text-[16px] leading-6 tracking-[0.32px] text-muted-foreground">
-                Full Time Student:
-              </WexLabel>
-              <WexRadioGroup
-                value={state.fullTimeStudent}
-                onValueChange={(v) => setState((s) => ({ ...s, fullTimeStudent: v as "yes" | "no" }))}
-                className="flex items-center gap-4"
-              >
-                <div className="flex items-center gap-2">
-                  <WexRadioGroup.Item value="yes" id="fts-yes" />
-                  <WexLabel htmlFor="fts-yes" className="text-[14px] text-foreground">Yes</WexLabel>
-                </div>
-                <div className="flex items-center gap-2">
-                  <WexRadioGroup.Item value="no" id="fts-no" />
-                  <WexLabel htmlFor="fts-no" className="text-[14px] text-foreground">No</WexLabel>
-                </div>
-              </WexRadioGroup>
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <WexLabel className="text-[14px] text-muted-foreground">Relationship</WexLabel>
-              <WexSelect value={state.relationship} onValueChange={(v) => setState((s) => ({ ...s, relationship: v }))}>
-                <WexSelect.Trigger className="w-full h-12 border border-input rounded-md">
-                  <WexSelect.Value placeholder="Select relationship" />
-                </WexSelect.Trigger>
-                <WexSelect.Content>
-                  <WexSelect.Item value="spouse">Spouse</WexSelect.Item>
-                  <WexSelect.Item value="child">Child</WexSelect.Item>
-                  <WexSelect.Item value="domestic-partner">Domestic Partner</WexSelect.Item>
-                  <WexSelect.Item value="other">Other</WexSelect.Item>
-                </WexSelect.Content>
-              </WexSelect>
-              {submitted && !state.relationship && (
-                <div className="text-xs text-destructive">Relationship is required.</div>
-              )}
-            </div>
-          </div>
+          {formContent}
         </div>
 
         <WexDialog.Footer className="justify-between">

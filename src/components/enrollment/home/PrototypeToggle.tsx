@@ -16,15 +16,11 @@ const MODE_LABELS: Record<SimulationMode, string> = {
   cobra: "COBRA",
 };
 
-const POST_ENROLLMENT_MODES: SimulationMode[] = ["modern", "simulated", "cobraEnroll", "cobra"];
-
-export function PrototypeToggle({ mode, onChange, hasSubmission = true }: Props) {
+export function PrototypeToggle({ mode, onChange, hasSubmission: _hasSubmission = true }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const handleSelect = (newMode: SimulationMode) => {
-    const isPostEnrollment = POST_ENROLLMENT_MODES.includes(newMode);
-    if (isPostEnrollment && !hasSubmission) return;
     onChange(newMode);
     setIsOpen(false);
   };
@@ -62,8 +58,7 @@ export function PrototypeToggle({ mode, onChange, hasSubmission = true }: Props)
           <div className="absolute bottom-full right-0 mb-2 min-w-[160px] rounded-lg border border-border bg-background shadow-lg">
             <div className="py-1">
               {(Object.keys(MODE_LABELS) as SimulationMode[]).map((modeOption) => {
-                const isPostEnrollment = POST_ENROLLMENT_MODES.includes(modeOption);
-                const isDisabled = isPostEnrollment && !hasSubmission;
+                const isDisabled = false;
 
                 return (
                   <button

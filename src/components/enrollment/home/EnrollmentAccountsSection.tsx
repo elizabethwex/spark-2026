@@ -1,12 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   AlertTriangle,
   CalendarCheck2,
-  ChevronRight,
+  CalendarClock,
   CircleDollarSign,
+  ClockAlert,
   Info,
-  Lightbulb,
   PiggyBank,
   TrendingUp,
 } from "lucide-react";
@@ -83,7 +82,6 @@ export function EnrollmentAccountsSection({
 }: Props) {
   const isSimulated = simulationMode === "simulated";
   const isCobra = simulationMode === "cobra";
-  const navigate = useNavigate();
   const { ref, isInView } = useInView({ threshold: 0.3, rootMargin: "0px 0px -15% 0px" });
 
   const hsaCents = (elections as Elections & { hsa?: { electionCents: number } }).hsa?.electionCents ?? 0;
@@ -102,7 +100,6 @@ export function EnrollmentAccountsSection({
         annualCents={hsaCents}
         isFamilyCoverage={isFamilyCoverage}
         isInView={isInView}
-        onNavigate={() => navigate("/hsa-details")}
         spentCents={isCobra ? Math.round(hsaCents * 0.75) : isSimulated ? Math.round(hsaCents * 0.35) : 0}
         contributionsFrozen={isCobra}
       />
@@ -120,7 +117,6 @@ export function EnrollmentAccountsSection({
         eligibleLabel="Vision & Dental"
         eligibleDescription="Covers dental & vision expenses only"
         isInView={isInView}
-        onReimburse={() => navigate("/reimburse")}
         spentCents={isCobra ? Math.round(elections.lpfsa.electionCents * 0.8) : isSimulated ? Math.round(elections.lpfsa.electionCents * 0.45) : 0}
         daysOverride={isCobra ? 30 : undefined}
       />
@@ -138,7 +134,6 @@ export function EnrollmentAccountsSection({
         eligibleLabel="Medical, Dental & Vision"
         eligibleDescription="Covers most eligible medical expenses"
         isInView={isInView}
-        onReimburse={() => navigate("/reimburse")}
         spentCents={isCobra ? Math.round(elections.fsa.electionCents * 0.8) : isSimulated ? Math.round(elections.fsa.electionCents * 0.45) : 0}
         daysOverride={isCobra ? 30 : undefined}
       />
@@ -154,6 +149,7 @@ export function EnrollmentAccountsSection({
         icon={<CalendarCheck2 className="h-5 w-5 transition-transform group-hover/card:rotate-12" />}
         annualCents={elections.dcfsa.electionCents}
         coveragePeriod={coveragePeriod}
+        isInView={isInView}
         spentCents={isCobra ? Math.round(elections.dcfsa.electionCents * 0.7) : isSimulated ? Math.round(elections.dcfsa.electionCents * 0.45) : 0}
       />
     );
@@ -169,6 +165,7 @@ export function EnrollmentAccountsSection({
         annualCents={elections.hra.electionCents}
         coveragePeriod={coveragePeriod}
         employerFunded
+        isInView={isInView}
         spentCents={isCobra ? Math.round(elections.hra.electionCents * 0.7) : isSimulated ? Math.round(elections.hra.electionCents * 0.3) : 0}
       />
     );
@@ -208,12 +205,11 @@ interface HsaCardProps {
   annualCents: number;
   isFamilyCoverage: boolean;
   isInView: boolean;
-  onNavigate: () => void;
   spentCents?: number;
   contributionsFrozen?: boolean;
 }
 
-function HsaCard({ annualCents, isFamilyCoverage, isInView, onNavigate, spentCents = 0, contributionsFrozen = false }: HsaCardProps) {
+function HsaCard({ annualCents, isFamilyCoverage, isInView, spentCents = 0, contributionsFrozen = false }: HsaCardProps) {
   const irsLimit = isFamilyCoverage ? 8550 : 4300;
   const irsLimitLabel = isFamilyCoverage ? "$8,550.00 (family)" : "$4,300.00 (individual)";
   const annualDollars = annualCents / 100;
@@ -263,7 +259,7 @@ function HsaCard({ annualCents, isFamilyCoverage, isInView, onNavigate, spentCen
         {/* Balances Box */}
         <div className="flex flex-col gap-3 rounded-xl bg-[#f1f3fb] px-4 py-3">
           <div className="flex h-[44px] items-center gap-3">
-            <div className="flex h-6 w-6 shrink-0 items-center justify-center text-neutral-700">
+            <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
               <TrendingUp className="h-5 w-5" />
             </div>
             <div className="flex flex-1 items-center justify-between">
@@ -279,7 +275,7 @@ function HsaCard({ annualCents, isFamilyCoverage, isInView, onNavigate, spentCen
           <div className="h-px w-full bg-[#d1d5db]" />
 
           <div className="flex h-[44px] items-center gap-3">
-            <div className="flex h-6 w-6 shrink-0 items-center justify-center text-neutral-700">
+            <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
               <CircleDollarSign className="h-5 w-5" />
             </div>
             <div className="flex flex-1 items-center justify-between">
@@ -339,8 +335,8 @@ function HsaCard({ annualCents, isFamilyCoverage, isInView, onNavigate, spentCen
             <div
               className="h-full rounded-[6px] bg-[#3958c3]"
               style={{
-                width: isInView ? `${pctUsed}%` : "0%",
-                transition: "width 2.2s cubic-bezier(0.22, 1, 0.36, 1) 0.15s",
+                width: isInView && hasSpent ? `${pctUsed}%` : "0%",
+                  transition: "width 2.2s cubic-bezier(0.22, 1, 0.36, 1) 0.15s",
               }}
             />
           </div>
@@ -350,16 +346,6 @@ function HsaCard({ annualCents, isFamilyCoverage, isInView, onNavigate, spentCen
         </div>
       </div>
 
-      {/* Footer */}
-      <div className="px-6 pb-6 mt-auto">
-        <button
-          type="button"
-          className="w-full rounded-xl border border-[#3958c3] py-[9.75px] text-[15.75px] font-medium text-neutral-700 hover:bg-[#3958c3]/5 transition-colors"
-          onClick={onNavigate}
-        >
-          Set Up Investments
-        </button>
-      </div>
     </div>
   );
 }
@@ -376,9 +362,22 @@ interface FsaRingCardProps {
   eligibleLabel: string;
   eligibleDescription: string;
   isInView: boolean;
-  onReimburse: () => void;
   spentCents?: number;
   daysOverride?: number;
+}
+
+/** Derives a final filing date 90 days after the plan year end.
+ *  Expects coveragePeriod in "MM/DD/YY - MM/DD/YY" or "MM/DD/YYYY - MM/DD/YYYY" format. */
+function filingDate(coveragePeriod: string): string {
+  const parts = coveragePeriod.split(/\s*[-–]\s*/);
+  const endStr = parts[parts.length - 1]?.trim();
+  if (!endStr) return "";
+  const [m, d, y] = endStr.split("/");
+  const fullYear = y && y.length === 2 ? `20${y}` : y;
+  const end = new Date(`${fullYear}-${m?.padStart(2, "0")}-${d?.padStart(2, "0")}`);
+  if (isNaN(end.getTime())) return "";
+  end.setDate(end.getDate() + 90);
+  return `${end.getMonth() + 1}/${end.getDate()}/${String(end.getFullYear()).slice(-2)}`;
 }
 
 function FsaRingCard({
@@ -386,20 +385,13 @@ function FsaRingCard({
   subtitle,
   annualCents,
   coveragePeriod,
-  eligibleLabel,
-  eligibleDescription,
   isInView,
-  onReimburse,
   spentCents = 0,
-  daysOverride,
 }: FsaRingCardProps) {
   const hasSpent = spentCents > 0;
-  const daysRemaining = daysOverride ?? (hasSpent ? 30 : 90);
-  const ringMax = 90;
-  const ringCircumference = 2 * Math.PI * 48;
-  const dashOffset = isInView
-    ? ringCircumference * (1 - Math.min(daysRemaining, ringMax) / ringMax)
-    : ringCircumference;
+  const remainingCents = annualCents - spentCents;
+  const spentPct = annualCents > 0 ? Math.round((spentCents / annualCents) * 100) : 0;
+  const filing = filingDate(coveragePeriod);
 
   return (
     <div
@@ -428,105 +420,92 @@ function FsaRingCard({
 
       {/* Body */}
       <div className="flex flex-1 flex-col gap-4 px-6 pb-8 pt-6">
-        <div className="flex w-full items-start justify-between">
-          <div className="flex flex-col gap-1">
-            <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#5f6a94]">
-              Annual Election
+        {/* Hero: available balance */}
+        <div className="flex flex-col gap-1">
+          <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#5f6a94]">
+            Available balance
+          </p>
+          <p className="text-[40px] font-bold leading-[56px] tracking-[-0.9px] text-[#14182c]">
+            {fmt(remainingCents)}
+          </p>
+          <div className="flex flex-col items-start gap-2">
+            <p className="text-[12px] text-[#5f6a94]">
+              <span className="font-normal leading-[16px]">Per pay deduction: </span>
+              <span className="font-bold leading-[16px]">{perPay(annualCents)}</span>
             </p>
-            <p className="text-[40px] font-bold leading-[36px] tracking-[-0.9px] text-[#14182c]">
-              {fmt(annualCents)}
+            {hasSpent ? (
+              <div className="flex items-center rounded-full border border-[#3958c3]/20 bg-[#eef2ff] px-[7px] py-[3px]">
+                <span className="text-[10px] font-bold leading-[15px] text-[#3958c3]">
+                  {fmt(spentCents)} spent · {fmt(remainingCents)} remaining
+                </span>
+              </div>
+            ) : (
+              <div className="flex items-center rounded-full border border-[#e0f0e8] bg-[#f0faf5] px-[7px] py-[3px]">
+                <span className="text-[10px] font-bold leading-[15px] text-[#009966]">
+                  Just enrolled — full year available
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Progress bar */}
+        <div className="flex flex-col gap-1.5 items-end w-full">
+          <div className="flex items-center gap-1 px-[7px] py-[3.5px] rounded-[16px] bg-[#f7f7f7]">
+            <p className="text-[12.25px] font-bold text-[#515f6b]">
+              {spentPct}% of {fmt(annualCents)} used
             </p>
-            <div className="mt-1 flex flex-col items-start gap-2">
-              <p className="text-[12px] text-[#5f6a94]">
-                <span className="font-normal leading-[16px]">Per pay deduction: </span>
-                <span className="font-bold leading-[16px]">{perPay(annualCents)}</span>
+          </div>
+          <div className="relative h-[20px] w-full overflow-hidden rounded-full bg-[#eef2ff]">
+            <div
+              className="absolute left-0 top-0 h-full bg-[#3958c3] transition-all duration-1000 ease-out"
+              style={{ width: isInView ? `${spentPct}%` : "0%" }}
+            />
+            <div
+              className="absolute top-0 h-full w-px bg-[#cefafe] transition-all duration-1000 ease-out"
+              style={{ left: isInView ? `${spentPct}%` : "0%" }}
+            />
+          </div>
+        </div>
+
+        {/* Detail rows */}
+        <div className="flex flex-col gap-3 rounded-xl bg-[#f1f3fb] px-4 py-3 w-full">
+          {/* Use it or lose it */}
+          <div className="flex h-[44px] items-center gap-3 w-full">
+            <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
+              <ClockAlert className="h-5 w-5" />
+            </div>
+            <div className="flex flex-1 items-center justify-between">
+              <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#14182c]">
+                Use it or lose it
               </p>
-              {hasSpent ? (
-                <div className="flex items-center rounded-full border border-[#3958c3]/20 bg-[#eef2ff] px-[7px] py-[3px]">
-                  <span className="text-[10px] font-bold leading-[15px] text-neutral-700">
-                    {fmt(spentCents)} spent · {fmt(annualCents - spentCents)} remaining
-                  </span>
-                </div>
-              ) : (
-                <div className="flex items-center rounded-full border border-[#e0f0e8] bg-[#f0faf5] px-[7px] py-[3px]">
-                  <span className="text-[10px] font-bold leading-[15px] text-[#009966]">
-                    Just enrolled — full year available
-                  </span>
-                </div>
+              <p className="text-[16px] font-semibold leading-[24px] tracking-[-0.176px] text-[#14182c]">
+                {fmt(remainingCents)}
+              </p>
+            </div>
+          </div>
+
+          <div className="h-px w-full bg-[#d1d5db]" />
+
+          {/* Final filing date */}
+          <div className="flex h-[44px] items-center gap-3 w-full">
+            <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
+              <CalendarClock className="h-5 w-5" />
+            </div>
+            <div className="flex flex-1 items-center justify-between">
+              <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#14182c]">
+                Final Filing Date
+              </p>
+              {filing && (
+                <p className="text-[16px] font-semibold leading-[24px] tracking-[-0.176px] text-[#14182c]">
+                  {filing}
+                </p>
               )}
             </div>
           </div>
-
-          {/* Days ring */}
-          {daysOverride !== undefined && daysRemaining <= 90 && (
-            <div className="relative flex h-[112px] w-[112px] shrink-0 items-center justify-center">
-              <svg
-                className="absolute inset-0 h-full w-full -rotate-90 transform"
-                viewBox="0 0 112 112"
-              >
-                <circle cx="56" cy="56" r="48" fill="none" stroke="#e3e7f4" strokeWidth="10" />
-                <circle
-                  cx="56"
-                  cy="56"
-                  r="48"
-                  fill="none"
-                  stroke="var(--neutral-700)"
-                  strokeWidth="10"
-                  strokeLinecap="round"
-                  strokeDasharray={ringCircumference}
-                  strokeDashoffset={dashOffset}
-                  style={{ transition: "stroke-dashoffset 2s cubic-bezier(0.22, 1, 0.36, 1) 0.15s" }}
-                />
-              </svg>
-              <div className="absolute flex flex-col items-center justify-center rounded-full bg-white">
-                <span className="text-[24px] font-bold leading-[32px] text-[#1f2636]">
-                  {daysRemaining}
-                </span>
-                <span className="-mt-[2px] text-center text-[10px] font-bold uppercase leading-[15px] tracking-[0.5px] text-[#5d688c]">
-                  days
-                  <br />
-                  to spend
-                </span>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Info Box */}
-        <div className="flex w-full items-center justify-between rounded-xl bg-[#3958c3]/5 p-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-6 w-6 shrink-0 items-center justify-center text-neutral-700">
-              <Lightbulb className="h-5 w-5" />
-            </div>
-            <div className="flex flex-col gap-[2px]">
-              <p className="text-[14px] font-bold leading-[20px] text-[#14182c]">
-                {eligibleLabel}
-              </p>
-              <p className="text-[12px] leading-[16px] text-[#5f6a94]">
-                {eligibleDescription}
-              </p>
-            </div>
-          </div>
-          <button
-            type="button"
-            className="flex items-center gap-2 text-[14px] leading-[20px] text-neutral-700 hover:underline"
-          >
-            View Eligible Expenses
-            <ChevronRight className="h-4 w-4" />
-          </button>
         </div>
       </div>
 
-      {/* Footer */}
-      <div className="px-6 pb-6 mt-auto">
-        <button
-          type="button"
-          className="w-full rounded-xl border border-[#3958c3] py-[9.75px] text-[15.75px] font-medium text-neutral-700 hover:bg-[#3958c3]/5 transition-colors"
-          onClick={onReimburse}
-        >
-          Reimburse Myself
-        </button>
-      </div>
     </div>
   );
 }
@@ -541,6 +520,7 @@ interface SimpleAccountCardProps {
   icon: React.ReactNode;
   annualCents: number;
   coveragePeriod: string;
+  isInView: boolean;
   employerFunded?: boolean;
   spentCents?: number;
 }
@@ -551,10 +531,10 @@ function SimpleAccountCard({
   icon,
   annualCents,
   coveragePeriod,
+  isInView,
   employerFunded,
   spentCents = 0,
 }: SimpleAccountCardProps) {
-  const hasSpent = spentCents > 0;
   const remainingCents = annualCents - spentCents;
   const spentPct = annualCents > 0 ? Math.round((spentCents / annualCents) * 100) : 0;
   return (
@@ -581,18 +561,39 @@ function SimpleAccountCard({
 
       {/* Body */}
       <div className="flex flex-1 flex-col gap-4 px-6 pb-8 pt-6">
+        {/* Hero */}
         <div className="flex flex-col gap-1">
           <p className="text-[16px] leading-[24px] tracking-[-0.176px] text-[#5f6a94]">
-            {employerFunded ? "Employer Contribution" : "Annual Election"}
+            {employerFunded ? "Employer Contribution" : "Account Balance"}
           </p>
           <p className="text-[40px] font-bold leading-[40px] tracking-[-0.9px] text-[#14182c]">
-            {fmt(annualCents)}
+            {fmt(remainingCents)}
           </p>
         </div>
 
+        {/* Progress bar */}
+        <div className="flex flex-col gap-1.5 items-end w-full">
+          <div className="flex items-center gap-1 px-[7px] py-[3.5px] rounded-[16px] bg-[#f7f7f7]">
+            <p className="text-[12.25px] font-bold text-[#515f6b]">
+              {spentPct}% of {fmt(annualCents)} used
+            </p>
+          </div>
+          <div className="relative h-[20px] w-full overflow-hidden rounded-full bg-[#eef2ff]">
+            <div
+              className="absolute left-0 top-0 h-full bg-[#3958c3] transition-all duration-1000 ease-out"
+              style={{ width: isInView ? `${spentPct}%` : "0%" }}
+            />
+            <div
+              className="absolute top-0 h-full w-px bg-[#cefafe] transition-all duration-1000 ease-out"
+              style={{ left: isInView ? `${spentPct}%` : "0%" }}
+            />
+          </div>
+        </div>
+
+        {/* Per pay deduction */}
         <div className="flex flex-col gap-3 rounded-xl bg-[#f1f3fb] px-4 py-3">
           <div className="flex h-[44px] items-center gap-3">
-            <div className="flex h-6 w-6 shrink-0 items-center justify-center text-neutral-700">
+            <div className="flex h-6 w-6 shrink-0 items-center justify-center text-[#3958c3]">
               <CircleDollarSign className="h-5 w-5" />
             </div>
             <div className="flex flex-1 items-center justify-between">
@@ -605,25 +606,6 @@ function SimpleAccountCard({
             </div>
           </div>
         </div>
-
-        {hasSpent && (
-          <div className="flex flex-col gap-[6px]">
-            <div className="flex items-center justify-between">
-              <p className="text-[12px] font-semibold leading-[16px] text-neutral-700">
-                {spentPct}% used ({fmt(spentCents)})
-              </p>
-              <p className="text-[12px] leading-[16px] text-[#14182c]">
-                {fmt(remainingCents)} remaining
-              </p>
-            </div>
-            <div className="flex h-[6px] w-full items-center overflow-hidden rounded-[6px] bg-[#eef2ff]">
-              <div
-                className="h-full rounded-[6px] bg-[#3958c3]"
-                style={{ width: `${spentPct}%`, transition: "width 1.5s ease-out" }}
-              />
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

@@ -204,7 +204,7 @@ function PlanSelectionRow({
   onEdit: () => void;
 }) {
   return (
-    <div className="rounded-2xl border border-border bg-background px-6 py-5 elevation-3">
+    <div className="rounded-2xl border border-border bg-background px-6 py-5 elevation-3 shadow-sm">
       <div className="flex items-center gap-4">
         <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
           {icon}
@@ -266,7 +266,7 @@ function SpendingAccountRow({
 }) {
   if (annualCents === 0) return null;
   return (
-    <div className="rounded-2xl border border-border bg-background px-6 py-5 elevation-3">
+    <div className="rounded-2xl border border-border bg-background px-6 py-5 elevation-3 shadow-sm">
       <div className="flex items-center gap-4">
         <div className="h-12 w-12 rounded-full bg-success/10 flex items-center justify-center text-success-text shrink-0">
           <CircleDollarSign className="h-6 w-6" />
@@ -318,7 +318,7 @@ function RemainingStepRow({
   statusLabel: string;
 }) {
   return (
-    <div className="rounded-2xl border border-border bg-background px-6 py-3 elevation-3">
+    <div className="rounded-2xl border border-border bg-background px-6 py-3 elevation-3 shadow-sm">
       <div className="flex items-center gap-4">
         <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
           {icon}
@@ -529,7 +529,7 @@ export default function SpendingAccountsCheckpointPage() {
 
           {/* Plans total card */}
           <div className="mt-6 flex justify-end">
-            <div className="rounded-2xl border border-border bg-background px-6 py-4 elevation-3">
+            <div className="rounded-2xl border border-border bg-background px-6 py-4 elevation-3 shadow-sm">
               <div className="text-[14px] font-semibold text-foreground">
                 Plans Total (you pay)
               </div>
@@ -585,7 +585,7 @@ export default function SpendingAccountsCheckpointPage() {
           {/* Total spending accounts card */}
           {totalCents > 0 && (
             <div className="mt-6 flex justify-end">
-              <div className="rounded-2xl border border-border bg-background px-6 py-4 elevation-3">
+              <div className="rounded-2xl border border-border bg-background px-6 py-4 elevation-3 shadow-sm">
                 <div className="text-[14px] font-semibold text-foreground mb-2">
                   Total Spending Accounts
                 </div>

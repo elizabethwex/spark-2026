@@ -55,7 +55,7 @@ export function AccountSelectCard({
       className={cn(
         "w-full rounded-lg border p-6 transition-all",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-        !disabled && "cursor-pointer elevation-4",
+        !disabled && "cursor-pointer elevation-4 shadow-md",
         disabled && "cursor-not-allowed bg-muted border-border shadow-none",
         checked && !disabled ? "border-primary" : "border-border",
         className,
