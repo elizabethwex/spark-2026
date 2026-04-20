@@ -14,6 +14,8 @@ import {
   ResponsiveContainer,
   Tooltip as RechartsTooltip,
   XAxis,
+  YAxis,
+  CartesianGrid,
 } from "recharts";
 import { Building2, CircleDollarSign, Info, TrendingUp, Wallet } from "lucide-react";
 import { ConsumerNavigation } from "@/components/layout/ConsumerNavigation";
@@ -33,6 +35,28 @@ import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 
 const fmt = (n: number) =>
   n.toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 });
+
+const fmtAxisCurrency = (n: number) =>
+  n.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+    notation: "compact",
+  });
+
+const WEEKDAY_TICKS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
+const INVESTMENT_AXIS_ANCHOR = new Date(2025, 11, 31); // Dec 31, 2025 (keeps 1Y labels in 2025)
+const MONTH_TICKS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"] as const;
+
+function addDays(d: Date, days: number) {
+  const next = new Date(d);
+  next.setDate(next.getDate() + days);
+  return next;
+}
+
+function formatMonthDay(d: Date) {
+  return `${d.getMonth() + 1}/${d.getDate()}`;
+}
 
 const INVESTMENT_RANGES = ["1W", "1M", "3M", "1Y", "3Y", "All"] as const;
 
@@ -69,6 +93,68 @@ export function HsaAccountDetails() {
     () => hsaInvestmentChartPoints.slice(-RANGE_WEEKS[investRange]),
     [investRange]
   );
+
+  const investmentXTicks = useMemo(() => {
+    const xs = filteredChartPoints.map((p) => p.i);
+    if (xs.length <= 10) return xs;
+    const keep = new Set<number>();
+    keep.add(xs[0]!);
+    keep.add(xs[xs.length - 1]!);
+    const remainingSlots = 10 - keep.size;
+    const step = (xs.length - 1) / (remainingSlots + 1);
+    for (let n = 1; n <= remainingSlots; n += 1) {
+      const idx = Math.round(n * step);
+      keep.add(xs[idx]!);
+    }
+    return xs.filter((x) => keep.has(x));
+  }, [filteredChartPoints]);
+
+  const investmentXLabel = useMemo(() => {
+    const points = filteredChartPoints;
+    const n = points.length;
+    if (n === 0) {
+      return () => "";
+    }
+
+    const getIndexForX = (x: number) => {
+      const idx = points.findIndex((p) => p.i === x);
+      return idx >= 0 ? idx : 0;
+    };
+
+    const spanDays =
+      investRange === "1W"
+        ? 7
+        : investRange === "1M"
+          ? 30
+          : investRange === "3M"
+            ? 90
+            : investRange === "1Y"
+              ? 365
+              : 365;
+
+    return (x: number) => {
+      const idx = getIndexForX(x);
+
+      if (investRange === "1W") {
+        return WEEKDAY_TICKS[idx % WEEKDAY_TICKS.length];
+      }
+
+      if (investRange === "1Y") {
+        // Map points across 2025 and show month names.
+        const start = new Date(2025, 0, 1);
+        const denom = Math.max(1, n - 1);
+        const offset = Math.round((idx / denom) * (spanDays - 1));
+        const d = addDays(start, offset);
+        return MONTH_TICKS[d.getMonth()];
+      }
+
+      // 1M / 3M: show recent dates leading up to the anchor date.
+      const denom = Math.max(1, n - 1);
+      const offset = Math.round((idx / denom) * (spanDays - 1));
+      const start = addDays(INVESTMENT_AXIS_ANCHOR, -(spanDays - 1));
+      return formatMonthDay(addDays(start, offset));
+    };
+  }, [filteredChartPoints, investRange]);
 
   const annual2026 = {
     contributed: 3_400,
@@ -370,14 +456,34 @@ export function HsaAccountDetails() {
                 </div>
                 <div className="h-[200px] w-full min-h-[180px]">
                   <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={filteredChartPoints} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                    <AreaChart
+                      data={filteredChartPoints}
+                      margin={{ top: 8, right: 8, left: 12, bottom: 8 }}
+                    >
                       <defs>
                         <linearGradient id="hsaInvestFill" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="0%" stopColor="hsl(142 71% 40%)" stopOpacity={0.35} />
                           <stop offset="100%" stopColor="hsl(142 71% 40%)" stopOpacity={0} />
                         </linearGradient>
                       </defs>
-                      <XAxis dataKey="i" hide />
+                      <CartesianGrid stroke="hsl(var(--border))" strokeOpacity={0.35} vertical={false} />
+                      <XAxis
+                        dataKey="i"
+                        ticks={investmentXTicks}
+                        tickLine={false}
+                        axisLine={false}
+                        tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+                        interval="preserveStartEnd"
+                        tickFormatter={(v: number) => investmentXLabel(v)}
+                      />
+                      <YAxis
+                        tickLine={false}
+                        axisLine={false}
+                        tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+                        width={48}
+                        tickFormatter={(v: number) => fmtAxisCurrency(v)}
+                        domain={["dataMin", "dataMax"]}
+                      />
                       <RechartsTooltip
                         formatter={(value: number) => [fmt(value), "Balance"]}
                         labelFormatter={() => ""}
@@ -393,6 +499,17 @@ export function HsaAccountDetails() {
                       />
                     </AreaChart>
                   </ResponsiveContainer>
+                </div>
+                <div className="pt-2">
+                  <Button
+                    intent="primary"
+                    variant="outline"
+                    size="md"
+                    className="w-full rounded-xl border-primary text-primary"
+                    type="button"
+                  >
+                    Manage Investments
+                  </Button>
                 </div>
               </CardContent>
             </Card>

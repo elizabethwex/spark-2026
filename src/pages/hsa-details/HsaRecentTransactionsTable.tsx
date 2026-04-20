@@ -127,11 +127,7 @@ export function HsaRecentTransactionsTable({ transactions }: HsaRecentTransactio
                     </TableCell>
                     <TableCell>{transaction.description}</TableCell>
                     <TableCell>{transaction.category}</TableCell>
-                    <TableCell
-                      className={`text-right font-medium ${
-                        transaction.isPositive ? "text-foreground" : "text-destructive"
-                      }`}
-                    >
+                    <TableCell className="text-right font-medium text-foreground">
                       {transaction.amount}
                     </TableCell>
                   </TableRow>
