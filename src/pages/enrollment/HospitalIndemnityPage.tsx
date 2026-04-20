@@ -110,7 +110,7 @@ function HospitalPlanCard({ plan, selected, onSelect }: PlanCardProps) {
       type="button"
       onClick={onSelect}
       className={cn(
-        "w-full h-full text-left rounded-2xl border px-6 py-5 elevation-3",
+        "w-full h-full text-left rounded-2xl border px-6 py-5 elevation-3 shadow-md",
         "transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         selected
           ? isWaive

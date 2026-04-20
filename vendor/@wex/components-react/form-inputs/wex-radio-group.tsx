@@ -48,13 +48,13 @@ const RadioGroupItem = React.forwardRef<
     <RadioGroupPrimitive.Item
       ref={ref}
       className={cn(
-        "aspect-square h-4 w-4 rounded-full border border-wex-radio-border text-wex-radio-checked-fg shadow focus:outline-none focus-visible:ring-1 focus-visible:ring-wex-radio-focus-ring disabled:cursor-not-allowed disabled:opacity-50",
+        "aspect-square h-4 w-4 rounded-full border border-wex-radio-border text-wex-radio-border shadow focus:outline-none focus-visible:ring-1 focus-visible:ring-wex-radio-focus-ring disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-primary data-[state=checked]:text-primary",
         className
       )}
       {...props}
     >
       <RadioGroupPrimitive.Indicator className="flex items-center justify-center">
-        <Circle className="h-3.5 w-3.5 fill-wex-radio-checked-fg" />
+        <Circle className="h-3.5 w-3.5 fill-current text-current" />
       </RadioGroupPrimitive.Indicator>
     </RadioGroupPrimitive.Item>
   );
@@ -93,13 +93,13 @@ const WexRadioGroupItem = React.forwardRef<
     <RadioGroupPrimitive.Item
       ref={ref}
       className={cn(
-        "aspect-square h-4 w-4 rounded-full border border-wex-radio-border bg-wex-radio-bg text-wex-radio-checked-fg ring-offset-background focus:outline-none focus-visible:ring-1 focus-visible:ring-wex-radio-focus-ring disabled:cursor-not-allowed disabled:opacity-[var(--wex-component-radio-disabled-opacity)]",
+        "aspect-square h-4 w-4 rounded-full border border-wex-radio-border bg-wex-radio-bg text-wex-radio-border ring-offset-background focus:outline-none focus-visible:ring-1 focus-visible:ring-wex-radio-focus-ring disabled:cursor-not-allowed disabled:opacity-[var(--wex-component-radio-disabled-opacity)] data-[state=checked]:border-primary data-[state=checked]:text-primary",
         className
       )}
       {...props}
     >
       <RadioGroupPrimitive.Indicator className="flex items-center justify-center">
-        <Circle className={cn(radioIndicatorSizes[radioSize], "fill-wex-radio-checked-fg")} />
+        <Circle className={cn(radioIndicatorSizes[radioSize], "fill-current text-current")} />
       </RadioGroupPrimitive.Indicator>
     </RadioGroupPrimitive.Item>
   );

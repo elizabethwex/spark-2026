@@ -39,14 +39,31 @@ export function attachmentLabel(count: number): string | null {
 export function expenseStatusBadgeClass(tone: ExpenseRow["status"]["tone"]): string {
   switch (tone) {
     case "blue":
-      return "bg-blue-100 text-blue-700 border-transparent"
+      return "bg-[#DBEAFE] text-[#1E40AF] border-transparent"
     case "green":
-      return "bg-green-100 text-green-700 border-transparent"
+      return "bg-[#D0FAE5] text-[#006045] border-transparent"
     case "amber":
-      return "bg-amber-100 text-amber-700 border-transparent"
+      return "bg-[#FFF1BF] text-[#735300] border-transparent"
     case "red":
-      return "bg-red-100 text-red-700 border-transparent"
+      return "bg-[#FEE2E2] text-[#C8102E] border-transparent"
     default:
-      return "bg-gray-100 text-gray-600 border-transparent"
+      return "bg-[#F1F3FB] text-[#444C72] border-transparent"
+  }
+}
+
+export function expenseStatusBadgeIntent(
+  tone: ExpenseRow["status"]["tone"]
+): "info" | "success" | "warning" | "destructive" | "default" {
+  switch (tone) {
+    case "blue":
+      return "info"
+    case "green":
+      return "success"
+    case "amber":
+      return "warning"
+    case "red":
+      return "destructive"
+    default:
+      return "default"
   }
 }

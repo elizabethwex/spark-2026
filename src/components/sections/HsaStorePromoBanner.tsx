@@ -1,7 +1,7 @@
 import { Button } from "@wexinc-healthbenefits/ben-ui-kit";
 import { cn } from "@/lib/utils";
 
-const HSA_STORE_URL = "https://www.hsastore.com/";
+const FSA_STORE_URL = "https://fsastore.com/";
 
 /** Figma 29515:8707 — Elevation/3 (Medium), same as FSA `SectionCard` */
 const CE_BANNER_SHADOW =
@@ -38,8 +38,8 @@ export function HsaStorePromoBanner() {
               className="h-11 rounded-lg border-0 bg-[#253746] px-3 text-base font-bold text-white shadow-[0px_1px_0px_0px_rgba(0,0,0,0.2)] hover:bg-[#253746]/90 sm:h-[45px] sm:px-4"
               asChild
             >
-              <a href={HSA_STORE_URL} target="_blank" rel="noopener noreferrer">
-                Shop HSA Store
+              <a href={FSA_STORE_URL} target="_blank" rel="noopener noreferrer">
+                Shop FSA Store
               </a>
             </Button>
           </div>

@@ -214,6 +214,7 @@ export default function DependentsPage({ currentStepId, onStepChange, onBack, on
           setAddOpen(false);
           setEditingDependent(null);
         }}
+        isEnrollmentFlow={true}
       />
 
       <WexDialog open={confirmRemoveDependent !== null} onOpenChange={(open) => { if (!open) setConfirmRemoveDependent(null); }}>

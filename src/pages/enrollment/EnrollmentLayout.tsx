@@ -4,10 +4,6 @@ import { getEnrollmentSteps, flattenEnrollmentStepIds } from "../../components/e
 import { WexButton } from "@wex/components-react/actions";
 import { WexDialog } from "@wex/components-react/overlays";
 import { ScrollIndicator } from "../../components/enrollment/ScrollIndicator";
-import { Sparkles } from "lucide-react";
-
-const BRAND_LINEAR_GRADIENT =
-  'linear-gradient(172.91deg, rgb(37, 20, 111) 2.4625%, rgb(200, 16, 46) 100%)';
 
 type EnrollmentLayoutProps = {
   currentStepId?: string;
@@ -168,14 +164,23 @@ export default function EnrollmentLayout({
 
       {/* Assiste IQ Icon - Fixed in upper-right corner */}
       <div className="fixed top-6 right-8 z-40">
-        <div className="relative shrink-0 size-[44px] rounded-full overflow-hidden shadow-sm ring-1 ring-white/80">
-          <div
-            className="absolute inset-0 rounded-full"
-            style={{ background: BRAND_LINEAR_GRADIENT }}
-          />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <Sparkles className="size-5 text-white drop-shadow-sm" strokeWidth={2} />
-          </div>
+        <div
+          className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-full shadow-[0_1.057px_3.17px_rgba(2,13,36,0.2),0_0_0.528px_rgba(2,13,36,0.3)]"
+          style={{
+            backgroundImage:
+              "linear-gradient(133.514deg, rgb(37, 20, 111) 2.4625%, rgb(200, 16, 46) 100%)",
+          }}
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            className="shrink-0"
+          >
+            <path d="M13.913 13.9149L11.9997 24.0033L10.087 13.9149L0 12.0013L10.087 10.0884L12.0003 0L13.913 10.0884L24 12.0013L13.913 13.9149Z" fill="white"/>
+            <path d="M20.2758 19.7969L19.5994 23.3628L18.923 19.7969L15.3569 19.1204L18.923 18.4439L19.5994 14.8781L20.2752 18.4439L23.8412 19.1204L20.2758 19.7969Z" fill="white"/>
+          </svg>
         </div>
       </div>
     </div>
