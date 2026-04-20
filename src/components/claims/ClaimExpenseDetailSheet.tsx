@@ -333,15 +333,15 @@ export function ClaimExpenseDetailSheet({
                 className={cn(
                   "rounded-md border p-2.5 shadow-sm",
                   toast.variant === "red"
-                    ? "border-red-200 bg-red-50/95"
-                    : "border-amber-200 bg-amber-50/95"
+                    ? "border-red-100 bg-red-50"
+                    : "border-amber-100 bg-amber-50"
                 )}
               >
                 <div className="flex gap-2">
                   <AlertTriangle
                     className={cn(
                       "mt-0.5 h-4 w-4 shrink-0",
-                      toast.variant === "red" ? "text-red-600" : "text-amber-600"
+                      toast.variant === "red" ? "text-[#C8102E]" : "text-[#735300]"
                     )}
                     aria-hidden
                   />
@@ -349,18 +349,20 @@ export function ClaimExpenseDetailSheet({
                     <p
                       className={cn(
                         "text-sm font-medium",
-                        toast.variant === "red" ? "text-red-800" : "text-amber-800"
+                        toast.variant === "red" ? "text-[#C8102E]" : "text-[#735300]"
                       )}
                     >
                       {toast.headline}
                     </p>
-                    <p className="text-xs text-foreground">{toast.subtext}</p>
+                    <p className="text-xs text-muted-foreground">{toast.subtext}</p>
                     {toast.tag && (
                       <Badge
                         intent={toast.variant === "red" ? "destructive" : "warning"}
                         size="sm"
                         pill
-                        className="uppercase"
+                        className={toast.variant === "red"
+                          ? "uppercase bg-[#FEE2E2] text-[#C8102E] border-[#C8102E]/20"
+                          : "uppercase bg-[#FFF1BF] text-[#735300] border-[#735300]/20"}
                       >
                         <span className="inline-flex items-center gap-1">
                           <Clock className="h-3 w-3 shrink-0 text-current" aria-hidden />
@@ -371,7 +373,7 @@ export function ClaimExpenseDetailSheet({
                     <div
                       className={cn(
                         "h-px w-full",
-                        toast.variant === "red" ? "bg-red-200/80" : "bg-amber-200/80"
+                        toast.variant === "red" ? "bg-[#C8102E]/20" : "bg-[#735300]/20"
                       )}
                       aria-hidden
                     />
@@ -486,7 +488,7 @@ export function ClaimExpenseDetailSheet({
                                       intent="info"
                                       size="sm"
                                       pill
-                                      className="text-[11px]"
+                                      className="text-[11px] bg-[#DBEAFE] text-[#1E40AF] border-transparent"
                                     >
                                       Now
                                     </Badge>
@@ -626,7 +628,7 @@ export function ClaimExpenseDetailSheet({
               intent="primary"
               variant="solid"
               size="sm"
-              className="gap-1.5"
+              className="gap-1.5 btn-primary-theme"
             >
               <Upload className="h-3.5 w-3.5 text-current" aria-hidden />
               Upload Documentation
@@ -663,6 +665,7 @@ export function ClaimExpenseDetailSheet({
               intent="primary"
               variant="solid"
               size="sm"
+              className="btn-primary-theme"
             >
               Continue Claim
             </Button>
@@ -676,6 +679,7 @@ export function ClaimExpenseDetailSheet({
               intent="primary"
               variant="solid"
               size="sm"
+              className="btn-primary-theme"
             >
               Repay
             </Button>
