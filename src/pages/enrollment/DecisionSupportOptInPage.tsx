@@ -34,7 +34,7 @@ export default function DecisionSupportOptInPage() {
   };
 
   const onCancel = () => {
-    navigate("/", { replace: true });
+    navigate("/enrollment/home", { replace: true });
   };
 
   const onStepChange = (stepId: string) => {

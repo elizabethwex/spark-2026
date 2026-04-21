@@ -186,7 +186,7 @@ export default function AddDependentModal({ open, onOpenChange, onAdd, editDepen
           date={state.birthDate}
           onDateChange={(d) => setState((s) => ({ ...s, birthDate: d }))}
           placeholder="Select birth date"
-          className="w-full [&_button]:w-full [&_button]:h-12 [&_button]:border [&_button]:border-input [&_button]:rounded-md"
+          className="w-full [&_button]:w-full [&_button]:h-12 [&_button]:border [&_button]:border-input [&_button]:rounded-md [&_button]:bg-white"
         />
         {submitted && !state.birthDate && (
           <div className="text-xs text-destructive">Birth date is required.</div>
@@ -255,7 +255,7 @@ export default function AddDependentModal({ open, onOpenChange, onAdd, editDepen
     if (!open) return null;
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-        <div className="w-[min(512px,90vw)] max-h-[90vh] flex flex-col rounded-xl bg-background p-6 shadow-xl">
+        <div className="w-[min(512px,90vw)] max-h-[90vh] flex flex-col rounded-xl bg-white p-6 shadow-xl">
           <h3 className="text-[20px] font-bold text-foreground mb-4">
             {isEditMode ? "Edit Dependent Information" : "Add Dependent Information"}
           </h3>
@@ -279,7 +279,7 @@ export default function AddDependentModal({ open, onOpenChange, onAdd, editDepen
                 "Save changes"
               ) : (
                 <>
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-4 w-4 text-white" />
                   Add Dependent
                 </>
               )}
@@ -316,7 +316,7 @@ export default function AddDependentModal({ open, onOpenChange, onAdd, editDepen
               "Save changes"
             ) : (
               <>
-                <Plus className="h-4 w-4" />
+                <Plus className="h-4 w-4 text-white" />
                 Add Dependent
               </>
             )}

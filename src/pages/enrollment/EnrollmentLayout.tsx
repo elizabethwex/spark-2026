@@ -64,7 +64,7 @@ export default function EnrollmentLayout({
   const showBackRight = showBack && Boolean(cancelAction);
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen bg-white flex">
       {/* Left rail */}
       <aside className="bg-muted w-[240px] shrink-0 rounded-tr-[32px] overflow-hidden">
         <div className="px-8 pt-14">
@@ -91,7 +91,7 @@ export default function EnrollmentLayout({
 
         {/* Bottom actions */}
         {!hideFooterActions ? (
-          <div className="fixed left-[240px] right-0 bottom-0 px-8 pb-8 pt-6 bg-gradient-to-t from-background via-background to-background/80 backdrop-blur-sm">
+          <div className="fixed left-[240px] right-0 bottom-0 px-8 pb-8 pt-6 bg-gradient-to-t from-white via-white to-white/80 backdrop-blur-sm">
             <div className="h-10 flex items-center justify-between">
               {cancelAction ? (
                 <WexButton variant="ghost" onClick={() => setCancelConfirmOpen(true)}>
@@ -135,7 +135,7 @@ export default function EnrollmentLayout({
 
         {cancelAction ? (
           <WexDialog open={cancelConfirmOpen} onOpenChange={setCancelConfirmOpen}>
-            <WexDialog.Content aria-describedby={undefined}>
+            <WexDialog.Content size="md" aria-describedby={undefined} className="left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
               <WexDialog.Header>
                 <WexDialog.Title>Exit enrollment?</WexDialog.Title>
               </WexDialog.Header>

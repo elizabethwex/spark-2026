@@ -80,7 +80,7 @@ export default function DcfsaPage({ currentStepId, onStepChange, onBack, onNext,
         <div className="relative w-[min(1136px,92vw)]">
           {/* Right summary card */}
           <div className="absolute right-0 top-0 w-[344px]">
-            <div className="bg-background rounded-[12px] border border-border shadow-[0px_4px_10px_0px_rgba(2,13,36,0.15),0px_0px_1px_0px_rgba(2,13,36,0.3)] p-4">
+            <div className="bg-white rounded-[12px] border border-border shadow-[0px_4px_10px_0px_rgba(2,13,36,0.15),0px_0px_1px_0px_rgba(2,13,36,0.3)] p-4">
               <div className="text-[14px] font-semibold leading-6 tracking-[0.28px] text-foreground">Plans</div>
 
               <div className="mt-2 flex items-center justify-between text-[14px] leading-6 tracking-[0.28px] text-foreground">

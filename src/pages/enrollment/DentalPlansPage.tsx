@@ -164,7 +164,7 @@ export default function DentalPlansPage({
             <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
               <div
                 className={cn(
-                  "w-full text-left rounded-xl border bg-background px-4 py-3 shadow-[0px_1px_2px_0px_rgba(18,18,23,0.05)]",
+                  "w-full text-left rounded-xl border bg-white px-4 py-3 shadow-[0px_1px_2px_0px_rgba(18,18,23,0.05)]",
                   "border-primary ring-1 ring-primary/10",
                 )}
                 aria-pressed={true}
@@ -194,7 +194,7 @@ export default function DentalPlansPage({
                     type="button"
                     onClick={() => toggleEnrollee(dep.id)}
                     className={cn(
-                      "w-full text-left rounded-xl border bg-background px-4 py-3 shadow-[0px_1px_2px_0px_rgba(18,18,23,0.05)]",
+                      "w-full text-left rounded-xl border bg-white px-4 py-3 shadow-[0px_1px_2px_0px_rgba(18,18,23,0.05)]",
                       "transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                       selected ? "border-primary ring-1 ring-primary/10" : "border-border",
                     )}

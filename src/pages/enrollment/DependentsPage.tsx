@@ -145,14 +145,14 @@ export default function DependentsPage({ currentStepId, onStepChange, onBack, on
               ))}
             </div>
           ) : (
-            <div className="mt-6 rounded-2xl border border-border bg-background p-8 text-center shadow-[0px_1px_2px_0px_rgba(18,18,23,0.05)]">
+            <div className="mt-6 rounded-2xl border border-border bg-white p-8 text-center shadow-[0px_1px_2px_0px_rgba(18,18,23,0.05)]">
               <div className="text-[16px] font-semibold text-foreground">No dependents added yet</div>
               <div className="mt-1 text-[14px] text-muted-foreground">
                 Add dependents you'd like to include in coverage, or continue as self-only.
               </div>
               <div className="mt-4 flex flex-col sm:flex-row gap-2 justify-center">
                 <WexButton intent="primary" onClick={() => { setEditingDependent(null); setAddOpen(true); }}>
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-4 w-4 text-white" />
                   Add a Dependent
                 </WexButton>
                 <WexButton variant="outline" onClick={handleSelfOnly}>
@@ -181,7 +181,7 @@ export default function DependentsPage({ currentStepId, onStepChange, onBack, on
               type="button"
               onClick={() => { setEditingDependent(null); setAddOpen(true); }}
               className={cn(
-                "w-full rounded-xl border-2 border-dashed border-border bg-background px-4 py-4",
+                "w-full rounded-xl border-2 border-dashed border-border bg-white px-4 py-4",
                 "text-foreground hover:bg-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
               )}
             >

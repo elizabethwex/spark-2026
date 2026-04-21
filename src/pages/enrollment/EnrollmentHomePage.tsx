@@ -200,7 +200,7 @@ export default function EnrollmentHomePage() {
                       style={{ background: 'linear-gradient(172.91deg, rgb(37, 20, 111) 2.4625%, rgb(200, 16, 46) 100%)' }}
                     >
                       Enroll Now
-                      <ChevronRight className="h-4 w-4 shrink-0 opacity-90" />
+                      <ChevronRight className="h-4 w-4 shrink-0 opacity-90 text-white" />
                     </button>
                     <button
                       type="button"
