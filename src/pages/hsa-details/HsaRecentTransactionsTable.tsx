@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, type KeyboardEvent } from "react";
+import { ClaimExpenseDetailSheet } from "@/components/claims/ClaimExpenseDetailSheet";
 import {
   Badge,
   Button,
@@ -27,6 +28,7 @@ import { ArrowDown, ChevronsLeft, ChevronsRight, Search, Upload } from "lucide-r
 import { usePrototype } from "@/context/PrototypeContext";
 import { cn, homepageAccountSurfaceClass } from "@/lib/utils";
 import type { Transaction } from "./mockData";
+import { hsaTransactionToExpenseRow } from "./hsaTransactionToExpenseRow";
 
 interface HsaRecentTransactionsTableProps {
   transactions: Transaction[];
@@ -41,6 +43,7 @@ export function HsaRecentTransactionsTable({ transactions }: HsaRecentTransactio
   const [searchQuery, setSearchQuery] = useState("");
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedTx, setSelectedTx] = useState<Transaction | null>(null);
 
   const filteredTransactions = useMemo(() => {
     if (!searchQuery.trim()) return transactions;
@@ -61,6 +64,7 @@ export function HsaRecentTransactionsTable({ transactions }: HsaRecentTransactio
   const paginated = filteredTransactions.slice(startIndex, startIndex + rowsPerPage);
 
   return (
+    <>
     <Card className={cn(cardSurface)} style={{ borderRadius: "24px" }}>
       <CardContent className="p-6">
         <div className="flex w-full flex-col items-center space-y-4">
@@ -115,7 +119,20 @@ export function HsaRecentTransactionsTable({ transactions }: HsaRecentTransactio
               </TableHeader>
               <TableBody>
                 {paginated.map((transaction) => (
-                  <TableRow key={transaction.id} className="h-[49px]">
+                  <TableRow
+                    key={transaction.id}
+                    className="h-[49px] cursor-pointer hover:bg-muted/40"
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`View details, ${transaction.description}, ${transaction.date}`}
+                    onClick={() => setSelectedTx(transaction)}
+                    onKeyDown={(e: KeyboardEvent<HTMLTableRowElement>) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setSelectedTx(transaction);
+                      }
+                    }}
+                  >
                     <TableCell>{transaction.date}</TableCell>
                     <TableCell>
                       <Badge
@@ -131,11 +148,7 @@ export function HsaRecentTransactionsTable({ transactions }: HsaRecentTransactio
                     </TableCell>
                     <TableCell>{transaction.description}</TableCell>
                     <TableCell>{transaction.category}</TableCell>
-                    <TableCell
-                      className={`text-right font-medium ${
-                        transaction.isPositive ? "text-foreground" : "text-destructive"
-                      }`}
-                    >
+                    <TableCell className="text-right font-medium text-foreground">
                       {transaction.amount}
                     </TableCell>
                   </TableRow>
@@ -236,5 +249,16 @@ export function HsaRecentTransactionsTable({ transactions }: HsaRecentTransactio
         </div>
       </CardContent>
     </Card>
+
+    <ClaimExpenseDetailSheet
+      key={selectedTx?.id ?? "closed"}
+      open={selectedTx !== null}
+      onOpenChange={(next) => {
+        if (!next) setSelectedTx(null);
+      }}
+      row={selectedTx ? hsaTransactionToExpenseRow(selectedTx) : null}
+      variant="hsa"
+    />
+    </>
   );
 }

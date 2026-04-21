@@ -56,8 +56,9 @@ import { consumerPageBackgroundStyle } from "@/constants/consumerPageBackground"
 import { usePrototype } from "@/context/PrototypeContext";
 import { useReimburseWorkspace } from "@/context/ReimburseWorkspaceContext";
 import { cn, homepageAccountSurfaceClass } from "@/lib/utils";
+import { ClaimExpenseDetailSheet } from "@/components/claims/ClaimExpenseDetailSheet";
 import { FsaPreviousPlanYearDetailSheet } from "./FsaPreviousPlanYearDetailSheet";
-import { FsaTransactionDetailSheet } from "./FsaTransactionDetailSheet";
+import { fsaTransactionToExpenseRow } from "./fsaTransactionToExpenseRow";
 import { fsaTransactionsData, type FsaTransactionRow } from "./fsaTransactionsMock";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 
@@ -116,14 +117,13 @@ export default function FsaAccountPage() {
   const { openReimburseWorkspace } = useReimburseWorkspace();
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
   /** When true, table lists only rows with an Actions control (e.g. Upload Receipt). */
   const [filterActionsOnly, setFilterActionsOnly] = useState(false);
   /** Animates FSA usage bar from 0 → 11% on first paint. */
   const [usageBarPct, setUsageBarPct] = useState(0);
-  /** Denied transaction row opened in the details slideout (Figma 30062:11931). */
-  const [transactionDetailRow, setTransactionDetailRow] = useState<FsaTransactionRow | null>(null);
+  const [selectedFsaTx, setSelectedFsaTx] = useState<FsaTransactionRow | null>(null);
   /** Previous Plan Year “View more details” slideout (Figma 29641:15455). */
   const [previousPlanYearDetailOpen, setPreviousPlanYearDetailOpen] = useState(false);
 
@@ -160,14 +160,9 @@ export default function FsaAccountPage() {
     return rows;
   }, [searchQuery, filterActionsOnly]);
 
-  const dataTotalPages = Math.max(1, Math.ceil(filtered.length / rowsPerPage));
-  /** At least 2 pages in the paginator UI (page 2 is a placeholder when data fits on one page). */
-  const paginationTotalPages = Math.max(2, dataTotalPages);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / rowsPerPage));
   const start = (currentPage - 1) * rowsPerPage;
-  const pageRows =
-    currentPage <= dataTotalPages
-      ? filtered.slice(start, start + rowsPerPage)
-      : [];
+  const pageRows = filtered.slice(start, start + rowsPerPage);
 
   return (
     <div className="min-h-screen" style={consumerPageBackgroundStyle}>
@@ -494,20 +489,14 @@ export default function FsaAccountPage() {
                   </TableHeader>
                   <TableBody>
                     {pageRows.map((t) => (
-                      <FsaTransactionTableRow
-                        key={t.id}
-                        row={t}
-                        onDeniedRowClick={
-                          t.status === "Denied" ? (r) => setTransactionDetailRow(r) : undefined
-                        }
-                      />
+                      <FsaTransactionTableRow key={t.id} row={t} onRowClick={setSelectedFsaTx} />
                     ))}
                   </TableBody>
                 </Table>
               </div>
 
-              <div className="mt-6 flex w-full flex-col items-center gap-4 sm:flex-row sm:justify-center">
-                <Pagination className="mx-auto w-fit">
+              <div className="mx-auto mt-6 flex w-fit flex-col gap-0 sm:flex-row sm:items-center sm:justify-start sm:gap-0">
+                <Pagination className="flex w-fit items-center justify-start">
                   <PaginationContent>
                     <PaginationItem>
                       <PaginationLink
@@ -519,7 +508,7 @@ export default function FsaAccountPage() {
                         }}
                         aria-disabled={currentPage <= 1}
                       >
-                        <ChevronsLeft className="h-4 w-4" />
+                        <ChevronsLeft className="h-4 w-4 text-current" />
                       </PaginationLink>
                     </PaginationItem>
                     <PaginationItem>
@@ -531,7 +520,7 @@ export default function FsaAccountPage() {
                         }}
                       />
                     </PaginationItem>
-                    {Array.from({ length: Math.min(5, paginationTotalPages) }, (_, i) => {
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                       const pageNum = i + 1;
                       return (
                         <PaginationItem key={pageNum}>
@@ -553,7 +542,7 @@ export default function FsaAccountPage() {
                         href="#"
                         onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
                           e.preventDefault();
-                          setCurrentPage((p) => Math.min(paginationTotalPages, p + 1));
+                          setCurrentPage((p) => Math.min(totalPages, p + 1));
                         }}
                       />
                     </PaginationItem>
@@ -563,31 +552,36 @@ export default function FsaAccountPage() {
                         className="gap-0 px-2"
                         onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
                           e.preventDefault();
-                          setCurrentPage(paginationTotalPages);
+                          setCurrentPage(totalPages);
                         }}
-                        aria-disabled={currentPage >= paginationTotalPages}
+                        aria-disabled={currentPage >= totalPages}
                       >
-                        <ChevronsRight className="h-4 w-4" />
+                        <ChevronsRight className="h-4 w-4 text-current" />
                       </PaginationLink>
                     </PaginationItem>
                   </PaginationContent>
                 </Pagination>
-                <Select
-                  value={String(rowsPerPage)}
-                  onValueChange={(value) => {
-                    setRowsPerPage(Number(value));
-                    setCurrentPage(1);
-                  }}
-                >
-                  <SelectTrigger className="h-8 w-[70px]" aria-label="Rows per page">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="5">5</SelectItem>
-                    <SelectItem value="10">10</SelectItem>
-                    <SelectItem value="25">25</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="flex shrink-0 items-center">
+                  <Select
+                    value={String(rowsPerPage)}
+                    onValueChange={(value) => {
+                      setRowsPerPage(Number(value));
+                      setCurrentPage(1);
+                    }}
+                  >
+                    <SelectTrigger
+                      className="h-8 w-[64px] gap-0"
+                      aria-label="Select rows per page"
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="5">5</SelectItem>
+                      <SelectItem value="10">10</SelectItem>
+                      <SelectItem value="25">25</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -737,12 +731,14 @@ export default function FsaAccountPage() {
 
       <ConsumerFooter />
 
-      <FsaTransactionDetailSheet
-        open={transactionDetailRow !== null}
+      <ClaimExpenseDetailSheet
+        key={selectedFsaTx?.id ?? "closed"}
+        open={selectedFsaTx !== null}
         onOpenChange={(open) => {
-          if (!open) setTransactionDetailRow(null);
+          if (!open) setSelectedFsaTx(null);
         }}
-        row={transactionDetailRow}
+        row={selectedFsaTx ? fsaTransactionToExpenseRow(selectedFsaTx) : null}
+        variant="fsa"
       />
 
       <FsaPreviousPlanYearDetailSheet
@@ -863,13 +859,12 @@ function PlanDeadlineRows() {
 
 function FsaTransactionTableRow({
   row,
-  onDeniedRowClick,
+  onRowClick,
 }: {
   row: FsaTransactionRow;
-  onDeniedRowClick?: (_row: FsaTransactionRow) => void;
+  onRowClick: (_row: FsaTransactionRow) => void;
 }) {
   const { openReimburseWorkspace } = useReimburseWorkspace();
-  const isDeniedInteractive = row.status === "Denied" && onDeniedRowClick != null;
 
   const statusCell =
     row.status === "Denied" ? (
@@ -894,41 +889,23 @@ function FsaTransactionTableRow({
 
   return (
     <TableRow
-      className={isDeniedInteractive ? "cursor-pointer hover:bg-muted/40" : undefined}
-      tabIndex={isDeniedInteractive ? 0 : undefined}
-      aria-label={
-        isDeniedInteractive
-          ? `View transaction details, ${row.description}, ${row.date}`
-          : undefined
-      }
-      onClick={
-        isDeniedInteractive
-          ? () => {
-              onDeniedRowClick?.(row);
-            }
-          : undefined
-      }
-      onKeyDown={
-        isDeniedInteractive
-          ? (e: React.KeyboardEvent<HTMLTableRowElement>) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                onDeniedRowClick?.(row);
-              }
-            }
-          : undefined
-      }
+      className="h-[49px] cursor-pointer hover:bg-muted/40"
+      role="button"
+      tabIndex={0}
+      aria-label={`View transaction details, ${row.description}, ${row.date}`}
+      onClick={() => onRowClick(row)}
+      onKeyDown={(e: React.KeyboardEvent<HTMLTableRowElement>) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onRowClick(row);
+        }
+      }}
     >
       <TableCell className="whitespace-nowrap">{row.date}</TableCell>
       <TableCell>{statusCell}</TableCell>
       <TableCell>{row.description}</TableCell>
       <TableCell className="whitespace-nowrap text-sm">{row.planYear}</TableCell>
-      <TableCell
-        className={cn(
-          "text-right text-sm font-semibold tabular-nums",
-          row.amountIsNegative ? "text-destructive" : "text-[#14182c]"
-        )}
-      >
+      <TableCell className="text-right text-sm font-semibold tabular-nums text-[#14182c]">
         {row.amount}
       </TableCell>
       <TableCell className="text-right text-sm">

@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import {
   Badge,
   Button,
@@ -45,6 +45,8 @@ export interface ClaimExpenseDetailSheetProps {
   open: boolean
   onOpenChange: (_open: boolean) => void
   row: ExpenseRow | null
+  /** `hsa` / `fsa` reuse this sheet for account transaction rows (hides Letters; account-specific Details). */
+  variant?: "claim" | "hsa" | "fsa"
 }
 
 // ---------------------------------------------------------------------------
@@ -73,7 +75,11 @@ type InlineToastConfig = {
   body: string
 }
 
-function getInlineToast(row: ExpenseRow, stepDate?: string): InlineToastConfig | null {
+function getInlineToast(
+  row: ExpenseRow,
+  stepDate?: string,
+  sheetVariant: "claim" | "hsa" | "fsa" = "claim"
+): InlineToastConfig | null {
   const label = row.status.label
   const date = stepDate ?? row.dateOfService
 
@@ -107,6 +113,14 @@ function getInlineToast(row: ExpenseRow, stepDate?: string): InlineToastConfig |
   }
 
   if (isDeniedStatus(label)) {
+    if (sheetVariant === "fsa") {
+      return {
+        variant: "amber",
+        headline: "Not approved",
+        subtext: `Denied on ${date}`,
+        body: row.denialReason ?? "This transaction was not approved for reimbursement under your plan.",
+      }
+    }
     return {
       variant: "amber",
       headline: "Claim Denied",
@@ -162,12 +176,14 @@ function DetailRow({
   return (
     <div
       className={cn(
-        "flex gap-4 py-2.5",
+        "flex w-full items-start justify-between gap-4 py-2.5",
         !last && "border-b border-border"
       )}
     >
-      <span className="w-36 shrink-0 text-muted-foreground">{label}</span>
-      <span className="font-medium text-foreground">{children}</span>
+      <span className="max-w-[45%] shrink-0 text-muted-foreground">{label}</span>
+      <span className="min-w-0 flex-1 text-right font-medium text-foreground break-words">
+        {children}
+      </span>
     </div>
   )
 }
@@ -187,10 +203,31 @@ function offsetDate(dateStr: string, days: number): string {
   return `${MONTH_NAMES[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`
 }
 
+/** Parses display dates like "Jan 15, 2026" for ordering (local noon to avoid TZ drift). */
+function parseSheetDateMs(dateStr: string): number {
+  const match = dateStr.match(/([A-Za-z]+)\s+(\d+),?\s+(\d+)/)
+  if (!match) return Number.NaN
+  const monthIdx = MONTH_NAMES.findIndex(m => m.toLowerCase() === match[1].toLowerCase().slice(0, 3))
+  if (monthIdx === -1) return Number.NaN
+  const y = Number.parseInt(match[3], 10)
+  const day = Number.parseInt(match[2], 10)
+  return new Date(y, monthIdx, day, 12, 0, 0, 0).getTime()
+}
+
+/** Returns the earlier of two display dates (chronological min). */
+function earlierSheetDate(a: string, b: string): string {
+  const ta = parseSheetDateMs(a)
+  const tb = parseSheetDateMs(b)
+  if (Number.isNaN(ta) || Number.isNaN(tb)) return a
+  return ta <= tb ? a : b
+}
+
 /**
  * Assigns a display date to every step. The first step anchors to
  * `baseDate`, each subsequent step adds `intervalDays`, and the final
  * step is pinned to `endDate` when provided (e.g. statusDate).
+ * Earlier steps are clamped so they are never **after** a later step
+ * (so "In process" is never dated after "Complete"); steps may share the same date.
  */
 function assignStepDates(
   steps: WhatHappensNextStep[],
@@ -198,11 +235,20 @@ function assignStepDates(
   endDate?: string,
   intervalDays = 4,
 ): WhatHappensNextStep[] {
-  return steps.map((step, i) => {
-    const isLast = i === steps.length - 1
-    const date = isLast && endDate ? endDate : offsetDate(baseDate, i * intervalDays)
-    return { ...step, date }
+  const n = steps.length
+  if (n === 0) return steps
+
+  const raw = steps.map((_, i) => {
+    const isLast = i === n - 1
+    return isLast && endDate ? endDate : offsetDate(baseDate, i * intervalDays)
   })
+
+  const dates = [...raw]
+  for (let i = n - 2; i >= 0; i--) {
+    dates[i] = earlierSheetDate(dates[i], dates[i + 1])
+  }
+
+  return steps.map((step, i) => ({ ...step, date: dates[i] }))
 }
 
 // ---------------------------------------------------------------------------
@@ -231,6 +277,7 @@ function StepIcon({
     case "documentation-needed":
     case "reviewed":
     case "under-review":
+    case "hsa-in-process":
       return <FileText className={cn(cls, "text-emerald-600")} aria-hidden />
     default:
       return <Check className={cn(cls, "text-emerald-600")} aria-hidden />
@@ -245,27 +292,35 @@ export function ClaimExpenseDetailSheet({
   open,
   onOpenChange,
   row,
+  variant = "claim",
 }: ClaimExpenseDetailSheetProps) {
   const [tab, setTab] = useState("overview")
   const [previewDoc, setPreviewDoc] = useState<DocumentItem | null>(null)
 
+  useEffect(() => {
+    setTab("overview")
+    setPreviewDoc(null)
+  }, [row?.id, open])
+
   if (!row) return null
 
   const categoryLabel = row.category.toUpperCase()
-  const footerType = getFooterActionType(row.status.label, row.origin)
+  const footerType =
+    variant === "claim" ? getFooterActionType(row.status.label, row.origin) : "none"
 
   const timelineSteps = assignStepDates(
     getWhatHappensNextSteps(row.status.label, {
       origin: row.origin,
       holdReason: row.holdReason,
       denialReason: row.denialReason,
+      sheetKind: variant,
     }),
     row.dateOfService,
     row.statusDate,
   )
 
   const toastStepDate = timelineSteps.find(s => s.id === toastStepId(row.status.label))?.date
-  const toast = getInlineToast(row, toastStepDate)
+  const toast = getInlineToast(row, toastStepDate, variant)
 
   const claimDocs = row.documentIds
     .map((id) => DOCUMENTS.find((d) => d.id === id))
@@ -287,14 +342,16 @@ export function ClaimExpenseDetailSheet({
         className="flex h-full w-full flex-col gap-0 overflow-hidden p-0 sm:max-w-[420px]"
       >
         <SheetHeader className="sr-only">
-          <SheetTitle>Claim details</SheetTitle>
+          <SheetTitle>
+            {variant === "claim" ? "Claim details" : "Transaction details"}
+          </SheetTitle>
         </SheetHeader>
         <ScrollArea className="flex min-h-0 flex-1 flex-col">
           <div className="flex flex-col gap-6 px-4 pb-6 pt-2 sm:px-[17.5px]">
 
             {/* Header — category, provider, amount, status, date */}
             <div className="flex flex-col gap-4 pr-8 pt-2">
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex w-full items-start justify-between gap-4">
                 <div className="min-w-0 flex-1 space-y-2">
                   <p className="text-[12px] font-bold uppercase leading-4 tracking-[0.6px] text-[#515E6C]">
                     {categoryLabel}
@@ -303,12 +360,12 @@ export function ClaimExpenseDetailSheet({
                     {row.provider}
                   </p>
                 </div>
-                <p className="shrink-0 text-xl font-semibold leading-8 tracking-[-0.34px] text-foreground">
+                <p className="shrink-0 text-right text-xl font-semibold leading-8 tracking-[-0.34px] text-foreground tabular-nums">
                   {row.amount}
                 </p>
               </div>
               {!toast && (
-                <div className="flex items-center justify-between gap-4">
+                <div className="flex w-full items-center justify-between gap-4">
                   <span
                     className={cn(
                       "inline-flex max-w-full items-center gap-1 truncate rounded-full border px-2.5 py-0.5 text-xs font-medium",
@@ -320,7 +377,7 @@ export function ClaimExpenseDetailSheet({
                     )}
                     <span className="min-w-0 truncate">{row.status.label}</span>
                   </span>
-                  <p className="shrink-0 text-[10px] leading-4 tracking-[0.1px] text-muted-foreground">
+                  <p className="shrink-0 text-right text-[10px] leading-4 tracking-[0.1px] text-muted-foreground">
                     {row.dateOfService}
                   </p>
                 </div>
@@ -398,12 +455,14 @@ export function ClaimExpenseDetailSheet({
                 >
                   Details
                 </TabsTrigger>
-                <TabsTrigger
-                  value="letters"
-                  className="rounded-none border-b-2 border-transparent px-4 py-2 text-sm data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none"
-                >
-                  Letters
-                </TabsTrigger>
+                {variant === "claim" ? (
+                  <TabsTrigger
+                    value="letters"
+                    className="rounded-none border-b-2 border-transparent px-4 py-2 text-sm data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+                  >
+                    Letters
+                  </TabsTrigger>
+                ) : null}
               </TabsList>
 
               <TabsContent value="overview" className="mt-4 space-y-6">
@@ -454,7 +513,7 @@ export function ClaimExpenseDetailSheet({
                             {isDeniedStep ? (
                               /* Denied step — no Now tag */
                               <div className="space-y-1">
-                                <div className="flex flex-wrap items-center justify-between gap-2">
+                                <div className="flex w-full flex-wrap items-center justify-between gap-2">
                                   <p className="text-sm font-medium text-foreground">
                                     {step.title}
                                   </p>
@@ -468,7 +527,7 @@ export function ClaimExpenseDetailSheet({
                               </div>
                             ) : isComplete ? (
                               /* Completed step — title + date */
-                              <div className="flex flex-wrap items-center justify-between gap-2">
+                              <div className="flex w-full flex-wrap items-center justify-between gap-2">
                                 <p className="text-sm font-medium text-muted-foreground">
                                   {step.title}
                                 </p>
@@ -479,7 +538,7 @@ export function ClaimExpenseDetailSheet({
                             ) : (
                               /* Current step — full detail */
                               <>
-                                <div className="flex flex-wrap items-center justify-between gap-2">
+                                <div className="flex w-full flex-wrap items-center justify-between gap-2">
                                   <div className="flex flex-wrap items-center gap-2">
                                     <p className="text-sm font-medium text-foreground">
                                       {step.title}
@@ -509,104 +568,190 @@ export function ClaimExpenseDetailSheet({
                   </ol>
                 </section>
 
-                {/* Documents */}
-                <section className="space-y-3">
-                  <h3 className="text-base font-medium leading-6 text-foreground">
-                    Documents
-                  </h3>
-                  {claimDocs.length > 0 ? (
+                {(variant === "claim" || variant === "fsa") ? (
+                  <>
+                    {/* Documents — same pattern as claims; FSA rows often have no attachments */}
+                    <section className="space-y-3">
+                      <h3 className="text-base font-medium leading-6 text-foreground">
+                        Documents
+                      </h3>
+                      {claimDocs.length > 0 ? (
+                        <ul className="space-y-2">
+                          {claimDocs.map((doc) => (
+                            <li key={doc.id}>
+                              <button
+                                type="button"
+                                onClick={() => setPreviewDoc(doc)}
+                                className="flex w-full items-center justify-between gap-3 rounded-lg border border-border bg-muted/30 px-2 py-2 transition-colors hover:border-border/80 hover:bg-muted/60 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                              >
+                                <div className="flex min-w-0 items-center gap-2">
+                                  <Paperclip className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                                  <span className="truncate text-sm font-medium text-foreground">
+                                    {doc.title}
+                                  </span>
+                                  <span className="text-sm text-muted-foreground">—</span>
+                                  <span className="text-sm text-muted-foreground">3mb</span>
+                                </div>
+                                <span className="shrink-0 text-[10px] text-muted-foreground">
+                                  {doc.date}
+                                </span>
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">No documents uploaded.</p>
+                      )}
+                    </section>
+                  </>
+                ) : null}
+              </TabsContent>
+
+              <TabsContent value="details" className="mt-4 text-sm">
+                {variant === "hsa" && row.hsaMeta ? (
+                  <div className="space-y-6">
+                    <section className="space-y-2">
+                      <h3 className="text-base font-semibold leading-6 text-foreground">
+                        Transaction Details
+                      </h3>
+                      <DetailRow label="Request Date" last={false}>
+                        {row.hsaMeta.tableDate}
+                      </DetailRow>
+                      <DetailRow label="Process Date" last={false}>
+                        {row.status.label === "Processed" ? row.hsaMeta.tableDate : "—"}
+                      </DetailRow>
+                      <DetailRow label="Category" last>
+                        {row.categoryType ?? `${row.provider} - ${row.category}`}
+                      </DetailRow>
+                    </section>
+                    <section className="space-y-2">
+                      <h3 className="text-base font-semibold leading-6 text-foreground">
+                        Payment Details
+                      </h3>
+                      <DetailRow label="Payment Number" last={false}>
+                        {row.hsaMeta.paymentNumber}
+                      </DetailRow>
+                      <DetailRow label="Method" last>
+                        EFT
+                      </DetailRow>
+                    </section>
+                    <section className="space-y-2">
+                      <h3 className="text-base font-semibold leading-6 text-foreground">
+                        Tax Details
+                      </h3>
+                      <DetailRow label="Tax Year" last={false}>
+                        {row.hsaMeta.taxYear}
+                      </DetailRow>
+                      <DetailRow label="Contrib. Amount in Tax Year" last={false}>
+                        {row.amount}
+                      </DetailRow>
+                      <DetailRow label="Contrib. Applied from Future Year" last={false}>
+                        $0.00
+                      </DetailRow>
+                      <DetailRow label="Contrib. Rollover Amount During Tax Year" last>
+                        $0.00
+                      </DetailRow>
+                    </section>
+                  </div>
+                ) : variant === "fsa" && row.fsaMeta ? (
+                  <div className="space-y-6">
+                    <section className="space-y-2">
+                      <h3 className="text-base font-semibold leading-6 text-foreground">
+                        Transaction Details
+                      </h3>
+                      <DetailRow label="Request Date" last={false}>
+                        {row.fsaMeta.tableDate}
+                      </DetailRow>
+                      <DetailRow label="Process Date" last={false}>
+                        {row.fsaMeta.tableDate}
+                      </DetailRow>
+                      <DetailRow label="Plan Year" last={false}>
+                        {row.fsaMeta.planYear}
+                      </DetailRow>
+                      <DetailRow label="Description" last>
+                        {row.provider}
+                      </DetailRow>
+                    </section>
+                    <section className="space-y-2">
+                      <h3 className="text-base font-semibold leading-6 text-foreground">
+                        Payment Details
+                      </h3>
+                      <DetailRow label="Reference Number" last={false}>
+                        {row.fsaMeta.paymentNumber}
+                      </DetailRow>
+                      <DetailRow label="Method" last>
+                        {row.status.label === "Paid" ? "EFT" : "—"}
+                      </DetailRow>
+                    </section>
+                  </div>
+                ) : (
+                  <>
+                    {/* Pay from */}
+                    <DetailRow label="Pay from" last={false}>
+                      {row.account}
+                    </DetailRow>
+
+                    {/* Pay to — debit card format matching My Account */}
+                    <DetailRow label="Pay to" last={false}>
+                      {row.payTo ? (
+                        <span className="inline-flex items-center gap-1.5">
+                          <CreditCard className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden />
+                          •••• {row.payTo.last4}
+                        </span>
+                      ) : "—"}
+                    </DetailRow>
+
+                    {/* Remaining fields */}
+                    <DetailRow label="Recipient" last={false}>
+                      {recipientFullName(row.recipient)}
+                    </DetailRow>
+                    <DetailRow label="Date of Service" last={false}>
+                      {row.dateOfService}
+                    </DetailRow>
+                    <DetailRow label="Category & Type" last={false}>
+                      {row.categoryType ? `${row.category} — ${row.categoryType}` : row.category}
+                    </DetailRow>
+                    <DetailRow label="Provider" last={false}>
+                      {row.provider}
+                    </DetailRow>
+                    <DetailRow label="Amount" last>
+                      {row.amount}
+                    </DetailRow>
+                  </>
+                )}
+              </TabsContent>
+
+              {variant === "claim" ? (
+                <TabsContent value="letters" className="mt-4">
+                  {claimLetters.length > 0 ? (
                     <ul className="space-y-2">
-                      {claimDocs.map((doc) => (
-                        <li key={doc.id}>
+                      {claimLetters.map((letter) => (
+                        <li key={letter.id}>
                           <button
                             type="button"
-                            onClick={() => setPreviewDoc(doc)}
+                            onClick={() => setPreviewDoc(letterAsDoc(letter))}
                             className="flex w-full items-center justify-between gap-3 rounded-lg border border-border bg-muted/30 px-2 py-2 transition-colors hover:border-border/80 hover:bg-muted/60 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                           >
                             <div className="flex min-w-0 items-center gap-2">
-                              <Paperclip className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                              <Mail className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                               <span className="truncate text-sm font-medium text-foreground">
-                                {doc.title}
+                                {letter.title}
                               </span>
-                              <span className="text-sm text-muted-foreground">—</span>
-                              <span className="text-sm text-muted-foreground">3mb</span>
                             </div>
                             <span className="shrink-0 text-[10px] text-muted-foreground">
-                              {doc.date}
+                              {letter.date}
                             </span>
                           </button>
                         </li>
                       ))}
                     </ul>
                   ) : (
-                    <p className="text-sm text-muted-foreground">No documents uploaded.</p>
+                    <p className="text-sm text-muted-foreground">
+                      No letters are available for this claim yet.
+                    </p>
                   )}
-                </section>
-              </TabsContent>
-
-              <TabsContent value="details" className="mt-4 text-sm">
-                {/* Pay from */}
-                <DetailRow label="Pay from" last={false}>
-                  {row.account}
-                </DetailRow>
-
-                {/* Pay to — debit card format matching My Account */}
-                <DetailRow label="Pay to" last={false}>
-                  {row.payTo ? (
-                    <span className="inline-flex items-center gap-1.5">
-                      <CreditCard className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden />
-                      •••• {row.payTo.last4}
-                    </span>
-                  ) : "—"}
-                </DetailRow>
-
-                {/* Remaining fields */}
-                <DetailRow label="Recipient" last={false}>
-                  {recipientFullName(row.recipient)}
-                </DetailRow>
-                <DetailRow label="Date of Service" last={false}>
-                  {row.dateOfService}
-                </DetailRow>
-                <DetailRow label="Category & Type" last={false}>
-                  {row.categoryType ? `${row.category} — ${row.categoryType}` : row.category}
-                </DetailRow>
-                <DetailRow label="Provider" last={false}>
-                  {row.provider}
-                </DetailRow>
-                <DetailRow label="Amount" last>
-                  {row.amount}
-                </DetailRow>
-              </TabsContent>
-
-              <TabsContent value="letters" className="mt-4">
-                {claimLetters.length > 0 ? (
-                  <ul className="space-y-2">
-                    {claimLetters.map((letter) => (
-                      <li key={letter.id}>
-                        <button
-                          type="button"
-                          onClick={() => setPreviewDoc(letterAsDoc(letter))}
-                          className="flex w-full items-center justify-between gap-3 rounded-lg border border-border bg-muted/30 px-2 py-2 transition-colors hover:border-border/80 hover:bg-muted/60 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                        >
-                          <div className="flex min-w-0 items-center gap-2">
-                            <Mail className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                            <span className="truncate text-sm font-medium text-foreground">
-                              {letter.title}
-                            </span>
-                          </div>
-                          <span className="shrink-0 text-[10px] text-muted-foreground">
-                            {letter.date}
-                          </span>
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-sm text-muted-foreground">
-                    No letters are available for this claim yet.
-                  </p>
-                )}
-              </TabsContent>
+                </TabsContent>
+              ) : null}
             </Tabs>
           </div>
         </ScrollArea>
