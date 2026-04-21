@@ -198,7 +198,7 @@ function CustomStepper({ steps, currentStepId }: { steps: Step[], currentStepId:
 
   return (
     <div
-      className="flex h-full min-h-0 min-w-0 w-full flex-1 flex-col gap-[24px] overflow-x-hidden bg-[var(--neutral-50)] p-6"
+      className="flex h-[-webkit-fill-available] w-auto flex-col gap-[24px] overflow-y-auto overflow-x-hidden bg-[var(--neutral-50)] -m-6 pt-8 pb-8 pl-6 pr-6"
     >
       {steps.map((step, index) => {
         const isCompleted = index < currentIndex;
