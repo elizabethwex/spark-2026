@@ -163,7 +163,7 @@ function CustomStepper({ steps, currentStepId }: { steps: Step[]; currentStepId:
   const currentIndex = steps.findIndex((s) => s.id === currentStepId);
 
   return (
-    <div className="flex h-full min-h-0 min-w-0 w-full flex-1 flex-col gap-[24px] overflow-x-hidden bg-[var(--neutral-50)] p-6">
+    <div className="flex h-full w-full flex-col gap-[24px] overflow-y-auto overflow-x-hidden bg-[var(--neutral-50)] p-6">
       {steps.map((step, index) => {
         const isCompleted = index < currentIndex;
         const isActive = index === currentIndex;
