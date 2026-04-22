@@ -35,7 +35,7 @@ export default function DependentCard({ dependent, selected, onClick, onEdit, on
       onClick={onClick}
       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick(); } }}
       className={cn(
-        "w-full text-left rounded-xl border bg-background px-4 py-3 shadow-[0px_1px_2px_0px_rgba(18,18,23,0.05)]",
+        "w-full text-left rounded-xl border bg-white px-4 py-3 shadow-[0px_1px_2px_0px_rgba(18,18,23,0.05)]",
         "transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer",
         selected ? "border-primary ring-1 ring-primary/10" : "border-border",
       )}

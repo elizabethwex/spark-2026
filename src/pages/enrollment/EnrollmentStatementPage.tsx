@@ -603,7 +603,7 @@ export default function EnrollmentStatementPage() {
 
   if (!submission) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center max-w-[400px]">
           <h1 className="text-[24px] font-bold text-foreground">
             No enrollment found
@@ -692,7 +692,7 @@ export default function EnrollmentStatementPage() {
     .filter(Boolean) as string[];
 
   return (
-    <div className="min-h-screen bg-background py-10 px-4 print:bg-white print:py-0">
+    <div className="min-h-screen bg-white py-10 px-4 print:bg-white print:py-0">
       <div className="max-w-[960px] mx-auto">
         {/* ---- Header ---- */}
         <div className="flex items-start justify-between mb-2 print:hidden">
@@ -713,7 +713,7 @@ export default function EnrollmentStatementPage() {
               Go Home
             </WexButton>
             <WexButton intent="primary" onClick={() => window.print()}>
-              <Printer className="h-4 w-4 text-current" />
+              <Printer className="h-4 w-4 text-white" />
               Print
             </WexButton>
           </div>
@@ -742,7 +742,7 @@ export default function EnrollmentStatementPage() {
         {/* ============================================================ */}
         <section className="mt-6">
           <h3 className="text-[20px] font-bold text-foreground mb-4">Plans</h3>
-          <div className="rounded-2xl border border-border bg-background elevation-3 shadow-md overflow-hidden">
+          <div className="rounded-2xl border border-border bg-white elevation-3 shadow-md overflow-hidden">
             <BenefitTableHeader />
             <PlanRow
               icon={<Heart className="h-5 w-5 text-primary" />}
@@ -808,7 +808,7 @@ export default function EnrollmentStatementPage() {
             <h3 className="text-[20px] font-bold text-foreground mb-4">
               Spending Accounts
             </h3>
-            <div className="rounded-2xl border border-border bg-background elevation-3 shadow-md overflow-hidden">
+            <div className="rounded-2xl border border-border bg-white elevation-3 shadow-md overflow-hidden">
               <SpendingTableHeader />
               {spending.selected.includes("fsa") &&
                 fsa.electionCents > 0 && (
@@ -846,7 +846,7 @@ export default function EnrollmentStatementPage() {
           <h3 className="text-[20px] font-bold text-foreground mb-4">
             Supplemental Benefits
           </h3>
-          <div className="rounded-2xl border border-border bg-background elevation-3 shadow-md overflow-hidden">
+          <div className="rounded-2xl border border-border bg-white elevation-3 shadow-md overflow-hidden">
             <BenefitTableHeader />
             <SupplementalRow
               icon={<ShieldCheck className="h-5 w-5 text-success-text" />}

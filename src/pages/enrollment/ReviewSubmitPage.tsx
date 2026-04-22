@@ -482,7 +482,7 @@ export default function ReviewSubmitPage({
           {/* ============================================================ */}
           <section className="mt-10">
             <h3 className="text-[20px] font-bold text-foreground mb-4">Plans</h3>
-            <div className="rounded-2xl border border-border bg-background elevation-3 shadow-md overflow-hidden">
+            <div className="rounded-2xl border border-border bg-white elevation-3 shadow-md overflow-hidden">
               <BenefitTableHeader />
               <BenefitRow
                 icon={<Heart className="h-5 w-5 text-primary" />}
@@ -530,7 +530,7 @@ export default function ReviewSubmitPage({
             <h3 className="text-[20px] font-bold text-foreground mb-4">
               Spending Accounts
             </h3>
-            <div className="rounded-2xl border border-border bg-background elevation-3 shadow-md overflow-hidden">
+            <div className="rounded-2xl border border-border bg-white elevation-3 shadow-md overflow-hidden">
               {displayedSpendingAccounts.length === 0 ? (
                 <div className="px-6 py-5">
                   <span className="text-[14px] text-muted-foreground">
@@ -640,7 +640,7 @@ export default function ReviewSubmitPage({
             <h3 className="text-[20px] font-bold text-foreground mb-4">
               Supplemental Benefits
             </h3>
-            <div className="rounded-2xl border border-border bg-background elevation-3 shadow-md overflow-hidden">
+            <div className="rounded-2xl border border-border bg-white elevation-3 shadow-md overflow-hidden">
               <BenefitTableHeader />
               <BenefitRow
                 icon={<ShieldCheck className="h-5 w-5 text-success-text" />}

@@ -94,7 +94,7 @@ export default function EnrollmentStepRoute() {
   };
 
   const onCancel = () => {
-    navigate("/", { replace: true });
+    navigate("/enrollment/home", { replace: true });
   };
 
   if (stepId === "profile") {

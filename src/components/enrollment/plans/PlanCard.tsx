@@ -78,7 +78,7 @@ export default function PlanCard({
             : "border-primary ring-1 ring-primary/10 bg-primary/5"
           : isWaive
             ? "border-dashed border-slate-200 bg-slate-50/80 hover:bg-slate-100/60"
-            : "border-border bg-background hover:bg-muted",
+            : "border-border bg-white hover:bg-muted",
         className,
       )}
     >

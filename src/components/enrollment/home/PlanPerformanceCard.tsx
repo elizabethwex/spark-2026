@@ -119,7 +119,7 @@ export function PlanPerformanceCard({ submission, simulationMode = "modern" }: P
   return (
     <div
       ref={ref}
-      className="rounded-[24px] bg-background border border-border shadow-sm overflow-hidden"
+      className="rounded-[24px] bg-white border border-border shadow-sm overflow-hidden"
     >
       {/* Header */}
       <div className="flex items-center justify-between px-6 pt-6 pb-2">
@@ -239,7 +239,7 @@ function DeductibleCard({ title, subtitle, spent, total, visible, delay }: Amoun
 
   return (
     <motion.div
-      className="rounded-[16px] border border-border bg-background p-5 flex flex-col gap-3 shadow-sm"
+      className="rounded-[16px] border border-border bg-white p-5 flex flex-col gap-3 shadow-sm"
       initial={{ opacity: 0, y: 12 }}
       animate={visible ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.4, delay, ease: softEaseOut }}
@@ -287,7 +287,7 @@ function OopMaxCard({ title, subtitle, spent, total, visible, delay }: AmountCar
 
   return (
     <motion.div
-      className="rounded-[16px] border border-border bg-background p-5 flex flex-col gap-3 shadow-sm"
+      className="rounded-[16px] border border-border bg-white p-5 flex flex-col gap-3 shadow-sm"
       initial={{ opacity: 0, y: 12 }}
       animate={visible ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.4, delay, ease: softEaseOut }}
@@ -330,7 +330,7 @@ function OopMaxCard({ title, subtitle, spent, total, visible, delay }: AmountCar
 function PlanPaysCard({ delay }: { delay: number }) {
   return (
     <motion.div
-      className="rounded-[16px] border border-border bg-background p-5 flex flex-col gap-2 shadow-sm"
+      className="rounded-[16px] border border-border bg-white p-5 flex flex-col gap-2 shadow-sm"
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay, ease: softEaseOut }}
@@ -358,7 +358,7 @@ function PlanDeductibleCard({ planLabel, deductible, spent, visible, delay }: Pl
 
   return (
     <motion.div
-      className="rounded-[16px] border border-border bg-background/80 p-4 flex flex-col gap-3 shadow-sm"
+      className="rounded-[16px] border border-border bg-white/80 p-4 flex flex-col gap-3 shadow-sm"
       initial={{ opacity: 0, y: 8 }}
       animate={visible ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.4, delay, ease: softEaseOut }}

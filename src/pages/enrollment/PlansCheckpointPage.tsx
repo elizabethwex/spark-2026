@@ -112,7 +112,7 @@ type SelectionRowProps = {
 
 function SelectionRow({ icon, title, planLine, status, amount, onEdit }: SelectionRowProps) {
   return (
-    <div className="rounded-2xl border border-border bg-background px-6 py-5 elevation-3 shadow-sm">
+    <div className="rounded-2xl border border-border bg-white px-6 py-5 elevation-3 shadow-sm">
       <div className="flex items-center gap-4">
         <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">{icon}</div>
         <div className="flex-1 min-w-0">
@@ -139,7 +139,7 @@ function SelectionRow({ icon, title, planLine, status, amount, onEdit }: Selecti
 
 function RemainingStepRow({ icon, label, statusLabel }: { icon: React.ReactNode; label: string; statusLabel: string }) {
   return (
-    <div className="rounded-2xl border border-border bg-background px-6 py-3 elevation-3 shadow-sm">
+    <div className="rounded-2xl border border-border bg-white px-6 py-3 elevation-3 shadow-sm">
       <div className="flex items-center gap-4">
         <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground">{icon}</div>
         <div className="flex-1 min-w-0"><div className="text-[16px] font-bold text-foreground capitalize">{label}</div></div>
@@ -243,7 +243,7 @@ export default function PlansCheckpointPage() {
           </div>
 
           <div className="mt-6 flex justify-end">
-            <div className="rounded-2xl border border-border bg-background px-6 py-4 elevation-3 shadow-sm">
+            <div className="rounded-2xl border border-border bg-white px-6 py-4 elevation-3 shadow-sm">
               <div className="text-[14px] font-semibold text-foreground">Plans Total (you pay)</div>
               <div className="mt-1 flex items-end justify-between gap-6">
                 <div className="text-[14px] text-muted-foreground">

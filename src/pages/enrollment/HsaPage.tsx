@@ -108,7 +108,7 @@ export default function HsaPage({ currentStepId, onStepChange, onBack, onNext, o
             </WexRadioGroup>
 
             {isEligible === "yes" && (
-              <div className="mt-2 rounded-md border border-border bg-background p-4">
+              <div className="mt-2 rounded-md border border-border bg-white p-4">
                 <label className="flex items-start gap-3 cursor-pointer">
                   <WexCheckbox
                     checked={authorizeAccount}

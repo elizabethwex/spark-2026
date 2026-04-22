@@ -274,7 +274,7 @@ export default function BeneficiariesPage({
                 setAddOpen(true);
               }}
               className={cn(
-                "mt-6 w-full rounded-xl border-2 border-dashed border-border bg-background px-4 py-4",
+                "mt-6 w-full rounded-xl border-2 border-dashed border-border bg-white px-4 py-4",
                 "text-foreground hover:bg-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
               )}
             >
@@ -303,7 +303,7 @@ export default function BeneficiariesPage({
                     type="button"
                     onClick={() => handleAddDependentAsBeneficiary(dep)}
                     className={cn(
-                      "w-full text-left rounded-xl border border-border bg-background px-4 py-3 shadow-[0px_1px_2px_0px_rgba(18,18,23,0.05)]",
+                      "w-full text-left rounded-xl border border-border bg-white px-4 py-3 shadow-[0px_1px_2px_0px_rgba(18,18,23,0.05)]",
                       "transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                     )}
                   >
@@ -399,7 +399,7 @@ export default function BeneficiariesPage({
       {/* Modal to set type/percentage when adding/editing dependent as beneficiary */}
       {depModalOpen && selectedDepForModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="w-[min(400px,90vw)] rounded-xl bg-background p-6 shadow-xl">
+          <div className="w-[min(400px,90vw)] rounded-xl bg-white p-6 shadow-xl">
             <h3 className="text-[18px] font-bold text-foreground">
               {editingBeneficiaryId ? "Edit" : "Add"} {selectedDepForModal.name} as Beneficiary
             </h3>

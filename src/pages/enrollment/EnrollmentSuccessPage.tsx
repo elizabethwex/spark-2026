@@ -8,7 +8,7 @@ export default function EnrollmentSuccessPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-6 py-16">
+    <div className="min-h-screen bg-white flex items-center justify-center px-6 py-16">
       <div className="w-full max-w-[532px] text-center">
         <div className="mx-auto w-[362px] max-w-full">
           <EnrollmentSuccessIllustration className="block w-full h-auto" alt="" />
