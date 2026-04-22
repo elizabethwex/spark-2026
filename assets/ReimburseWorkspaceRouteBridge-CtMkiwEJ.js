@@ -1,1 +1,0 @@
-import{u as o,f as r,H as n,r as u}from"./index-y3wB6Id6.js";function i(){const e=o(),t=r(),{openReimburseWorkspaceFromPath:a}=n();return u.useEffect(()=>{const s=e.state?.from??"/";a(e.pathname),t(s,{replace:!0})},[e.pathname,e.state,t,a]),null}export{i as default};
