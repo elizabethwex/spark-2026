@@ -93,11 +93,17 @@ export function FsaPreviousPlanYearDetailSheet({
   open,
   onOpenChange,
   planYearRange = "01/01/2025 - 12/31/2025",
+  sheetAriaTitle = "Flexible Spending Account plan details",
+  planHeading = "Flexible Spending Account",
 }: {
   open: boolean;
   onOpenChange: (_open: boolean) => void;
   /** Display string under the title, e.g. from plan period control */
   planYearRange?: string;
+  /** Accessible title for the sheet (e.g. LPFSA reuse). */
+  sheetAriaTitle?: string;
+  /** Main visible heading (e.g. Limited Purpose Flexible Spending Account). */
+  planHeading?: string;
 }) {
   const [barPct, setBarPct] = useState(0);
   const [eligibleCents, setEligibleCents] = useState(0);
@@ -163,14 +169,14 @@ export function FsaPreviousPlanYearDetailSheet({
         className="flex h-full w-full flex-col gap-0 overflow-hidden border-l border-[#e3e7f4] p-0 shadow-[0px_8px_16px_0px_rgba(2,13,36,0.15),0px_0px_1px_0px_rgba(2,13,36,0.3)] sm:max-w-[480px]"
       >
         <SheetHeader className="sr-only">
-          <SheetTitle>Flexible Spending Account plan details</SheetTitle>
+          <SheetTitle>{sheetAriaTitle}</SheetTitle>
         </SheetHeader>
 
         <ScrollArea className="min-h-0 flex-1">
           <div className="flex flex-col gap-6 px-6 py-6">
             <div className="pr-14">
               <h2 className="text-[30px] font-bold leading-10 tracking-tight text-[#14182c]">
-                Flexible Spending Account
+                {planHeading}
               </h2>
               <p className="mt-2 text-[19px] font-normal leading-8 text-[#5f6a94]">
                 Plan Year: {planYearRange}

@@ -56,10 +56,11 @@ import { usePrototype } from "@/context/PrototypeContext";
 import { useReimburseWorkspace } from "@/context/ReimburseWorkspaceContext";
 import { cn, homepageAccountSurfaceClass } from "@/lib/utils";
 import { ClaimExpenseDetailSheet } from "@/components/claims/ClaimExpenseDetailSheet";
-import { FsaPreviousPlanYearCard } from "./FsaPreviousPlanYearCard";
-import { FsaPreviousPlanYearDetailSheet } from "./FsaPreviousPlanYearDetailSheet";
-import { fsaTransactionToExpenseRow } from "./fsaTransactionToExpenseRow";
-import { fsaTransactionsData, type FsaTransactionRow } from "./fsaTransactionsMock";
+import { FsaPreviousPlanYearCard } from "@/pages/fsa-account/FsaPreviousPlanYearCard";
+import { FsaPreviousPlanYearDetailSheet } from "@/pages/fsa-account/FsaPreviousPlanYearDetailSheet";
+import { lpfsaTransactionToExpenseRow } from "./lpfsaTransactionToExpenseRow";
+import { lpfsaTransactionsData } from "./lpfsaTransactionsMock";
+import type { FsaTransactionRow } from "@/pages/fsa-account/fsaTransactionsMock";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 
 const fmt = (n: number) =>
@@ -108,10 +109,10 @@ function InfoTip({ label, children }: { label: string; children: React.ReactNode
 }
 
 /**
- * Flexible Spending Account dashboard at `/fsa-account`
- * (Consumer Experience Redesign — Figma node 29515:8367).
+ * Limited Purpose Flexible Spending Account dashboard at `/lpfsa-account`
+ * (Consumer Experience Redesign — Figma node 33707:19326).
  */
-export default function FsaAccountPage() {
+export default function LpfsaAccountPage() {
   const { homepageMode } = usePrototype();
   const cardSurface = homepageAccountSurfaceClass(homepageMode === "partner-safe");
   const { openReimburseWorkspace } = useReimburseWorkspace();
@@ -121,7 +122,7 @@ export default function FsaAccountPage() {
   const [currentPage, setCurrentPage] = useState(1);
   /** When true, table lists only rows with an Actions control (e.g. Upload Receipt). */
   const [filterActionsOnly, setFilterActionsOnly] = useState(false);
-  /** Animates FSA usage bar from 0 → 11% on first paint. */
+  /** Animates LPFSA usage bar from 0 → 8.6% on first paint (tag: 8.6% of $2,925 used). */
   const [usageBarPct, setUsageBarPct] = useState(0);
   const [selectedFsaTx, setSelectedFsaTx] = useState<FsaTransactionRow | null>(null);
   /** Previous Plan Year “View more details” slideout (Figma 29641:15455). */
@@ -130,19 +131,19 @@ export default function FsaAccountPage() {
   useLayoutEffect(() => {
     if (typeof window === "undefined") return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setUsageBarPct(11);
+      setUsageBarPct(8.6);
     }
   }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const id = requestAnimationFrame(() => setUsageBarPct(11));
+    const id = requestAnimationFrame(() => setUsageBarPct(8.6));
     return () => cancelAnimationFrame(id);
   }, []);
 
   const filtered = useMemo(() => {
-    let rows = fsaTransactionsData;
+    let rows = lpfsaTransactionsData;
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       rows = rows.filter(
@@ -171,7 +172,7 @@ export default function FsaAccountPage() {
       <FadeInItem>
         <main className="mx-auto w-full max-w-[1440px] space-y-6 px-8 py-7">
           <h1 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-            Flexible Spending Account
+            Limited Purpose FSA
           </h1>
 
           <div
@@ -201,7 +202,7 @@ export default function FsaAccountPage() {
                     </InfoTip>
                   </div>
                   <p className="mt-1 text-[40px] font-bold leading-[56px] tracking-tight text-[#14182c]">
-                    <AnimatedNumber value={2225} format={fmt} durationMs={1200} />
+                    <AnimatedNumber value={2925} format={fmt} durationMs={1200} />
                   </p>
                 </div>
 
@@ -220,7 +221,7 @@ export default function FsaAccountPage() {
                     intent="secondary"
                     className="shrink-0 rounded-2xl bg-[#f7f7f7] px-2 py-1 text-xs font-bold text-[#515f6b]"
                   >
-                    11% of $2,500 used
+                    8.6% of $2,925 used
                   </Badge>
                 </div>
 
@@ -232,7 +233,7 @@ export default function FsaAccountPage() {
                         <span className="font-medium text-[#5f6a94]">Plan Year</span>
                       </div>
                       <span className="shrink-0 font-semibold text-[#14182c]">
-                        Jan 1, 2026 – Dec 31, 2026
+                        Jan 1, 2026 - Dec 31, 2026
                       </span>
                     </div>
                     <div className="h-px w-full bg-[#b7c0da]" />
@@ -241,7 +242,7 @@ export default function FsaAccountPage() {
                         <CircleDollarSign className="h-4 w-4 shrink-0 text-neutral-700" aria-hidden />
                         <span className="font-medium text-[#5f6a94]">Eligible Amount</span>
                       </div>
-                      <span className="shrink-0 font-semibold text-[#14182c]">$2,500.00</span>
+                      <span className="shrink-0 font-semibold text-[#14182c]">$3,200.00</span>
                     </div>
                     <div className="h-px w-full bg-[#b7c0da]" />
                     <div className="flex items-center justify-between gap-4 text-base">
@@ -253,7 +254,7 @@ export default function FsaAccountPage() {
                           payment based on your contributions to date.
                         </InfoTip>
                       </div>
-                      <span className="shrink-0 font-semibold text-[#14182c]">$2,225.00</span>
+                      <span className="shrink-0 font-semibold text-[#14182c]">$2,925.00</span>
                     </div>
                   </div>
                 </div>
@@ -265,7 +266,7 @@ export default function FsaAccountPage() {
                   </div>
                   <div className="flex items-center justify-between py-3 text-sm">
                     <span className="text-[#5f6a94]">Use It or Lose It</span>
-                    <span className="font-semibold text-[#14182c]">$2,225.00</span>
+                    <span className="font-semibold text-[#14182c]">$2,925.00</span>
                   </div>
                 </div>
 
@@ -281,15 +282,14 @@ export default function FsaAccountPage() {
               <div className="min-w-0 flex-1 rounded-lg bg-[#f1f3fb] p-6 shadow-[0px_0px_1px_0px_rgba(18,24,29,0.2),0px_1px_3px_0px_rgba(18,24,29,0.1),0px_1px_2px_0px_rgba(18,24,29,0.06)] lg:mt-14">
                 <div className="space-y-1">
                   <p className="text-2xl font-bold tracking-tight text-[#14182c]">
-                    $2,225.00 ready to use
+                    $2,925.00 ready to use
                   </p>
                   <p className="text-sm leading-6 text-[#5f6a94]">
                     Use your funds for eligible services through{" "}
                     <strong className="font-bold text-[#14182c]">Mar 15, 2027</strong>
                   </p>
                   <p className="text-sm leading-6 text-[#5f6a94]">
-                    Submit claims by{" "}
-                    <strong className="font-bold text-[#14182c]">Mar 31, 2027</strong>
+                    Submit claims by <strong className="font-bold text-[#14182c]">Mar 31, 2027</strong>
                   </p>
                 </div>
 
@@ -306,9 +306,9 @@ export default function FsaAccountPage() {
                           <ReceiptText className="h-6 w-6 text-neutral-700" aria-hidden />
                         </div>
                         <div className="min-w-0 space-y-1">
-                          <p className="text-sm font-bold text-[#14182c]">Request Reimbursement</p>
+                          <p className="text-sm font-bold text-[#14182c]">Request Dental & Vision Reimbursement</p>
                           <p className="text-xs font-medium leading-5 text-[#5f6a94]">
-                            Get reimbursed for eligible expenses you&apos;ve already paid
+                            Get reimbursed for eligible expenses you&apos;ve already paid.
                           </p>
                         </div>
                       </div>
@@ -327,12 +327,9 @@ export default function FsaAccountPage() {
                           <ShoppingBag className="h-5 w-5 text-neutral-700" aria-hidden />
                         </div>
                         <div className="min-w-0 space-y-1">
-                          <p className="text-sm font-bold text-[#14182c]">Shop FSA Store</p>
+                          <p className="text-sm font-bold text-[#14182c]">Shop Dental & Vision Essentials</p>
                           <p className="text-xs font-medium leading-5 text-[#5f6a94]">
-                            Browse eligible products
-                          </p>
-                          <p className="text-xs font-medium leading-5 text-[#5f6a94]">
-                            Use your FSA funds easily
+                            Browse eligible products. Use your LPFSA funds easily.
                           </p>
                         </div>
                       </div>
@@ -342,7 +339,7 @@ export default function FsaAccountPage() {
                         className="h-10 w-full rounded-xl border-primary text-primary hover:bg-primary/10"
                         onClick={() => window.open("https://fsastore.com", "_blank")}
                       >
-                        Shop Now
+                        Shop now
                       </Button>
                     </div>
                   </div>
@@ -366,7 +363,7 @@ export default function FsaAccountPage() {
                   <p className="text-sm text-[#5f6a94]">Paid</p>
                   <p className="mt-1 text-2xl font-semibold tracking-tight text-[#14182c]">$275.00</p>
                 </div>
-                <ClaimRows />
+                <LpfsaClaimRows />
               </div>
             </SectionCard>
 
@@ -382,9 +379,9 @@ export default function FsaAccountPage() {
                 </div>
                 <div>
                   <p className="text-sm text-[#5f6a94]">Election Amount</p>
-                  <p className="mt-1 text-2xl font-semibold tracking-tight text-[#14182c]">$2,500.00</p>
+                  <p className="mt-1 text-2xl font-semibold tracking-tight text-[#14182c]">$3,200.00</p>
                 </div>
-                <ElectionRows />
+                <LpfsaElectionRows />
               </div>
             </SectionCard>
           </div>
@@ -489,7 +486,7 @@ export default function FsaAccountPage() {
                   </TableHeader>
                   <TableBody>
                     {pageRows.map((t) => (
-                      <FsaTransactionTableRow key={t.id} row={t} onRowClick={setSelectedFsaTx} />
+                      <LpfsaTransactionTableRow key={t.id} row={t} onRowClick={setSelectedFsaTx} />
                     ))}
                   </TableBody>
                 </Table>
@@ -598,15 +595,14 @@ export default function FsaAccountPage() {
                     <div className="flex gap-3">
                       <Info className="mt-0.5 h-5 w-5 shrink-0 text-[#5f6a94]" aria-hidden />
                       <p className="text-sm font-medium leading-5 text-[#5f6a94]">
-                        Submit claims by <strong className="font-bold text-[#14182c]">Mar 31, 2027.</strong>{" "}
-                        Based on your <strong className="font-bold text-[#14182c]">Active</strong> employment
-                        status, only services received on or before{" "}
-                        <strong className="font-bold text-[#14182c]">Mar 15, 2027</strong> are eligible for
-                        reimbursement.
+                        Submit claims by <strong className="font-bold text-[#14182c]">Mar 31, 2027</strong>. Based on
+                        your <strong className="font-bold text-[#14182c]">Active</strong> employment status, only dental
+                        and vision services received on or before{" "}
+                        <strong className="font-bold text-[#14182c]">Mar 15, 2027</strong> are eligible for reimbursement.
                       </p>
                     </div>
                   </div>
-                  <PlanDeadlineRows />
+                  <LpfsaPlanDeadlineRows />
                 </div>
                 <div>
                   <h3 className="text-[20px] font-semibold leading-8 text-[#14182c]">
@@ -614,7 +610,7 @@ export default function FsaAccountPage() {
                   </h3>
                   <div className="mt-4 space-y-0">
                     <div className="flex items-center justify-between border-b border-[#b7c0da] py-3 text-sm">
-                      <span className="text-[#5f6a94]">Card Transactions</span>
+                      <span className="text-[#5f6a94]">Cards Transactions</span>
                       <span className="font-medium text-[#14182c]">Allowed</span>
                     </div>
                     <div className="flex items-center justify-between py-3 text-sm">
@@ -628,13 +624,13 @@ export default function FsaAccountPage() {
 
             <SectionCard className="flex h-full min-h-0 flex-col">
               <FsaPreviousPlanYearCard
-                fundTypePhrase="FSA funds"
+                fundTypePhrase="LPFSA funds"
                 onOpenMoreDetails={() => setPreviousPlanYearDetailOpen(true)}
               />
             </SectionCard>
           </div>
 
-          <HsaStorePromoBanner />
+          <HsaStorePromoBanner variant="lpfsa" />
         </main>
       </FadeInItem>
 
@@ -646,19 +642,21 @@ export default function FsaAccountPage() {
         onOpenChange={(open) => {
           if (!open) setSelectedFsaTx(null);
         }}
-        row={selectedFsaTx ? fsaTransactionToExpenseRow(selectedFsaTx) : null}
+        row={selectedFsaTx ? lpfsaTransactionToExpenseRow(selectedFsaTx) : null}
         variant="fsa"
       />
 
       <FsaPreviousPlanYearDetailSheet
         open={previousPlanYearDetailOpen}
         onOpenChange={setPreviousPlanYearDetailOpen}
+        sheetAriaTitle="Limited Purpose FSA plan details"
+        planHeading="Limited Purpose FSA"
       />
     </div>
   );
 }
 
-function ClaimRows() {
+function LpfsaClaimRows() {
   return (
     <div className="space-y-0">
       <div className="relative flex items-center justify-between border-b border-[#b7c0da] py-3 text-sm">
@@ -686,7 +684,7 @@ function ClaimRows() {
   );
 }
 
-function ElectionRows() {
+function LpfsaElectionRows() {
   return (
     <div className="space-y-0">
       <div className="relative flex items-center justify-between border-b border-[#b7c0da] py-3 text-sm">
@@ -694,14 +692,14 @@ function ElectionRows() {
           <UserRound className="h-4 w-4 shrink-0 text-[#5f6a94]" aria-hidden />
           <span className="text-[#5f6a94]">My Contribution to Date</span>
         </div>
-        <span className="font-medium text-[#14182c]">$378.80</span>
+        <span className="font-medium text-[#14182c]">$615.35</span>
       </div>
       <div className="relative flex items-center justify-between border-b border-[#b7c0da] py-3 text-sm">
         <div className="flex items-center gap-2">
           <Banknote className="h-4 w-4 shrink-0 text-[#5f6a94]" aria-hidden />
           <span className="text-[#5f6a94]">Estimated Payroll Deduction</span>
         </div>
-        <span className="font-medium text-[#14182c]">$75.76</span>
+        <span className="font-medium text-[#14182c]">$123.07</span>
       </div>
       <div className="relative flex items-center justify-between py-3 text-sm">
         <div className="flex items-center gap-2">
@@ -714,7 +712,7 @@ function ElectionRows() {
   );
 }
 
-function PlanDeadlineRows() {
+function LpfsaPlanDeadlineRows() {
   return (
     <div className="mt-4 space-y-0">
       <div className="flex flex-wrap items-center justify-between border-b border-[#b7c0da] py-3 text-sm">
@@ -736,9 +734,9 @@ function PlanDeadlineRows() {
       </div>
       <div className="flex items-center justify-between border-b border-[#b7c0da] py-3 text-sm">
         <div className="flex items-center gap-2 text-[#5f6a94]">
-          <span>Status Effective Date</span>
-          <InfoTip label="About Status Effective Date">
-            Status Effective Date is the date your current active status began with your employer.
+          <span>Effective Date</span>
+          <InfoTip label="About Effective Date">
+            Effective Date is the date your current active status began with your employer.
           </InfoTip>
         </div>
         <span className="font-medium text-[#14182c]">10/15/2024</span>
@@ -750,7 +748,7 @@ function PlanDeadlineRows() {
             Final Filing Date is the last day that you may submit your claim for reimbursement from the plan.
           </InfoTip>
         </div>
-        <span className="font-medium text-[#14182c]">03/15/2027</span>
+        <span className="font-medium text-[#14182c]">03/31/2027</span>
       </div>
       <div className="flex items-center justify-between py-3 text-sm">
         <div className="flex items-center gap-2 text-[#5f6a94]">
@@ -766,7 +764,7 @@ function PlanDeadlineRows() {
   );
 }
 
-function FsaTransactionTableRow({
+function LpfsaTransactionTableRow({
   row,
   onRowClick,
 }: {
@@ -778,10 +776,10 @@ function FsaTransactionTableRow({
   const statusCell =
     row.status === "Denied" ? (
       <Badge
-        intent="destructive"
+        intent="secondary"
         size="sm"
         pill
-        className="bg-[#FEE2E2] text-[#C8102E] border-transparent"
+        className="border-transparent bg-[#ffedd5] text-[#9a3412]"
       >
         {row.status}
       </Badge>
@@ -814,14 +812,19 @@ function FsaTransactionTableRow({
       <TableCell>{statusCell}</TableCell>
       <TableCell>{row.description}</TableCell>
       <TableCell className="whitespace-nowrap text-sm">{row.planYear}</TableCell>
-      <TableCell className="text-right text-sm font-semibold tabular-nums text-[#14182c]">
+      <TableCell
+        className={cn(
+          "text-right text-sm font-semibold tabular-nums",
+          row.amountIsNegative ? "text-[#c8102e]" : "text-[#14182c]"
+        )}
+      >
         {row.amount}
       </TableCell>
       <TableCell className="text-right text-sm">
         {row.action === "upload_receipt" ? (
           <button
             type="button"
-            className="font-medium text-neutral-700 underline-offset-2 hover:underline focus-visible:outline focus-visible:ring-2 focus-visible:ring-primary"
+            className="font-medium text-[#3958c3] underline-offset-2 hover:underline focus-visible:outline focus-visible:ring-2 focus-visible:ring-primary"
             onClick={(e) => {
               e.stopPropagation();
               openReimburseWorkspace();
