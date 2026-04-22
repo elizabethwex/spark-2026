@@ -8,11 +8,19 @@ function paymentNumberFromRowId(id: string): string {
   return `${head}A14745B`;
 }
 
+export type FsaTransactionToExpenseRowOptions = {
+  /** Defaults to “Healthcare FSA” (Health FSA dashboard). */
+  accountAndCategoryLabel?: string;
+};
+
 /**
  * Maps FSA account table rows to the claims {@link ExpenseRow} shape so we can reuse
  * {@link ClaimExpenseDetailSheet} (`variant="fsa"`). Status labels match the table: Complete, Denied, Paid.
  */
-export function fsaTransactionToExpenseRow(t: FsaTransactionRow): ExpenseRow {
+export function fsaTransactionToExpenseRow(
+  t: FsaTransactionRow,
+  options?: FsaTransactionToExpenseRowOptions
+): ExpenseRow {
   const dateLong = formatHsaTableDateLong(t.date);
   const status =
     t.status === "Denied"
@@ -21,14 +29,16 @@ export function fsaTransactionToExpenseRow(t: FsaTransactionRow): ExpenseRow {
         ? { label: "Paid" as const, tone: "green" as const }
         : { label: "Complete" as const, tone: "green" as const };
 
+  const acct = options?.accountAndCategoryLabel ?? "Healthcare FSA";
+
   return {
     id: t.id,
     dateOfService: dateLong,
     status,
-    account: "Healthcare FSA",
+    account: acct,
     provider: t.description,
     recipient: "BS",
-    category: "Healthcare FSA",
+    category: acct,
     categoryType: t.description,
     documentIds: [],
     letterIds: [],

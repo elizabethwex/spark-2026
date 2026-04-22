@@ -16,7 +16,7 @@ export function getAccountsSubItems(view: SparkActiveView): ConsumerNavSubItem[]
     case 2:
       return [
         { label: "Health Care FSA", href: "/fsa-account" },
-        { label: "Dependent Care FSA", href: null },
+        { label: "Dependent Care FSA", href: "/dependent-care-fsa" },
       ];
     case 3:
       return [{ label: "Health Savings Account (HSA)", href: "/hsa-details" }];

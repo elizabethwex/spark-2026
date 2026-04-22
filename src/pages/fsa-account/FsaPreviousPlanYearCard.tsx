@@ -14,20 +14,36 @@ const ELEV_SHADOW =
 
 export type FsaPreviousPlanYearCardProps = {
   /** First summary line: “… your total {fundTypePhrase}”. */
-  fundTypePhrase: "FSA funds" | "LPFSA funds";
+  fundTypePhrase: "FSA funds" | "LPFSA funds" | "dependent FSA funds";
+  /** Label before the plan-period select (Figma Health FSA / LPFSA: “Plan Period:”; DCFSA: “Plan Year:”). */
+  planPeriodLabel?: string;
+  /** Column titles for the four summary stats under Total Used. */
+  statColumnVariant?: "default" | "dependentCare";
   onOpenMoreDetails: () => void;
 };
 
 /**
  * Previous Plan Year card (Consumer Experience) — shared by Health FSA and LPFSA account dashboards.
  */
-export function FsaPreviousPlanYearCard({ fundTypePhrase, onOpenMoreDetails }: FsaPreviousPlanYearCardProps) {
+export function FsaPreviousPlanYearCard({
+  fundTypePhrase,
+  planPeriodLabel = "Plan Period:",
+  statColumnVariant = "default",
+  onOpenMoreDetails,
+}: FsaPreviousPlanYearCardProps) {
+  const col1 = statColumnVariant === "dependentCare" ? "Annual Election" : "Elected";
+  const col2 = "Unused/Forfeited";
+  const col3 = "Rolled Over";
+  const col4 = "Denied Claims";
+  const totalUsedAmount = statColumnVariant === "dependentCare" ? "$5,000.00" : "$2,500.00";
+  const electedAmount = statColumnVariant === "dependentCare" ? "$5,000.00" : "$2,500.00";
+
   return (
     <>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <h2 className="text-[20px] font-bold leading-8 text-[#14182c]">Previous Plan Year</h2>
         <div className="flex flex-wrap items-center gap-2 sm:justify-end">
-          <span className="text-sm text-[#5f6a94]">Plan Period:</span>
+          <span className="text-sm text-[#5f6a94]">{planPeriodLabel}</span>
           <Select defaultValue="2025">
             <SelectTrigger className="h-14 w-[min(100%,280px)] min-w-[200px] sm:w-[230px]">
               <SelectValue placeholder="Plan period" />
@@ -49,7 +65,7 @@ export function FsaPreviousPlanYearCard({ fundTypePhrase, onOpenMoreDetails }: F
         <div>
           <p className="text-sm text-[#5f6a94]">Total Used</p>
           <div className="mt-1 flex flex-wrap items-center gap-2">
-            <span className="text-2xl font-semibold tracking-tight text-[#14182c]">$2,500.00</span>
+            <span className="text-2xl font-semibold tracking-tight text-[#14182c]">{totalUsedAmount}</span>
             <Badge
               intent="success"
               className="rounded-md border-0 bg-[#ecfdf5] px-2 py-0.5 text-xs font-bold text-[#006045]"
@@ -60,19 +76,19 @@ export function FsaPreviousPlanYearCard({ fundTypePhrase, onOpenMoreDetails }: F
         </div>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div>
-            <p className="text-sm text-[#5f6a94]">Elected</p>
-            <p className="text-base font-semibold text-[#14182c]">$2,500.00</p>
+            <p className="text-sm text-[#5f6a94]">{col1}</p>
+            <p className="text-base font-semibold text-[#14182c]">{electedAmount}</p>
           </div>
           <div>
-            <p className="text-sm text-[#5f6a94]">Unused/Forfeited</p>
+            <p className="text-sm text-[#5f6a94]">{col2}</p>
             <p className="text-base font-semibold text-[#14182c]">$0.00</p>
           </div>
           <div>
-            <p className="text-sm text-[#5f6a94]">Rolled Over</p>
+            <p className="text-sm text-[#5f6a94]">{col3}</p>
             <p className="text-base font-semibold text-[#14182c]">$0.00</p>
           </div>
           <div>
-            <p className="text-sm text-[#5f6a94]">Denied Claims</p>
+            <p className="text-sm text-[#5f6a94]">{col4}</p>
             <p className="text-base font-semibold text-[#14182c]">$0.00</p>
           </div>
         </div>

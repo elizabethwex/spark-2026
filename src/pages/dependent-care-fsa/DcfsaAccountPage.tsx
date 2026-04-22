@@ -40,12 +40,10 @@ import {
   Landmark,
   ReceiptText,
   Search,
-  ShoppingBag,
   WalletCards,
   ChevronsLeft,
   ChevronsRight,
   UserRound,
-  X,
 } from "lucide-react";
 import { ConsumerNavigation } from "@/components/layout/ConsumerNavigation";
 import { ConsumerFooter } from "@/components/layout/Footer";
@@ -56,10 +54,11 @@ import { usePrototype } from "@/context/PrototypeContext";
 import { useReimburseWorkspace } from "@/context/ReimburseWorkspaceContext";
 import { cn, homepageAccountSurfaceClass } from "@/lib/utils";
 import { ClaimExpenseDetailSheet } from "@/components/claims/ClaimExpenseDetailSheet";
-import { FsaPreviousPlanYearCard } from "./FsaPreviousPlanYearCard";
-import { FsaPreviousPlanYearDetailSheet } from "./FsaPreviousPlanYearDetailSheet";
-import { fsaTransactionToExpenseRow } from "./fsaTransactionToExpenseRow";
-import { fsaTransactionsData, type FsaTransactionRow } from "./fsaTransactionsMock";
+import { FsaPreviousPlanYearCard } from "@/pages/fsa-account/FsaPreviousPlanYearCard";
+import { FsaPreviousPlanYearDetailSheet } from "@/pages/fsa-account/FsaPreviousPlanYearDetailSheet";
+import { fsaTransactionToExpenseRow } from "@/pages/fsa-account/fsaTransactionToExpenseRow";
+import type { FsaTransactionRow } from "@/pages/fsa-account/fsaTransactionsMock";
+import { dcfsaTransactionsData } from "./dcfsaTransactionsMock";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 
 const fmt = (n: number) =>
@@ -108,20 +107,18 @@ function InfoTip({ label, children }: { label: string; children: React.ReactNode
 }
 
 /**
- * Flexible Spending Account dashboard at `/fsa-account`
- * (Consumer Experience Redesign — Figma node 29515:8367).
+ * Dependent Care FSA dashboard at `/dependent-care-fsa`
+ * (Consumer Experience Redesign — Figma node 33707:18533).
  */
-export default function FsaAccountPage() {
+export default function DcfsaAccountPage() {
   const { homepageMode } = usePrototype();
   const cardSurface = homepageAccountSurfaceClass(homepageMode === "partner-safe");
   const { openReimburseWorkspace } = useReimburseWorkspace();
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
-  /** When true, table lists only rows with an Actions control (e.g. Upload Receipt). */
-  const [filterActionsOnly, setFilterActionsOnly] = useState(false);
-  /** Animates FSA usage bar from 0 → 11% on first paint. */
+  /** Animates usage bar from 0 → 50% on first paint (half of election used). */
   const [usageBarPct, setUsageBarPct] = useState(0);
   const [selectedFsaTx, setSelectedFsaTx] = useState<FsaTransactionRow | null>(null);
   /** Previous Plan Year “View more details” slideout (Figma 29641:15455). */
@@ -130,19 +127,19 @@ export default function FsaAccountPage() {
   useLayoutEffect(() => {
     if (typeof window === "undefined") return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      queueMicrotask(() => setUsageBarPct(11));
+      queueMicrotask(() => setUsageBarPct(50));
     }
   }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const id = requestAnimationFrame(() => setUsageBarPct(11));
+    const id = requestAnimationFrame(() => setUsageBarPct(50));
     return () => cancelAnimationFrame(id);
   }, []);
 
   const filtered = useMemo(() => {
-    let rows = fsaTransactionsData;
+    let rows = dcfsaTransactionsData;
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       rows = rows.filter(
@@ -154,11 +151,8 @@ export default function FsaAccountPage() {
           t.amount.toLowerCase().includes(q)
       );
     }
-    if (filterActionsOnly) {
-      rows = rows.filter((t) => t.action != null);
-    }
     return rows;
-  }, [searchQuery, filterActionsOnly]);
+  }, [searchQuery]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / rowsPerPage));
   const start = (currentPage - 1) * rowsPerPage;
@@ -171,7 +165,7 @@ export default function FsaAccountPage() {
       <FadeInItem>
         <main className="mx-auto w-full max-w-[1440px] space-y-6 px-8 py-7">
           <h1 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-            Flexible Spending Account
+            Dependent Care FSA
           </h1>
 
           <div
@@ -201,7 +195,7 @@ export default function FsaAccountPage() {
                     </InfoTip>
                   </div>
                   <p className="mt-1 text-[40px] font-bold leading-[56px] tracking-tight text-[#14182c]">
-                    <AnimatedNumber value={2225} format={fmt} durationMs={1200} />
+                    <AnimatedNumber value={0} format={fmt} durationMs={1200} />
                   </p>
                 </div>
 
@@ -220,7 +214,7 @@ export default function FsaAccountPage() {
                     intent="secondary"
                     className="shrink-0 rounded-2xl bg-[#f7f7f7] px-2 py-1 text-xs font-bold text-[#515f6b]"
                   >
-                    11% of $2,500 used
+                    50% of $5,000 used
                   </Badge>
                 </div>
 
@@ -241,7 +235,7 @@ export default function FsaAccountPage() {
                         <CircleDollarSign className="h-4 w-4 shrink-0 text-neutral-700" aria-hidden />
                         <span className="font-medium text-[#5f6a94]">Eligible Amount</span>
                       </div>
-                      <span className="shrink-0 font-semibold text-[#14182c]">$2,500.00</span>
+                      <span className="shrink-0 font-semibold text-[#14182c]">$5,000.00</span>
                     </div>
                     <div className="h-px w-full bg-[#b7c0da]" />
                     <div className="flex items-center justify-between gap-4 text-base">
@@ -253,19 +247,8 @@ export default function FsaAccountPage() {
                           payment based on your contributions to date.
                         </InfoTip>
                       </div>
-                      <span className="shrink-0 font-semibold text-[#14182c]">$2,225.00</span>
+                      <span className="shrink-0 font-semibold text-[#14182c]">$1,153.86</span>
                     </div>
-                  </div>
-                </div>
-
-                <div className="space-y-0">
-                  <div className="flex items-center justify-between border-b border-[#b7c0da] py-3 text-sm">
-                    <span className="text-[#5f6a94]">Rollover Amount</span>
-                    <span className="font-semibold text-[#14182c]">$0.00</span>
-                  </div>
-                  <div className="flex items-center justify-between py-3 text-sm">
-                    <span className="text-[#5f6a94]">Use It or Lose It</span>
-                    <span className="font-semibold text-[#14182c]">$2,225.00</span>
                   </div>
                 </div>
 
@@ -280,71 +263,45 @@ export default function FsaAccountPage() {
 
               <div className="min-w-0 flex-1 rounded-lg bg-[#f1f3fb] p-6 shadow-[0px_0px_1px_0px_rgba(18,24,29,0.2),0px_1px_3px_0px_rgba(18,24,29,0.1),0px_1px_2px_0px_rgba(18,24,29,0.06)] lg:mt-14">
                 <div className="space-y-1">
-                  <p className="text-2xl font-bold tracking-tight text-[#14182c]">
-                    $2,225.00 ready to use
-                  </p>
-                  <p className="text-sm leading-6 text-[#5f6a94]">
-                    Use your funds for eligible services through{" "}
-                    <strong className="font-bold text-[#14182c]">Mar 15, 2027</strong>
-                  </p>
-                  <p className="text-sm leading-6 text-[#5f6a94]">
-                    Submit claims by{" "}
-                    <strong className="font-bold text-[#14182c]">Mar 31, 2027</strong>
-                  </p>
+                  <p className="text-2xl font-bold tracking-tight text-[#14182c]">No funds available now</p>
+                  <div className="text-sm leading-6 text-[#5f6a94]">
+                    <p>You can still submit expenses now and get reimbursed once funds are available.</p>
+                    <p className="mt-1">
+                      Use your funds for eligible services through{" "}
+                      <strong className="font-bold text-[#14182c]">Dec 31, 2026</strong>
+                    </p>
+                    <p className="mt-1">
+                      Submit claims by <strong className="font-bold text-[#14182c]">Mar 31, 2027</strong>
+                    </p>
+                  </div>
                 </div>
 
                 <div className="my-6 h-px w-full bg-[#b7c0da]" />
 
                 <div className="space-y-4">
                   <h3 className="text-[19px] font-semibold leading-8 text-[#14182c]">
-                    Ways to use your funds
+                    Get ready to use your Dependent Care FSA
                   </h3>
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div className="flex flex-col gap-6 rounded-3xl border border-[#f8f9fe] bg-[#f8f9fe] p-[17px]">
-                      <div className="flex gap-4">
-                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-[#e2e8f0] bg-white shadow-sm">
-                          <ReceiptText className="h-6 w-6 text-neutral-700" aria-hidden />
-                        </div>
-                        <div className="min-w-0 space-y-1">
-                          <p className="text-sm font-bold text-[#14182c]">Request Reimbursement</p>
-                          <p className="text-xs font-medium leading-5 text-[#5f6a94]">
-                            Get reimbursed for eligible expenses you&apos;ve already paid
-                          </p>
-                        </div>
+                  <div className="flex flex-col gap-6 rounded-3xl border border-[#f8f9fe] bg-[#f8f9fe] p-[17px]">
+                    <div className="flex gap-4">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-[#e2e8f0] bg-white shadow-sm">
+                        <ReceiptText className="h-6 w-6 text-neutral-700" aria-hidden />
                       </div>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="h-10 w-full rounded-xl border-primary text-primary hover:bg-primary/10"
-                        onClick={() => openReimburseWorkspace()}
-                      >
-                        Reimburse Myself
-                      </Button>
-                    </div>
-                    <div className="flex flex-col gap-6 rounded-3xl border border-[#f8f9fe] bg-[#f8f9fe] p-[17px]">
-                      <div className="flex gap-4">
-                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-[#e2e8f0] bg-white shadow-sm">
-                          <ShoppingBag className="h-5 w-5 text-neutral-700" aria-hidden />
-                        </div>
-                        <div className="min-w-0 space-y-1">
-                          <p className="text-sm font-bold text-[#14182c]">Shop FSA Store</p>
-                          <p className="text-xs font-medium leading-5 text-[#5f6a94]">
-                            Browse eligible products
-                          </p>
-                          <p className="text-xs font-medium leading-5 text-[#5f6a94]">
-                            Use your FSA funds easily
-                          </p>
-                        </div>
+                      <div className="min-w-0 space-y-1">
+                        <p className="text-sm font-bold text-[#14182c]">Request a Dependent Care Reimbursement</p>
+                        <p className="text-xs font-medium leading-5 text-[#5f6a94]">
+                          Submit receipts for Dependent Care expenses you&apos;ve already paid.
+                        </p>
                       </div>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="h-10 w-full rounded-xl border-primary text-primary hover:bg-primary/10"
-                        onClick={() => window.open("https://fsastore.com", "_blank")}
-                      >
-                        Shop Now
-                      </Button>
                     </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-10 w-full rounded-xl border-primary text-primary hover:bg-primary/10"
+                      onClick={() => openReimburseWorkspace()}
+                    >
+                      Upload a Receipt
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -363,10 +320,10 @@ export default function FsaAccountPage() {
                   </h2>
                 </div>
                 <div>
-                  <p className="text-sm text-[#5f6a94]">Paid</p>
-                  <p className="mt-1 text-2xl font-semibold tracking-tight text-[#14182c]">$275.00</p>
+                  <p className="text-sm text-[#5f6a94]">Paid to Date</p>
+                  <p className="mt-1 text-2xl font-semibold tracking-tight text-[#14182c]">$1,153.86</p>
                 </div>
-                <ClaimRows />
+                <DcClaimRows />
               </div>
             </SectionCard>
 
@@ -381,10 +338,10 @@ export default function FsaAccountPage() {
                   </h2>
                 </div>
                 <div>
-                  <p className="text-sm text-[#5f6a94]">Election Amount</p>
-                  <p className="mt-1 text-2xl font-semibold tracking-tight text-[#14182c]">$2,500.00</p>
+                  <p className="text-sm text-[#5f6a94]">Annual Election</p>
+                  <p className="mt-1 text-2xl font-semibold tracking-tight text-[#14182c]">$5,000.00</p>
                 </div>
-                <ElectionRows />
+                <DcElectionRows />
               </div>
             </SectionCard>
           </div>
@@ -394,45 +351,6 @@ export default function FsaAccountPage() {
               <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div className="flex flex-wrap items-center gap-4">
                   <h2 className="text-2xl font-semibold text-[#14182c]">Transactions</h2>
-                  {filterActionsOnly ? (
-                    <div
-                      className={cn(
-                        "inline-flex items-center gap-0.5 rounded-md border border-amber-400/80 bg-[#ffedb0] py-1 pl-2 pr-0.5 text-xs font-bold text-[#4a3500]",
-                        "ring-2 ring-[#3958c3] ring-offset-1"
-                      )}
-                      role="group"
-                      aria-label="Filtered to rows with action items"
-                    >
-                      <span className="pr-0.5">1 needs action</span>
-                      <button
-                        type="button"
-                        className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded text-[#4a3500] hover:bg-black/10 focus-visible:outline focus-visible:ring-2 focus-visible:ring-primary"
-                        aria-label="Remove action filter"
-                        onClick={() => {
-                          setFilterActionsOnly(false);
-                          setCurrentPage(1);
-                        }}
-                      >
-                        <X className="h-3.5 w-3.5" strokeWidth={2.5} aria-hidden />
-                      </button>
-                    </div>
-                  ) : (
-                    <button
-                      type="button"
-                      aria-pressed={false}
-                      aria-label="Filter to rows with action items only"
-                      onClick={() => {
-                        setFilterActionsOnly(true);
-                        setCurrentPage(1);
-                      }}
-                      className={cn(
-                        "rounded-md border border-amber-400/80 bg-[#fff9e6] px-2 py-1 text-xs font-bold text-[#4a3500]",
-                        "cursor-pointer transition-shadow hover:bg-[#fff3d6] focus-visible:outline focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                      )}
-                    >
-                      1 needs action
-                    </button>
-                  )}
                 </div>
                 <div className="flex w-full flex-col gap-3 sm:max-w-none sm:flex-row sm:items-center lg:w-auto">
                   <div className="w-full min-w-[200px] sm:w-[330px]">
@@ -600,17 +518,17 @@ export default function FsaAccountPage() {
                       <p className="text-sm font-medium leading-5 text-[#5f6a94]">
                         Submit claims by <strong className="font-bold text-[#14182c]">Mar 31, 2027.</strong>{" "}
                         Based on your <strong className="font-bold text-[#14182c]">Active</strong> employment
-                        status, only services received on or before{" "}
-                        <strong className="font-bold text-[#14182c]">Mar 15, 2027</strong> are eligible for
+                        status, only care services received on or before{" "}
+                        <strong className="font-bold text-[#14182c]">Dec 31, 2026</strong> are eligible for
                         reimbursement.
                       </p>
                     </div>
                   </div>
-                  <PlanDeadlineRows />
+                  <DcPlanDeadlineRows />
                 </div>
                 <div>
                   <h3 className="text-[20px] font-semibold leading-8 text-[#14182c]">
-                    Debit Card Rules
+                    Card Rules
                   </h3>
                   <div className="mt-4 space-y-0">
                     <div className="flex items-center justify-between border-b border-[#b7c0da] py-3 text-sm">
@@ -628,7 +546,9 @@ export default function FsaAccountPage() {
 
             <SectionCard className="flex h-full min-h-0 flex-col">
               <FsaPreviousPlanYearCard
-                fundTypePhrase="FSA funds"
+                fundTypePhrase="dependent FSA funds"
+                planPeriodLabel="Plan Year:"
+                statColumnVariant="dependentCare"
                 onOpenMoreDetails={() => setPreviousPlanYearDetailOpen(true)}
               />
             </SectionCard>
@@ -646,7 +566,13 @@ export default function FsaAccountPage() {
         onOpenChange={(open) => {
           if (!open) setSelectedFsaTx(null);
         }}
-        row={selectedFsaTx ? fsaTransactionToExpenseRow(selectedFsaTx) : null}
+        row={
+          selectedFsaTx
+            ? fsaTransactionToExpenseRow(selectedFsaTx, {
+                accountAndCategoryLabel: "Dependent Care FSA",
+              })
+            : null
+        }
         variant="fsa"
       />
 
@@ -658,7 +584,7 @@ export default function FsaAccountPage() {
   );
 }
 
-function ClaimRows() {
+function DcClaimRows() {
   return (
     <div className="space-y-0">
       <div className="relative flex items-center justify-between border-b border-[#b7c0da] py-3 text-sm">
@@ -666,7 +592,7 @@ function ClaimRows() {
           <CircleCheck className="h-4 w-4 shrink-0 text-[#5f6a94]" aria-hidden />
           <span className="text-[#5f6a94]">Total Submitted</span>
         </div>
-        <span className="font-medium text-[#14182c]">$275.00</span>
+        <span className="font-medium text-[#14182c]">$1,153.86</span>
       </div>
       <div className="relative flex items-center justify-between border-b border-[#b7c0da] py-3 text-sm">
         <div className="flex items-center gap-2">
@@ -680,13 +606,13 @@ function ClaimRows() {
           <CircleX className="h-4 w-4 shrink-0 text-[#5f6a94]" aria-hidden />
           <span className="text-[#5f6a94]">Total Denied</span>
         </div>
-        <span className="font-medium text-[#14182c]">$60.00</span>
+        <span className="font-medium text-[#14182c]">$0.00</span>
       </div>
     </div>
   );
 }
 
-function ElectionRows() {
+function DcElectionRows() {
   return (
     <div className="space-y-0">
       <div className="relative flex items-center justify-between border-b border-[#b7c0da] py-3 text-sm">
@@ -694,14 +620,14 @@ function ElectionRows() {
           <UserRound className="h-4 w-4 shrink-0 text-[#5f6a94]" aria-hidden />
           <span className="text-[#5f6a94]">My Contribution to Date</span>
         </div>
-        <span className="font-medium text-[#14182c]">$378.80</span>
+        <span className="font-medium text-[#14182c]">$1,153.86</span>
       </div>
       <div className="relative flex items-center justify-between border-b border-[#b7c0da] py-3 text-sm">
         <div className="flex items-center gap-2">
           <Banknote className="h-4 w-4 shrink-0 text-[#5f6a94]" aria-hidden />
           <span className="text-[#5f6a94]">Estimated Payroll Deduction</span>
         </div>
-        <span className="font-medium text-[#14182c]">$75.76</span>
+        <span className="font-medium text-[#14182c]">$192.31</span>
       </div>
       <div className="relative flex items-center justify-between py-3 text-sm">
         <div className="flex items-center gap-2">
@@ -714,14 +640,14 @@ function ElectionRows() {
   );
 }
 
-function PlanDeadlineRows() {
+function DcPlanDeadlineRows() {
   return (
     <div className="mt-4 space-y-0">
       <div className="flex flex-wrap items-center justify-between border-b border-[#b7c0da] py-3 text-sm">
         <div className="flex min-w-0 flex-1 items-center gap-2 text-[#5f6a94]">
-          <span>Current Status</span>
-          <InfoTip label="About Current Status">
-            Current Status is your current employment status with your employer.
+          <span>Enrollment Status</span>
+          <InfoTip label="About Enrollment Status">
+            Enrollment Status reflects your current participation in this Dependent Care FSA plan.
           </InfoTip>
         </div>
         <Badge
@@ -750,7 +676,7 @@ function PlanDeadlineRows() {
             Final Filing Date is the last day that you may submit your claim for reimbursement from the plan.
           </InfoTip>
         </div>
-        <span className="font-medium text-[#14182c]">03/15/2027</span>
+        <span className="font-medium text-[#14182c]">03/31/2027</span>
       </div>
       <div className="flex items-center justify-between py-3 text-sm">
         <div className="flex items-center gap-2 text-[#5f6a94]">
@@ -760,7 +686,7 @@ function PlanDeadlineRows() {
             the plan.
           </InfoTip>
         </div>
-        <span className="font-medium text-[#14182c]">03/15/2027</span>
+        <span className="font-medium text-[#14182c]">12/31/2026</span>
       </div>
     </div>
   );

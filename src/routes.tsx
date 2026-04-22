@@ -33,6 +33,9 @@ const HomePage = React.lazy(() => import("@/pages/HomePage"));
 // FSA account dashboard (consumer)
 const FsaAccountPage = React.lazy(() => import("@/pages/fsa-account/FsaAccountPage"));
 
+// Dependent Care FSA dashboard (consumer)
+const DcfsaAccountPage = React.lazy(() => import("@/pages/dependent-care-fsa/DcfsaAccountPage"));
+
 // Limited Purpose FSA dashboard (consumer)
 const LpfsaAccountPage = React.lazy(() => import("@/pages/lpfsa-account/LpfsaAccountPage"));
 
@@ -140,6 +143,8 @@ export function AppRoutes() {
         
         {/* FSA account dashboard (consumer) */}
         <Route path="fsa-account" element={withConsumerLight(<FsaAccountPage />)} />
+
+        <Route path="dependent-care-fsa" element={withConsumerLight(<DcfsaAccountPage />)} />
 
         {/* Limited Purpose FSA dashboard (consumer) */}
         <Route path="lpfsa-account" element={withConsumerLight(<LpfsaAccountPage />)} />
