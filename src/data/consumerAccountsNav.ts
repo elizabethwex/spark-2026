@@ -1,6 +1,6 @@
 import type { SparkActiveView } from "@/context/PrototypeContext";
 
-/** `href: null` = label shown in the menu but not a navigation target (prototype). */
+/** `href: null` = label shown in the menu but not a navigation target (prototype placeholder). */
 export type ConsumerNavSubItem = { label: string; href: string | null };
 
 /**
@@ -11,7 +11,7 @@ export function getAccountsSubItems(view: SparkActiveView): ConsumerNavSubItem[]
     case 1:
       return [
         { label: "Health Savings Account (HSA)", href: "/hsa-details" },
-        { label: "Limited Purpose FSA", href: null },
+        { label: "Limited Purpose FSA", href: "/lpfsa-account" },
       ];
     case 2:
       return [
