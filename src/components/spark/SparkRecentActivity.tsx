@@ -1,16 +1,12 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Clock, ChevronDown, Check } from "lucide-react";
-import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-} from "@wexinc-healthbenefits/ben-ui-kit";
+import { Clock, ChevronRight } from "lucide-react";
 import {
   sparkRecentActivity,
   type SparkActivityStatus,
   type SparkActivityRow,
 } from "@/data/sparkAiForwardMock";
+import { ClaimExpenseDetailSheet } from "@/components/claims/ClaimExpenseDetailSheet";
+import type { ExpenseRow } from "@/components/claims/expenseTypes";
 import { cn } from "@/lib/utils";
 
 function statusStyles(status: SparkActivityStatus): { wrapper: string; text: string } {
@@ -25,82 +21,82 @@ function statusStyles(status: SparkActivityStatus): { wrapper: string; text: str
   }
 }
 
-const STEP_TOOLTIPS: Record<string, string> = {
-  "Submitted": "Your claim is currently being submitted and queued for review.",
-  "Processing": "Your claim is currently being reviewed and verified against your plan's eligible expenses.",
-  "Action Required": "Missing documentation required. Please upload your receipt or EOB to continue processing this claim.",
-  "Complete": "Your claim has been approved and the funds are being disbursed to your account.",
-};
+const MONTH_NAMES = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+] as const;
 
-function TimelineTracker({ steps }: { steps: NonNullable<SparkActivityRow["timeline"]> }) {
-  return (
-    <div className="flex items-center gap-0 w-full">
-      {steps.map((step, i) => {
-        const stepContent = (
-          <div className={`flex flex-col items-center gap-1 ${step.active ? "cursor-help" : ""}`}>
-            <div
-              className={[
-                "h-5 w-5 rounded-full flex items-center justify-center text-white transition-all duration-500",
-                step.completed
-                  ? "bg-[#009966]"
-                  : step.active
-                    ? "bg-[#3958c3] animate-pulse"
-                    : "bg-slate-200",
-              ].join(" ")}
-              style={{ animationDelay: `${i * 150}ms`, animationDuration: step.active ? "3s" : undefined }}
-            >
-              {step.completed ? (
-                <Check className="h-3 w-3 text-white" strokeWidth={3} />
-              ) : step.active ? (
-                <div className="h-1.5 w-1.5 rounded-full bg-white" />
-              ) : null}
-            </div>
-            <span className={[
-              "text-[10px] leading-tight text-center whitespace-nowrap",
-              step.completed || step.active ? "text-foreground font-medium" : "text-[#5f6a94]",
-            ].join(" ")}>
-              {step.label}
-            </span>
-            {step.date && (
-              <span className="text-[10px] text-[#5f6a94] leading-tight">
-                {step.date}
-              </span>
-            )}
-          </div>
-        );
+/** Parses "4/27/26" or "12/14/26" → "Apr 27, 2026" */
+function formatMetaDate(dateStr: string): string {
+  const parts = dateStr.trim().split("/").map((p) => parseInt(p, 10));
+  if (parts.length !== 3 || parts.some(Number.isNaN)) return dateStr;
+  const [mm, dd, yy] = parts;
+  if (mm < 1 || mm > 12) return dateStr;
+  const yyyy = yy < 100 ? 2000 + yy : yy;
+  return `${MONTH_NAMES[mm - 1]} ${dd}, ${yyyy}`;
+}
 
-        return (
-          <div key={step.label} className="flex items-center flex-1 last:flex-none">
-            {step.active ? (
-              <Tooltip>
-                <TooltipTrigger asChild>{stepContent}</TooltipTrigger>
-                <TooltipContent>
-                  <p className="text-sm max-w-[220px]">
-                    {STEP_TOOLTIPS[step.label] ?? step.label}
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            ) : (
-              stepContent
-            )}
-            {i < steps.length - 1 && (
-              <div className={[
-                "h-0.5 flex-1 mx-1 rounded-full transition-all duration-500",
-                step.completed ? "bg-[#009966]" : "bg-slate-200",
-              ].join(" ")} />
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
+function planVariant(meta: string): "hsa" | "fsa" {
+  const plan = (meta.split(" • ")[1] ?? "").toUpperCase();
+  return plan.includes("HSA") && !plan.includes("FSA") ? "hsa" : "fsa";
+}
+
+let _rowCounter = 0;
+function sparkActivityRowToExpenseRow(row: SparkActivityRow, meta: string): ExpenseRow {
+  const id = `spark-activity-${++_rowCounter}`;
+  const [datePart, planPart] = meta.split(" • ");
+  const dateFormatted = formatMetaDate(datePart ?? "");
+  const variant = planVariant(meta);
+  const planLabel = planPart ?? (variant === "hsa" ? "HSA" : "FSA");
+
+  const statusLabel =
+    row.status === "needs_attention"
+      ? "Documentation Needed"
+      : variant === "hsa"
+        ? "Processed"
+        : "Paid";
+
+  const tone: ExpenseRow["status"]["tone"] =
+    row.status === "needs_attention" ? "amber" : "green";
+
+  const taxYear = (() => {
+    const y = (datePart ?? "").split("/")[2];
+    if (!y) return "2026";
+    const n = parseInt(y, 10);
+    return String(n < 100 ? 2000 + n : n);
+  })();
+
+  const paymentNumber = `${id.replace(/\D/g, "").padStart(5, "1").slice(0, 5)}A14745B`;
+
+  return {
+    id,
+    dateOfService: dateFormatted,
+    status: { label: statusLabel, tone },
+    account: planLabel,
+    provider: row.merchant,
+    recipient: "BS",
+    category: planLabel,
+    documentIds: [],
+    letterIds: [],
+    amount: row.amount,
+    origin: "manual",
+    statusDate: row.status === "needs_attention" ? undefined : dateFormatted,
+    hsaMeta:
+      variant === "hsa"
+        ? { tableDate: datePart ?? "", taxYear, paymentNumber }
+        : undefined,
+    fsaMeta:
+      variant === "fsa"
+        ? { tableDate: datePart ?? "", planYear: "01/01/2026 - 12/31/2026", paymentNumber }
+        : undefined,
+  };
 }
 
 /**
  * SPARK-2026 simplified recent activity list (Figma).
  */
 export function SparkRecentActivity({ activeView = 1 }: { activeView?: 1 | 2 | 3 }) {
-  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+  const [selectedRow, setSelectedRow] = useState<{ row: SparkActivityRow; meta: string } | null>(null);
 
   const displayActivity = sparkRecentActivity.map((row) => {
     if (activeView === 2) {
@@ -125,33 +121,32 @@ export function SparkRecentActivity({ activeView = 1 }: { activeView?: 1 | 2 | 3
     return row;
   });
 
+  const sheetExpenseRow = selectedRow
+    ? sparkActivityRowToExpenseRow(selectedRow.row, selectedRow.meta)
+    : null;
+
+  const sheetVariant: "hsa" | "fsa" = selectedRow
+    ? planVariant(selectedRow.meta)
+    : "hsa";
+
   return (
-    <section className="space-y-4" aria-labelledby="spark-activity-heading">
-      <div className="flex items-center justify-between w-full">
-        <h2 id="spark-activity-heading" className="text-[12px] font-black uppercase tracking-[3px] text-[#5f6a94] leading-[16px]">
-          Recent Activity
-        </h2>
-        <Link
-          to="/claims"
-          className="text-[12px] font-bold uppercase tracking-[1.2px] text-[color:var(--system-link,#1c6eff)] leading-[16px] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
-        >
-          View All
-        </Link>
-      </div>
+    <>
+      <section className="space-y-4" aria-labelledby="spark-activity-heading">
+        <div className="flex items-center justify-between w-full">
+          <h2 id="spark-activity-heading" className="text-[12px] font-black uppercase tracking-[3px] text-[#5f6a94] leading-[16px]">
+            Recent Activity
+          </h2>
+        </div>
 
-      <div className="flex flex-col gap-[12px]">
-        {displayActivity.map((row, index) => {
-          const isExpanded = expandedIndex === index;
-          const hasTimeline = row.timeline && row.timeline.length > 0;
-
-          return (
+        <div className="flex flex-col gap-[12px]">
+          {displayActivity.map((row, index) => (
             <button
-              key={`${row.merchant}-${row.meta}`}
+              key={`${row.merchant}-${row.meta}-${index}`}
               type="button"
-              onClick={() => hasTimeline && setExpandedIndex(isExpanded ? null : index)}
+              onClick={() => setSelectedRow({ row, meta: row.meta })}
               className={cn(
                 "group relative flex w-full flex-col items-start overflow-hidden rounded-[16px] border border-white bg-white p-px text-left shadow-[0_3px_9px_rgba(43,49,78,0.04),0_6px_18px_rgba(43,49,78,0.06)] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                hasTimeline ? "hover:border-[#3958c3]/20 hover:shadow-md cursor-pointer" : "cursor-default"
+                "hover:border-[#3958c3]/20 hover:shadow-md cursor-pointer"
               )}
             >
               <div className="relative w-full bg-white/40">
@@ -169,8 +164,8 @@ export function SparkRecentActivity({ activeView = 1 }: { activeView?: 1 | 2 | 3
                       </p>
                     </div>
                   </div>
-                  
-                  <div className="flex items-center gap-[24px]">
+
+                  <div className="flex items-center gap-[12px]">
                     <div className="flex flex-col items-end gap-1">
                       <p className="text-[14px] font-bold leading-[20px] text-foreground">
                         {row.amount}
@@ -191,39 +186,27 @@ export function SparkRecentActivity({ activeView = 1 }: { activeView?: 1 | 2 | 3
                         </span>
                       </div>
                     </div>
-                    {hasTimeline ? (
-                      <ChevronDown 
-                        className={cn(
-                          "h-4 w-4 text-[#5f6a94] transition-transform duration-200",
-                          isExpanded ? "rotate-180" : "group-hover:translate-y-0.5"
-                        )} 
-                        aria-hidden 
-                      />
-                    ) : (
-                      <div className="w-4" />
-                    )}
+                    <ChevronRight
+                      className="h-4 w-4 text-[#5f6a94] transition-transform duration-200 group-hover:translate-x-0.5"
+                      aria-hidden
+                    />
                   </div>
                 </div>
-
-                {hasTimeline && (
-                  <div
-                    className={cn(
-                      "overflow-hidden transition-all duration-300 ease-out",
-                      isExpanded ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
-                    )}
-                  >
-                    <div className="px-4 pb-4 pt-0">
-                      <div className="rounded-xl border border-slate-100/80 bg-slate-50/80 p-4">
-                        <TimelineTracker steps={row.timeline!} />
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
             </button>
-          );
-        })}
-      </div>
-    </section>
+          ))}
+        </div>
+      </section>
+
+      <ClaimExpenseDetailSheet
+        key={selectedRow ? `${selectedRow.row.merchant}-${selectedRow.meta}` : "closed"}
+        open={selectedRow !== null}
+        onOpenChange={(next) => {
+          if (!next) setSelectedRow(null);
+        }}
+        row={sheetExpenseRow}
+        variant={sheetVariant}
+      />
+    </>
   );
 }
