@@ -35,6 +35,7 @@ import {
   CreditCard,
   FileEdit,
   FileText,
+  List,
   Mail,
   Paperclip,
   Upload,
@@ -84,11 +85,12 @@ function getInlineToast(
   const date = stepDate ?? row.dateOfService
 
   if (isDocumentationNeededStatus(label)) {
+    const isAccountVariant = sheetVariant === "hsa" || sheetVariant === "fsa"
     return {
-      variant: "red",
+      variant: isAccountVariant ? "amber" : "red",
       headline: "Documentation Needed",
       subtext: `Requested ${date}`,
-      tag: "28 Days Remaining",
+      tag: isAccountVariant ? undefined : "28 Days Remaining",
       body: "Document is missing Date of Service. Please upload new documentation that includes all required info.",
     }
   }
@@ -259,13 +261,18 @@ function StepIcon({
   step,
   isComplete,
   isDenied = false,
+  sheetVariant = "claim",
 }: {
   step: WhatHappensNextStep
   isComplete: boolean
   isDenied?: boolean
+  sheetVariant?: "claim" | "hsa" | "fsa"
 }) {
   const cls = "h-3.5 w-3.5"
   if (!isComplete) {
+    if (step.id === "documentation-needed" && (sheetVariant === "hsa" || sheetVariant === "fsa")) {
+      return <List className={cn(cls, "text-amber-500")} aria-hidden />
+    }
     return <FileEdit className={cn(cls, "text-muted-foreground")} aria-hidden />
   }
   if (isDenied) {
@@ -313,7 +320,12 @@ export function ClaimExpenseDetailSheet({
       origin: row.origin,
       holdReason: row.holdReason,
       denialReason: row.denialReason,
-      sheetKind: variant,
+      // hsa/fsa sheetKind routes only handle account-specific statuses; fall back
+      // to the general "claim" timeline for statuses like "Documentation Needed"
+      // so the correct steps are generated regardless of which variant opened the sheet.
+      sheetKind: (variant === "hsa" || variant === "fsa") && isDocumentationNeededStatus(row.status.label)
+        ? "claim"
+        : variant,
     }),
     row.dateOfService,
     row.statusDate,
@@ -476,6 +488,8 @@ export function ClaimExpenseDetailSheet({
                       const isLast = index === timelineSteps.length - 1
                       const isComplete = step.phase === "complete"
                       const isDeniedStep = step.id === "denied"
+                      const isActionRequired = !isComplete && step.id === "documentation-needed"
+                        && (variant === "hsa" || variant === "fsa")
 
                       return (
                         <li key={step.id} className="flex gap-2">
@@ -484,14 +498,14 @@ export function ClaimExpenseDetailSheet({
                             <span
                               className={cn(
                                 "flex shrink-0 items-center justify-center rounded-full border bg-background",
-                                isDeniedStep
+                                isDeniedStep || isActionRequired
                                   ? "h-6 w-6 border-amber-500"
                                   : isComplete
                                     ? "h-6 w-6 border-emerald-600"
                                     : "h-6 w-6 border-muted-foreground/40"
                               )}
                             >
-                              <StepIcon step={step} isComplete={isComplete} isDenied={isDeniedStep} />
+                              <StepIcon step={step} isComplete={isComplete} isDenied={isDeniedStep} sheetVariant={variant} />
                             </span>
                             {!isLast && (
                               <span
@@ -543,14 +557,16 @@ export function ClaimExpenseDetailSheet({
                                     <p className="text-sm font-medium text-foreground">
                                       {step.title}
                                     </p>
-                                    <Badge
-                                      intent="info"
-                                      size="sm"
-                                      pill
-                                      className="text-[11px] bg-[#DBEAFE] text-[#1E40AF] border-transparent"
-                                    >
-                                      Now
-                                    </Badge>
+                                    {variant !== "hsa" && variant !== "fsa" && (
+                                      <Badge
+                                        intent="info"
+                                        size="sm"
+                                        pill
+                                        className="text-[11px] bg-[#DBEAFE] text-[#1E40AF] border-transparent"
+                                      >
+                                        Now
+                                      </Badge>
+                                    )}
                                   </div>
                                   <p className="text-[10px] text-muted-foreground">
                                     {step.date}
