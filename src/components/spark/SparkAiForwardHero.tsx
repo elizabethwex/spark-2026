@@ -897,21 +897,6 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
           )}
         </AnimatePresence>
 
-        <AnimatePresence>
-          {uploadPhase === "default" && isTaskVisible && (
-            <motion.div
-              key="caught-up-message"
-              variants={ctaHeaderVariants}
-              exit={{ opacity: 0, height: 0, paddingTop: 0, transition: { duration: 0.3 } }}
-              className="flex items-center justify-center gap-[8px] pt-2 overflow-hidden"
-            >
-              <CheckCircle2 className="h-[18px] w-[18px] text-[#9ca7c7]" />
-              <p className="text-[14px] leading-[24px] tracking-[-0.084px] text-[#9ca7c7]">
-                You're all caught up on other tasks
-              </p>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </motion.div>
           </motion.div>
         )}

@@ -22,7 +22,7 @@ export default defineConfig(() => ({
     port: 5175,
     strictPort: false, // Allow fallback if port is in use
     // Helps Cursor port forwarding, Remote-SSH, and some corporate DNS setups vs localhost-only
-    host: true,
+    host: '127.0.0.1',
     hmr: {
       overlay: true,  // Show errors as overlay
     },

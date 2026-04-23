@@ -453,7 +453,7 @@ export function SparkAccountsSection({
                 </div>
                 <button
                   type="button"
-                  onClick={() => navigate("/account-overview?account=fsa")}
+                  onClick={() => navigate("/fsa-account")}
                   className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[color:var(--system-link,#1c6eff)] hover:underline transition-colors -mr-3"
                 >
                   View Details
