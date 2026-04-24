@@ -61,6 +61,9 @@ import { cn, homepageAccountSurfaceClass } from "@/lib/utils";
 import { ClaimExpenseDetailSheet } from "@/components/claims/ClaimExpenseDetailSheet";
 import { FsaPreviousPlanYearCard } from "@/pages/fsa-account/FsaPreviousPlanYearCard";
 import { FsaPreviousPlanYearDetailSheet } from "@/pages/fsa-account/FsaPreviousPlanYearDetailSheet";
+import { FsaPreviousPlanYearPlanRulesSheet } from "@/pages/fsa-account/FsaPreviousPlanYearPlanRulesSheet";
+import { dcfsaPreviousPlanYearPlanRulesViewModel } from "@/pages/fsa-account/fsaPreviousPlanYearPlanRulesViewModel";
+import { dcfsaPreviousPlanYearViewModel } from "@/pages/fsa-account/fsaPreviousPlanYearViewModel";
 import { fsaTransactionToExpenseRow } from "@/pages/fsa-account/fsaTransactionToExpenseRow";
 import type { FsaTransactionRow } from "@/pages/fsa-account/fsaTransactionsMock";
 import { dcfsaTransactionsData } from "./dcfsaTransactionsMock";
@@ -128,6 +131,7 @@ export default function DcfsaAccountPage() {
   const [selectedFsaTx, setSelectedFsaTx] = useState<FsaTransactionRow | null>(null);
   /** Previous Plan Year “View more details” slideout (Figma 29641:15455). */
   const [previousPlanYearDetailOpen, setPreviousPlanYearDetailOpen] = useState(false);
+  const [previousPlanYearPlanRulesOpen, setPreviousPlanYearPlanRulesOpen] = useState(false);
 
   useLayoutEffect(() => {
     if (typeof window === "undefined") return;
@@ -511,7 +515,9 @@ export default function DcfsaAccountPage() {
 
           <div className="grid gap-6 lg:grid-cols-2 lg:items-stretch">
             <SectionCard className="flex h-full min-h-0 flex-col">
-              <h2 className="text-[20px] font-bold leading-8 text-[#14182c]">Plan Rules</h2>
+              <h2 id="plan-rules" className="scroll-mt-24 text-[20px] font-bold leading-8 text-[#14182c]">
+                Plan Rules
+              </h2>
               <div className="mt-6 space-y-6">
                 <div>
                   <h3 className="text-[20px] font-semibold leading-8 text-[#14182c]">
@@ -552,9 +558,9 @@ export default function DcfsaAccountPage() {
             <SectionCard className="flex h-full min-h-0 flex-col">
               <FsaPreviousPlanYearCard
                 fundTypePhrase="dependent FSA funds"
-                planPeriodLabel="Plan Year:"
-                statColumnVariant="dependentCare"
+                viewModel={dcfsaPreviousPlanYearViewModel}
                 onOpenMoreDetails={() => setPreviousPlanYearDetailOpen(true)}
+                onOpenPlanRules={() => setPreviousPlanYearPlanRulesOpen(true)}
               />
             </SectionCard>
           </div>
@@ -584,6 +590,16 @@ export default function DcfsaAccountPage() {
       <FsaPreviousPlanYearDetailSheet
         open={previousPlanYearDetailOpen}
         onOpenChange={setPreviousPlanYearDetailOpen}
+        viewModel={dcfsaPreviousPlanYearViewModel}
+        planHeading="Dependent Care FSA"
+        sheetAriaTitle="Dependent care flexible spending account plan details"
+      />
+
+      <FsaPreviousPlanYearPlanRulesSheet
+        open={previousPlanYearPlanRulesOpen}
+        onOpenChange={setPreviousPlanYearPlanRulesOpen}
+        planRules={dcfsaPreviousPlanYearPlanRulesViewModel}
+        sheetAriaTitle="Dependent Care FSA plan rules for the previous plan year"
       />
     </div>
   );

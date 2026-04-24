@@ -8,6 +8,7 @@ import {
 } from "@wexinc-healthbenefits/ben-ui-kit";
 import { CircleCheck, CircleSlash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import type { FsaPreviousPlanYearViewModel } from "./fsaPreviousPlanYearViewModel";
 
 const ELEV_SHADOW =
   "shadow-[0px_3.017px_9.051px_0px_rgba(43,49,78,0.04),0px_6.034px_18.101px_0px_rgba(43,49,78,0.06)]";
@@ -15,11 +16,11 @@ const ELEV_SHADOW =
 export type FsaPreviousPlanYearCardProps = {
   /** First summary line: “… your total {fundTypePhrase}”. */
   fundTypePhrase: "FSA funds" | "LPFSA funds" | "dependent FSA funds";
-  /** Label before the plan-period select (Figma Health FSA / LPFSA: “Plan Period:”; DCFSA: “Plan Year:”). */
-  planPeriodLabel?: string;
-  /** Column titles for the four summary stats under Total Used. */
-  statColumnVariant?: "default" | "dependentCare";
+  /** Card + modal figures (must match `FsaPreviousPlanYearDetailSheet` viewModel). */
+  viewModel: FsaPreviousPlanYearViewModel;
   onOpenMoreDetails: () => void;
+  /** Opens Plan Rules for the same plan year as this card. */
+  onOpenPlanRules: () => void;
 };
 
 /**
@@ -27,29 +28,30 @@ export type FsaPreviousPlanYearCardProps = {
  */
 export function FsaPreviousPlanYearCard({
   fundTypePhrase,
-  planPeriodLabel = "Plan Period:",
-  statColumnVariant = "default",
+  viewModel,
   onOpenMoreDetails,
+  onOpenPlanRules,
 }: FsaPreviousPlanYearCardProps) {
-  const col1 = statColumnVariant === "dependentCare" ? "Annual Election" : "Elected";
+  const col1 = viewModel.electedColumnLabel;
   const col2 = "Unused/Forfeited";
   const col3 = "Rolled Over";
   const col4 = "Denied Claims";
-  const totalUsedAmount = statColumnVariant === "dependentCare" ? "$5,000.00" : "$2,500.00";
-  const electedAmount = statColumnVariant === "dependentCare" ? "$5,000.00" : "$2,500.00";
+  const totalUsedAmount = viewModel.totalUsedFormatted;
+  const electedAmount = viewModel.electedAmountFormatted;
+  const usedPctLabel = `${viewModel.usedPercent}%`;
 
   return (
     <>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <h2 className="text-[20px] font-bold leading-8 text-[#14182c]">Previous Plan Year</h2>
         <div className="flex flex-wrap items-center gap-2 sm:justify-end">
-          <span className="text-sm text-[#5f6a94]">{planPeriodLabel}</span>
+          <span className="text-sm text-[#5f6a94]">{viewModel.planPeriodLabel}</span>
           <Select defaultValue="2025">
             <SelectTrigger className="h-14 w-[min(100%,280px)] min-w-[200px] sm:w-[230px]">
               <SelectValue placeholder="Plan period" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="2025">Jan 1, 2025 – Dec 31, 2025</SelectItem>
+              <SelectItem value="2025">{viewModel.planYearRangeDisplay}</SelectItem>
               <SelectItem value="2024">Jan 1, 2024 – Dec 31, 2024</SelectItem>
             </SelectContent>
           </Select>
@@ -70,7 +72,7 @@ export function FsaPreviousPlanYearCard({
               intent="success"
               className="rounded-md border-0 bg-[#ecfdf5] px-2 py-0.5 text-xs font-bold text-[#006045]"
             >
-              100%
+              {usedPctLabel}
             </Badge>
           </div>
         </div>
@@ -81,15 +83,15 @@ export function FsaPreviousPlanYearCard({
           </div>
           <div>
             <p className="text-sm text-[#5f6a94]">{col2}</p>
-            <p className="text-base font-semibold text-[#14182c]">$0.00</p>
+            <p className="text-base font-semibold text-[#14182c]">{viewModel.unusedForfeitedFormatted}</p>
           </div>
           <div>
             <p className="text-sm text-[#5f6a94]">{col3}</p>
-            <p className="text-base font-semibold text-[#14182c]">$0.00</p>
+            <p className="text-base font-semibold text-[#14182c]">{viewModel.rolledOverFormatted}</p>
           </div>
           <div>
             <p className="text-sm text-[#5f6a94]">{col4}</p>
-            <p className="text-base font-semibold text-[#14182c]">$0.00</p>
+            <p className="text-base font-semibold text-[#14182c]">{viewModel.deniedClaimsFormatted}</p>
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-x-8 gap-y-2">
@@ -99,6 +101,13 @@ export function FsaPreviousPlanYearCard({
             onClick={onOpenMoreDetails}
           >
             View More Details
+          </button>
+          <button
+            type="button"
+            className="text-base font-medium text-[#3958c3] underline-offset-2 hover:underline focus-visible:outline focus-visible:ring-2 focus-visible:ring-primary"
+            onClick={onOpenPlanRules}
+          >
+            View Plan Rules
           </button>
           <a
             href="#"
@@ -117,19 +126,22 @@ export function FsaPreviousPlanYearCard({
             <li className="flex gap-2">
               <CircleCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" aria-hidden />
               <span>
-                You <strong className="font-bold">used 100%</strong> of your total {fundTypePhrase}
+                You <strong className="font-bold">used {usedPctLabel}</strong> of your total {fundTypePhrase}
               </span>
             </li>
             <li className="flex gap-2">
               <CircleCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" aria-hidden />
               <span>
-                You <strong className="font-bold">lost $0.00</strong>
+                You <strong className="font-bold">lost {viewModel.lostAmountFormatted}</strong>
               </span>
             </li>
             <li className="flex gap-2">
               <CircleSlash2 className="mt-0.5 h-4 w-4 shrink-0 text-[#460809]" aria-hidden />
               <span>
-                <strong className="font-bold text-[#460809]">0 claims</strong> were denied
+                <strong className="font-bold text-[#460809]">
+                  {viewModel.deniedClaimCount} {viewModel.deniedClaimCount === 1 ? "claim" : "claims"}
+                </strong>{" "}
+                were denied
               </span>
             </li>
           </ul>
