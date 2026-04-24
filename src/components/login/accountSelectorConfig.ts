@@ -13,7 +13,6 @@ export const ACCOUNT_GROUPS: AccountGroup[] = [
     employerName: "Dunder Mifflin Paper Co.",
     accounts: [
       { id: "dm-reimb", label: "Reimbursement Account(s)", icon: "building" },
-      { id: "dm-mbe", label: "My Benefit Express", icon: "building" },
     ],
   },
   {
