@@ -49,11 +49,11 @@ interface AccountCardData {
 const ACCOUNTS_BY_VARIANT: Record<AppVariant, AccountCardData[]> = {
   1: [
     { id: "hsa", name: "Health Savings Account", subtitle: "HSA", balanceLabel: "Cash + Invested Assets", balance: "$15,900.00", icon: "landmark" },
-    { id: "lpfsa", name: "Limited Purpose FSA", subtitle: "01/01/2026 - 12/31/2026", balanceLabel: "", balance: "$2,425.00", icon: "calendar-check" },
+    { id: "lpfsa", name: "Limited Purpose FSA", subtitle: "01/01/2026 - 12/31/2026", balanceLabel: "", balance: "$2,925.00", icon: "calendar-check" },
   ],
   2: [
-    { id: "fsa", name: "Healthcare FSA", subtitle: "01/01/2026 - 12/31/2026", balanceLabel: "", balance: "$2,425.00", icon: "heart-pulse" },
-    { id: "dcfsa", name: "DCFSA", subtitle: "01/01/2026 - 12/31/2026", balanceLabel: "", balance: "$620.00", icon: "baby" },
+    { id: "fsa", name: "Healthcare FSA", subtitle: "01/01/2026 - 12/31/2026", balanceLabel: "", balance: "$2,225.00", icon: "heart-pulse" },
+    { id: "dcfsa", name: "DCFSA", subtitle: "01/01/2026 - 12/31/2026", balanceLabel: "", balance: "$0.00", icon: "baby" },
   ],
   3: [
     { id: "hsa", name: "Health Savings Account", subtitle: "HSA", balanceLabel: "Cash + Invested Assets", balance: "$15,900.00", icon: "landmark" },

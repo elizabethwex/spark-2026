@@ -124,8 +124,8 @@ const ACCOUNT_META: Record<string, { name: string; totalBalance: string; availab
   },
   lpfsa: {
     name: "Limited Purpose FSA",
-    totalBalance: "$2,425.00",
-    availableCash: "$2,425.00",
+    totalBalance: "$2,925.00",
+    availableCash: "$2,925.00",
   },
 };
 

@@ -50,11 +50,11 @@ interface HomeAccountCard {
 const HOME_ACCOUNTS: Record<AppVariant, HomeAccountCard[]> = {
   1: [
     { id: "hsa", name: "Health Savings Account", tag: "HSA", balanceLabel: "Cash + Invested Assets", balance: "$15,900.00", icon: Landmark, route: "/app/account/hsa" },
-    { id: "lpfsa", name: "Limited Purpose FSA", tag: "01/01/2026 – 12/31/2026", balance: "$2,425.00", icon: CalendarCheck2, route: "/app/account/lpfsa" },
+    { id: "lpfsa", name: "Limited Purpose FSA", tag: "01/01/2026 – 12/31/2026", balance: "$2,925.00", icon: CalendarCheck2, route: "/app/account/lpfsa" },
   ],
   2: [
-    { id: "fsa", name: "Healthcare FSA", tag: "01/01/2026 – 12/31/2026", balance: "$2,425.00", icon: HeartPulse, route: "/app/account/fsa" },
-    { id: "dcfsa", name: "DCFSA", tag: "01/01/2026 – 12/31/2026", balance: "$620.00", icon: Baby, route: "/app/account/dcfsa" },
+    { id: "fsa", name: "Healthcare FSA", tag: "01/01/2026 – 12/31/2026", balance: "$2,225.00", icon: HeartPulse, route: "/app/account/fsa" },
+    { id: "dcfsa", name: "DCFSA", tag: "01/01/2026 – 12/31/2026", balance: "$0.00", icon: Baby, route: "/app/account/dcfsa" },
   ],
   3: [
     { id: "hsa", name: "Health Savings Account", tag: "HSA", balanceLabel: "Cash + Invested Assets", balance: "$15,900.00", icon: Landmark, route: "/app/account/hsa" },

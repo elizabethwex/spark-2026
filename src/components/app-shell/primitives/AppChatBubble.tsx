@@ -91,7 +91,7 @@ export function AppChatBubble({ role, children, timestamp, variant = "bubble" }:
   );
 }
 
-/** Gradient avatar circle used in WEXly chat headers */
+/** Gradient avatar circle used in Assist IQ chat headers */
 export function AssistIQAvatar({ size = 28 }: { size?: number }) {
   const iconSize = Math.round(size * 0.5);
   return (
@@ -116,7 +116,7 @@ export function AssistIQAvatar({ size = 28 }: { size?: number }) {
   );
 }
 
-/** Suggested prompt chip for the WEXly screen */
+/** Suggested prompt chip for the Assist IQ screen */
 export function AppPromptChip({
   label,
   onClick,
