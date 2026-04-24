@@ -613,10 +613,14 @@ export function SparkAccountsSection({
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[color:var(--system-link,#1c6eff)] -mr-3 cursor-default">
+                <button
+                  type="button"
+                  onClick={() => navigate("/dependent-care-fsa")}
+                  className="flex items-center gap-[7px] rounded-[6px] px-[12px] py-[8px] text-[15.75px] font-medium text-[color:var(--system-link,#1c6eff)] hover:underline transition-colors -mr-3"
+                >
                   View Details
                   <ChevronRight className="h-4 w-4" />
-                </div>
+                </button>
               </div>
 
           {/* Body */}

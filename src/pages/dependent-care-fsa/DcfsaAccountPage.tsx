@@ -61,6 +61,9 @@ import { cn, homepageAccountSurfaceClass } from "@/lib/utils";
 import { ClaimExpenseDetailSheet } from "@/components/claims/ClaimExpenseDetailSheet";
 import { FsaPreviousPlanYearCard } from "@/pages/fsa-account/FsaPreviousPlanYearCard";
 import { FsaPreviousPlanYearDetailSheet } from "@/pages/fsa-account/FsaPreviousPlanYearDetailSheet";
+import { FsaPreviousPlanYearPlanRulesSheet } from "@/pages/fsa-account/FsaPreviousPlanYearPlanRulesSheet";
+import { dcfsaPreviousPlanYearPlanRulesViewModel } from "@/pages/fsa-account/fsaPreviousPlanYearPlanRulesViewModel";
+import { dcfsaPreviousPlanYearViewModel } from "@/pages/fsa-account/fsaPreviousPlanYearViewModel";
 import { fsaTransactionToExpenseRow } from "@/pages/fsa-account/fsaTransactionToExpenseRow";
 import type { FsaTransactionRow } from "@/pages/fsa-account/fsaTransactionsMock";
 import { dcfsaTransactionsData } from "./dcfsaTransactionsMock";
@@ -123,23 +126,24 @@ export default function DcfsaAccountPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
-  /** Animates usage bar from 0 → 50% on first paint (half of election used). */
+  /** Animates usage bar from 0 → 100% on first paint (election fully used; $0 available). */
   const [usageBarPct, setUsageBarPct] = useState(0);
   const [selectedFsaTx, setSelectedFsaTx] = useState<FsaTransactionRow | null>(null);
   /** Previous Plan Year “View more details” slideout (Figma 29641:15455). */
   const [previousPlanYearDetailOpen, setPreviousPlanYearDetailOpen] = useState(false);
+  const [previousPlanYearPlanRulesOpen, setPreviousPlanYearPlanRulesOpen] = useState(false);
 
   useLayoutEffect(() => {
     if (typeof window === "undefined") return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      queueMicrotask(() => setUsageBarPct(50));
+      queueMicrotask(() => setUsageBarPct(100));
     }
   }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const id = requestAnimationFrame(() => setUsageBarPct(50));
+    const id = requestAnimationFrame(() => setUsageBarPct(100));
     return () => cancelAnimationFrame(id);
   }, []);
 
@@ -219,7 +223,7 @@ export default function DcfsaAccountPage() {
                     intent="secondary"
                     className="shrink-0 rounded-2xl bg-[#f7f7f7] px-2 py-1 text-xs font-bold text-[#515f6b]"
                   >
-                    50% of $5,000 used
+                    100% of $5,000 used
                   </Badge>
                 </div>
 
@@ -255,6 +259,11 @@ export default function DcfsaAccountPage() {
                       <span className="shrink-0 font-semibold text-[#14182c]">$1,153.86</span>
                     </div>
                   </div>
+                </div>
+
+                <div className="flex items-center justify-between py-3 text-sm">
+                  <span className="text-[#5f6a94]">Use It or Lose It</span>
+                  <span className="font-semibold text-[#14182c]">$0.00</span>
                 </div>
 
                 <Button
@@ -511,7 +520,9 @@ export default function DcfsaAccountPage() {
 
           <div className="grid gap-6 lg:grid-cols-2 lg:items-stretch">
             <SectionCard className="flex h-full min-h-0 flex-col">
-              <h2 className="text-[20px] font-bold leading-8 text-[#14182c]">Plan Rules</h2>
+              <h2 id="plan-rules" className="scroll-mt-24 text-[20px] font-bold leading-8 text-[#14182c]">
+                Plan Rules
+              </h2>
               <div className="mt-6 space-y-6">
                 <div>
                   <h3 className="text-[20px] font-semibold leading-8 text-[#14182c]">
@@ -552,9 +563,9 @@ export default function DcfsaAccountPage() {
             <SectionCard className="flex h-full min-h-0 flex-col">
               <FsaPreviousPlanYearCard
                 fundTypePhrase="dependent FSA funds"
-                planPeriodLabel="Plan Year:"
-                statColumnVariant="dependentCare"
+                viewModel={dcfsaPreviousPlanYearViewModel}
                 onOpenMoreDetails={() => setPreviousPlanYearDetailOpen(true)}
+                onOpenPlanRules={() => setPreviousPlanYearPlanRulesOpen(true)}
               />
             </SectionCard>
           </div>
@@ -584,6 +595,16 @@ export default function DcfsaAccountPage() {
       <FsaPreviousPlanYearDetailSheet
         open={previousPlanYearDetailOpen}
         onOpenChange={setPreviousPlanYearDetailOpen}
+        viewModel={dcfsaPreviousPlanYearViewModel}
+        planHeading="Dependent Care FSA"
+        sheetAriaTitle="Dependent care flexible spending account plan details"
+      />
+
+      <FsaPreviousPlanYearPlanRulesSheet
+        open={previousPlanYearPlanRulesOpen}
+        onOpenChange={setPreviousPlanYearPlanRulesOpen}
+        planRules={dcfsaPreviousPlanYearPlanRulesViewModel}
+        sheetAriaTitle="Dependent Care FSA plan rules for the previous plan year"
       />
     </div>
   );

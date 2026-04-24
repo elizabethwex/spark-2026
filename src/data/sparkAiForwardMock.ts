@@ -87,9 +87,9 @@ export const sparkDcfsaSummary = {
   spendByTag: null,
   eligibleLabel: "Using DCFSA funds",
   eligibleDesc: "Daycare, Preschool, Day Camps, Adult Care.",
-  contributionPctUsed: 50,
+  contributionPctUsed: 100,
   contributionLimit: "$5,000",
-  useItOrLoseIt: "$1,153.86",
+  useItOrLoseIt: "$0.00",
   finalFilingDate: "Mar 31, 2027",
 };
 

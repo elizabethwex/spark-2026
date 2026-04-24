@@ -63,6 +63,9 @@ import { cn, homepageAccountSurfaceClass } from "@/lib/utils";
 import { ClaimExpenseDetailSheet } from "@/components/claims/ClaimExpenseDetailSheet";
 import { FsaPreviousPlanYearCard } from "./FsaPreviousPlanYearCard";
 import { FsaPreviousPlanYearDetailSheet } from "./FsaPreviousPlanYearDetailSheet";
+import { FsaPreviousPlanYearPlanRulesSheet } from "./FsaPreviousPlanYearPlanRulesSheet";
+import { healthFsaPreviousPlanYearPlanRulesViewModel } from "./fsaPreviousPlanYearPlanRulesViewModel";
+import { healthLpfsaPreviousPlanYearViewModel } from "./fsaPreviousPlanYearViewModel";
 import { fsaTransactionToExpenseRow } from "./fsaTransactionToExpenseRow";
 import { fsaTransactionsData, type FsaTransactionRow } from "./fsaTransactionsMock";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
@@ -131,6 +134,7 @@ export default function FsaAccountPage() {
   const [selectedFsaTx, setSelectedFsaTx] = useState<FsaTransactionRow | null>(null);
   /** Previous Plan Year “View more details” slideout (Figma 29641:15455). */
   const [previousPlanYearDetailOpen, setPreviousPlanYearDetailOpen] = useState(false);
+  const [previousPlanYearPlanRulesOpen, setPreviousPlanYearPlanRulesOpen] = useState(false);
 
   useLayoutEffect(() => {
     if (typeof window === "undefined") return;
@@ -593,7 +597,9 @@ export default function FsaAccountPage() {
 
           <div className="grid gap-6 lg:grid-cols-2 lg:items-stretch">
             <SectionCard className="flex h-full min-h-0 flex-col">
-              <h2 className="text-[20px] font-bold leading-8 text-[#14182c]">Plan Rules</h2>
+              <h2 id="plan-rules" className="scroll-mt-24 text-[20px] font-bold leading-8 text-[#14182c]">
+                Plan Rules
+              </h2>
               <div className="mt-6 space-y-6">
                 <div>
                   <h3 className="text-[20px] font-semibold leading-8 text-[#14182c]">
@@ -634,7 +640,9 @@ export default function FsaAccountPage() {
             <SectionCard className="flex h-full min-h-0 flex-col">
               <FsaPreviousPlanYearCard
                 fundTypePhrase="FSA funds"
+                viewModel={healthLpfsaPreviousPlanYearViewModel}
                 onOpenMoreDetails={() => setPreviousPlanYearDetailOpen(true)}
+                onOpenPlanRules={() => setPreviousPlanYearPlanRulesOpen(true)}
               />
             </SectionCard>
           </div>
@@ -658,6 +666,16 @@ export default function FsaAccountPage() {
       <FsaPreviousPlanYearDetailSheet
         open={previousPlanYearDetailOpen}
         onOpenChange={setPreviousPlanYearDetailOpen}
+        viewModel={healthLpfsaPreviousPlanYearViewModel}
+        planHeading="Healthcare FSA"
+        sheetAriaTitle="Healthcare flexible spending account plan details"
+      />
+
+      <FsaPreviousPlanYearPlanRulesSheet
+        open={previousPlanYearPlanRulesOpen}
+        onOpenChange={setPreviousPlanYearPlanRulesOpen}
+        planRules={healthFsaPreviousPlanYearPlanRulesViewModel}
+        sheetAriaTitle="Healthcare FSA plan rules for the previous plan year"
       />
     </div>
   );
