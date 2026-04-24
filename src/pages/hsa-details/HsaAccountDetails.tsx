@@ -196,10 +196,10 @@ export function HsaAccountDetails() {
               <CardContent className="flex flex-1 flex-col gap-6 p-6">
                 {/* Header */}
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--theme-secondary-ramp-50)] text-[var(--theme-secondary)]">
-                    <Building2 className="h-5 w-5 text-current" aria-hidden />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--app-secondary-50)] text-[var(--theme-secondary)]">
+                    <Building2 className="h-5 w-5 text-[var(--theme-secondary)]" aria-hidden />
                   </div>
-                  <h2 className="text-[20px] font-bold leading-7 text-[#14182c]">Account Overview</h2>
+                  <h2 className="text-[20px] font-bold leading-8 text-[#14182c] md:text-2xl">Account Overview</h2>
                 </div>
 
                 {/* Total value */}
@@ -218,8 +218,8 @@ export function HsaAccountDetails() {
                   {/* Cash Balance */}
                   <div className="flex items-center justify-between px-4 py-4">
                     <div className="flex items-center gap-2">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center text-neutral-700">
-                        <CircleDollarSign className="h-[24px] w-[24px]" />
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center text-[var(--theme-secondary)]">
+                        <CircleDollarSign className="h-[24px] w-[24px] text-[var(--theme-secondary)]" />
                       </div>
                       <span className="text-[16px] font-bold leading-5 text-[#14182c]">Cash Balance</span>
                     </div>
@@ -233,8 +233,8 @@ export function HsaAccountDetails() {
                   {/* Invested assets */}
                   <div className="flex items-center justify-between px-4 py-4">
                     <div className="flex items-center gap-2">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center text-neutral-700">
-                        <TrendingUp className="h-[24px] w-[24px] text-current" aria-hidden />
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center text-[var(--theme-secondary)]">
+                        <TrendingUp className="h-[24px] w-[24px] text-[var(--theme-secondary)]" aria-hidden />
                       </div>
                       <span className="text-[16px] font-bold leading-5 text-[#14182c]">Invested assets</span>
                     </div>
@@ -278,10 +278,10 @@ export function HsaAccountDetails() {
             >
               <CardContent className="flex flex-1 flex-col gap-6 p-6">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--theme-secondary-ramp-50)] text-[var(--theme-secondary)]">
-                    <Wallet className="h-5 w-5 text-current" aria-hidden />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--app-secondary-50)] text-[var(--theme-secondary)]">
+                    <Wallet className="h-5 w-5 text-[var(--theme-secondary)]" aria-hidden />
                   </div>
-                  <h2 className="text-lg font-semibold text-foreground">2026 Contributions</h2>
+                  <h2 className="text-[20px] font-bold leading-8 text-[#14182c] md:text-2xl">2026 Contributions</h2>
                 </div>
                 <div className="box-content flex items-start justify-between gap-8">
                   <div className="min-w-0 flex w-full flex-col gap-1">
@@ -422,10 +422,10 @@ export function HsaAccountDetails() {
             >
               <CardContent className="flex flex-1 flex-col gap-4 p-6">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--theme-secondary-ramp-50)] text-[var(--theme-secondary)]">
-                    <TrendingUp className="h-5 w-5 text-current" aria-hidden />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--app-secondary-50)] text-[var(--theme-secondary)]">
+                    <TrendingUp className="h-5 w-5 text-[var(--theme-secondary)]" aria-hidden />
                   </div>
-                  <h2 className="text-lg font-semibold text-foreground">Investments</h2>
+                  <h2 className="text-[20px] font-bold leading-8 text-[#14182c] md:text-2xl">Investments</h2>
                 </div>
                 <div className="flex items-center justify-center gap-4">
                   <div className="w-full">
@@ -520,7 +520,7 @@ export function HsaAccountDetails() {
               style={{ borderRadius: "24px" }}
             >
               <CardContent className="flex flex-1 flex-col gap-6 p-6">
-                <h2 className="text-lg font-semibold text-foreground">My HSA Planner</h2>
+                <h2 className="text-[20px] font-bold leading-8 text-[#14182c] md:text-2xl">My HSA Planner</h2>
                 <div className="flex rounded-lg bg-muted p-1">
                   <button
                     type="button"

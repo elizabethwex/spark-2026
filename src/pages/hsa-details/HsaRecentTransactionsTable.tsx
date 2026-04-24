@@ -1,6 +1,11 @@
 import { useMemo, useState, type KeyboardEvent } from "react";
 import { ClaimExpenseDetailSheet } from "@/components/claims/ClaimExpenseDetailSheet";
 import {
+  expenseStatusBadgeClass,
+  expenseStatusBadgeIntent,
+  transactionTableStatusTone,
+} from "@/components/claims/expenseTypes";
+import {
   Badge,
   Button,
   Card,
@@ -24,7 +29,7 @@ import {
   TableHeader,
   TableRow,
 } from "@wexinc-healthbenefits/ben-ui-kit";
-import { ArrowDown, ChevronsLeft, ChevronsRight, Search, Upload } from "lucide-react";
+import { ArrowDown, ChevronsLeft, ChevronsRight, Download, Search } from "lucide-react";
 import { usePrototype } from "@/context/PrototypeContext";
 import { cn, homepageAccountSurfaceClass } from "@/lib/utils";
 import type { Transaction } from "./mockData";
@@ -69,9 +74,9 @@ export function HsaRecentTransactionsTable({ transactions }: HsaRecentTransactio
       <CardContent className="p-6">
         <div className="flex w-full flex-col items-center space-y-4">
           <div className="flex w-full flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <h2 className="text-2xl font-semibold text-foreground">Transactions</h2>
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-              <div className="w-full min-w-[200px] sm:w-[280px]">
+            <h2 className="text-[20px] font-bold leading-8 text-[#14182c] md:text-2xl">Transactions</h2>
+            <div className="flex w-full flex-col gap-3 sm:max-w-none sm:flex-row sm:items-center lg:w-auto">
+              <div className="w-full min-w-[200px] sm:w-[330px]">
                 <Input
                   inputSize="md"
                   type="text"
@@ -85,32 +90,32 @@ export function HsaRecentTransactionsTable({ transactions }: HsaRecentTransactio
                 />
               </div>
               <Button
-                variant="outline"
+                variant="ghost"
                 size="md"
-                className="shrink-0 border-primary text-primary rounded-xl"
                 type="button"
+                className="shrink-0 text-[#5f6a94] hover:text-[#14182c]"
               >
-                <Upload className="mr-2 h-4 w-4 text-current" aria-hidden />
+                <Download className="mr-2 h-4 w-4" aria-hidden />
                 Export
               </Button>
             </div>
           </div>
 
           <div className="w-full overflow-x-auto">
-            <Table>
+            <Table className="table-fixed w-full">
               <TableHeader>
                 <TableRow className="hover:bg-transparent border-y border-border bg-muted/30">
-                  <TableHead>
+                  <TableHead className="min-w-0 w-[20%]">
                     <div className="flex items-center gap-1">
                       Date
                       <ArrowDown className="h-3 w-3" />
                     </div>
                   </TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Description</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead className="text-right">
-                    <div className="flex items-center justify-end gap-1">
+                  <TableHead className="min-w-0 w-[20%]">Status</TableHead>
+                  <TableHead className="min-w-0 w-[20%]">Description</TableHead>
+                  <TableHead className="min-w-0 w-[20%]">Category</TableHead>
+                  <TableHead className="min-w-0 w-[20%] text-left">
+                    <div className="flex items-center gap-1">
                       Amount
                       <ArrowDown className="h-3 w-3" />
                     </div>
@@ -118,7 +123,9 @@ export function HsaRecentTransactionsTable({ transactions }: HsaRecentTransactio
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {paginated.map((transaction) => (
+                {paginated.map((transaction) => {
+                  const statusTone = transactionTableStatusTone(transaction.status);
+                  return (
                   <TableRow
                     key={transaction.id}
                     className="h-[49px] cursor-pointer hover:bg-muted/40"
@@ -133,26 +140,25 @@ export function HsaRecentTransactionsTable({ transactions }: HsaRecentTransactio
                       }
                     }}
                   >
-                    <TableCell>{transaction.date}</TableCell>
-                    <TableCell>
+                    <TableCell className="min-w-0 w-[20%]">{transaction.date}</TableCell>
+                    <TableCell className="min-w-0 w-[20%]">
                       <Badge
-                        intent={transaction.status === "Pending" ? "warning" : "success"}
+                        intent={expenseStatusBadgeIntent(statusTone)}
                         size="sm"
                         pill
-                        className={transaction.status === "Pending"
-                          ? "bg-[#FFF1BF] text-[#735300] border-transparent"
-                          : "bg-[#D0FAE5] text-[#006045] border-transparent"}
+                        className={cn("max-w-full", expenseStatusBadgeClass(statusTone))}
                       >
                         {transaction.status}
                       </Badge>
                     </TableCell>
-                    <TableCell>{transaction.description}</TableCell>
-                    <TableCell>{transaction.category}</TableCell>
-                    <TableCell className="text-right font-medium text-foreground">
+                    <TableCell className="min-w-0 w-[20%]">{transaction.description}</TableCell>
+                    <TableCell className="min-w-0 w-[20%]">{transaction.category}</TableCell>
+                    <TableCell className="min-w-0 w-[20%] text-left text-sm font-semibold tabular-nums text-[#14182c]">
                       {transaction.amount}
                     </TableCell>
                   </TableRow>
-                ))}
+                  );
+                })}
               </TableBody>
             </Table>
           </div>

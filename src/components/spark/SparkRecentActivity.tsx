@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Clock, ChevronRight } from "lucide-react";
 import {
-  sparkRecentActivity,
+  getSparkRecentActivity,
   type SparkActivityStatus,
   type SparkActivityRow,
 } from "@/data/sparkAiForwardMock";
@@ -98,28 +98,7 @@ function sparkActivityRowToExpenseRow(row: SparkActivityRow, meta: string): Expe
 export function SparkRecentActivity({ activeView = 1 }: { activeView?: 1 | 2 | 3 }) {
   const [selectedRow, setSelectedRow] = useState<{ row: SparkActivityRow; meta: string } | null>(null);
 
-  const displayActivity = sparkRecentActivity.map((row) => {
-    if (activeView === 2) {
-      if (row.merchant === "Vanguard Invest") {
-        return {
-          ...row,
-          merchant: "Bright Horizons Daycare",
-          meta: "12/14/26 • DCFSA",
-        };
-      }
-      if (row.meta.includes("Limited Purpose FSA")) {
-        return { ...row, meta: row.meta.replace("Limited Purpose FSA", "Healthcare FSA") };
-      }
-      if (row.meta.includes("HSA") && !row.meta.includes("DCFSA")) {
-        return { ...row, meta: row.meta.replace("HSA", "Healthcare FSA") };
-      }
-    } else if (activeView === 3) {
-      if (row.meta.includes("Limited Purpose FSA")) {
-        return { ...row, meta: row.meta.replace("Limited Purpose FSA", "HSA") };
-      }
-    }
-    return row;
-  });
+  const displayActivity = getSparkRecentActivity(activeView);
 
   const sheetExpenseRow = selectedRow
     ? sparkActivityRowToExpenseRow(selectedRow.row, selectedRow.meta)
