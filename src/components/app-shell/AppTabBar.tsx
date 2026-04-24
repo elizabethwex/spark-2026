@@ -26,7 +26,7 @@ export function isFullScreenRoute(pathname: string) {
 export function AppTabBar() {
   const location = useLocation();
 
-  // WEXly takes over the full screen — hide the tab bar
+  // Assist IQ takes over the full screen — hide the tab bar
   if (isFullScreenRoute(location.pathname)) {
     return null;
   }

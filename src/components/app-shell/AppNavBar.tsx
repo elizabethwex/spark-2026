@@ -33,7 +33,7 @@ export type AppNavBarProps =
       backTo?: string | number;
       backLabel?: string;
       onClose: () => void;
-      /** Shown before the close control (e.g. WEXly “new chat”). */
+      /** Shown before the close control (e.g. Assist IQ “new chat”). */
       rightActions?: ReactNode;
     });
 
@@ -101,7 +101,7 @@ function ProfileButton({ onClick }: { onClick: () => void }) {
 
 function AssistIqButton({ onClick }: { onClick: () => void }) {
   return (
-    <button type="button" aria-label="WEXly" onClick={onClick} style={ASSIST_GRADIENT_BTN}>
+    <button type="button" aria-label="Assist IQ" onClick={onClick} style={ASSIST_GRADIENT_BTN}>
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M13.913 13.9149L11.9997 24.0033L10.087 13.9149L0 12.0013L10.087 10.0884L12.0003 0L13.913 10.0884L24 12.0013L13.913 13.9149Z" fill="white"/>
         <path d="M20.2758 19.7969L19.5994 23.3628L18.923 19.7969L15.3569 19.1204L18.923 18.4439L19.5994 14.8781L20.2752 18.4439L23.8412 19.1204L20.2758 19.7969Z" fill="white"/>

@@ -46,7 +46,7 @@
 | `abc8329` | feat: updates to mobile UI and AI AssistIQ |
 | `11f190c` | fix(spark): link Healthcare FSA View Details to /fsa-account |
 | `bd490f4` | fix(app): stabilize Messages scroll and mobile list padding |
-| `0b24fb2` | Merge pull request #63 — Wexly use cases |
+| `0b24fb2` | Merge pull request #63 — Assist IQ use cases |
 | `11cf1e5` | fix(message-center): restore primary active state on sidebar nav |
 | `921d870` | fix: remove unused isDenied var, let → const for formatDateOfService |
 | `953048f` | Tie document library to claims, add letters tab, and claims page polish |

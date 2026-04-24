@@ -171,7 +171,7 @@ function AssistIQMessageHeader({ timestamp }: { timestamp: string }) {
           letterSpacing: -0.1,
         }}
       >
-        WEXly
+        Assist IQ
       </span>
       <span style={{ fontSize: 12, color: TEXT_SECONDARY }}>{timestamp}</span>
     </div>
@@ -1004,7 +1004,7 @@ function WelcomeSplash({ onChipSend }: { onChipSend: (text: string) => void }) {
             fontWeight: 700,
           }}
         >
-          WEXly
+          Assist IQ
         </span>
         , your Benefits helper.
         <br />
@@ -1562,7 +1562,7 @@ export default function AppAssistIQ() {
       {/* Nav bar */}
       <AppNavBar
         variant="full-page"
-        title={inWelcome ? "" : "WEXly"}
+        title={inWelcome ? "" : "Assist IQ"}
         onClose={() => navigate(-1)}
       />
 
@@ -1736,7 +1736,7 @@ export default function AppAssistIQ() {
                 send(input);
               }
             }}
-            placeholder="Message WEXly…"
+            placeholder="Message Assist IQ…"
             style={{
               flex: 1,
               border: "none",
