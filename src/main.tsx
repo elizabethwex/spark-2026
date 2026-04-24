@@ -6,6 +6,11 @@ import { AppProviders } from '@wexinc-healthbenefits/ben-ui-kit'
 import '@wex/design-tokens'
 import './index.css'
 import App from './App.tsx'
+import { applyPortalThemeToDocument } from '@/lib/portalTheme'
+
+// Set brand CSS variables before first paint when no saved portal theme exists
+// (otherwise icons and accents fall back to neutral --theme-secondary in theme-fallbacks.css).
+applyPortalThemeToDocument()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

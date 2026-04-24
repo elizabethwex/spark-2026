@@ -7,61 +7,46 @@ const FSA_STORE_URL = "https://fsastore.com/";
 const CE_BANNER_SHADOW =
   "shadow-[0px_3.017px_9.051px_0px_rgba(43,49,78,0.04),0px_6.034px_18.101px_0px_rgba(43,49,78,0.06)]";
 
-export type HsaStorePromoBannerVariant = "fsa" | "lpfsa";
+const DEFAULT_HEADING = "Prioritize a year of health and wellness with your FSA";
+const DEFAULT_CTA_LABEL = "Shop FSA Store";
 
 export type HsaStorePromoBannerProps = {
-  /** LPFSA dashboard uses alternate headline, body, and CTA label (consumer reference). */
-  variant?: HsaStorePromoBannerVariant;
+  /** When set (e.g. LPFSA account page), replaces the default FSA headline and allows wrapping for longer copy. */
+  heading?: string;
+  /** When set (e.g. LPFSA account page), replaces the default CTA label on the store link button. */
+  ctaLabel?: string;
 };
 
 /**
- * End-of-page FSA store promo on the FSA account dashboard (Consumer Experience Redesign — Figma 29515:8707).
+ * End-of-page FSA store promo on consumer account dashboards (Consumer Experience Redesign — Figma 29515:8707).
  */
-export function HsaStorePromoBanner({ variant = "fsa" }: HsaStorePromoBannerProps) {
+export function HsaStorePromoBanner({ heading, ctaLabel }: HsaStorePromoBannerProps = {}) {
   const base = `${import.meta.env.BASE_URL}fsa-store-banner-ce/`;
-  const fsaSingleLine = variant === "fsa";
-
-  const copy =
-    variant === "lpfsa"
-      ? {
-          logoAlt: "FSA store",
-          heading: "Prioritize a year of dental and vision care with your LPFSA",
-          subtext: "Plus use BlexPay™ for dental and vision essentials and check out instantly!",
-          cta: "Shop Dental & Vision Essentials",
-        }
-      : {
-          logoAlt: "FSA store",
-          heading: "Prioritize a year of health and wellness with your FSA",
-          subtext: "Plus use DirectPay™ and check out instantly!",
-          cta: "Shop FSA Store",
-        };
+  const headline = heading ?? DEFAULT_HEADING;
+  const useCompactHeading = heading == null;
+  const buttonLabel = ctaLabel ?? DEFAULT_CTA_LABEL;
 
   return (
     <div className={cn("relative overflow-hidden rounded-2xl bg-[#FBFBFB]", CE_BANNER_SHADOW)}>
-      <div className="relative z-10 grid min-h-0 md:min-h-[277px] md:grid-cols-2 md:items-center">
-        {/* Copy + CTA — left column */}
-        <div className="order-1 flex min-w-0 flex-col py-6 pl-10 pr-5 sm:py-7 sm:pr-6 md:min-w-0 md:max-w-none md:py-8 md:pr-6">
-          <div className="flex flex-col gap-2.5">
+      <div className="relative z-10 grid min-h-0 md:min-h-[277px] md:grid-cols-[minmax(0,1.42fr)_minmax(0,0.58fr)] md:items-center">
+        {/* Copy + CTA — left column (~71% on md+ so LPFSA headline can stay one line) */}
+        <div className="order-1 flex min-w-0 flex-col py-6 pl-10 pr-5 sm:py-7 sm:pr-6 md:min-w-0 md:max-w-none md:py-8 md:pr-5">
+          <div className="flex min-w-0 flex-col gap-2.5">
             <img
               src={`${base}logo.png`}
-              alt={copy.logoAlt}
+              alt="FSA store"
               className="h-7 w-auto max-w-full shrink-0 self-start object-contain sm:h-8"
             />
             <h2
               className={cn(
                 "w-full min-w-0 text-xl font-bold leading-snug text-[#253746] sm:text-2xl md:text-[25px] md:leading-[31px]",
-                fsaSingleLine ? "whitespace-nowrap" : "md:max-w-[520px]"
+                useCompactHeading ? "whitespace-nowrap" : "md:whitespace-nowrap"
               )}
             >
-              {copy.heading}
+              {headline}
             </h2>
-            <p
-              className={cn(
-                "text-base font-normal leading-[1.332] text-[#253746]",
-                fsaSingleLine ? "whitespace-nowrap" : "max-w-[408px]"
-              )}
-            >
-              {copy.subtext}
+            <p className="whitespace-nowrap text-base font-normal leading-[1.332] text-[#253746]">
+              Plus use BlexPay™ for essentials and check out instantly!
             </p>
           </div>
           <div className="mt-6">
@@ -72,14 +57,14 @@ export function HsaStorePromoBanner({ variant = "fsa" }: HsaStorePromoBannerProp
               asChild
             >
               <a href={FSA_STORE_URL} target="_blank" rel="noopener noreferrer">
-                {copy.cta}
+                {buttonLabel}
               </a>
             </Button>
           </div>
         </div>
 
         {/* Illustration — right column (Figma hero ~277px) */}
-        <div className="relative order-2 flex min-h-[200px] justify-center overflow-hidden md:min-h-[277px] md:justify-end">
+        <div className="relative order-2 flex min-h-[200px] w-full items-start justify-center overflow-hidden md:min-h-[277px] md:items-start md:justify-center">
           <img
             src={`${base}illustration.png`}
             alt=""

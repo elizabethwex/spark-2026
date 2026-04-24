@@ -54,7 +54,13 @@ import {
   Upload,
 } from "lucide-react"
 import { ClaimExpenseDetailSheet } from "@/components/claims/ClaimExpenseDetailSheet"
-import { attachmentLabel, expenseStatusBadgeClass, expenseStatusBadgeIntent, type ExpenseRow } from "@/components/claims/expenseTypes"
+import {
+  attachmentLabel,
+  expenseRowStatusBadgeTone,
+  expenseStatusBadgeClass,
+  expenseStatusBadgeIntent,
+  type ExpenseRow,
+} from "@/components/claims/expenseTypes"
 import { DOCUMENTS, type DocumentItem } from "@/components/documents/documentData"
 import { FilePreviewModal } from "@/components/documents/FilePreviewModal"
 
@@ -137,7 +143,7 @@ const EXPENSE_ROWS: ExpenseRow[] = [
   {
     id: "4",
     dateOfService: "Jan 31, 2026",
-    status: { label: "Denied", tone: "amber" },
+    status: { label: "Denied", tone: "red" },
     origin: "card",
     denialReason: "Expense is not eligible under Healthcare FSA plan.",
     account: "Healthcare FSA",
@@ -531,7 +537,7 @@ export function ClaimsPaymentsContent() {
         <CardContent className="border-0 p-0">
           {/* Section header */}
           <div className="flex items-center gap-2 px-6 pt-5 pb-4">
-            <h2 className="text-xl font-semibold text-foreground">Action Required</h2>
+            <h2 className="text-[20px] font-bold leading-8 text-[#14182c] md:text-2xl">Action Required</h2>
             {!caughtUp && (
               <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-[11px] font-bold leading-none text-white">
                 2
@@ -658,8 +664,8 @@ export function ClaimsPaymentsContent() {
         <CardContent className="p-0">
           {/* Section header */}
           <div className="flex flex-col gap-3 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
-            <h2 className="text-xl font-semibold text-foreground">Claims</h2>
-            <div className="w-full max-w-[240px]">
+            <h2 className="text-[20px] font-bold leading-8 text-[#14182c] md:text-2xl">Claims</h2>
+            <div className="w-full min-w-[200px] sm:w-[330px]">
               <Input
                 inputSize="md"
                 type="search"
@@ -785,10 +791,13 @@ export function ClaimsPaymentsContent() {
                     </TableCell>
                     <TableCell className="min-w-0 px-2 py-2.5">
                       <Badge
-                        intent={expenseStatusBadgeIntent(row.status.tone)}
+                        intent={expenseStatusBadgeIntent(expenseRowStatusBadgeTone(row.status))}
                         size="sm"
                         pill
-                        className={cn("max-w-full", expenseStatusBadgeClass(row.status.tone))}
+                        className={cn(
+                          "max-w-full",
+                          expenseStatusBadgeClass(expenseRowStatusBadgeTone(row.status))
+                        )}
                       >
                         <span className="inline-flex items-center gap-1 overflow-hidden">
                           {row.status.icon && <AlertTriangle className="h-3 w-3 shrink-0 text-current" aria-hidden />}
@@ -932,7 +941,7 @@ export function ClaimsPaymentsContent() {
         <CardContent className="p-0">
           {/* Section header */}
           <div className="flex items-center justify-between px-6 py-4">
-            <h2 className="text-xl font-semibold text-foreground">Document Organizer</h2>
+            <h2 className="text-[20px] font-bold leading-8 text-[#14182c] md:text-2xl">Document Organizer</h2>
             <Button type="button" intent="primary" variant="outline" size="md" asChild className="btn-outline-theme" style={{ borderColor: "var(--theme-primary)", color: "var(--theme-primary)" }}>
               <Link to="/document-org">See All Documents</Link>
             </Button>

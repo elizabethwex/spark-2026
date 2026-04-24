@@ -47,8 +47,7 @@ function getAllThemingCssVarNames(): string[] {
  * Apply saved portal theme to the document root so all routes use the same variables.
  */
 export function applyPortalThemeToDocument(): void {
-  const theme = loadPortalTheme();
-  if (!theme) return;
+  const theme = loadPortalTheme() ?? defaultThemingEngineValues;
   const vars = themeToCssVars(theme, false);
   const root = document.documentElement;
   for (const [key, value] of Object.entries(vars)) {
