@@ -35,7 +35,6 @@ export function AccountLinkingIntro({
   continueRef,
 }: AccountLinkingIntroProps) {
   const [linked, setLinked] = useState<Record<string, boolean>>({
-    "mbe-stark": false,
     "cobra-dm": false,
     "cobra-stark2": false,
   })
