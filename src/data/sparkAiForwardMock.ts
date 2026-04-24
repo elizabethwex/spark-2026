@@ -42,161 +42,60 @@ export const sparkHsaSummary = {
   irsLimitFormatted: fmtUsd(hsaC.contributionLimit),
 };
 
+/** LPFSA figures aligned with `/lpfsa-account` (Account Overview). */
 export const sparkLpfsaSummary = {
-  balance: "$1,000.00",
-  planRange: "01/01/2026 – 12/31/2026",
+  balance: "$2,925.00",
+  planRange: "Jan 1, 2026 - Dec 31, 2026",
   daysToSpend: 28,
-  spendByTag: "spend by 12/31",
+  spendByTag: null,
   eligibleLabel: "Vision & Dental",
-  contributionPctUsed: 60,
-  contributionLimit: "$2,500",
-  rolloverAmount: "$500.00",
-  useItOrLoseIt: "$500.00",
-  finalFilingDate: "3/1/27",
+  contributionPctUsed: 8.6,
+  contributionLimit: "$2,925",
+  rolloverAmount: "$0.00",
+  useItOrLoseIt: "$2,925.00",
+  finalFilingDate: "Mar 31, 2027",
 };
 
 export const sparkLpfsaPrimarySummary = {
-  balance: "$2,425.00",
-  planRange: "01/01/2026 – 12/31/2026",
-  daysToSpend: 28,
-  spendByTag: null,
-  eligibleLabel: "Vision & Dental",
-  contributionPctUsed: 11,
-  contributionLimit: "$2,500",
-  rolloverAmount: "$500.00",
-  useItOrLoseIt: "$1,925.00",
-  finalFilingDate: "3/1/27",
+  ...sparkLpfsaSummary,
 };
 
+/** Healthcare FSA — aligned with `/fsa-account` (Account Overview). */
 export const sparkFsaSummary = {
-  balance: "$1,000.00",
-  planRange: "01/01/2026 - 4/15/2026",
+  balance: "$2,225.00",
+  planRange: "Jan 1, 2026 – Dec 31, 2026",
   daysToSpend: 28,
-  spendByTag: "spend by 12/31",
+  spendByTag: null,
   eligibleLabel: "Health FSA",
   eligibleDesc: "Medical, Dental, Vision, RX, OTC meds.",
-  contributionPctUsed: 60,
+  contributionPctUsed: 11,
   contributionLimit: "$2,500",
-  rolloverAmount: "$500.00",
-  useItOrLoseIt: "$500.00",
-  finalFilingDate: "3/1/27",
+  rolloverAmount: "$0.00",
+  useItOrLoseIt: "$2,225.00",
+  finalFilingDate: "Mar 31, 2027",
 };
 
 export const sparkFsaPrimarySummary = {
-  balance: "$2,425.00",
-  planRange: "01/01/2026 - 4/15/2026",
-  daysToSpend: 28,
-  spendByTag: null,
-  eligibleLabel: "Health FSA",
-  eligibleDesc: "Medical, Dental, Vision, RX, OTC meds.",
-  contributionPctUsed: 11,
-  contributionLimit: "$2,500",
-  rolloverAmount: "$500.00",
-  useItOrLoseIt: "$1,925.00",
-  finalFilingDate: "3/1/27",
+  ...sparkFsaSummary,
 };
 
+/** DCFSA — aligned with `/dependent-care-fsa` (Account Overview; use-it-or-lose-it = plan year balance). */
 export const sparkDcfsaSummary = {
-  balance: "$300.00",
-  planRange: "01/01/2026 - 12/31/2026",
+  balance: "$0.00",
+  planRange: "Jan 1, 2026 – Dec 31, 2026",
   daysToSpend: 28,
-  spendByTag: "spend by 12/31",
+  spendByTag: null,
   eligibleLabel: "Using DCFSA funds",
   eligibleDesc: "Daycare, Preschool, Day Camps, Adult Care.",
-  contributionPctUsed: 80,
-  contributionLimit: "$1,500",
-  useItOrLoseIt: "$300.00",
-  finalFilingDate: "3/1/27",
+  contributionPctUsed: 50,
+  contributionLimit: "$5,000",
+  useItOrLoseIt: "$1,153.86",
+  finalFilingDate: "Mar 31, 2027",
 };
 
 export const sparkDcfsaPrimarySummary = {
-  balance: "$620.00",
-  planRange: "01/01/2026 - 12/31/2026",
-  daysToSpend: 28,
-  spendByTag: null,
-  eligibleLabel: "Using DCFSA funds",
-  eligibleDesc: "Daycare, Preschool, Day Camps, Adult Care.",
-  contributionPctUsed: 41,
-  contributionLimit: "$1,500",
-  useItOrLoseIt: "$620.00",
-  finalFilingDate: "3/1/27",
+  ...sparkDcfsaSummary,
 };
 
-export type SparkActivityStatus = "approved" | "needs_attention" | "completed";
-
-export interface SparkActivityRow {
-  merchant: string;
-  meta: string;
-  amount: string;
-  status: SparkActivityStatus;
-  statusLabel: string;
-  timeline?: {
-    label: string;
-    date?: string;
-    completed: boolean;
-    active: boolean;
-  }[];
-}
-
-export const sparkRecentActivity: SparkActivityRow[] = [
-  {
-    merchant: "Walgreens",
-    meta: "4/27/26 • Limited Purpose FSA",
-    amount: "$42.50",
-    status: "approved",
-    statusLabel: "APPROVED",
-    timeline: [
-      { label: "Submitted", date: "Apr 27", completed: true, active: false },
-      { label: "Processing", date: "Apr 28", completed: true, active: false },
-      { label: "Complete", date: "Apr 29", completed: true, active: true },
-    ],
-  },
-  {
-    merchant: "Bigtown Dentistry",
-    meta: "4/27/26 • Limited Purpose FSA",
-    amount: "$210.00",
-    status: "needs_attention",
-    statusLabel: "NEEDS ATTENTION",
-    timeline: [
-      { label: "Submitted", date: "Apr 27", completed: true, active: false },
-      { label: "Action Required", date: "Apr 28", completed: false, active: true },
-      { label: "Complete", completed: false, active: false },
-    ],
-  },
-  {
-    merchant: "Vanguard Invest",
-    meta: "12/14/26 • HSA",
-    amount: "$500.00",
-    status: "completed",
-    statusLabel: "COMPLETED",
-    timeline: [
-      { label: "Submitted", date: "Dec 14", completed: true, active: false },
-      { label: "Processing", date: "Dec 15", completed: true, active: false },
-      { label: "Complete", date: "Dec 16", completed: true, active: true },
-    ],
-  },
-  {
-    merchant: "Target",
-    meta: "11/20/26 • HSA",
-    amount: "$15.99",
-    status: "completed",
-    statusLabel: "COMPLETED",
-    timeline: [
-      { label: "Submitted", date: "Nov 20", completed: true, active: false },
-      { label: "Processing", date: "Nov 21", completed: true, active: false },
-      { label: "Complete", date: "Nov 22", completed: true, active: true },
-    ],
-  },
-  {
-    merchant: "Dr. Smith Vision",
-    meta: "11/15/26 • Limited Purpose FSA",
-    amount: "$120.00",
-    status: "completed",
-    statusLabel: "COMPLETED",
-    timeline: [
-      { label: "Submitted", date: "Nov 15", completed: true, active: false },
-      { label: "Processing", date: "Nov 16", completed: true, active: false },
-      { label: "Complete", date: "Nov 17", completed: true, active: true },
-    ],
-  },
-];
+export type { SparkActivityRow, SparkActivityStatus } from "./sparkRecentActivity";
+export { getSparkRecentActivity } from "./sparkRecentActivity";

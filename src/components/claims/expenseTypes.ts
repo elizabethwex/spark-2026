@@ -79,3 +79,18 @@ export function expenseStatusBadgeIntent(
       return "default"
   }
 }
+
+/** Maps FSA / LPFSA / DCFSA / HSA transaction status labels to Claims table badge tones. */
+export function transactionTableStatusTone(status: string): ExpenseRow["status"]["tone"] {
+  const key = status.trim().toLowerCase()
+  if (key === "denied") return "red"
+  if (key === "pending") return "amber"
+  return "green"
+}
+
+/** Badge tone for claim expense rows: Denied is always red (never warning/amber). */
+export function expenseRowStatusBadgeTone(status: ExpenseRow["status"]): ExpenseRow["status"]["tone"] {
+  const label = status.label.trim().toLowerCase()
+  if (label === "denied") return "red"
+  return status.tone
+}

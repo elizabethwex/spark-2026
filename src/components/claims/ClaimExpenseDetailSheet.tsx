@@ -24,7 +24,11 @@ import {
   isDocumentationReviewStatus,
   type WhatHappensNextStep,
 } from "@/components/claims/claimTimeline"
-import { expenseStatusBadgeClass, type ExpenseRow } from "@/components/claims/expenseTypes"
+import {
+  expenseRowStatusBadgeTone,
+  expenseStatusBadgeClass,
+  type ExpenseRow,
+} from "@/components/claims/expenseTypes"
 import { LETTERS, type LetterItem } from "@/components/claims/letterData"
 import { DOCUMENTS, type DocumentItem } from "@/components/documents/documentData"
 import { FilePreviewModal } from "@/components/documents/FilePreviewModal"
@@ -381,7 +385,7 @@ export function ClaimExpenseDetailSheet({
                   <span
                     className={cn(
                       "inline-flex max-w-full items-center gap-1 truncate rounded-full border px-2.5 py-0.5 text-xs font-medium",
-                      expenseStatusBadgeClass(row.status.tone)
+                      expenseStatusBadgeClass(expenseRowStatusBadgeTone(row.status))
                     )}
                   >
                     {row.status.icon && (
