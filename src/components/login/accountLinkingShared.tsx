@@ -3,14 +3,6 @@ import { cn } from "@/lib/utils"
 
 export const MATCHED_ACCOUNT_ROWS = [
   {
-    id: "mbe-stark",
-    productLabel: "My Benefit Express",
-    tagVariant: "cyan" as const,
-    maskedUsername: "pen*****ith",
-    employer: "Stark Industries",
-    lastActive: "November 9, 2022",
-  },
-  {
     id: "cobra-dm",
     productLabel: "COBRA & Direct Bill",
     tagVariant: "purple" as const,

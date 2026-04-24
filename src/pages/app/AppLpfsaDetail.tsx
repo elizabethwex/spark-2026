@@ -3,8 +3,26 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { ChevronRight, FileSearch, SlidersHorizontal, HeartPulse, Baby, CalendarCheck2 } from "lucide-react";
 import { AppNavBar } from "@/components/app-shell/AppNavBar";
 import { AppTopSpacer } from "@/components/app-shell/AppTopSpacer";
+import type { FsaTransactionRow } from "@/pages/fsa-account/fsaTransactionsMock";
+import { fsaTransactionsData } from "@/pages/fsa-account/fsaTransactionsMock";
+import { dcfsaTransactionsData } from "@/pages/dependent-care-fsa/dcfsaTransactionsMock";
+import { lpfsaTransactionsData } from "@/pages/lpfsa-account/lpfsaTransactionsMock";
 import type { TransactionRow } from "./AppAccountOverview";
 import { TransactionDetailSheet } from "./AppAccountOverview";
+
+function mapConsumerFsaRowToTransactionRow(t: FsaTransactionRow, account: string): TransactionRow {
+  const status: TransactionRow["status"] = t.status === "Denied" ? "denied" : "complete";
+  return {
+    merchant: t.description,
+    date: t.date,
+    account,
+    amount: t.amount,
+    processedDate: t.date,
+    description: t.description,
+    planYear: t.planYear,
+    status,
+  };
+}
 
 const CARD_SHADOW = "0px 3.017px 9.051px rgba(43,49,78,0.04), 0px 6.034px 18.101px rgba(43,49,78,0.06)";
 const TEXT_PRIMARY = "#14182c";
@@ -13,7 +31,6 @@ const TINT = "#3958c3";
 const SEPARATOR = "#e6e6e6";
 const SUCCESS_SURFACE = "#ecfdf5";
 const SUCCESS_TEXT = "#002c22";
-const CRITICAL_RED = "#dc2626";
 const BORDER_COLOR = "#b7c0da";
 const INFO_SURFACE = "#eff6ff";
 const TINT_50 = "#eef2ff";
@@ -42,6 +59,8 @@ interface AccountData {
   maxPerTransaction: string;
   claimsStats: { value: string; label: string }[];
   electionAmount: string;
+  /** When set (e.g. DCFSA), shown above election amount instead of "Election Amount". */
+  electionAmountLabel?: string;
   contributions: { label: string; value: string }[];
   status: { label: string; value: string }[];
   transactions: TransactionRow[];
@@ -51,127 +70,110 @@ const ACCOUNT_DATA: Record<string, AccountData> = {
   lpfsa: {
     title: "Limited Purpose FSA",
     icon: CalendarCheck2,
-    balanceSubtitle: "FSA Available Balance",
-    balance: "$2,425.00",
+    balanceSubtitle: "Available Balance",
+    balance: "$2,925.00",
     balanceRows: [
-      { label: "Plan Year", value: "01/01/2026 - 12/31/2026" },
-      { label: "Eligible Amount", value: "$2,500.00" },
-      { label: "Max Rollover", value: "$500.00" },
-      { label: "Use it or Lose It", value: "$1,925.00", valueColor: CRITICAL_RED },
-      { label: "File by 3/1/27" },
+      { label: "Plan Year", value: "Jan 1, 2026 - Dec 31, 2026" },
+      { label: "Eligible Amount", value: "$3,200.00" },
+      { label: "Rollover Amount", value: "$0.00" },
+      { label: "Use It or Lose It", value: "$2,925.00" },
+      { label: "File by 3/31/27" },
     ],
     effectiveDate: "January 1, 2026",
     planDuration: "Jan 1, 2026 - Dec 31, 2026",
     finalServiceDate: "December 31, 2026",
-    finalFilingDate: "March 1, 2027",
+    finalFilingDate: "March 31, 2027",
     finalFilingDescription: "Last date to submit claims for the 2026 plan year",
     debitCardAllowed: "Yes",
     maxPerTransaction: "No maximum",
     claimsStats: [
-      { value: "$640.00", label: "Total Paid" },
-      { value: "$892.00", label: "Total Submitted" },
-      { value: "0.00", label: "Total Pending" },
-      { value: "$252.00", label: "Total Denied" },
+      { value: "$275.00", label: "Total Paid" },
+      { value: "$275.00", label: "Total Submitted" },
+      { value: "$0.00", label: "Total Pending" },
+      { value: "$60.00", label: "Total Denied" },
     ],
-    electionAmount: "$2,500.00",
+    electionAmount: "$3,200.00",
     contributions: [
       { label: "Employer", value: "$0.00" },
-      { label: "My Contribution to Date", value: "$2,500.00" },
+      { label: "My Contribution to Date", value: "$615.35" },
     ],
     status: [
-      { label: "Eligible Amount", value: "$2,500.00" },
-      { label: "Estimated Payroll Deductible", value: "$57.69" },
+      { label: "Eligible Amount", value: "$3,200.00" },
+      { label: "Estimated Payroll Deduction", value: "$123.07" },
     ],
-    transactions: [
-      { merchant: "Pharmacy", date: "4/27/2026", account: "LPFSA", amount: "$42.50", processedDate: "04/27/2026", description: "Prescription Medicine", planYear: "2026", availableBalance: "$807.50", runningBalance: "$765.00", status: "complete" },
-      { merchant: "Dr. Miller DDS", date: "4/27/2026", account: "LPFSA", amount: "$340.00", processedDate: "04/27/2026", description: "Dental Services", planYear: "2026", availableBalance: "$1,147.50", runningBalance: "$807.50", status: "complete" },
-      { merchant: "CVS Pharmacy", date: "4/24/2026", account: "LPFSA", amount: "$28.10", processedDate: "04/24/2026", description: "Prescription Medicine", planYear: "2026", availableBalance: "$1,175.60", runningBalance: "$1,147.50", status: "complete" },
-      { merchant: "Target Store", date: "4/20/2026", account: "LPFSA", amount: "$34.99", processedDate: "04/20/2026", description: "Health Products", planYear: "2026", availableBalance: "$1,210.59", runningBalance: "$1,175.60", status: "complete" },
-      { merchant: "Walgreens Pharmacy", date: "4/18/2026", account: "LPFSA", amount: "$19.50", processedDate: "04/18/2026", description: "Prescription Medicine", planYear: "2026", availableBalance: "$1,230.09", runningBalance: "$1,210.59", status: "complete" },
-    ],
+    transactions: lpfsaTransactionsData.map((t) => mapConsumerFsaRowToTransactionRow(t, "LPFSA")),
   },
   fsa: {
-    title: "Healthcare FSA",
+    title: "Flexible Spending Account",
     icon: HeartPulse,
-    balanceSubtitle: "FSA Available Balance",
-    balance: "$2,425.00",
+    balanceSubtitle: "Available Balance",
+    balance: "$2,225.00",
     balanceRows: [
-      { label: "Plan Year", value: "01/01/2026 - 12/31/2026" },
+      { label: "Plan Year", value: "Jan 1, 2026 - Dec 31, 2026" },
       { label: "Eligible Amount", value: "$2,500.00" },
-      { label: "Max Rollover", value: "$500.00" },
-      { label: "Use it or Lose It", value: "$1,925.00", valueColor: CRITICAL_RED },
-      { label: "File by 3/1/27" },
+      { label: "Rollover Amount", value: "$0.00" },
+      { label: "Use It or Lose It", value: "$2,225.00" },
+      { label: "File by 3/31/27" },
     ],
     effectiveDate: "January 1, 2026",
     planDuration: "Jan 1, 2026 - Dec 31, 2026",
     finalServiceDate: "December 31, 2026",
-    finalFilingDate: "March 1, 2027",
+    finalFilingDate: "March 31, 2027",
     finalFilingDescription: "Last date to submit claims for the 2026 plan year",
     debitCardAllowed: "Yes",
     maxPerTransaction: "No maximum",
     claimsStats: [
-      { value: "$1,020.00", label: "Total Paid" },
-      { value: "$1,020.00", label: "Total Submitted" },
+      { value: "$275.00", label: "Total Paid" },
+      { value: "$275.00", label: "Total Submitted" },
       { value: "$0.00", label: "Total Pending" },
-      { value: "$0.00", label: "Total Denied" },
+      { value: "$60.00", label: "Total Denied" },
     ],
     electionAmount: "$2,500.00",
     contributions: [
       { label: "Employer", value: "$0.00" },
-      { label: "My Contribution to Date", value: "$2,500.00" },
+      { label: "My Contribution to Date", value: "$378.80" },
     ],
     status: [
       { label: "Eligible Amount", value: "$2,500.00" },
-      { label: "Estimated Payroll Deductible", value: "$57.69" },
+      { label: "Estimated Payroll Deduction", value: "$75.76" },
     ],
-    transactions: [
-      { merchant: "Pharmacy", date: "4/27/2026", account: "FSA", amount: "$42.50", processedDate: "04/27/2026", description: "Prescription Medicine", planYear: "2026", availableBalance: "$807.50", runningBalance: "$765.00", status: "complete" },
-      { merchant: "CVS Pharmacy", date: "4/25/2026", account: "FSA", amount: "$28.10", processedDate: "04/25/2026", description: "OTC Medicine", planYear: "2026", availableBalance: "$835.60", runningBalance: "$807.50", status: "complete" },
-      { merchant: "Target Store", date: "4/20/2026", account: "FSA", amount: "$34.99", processedDate: "04/20/2026", description: "Health Products", planYear: "2026", availableBalance: "$870.59", runningBalance: "$835.60", status: "complete" },
-      { merchant: "Walgreens Pharmacy", date: "4/18/2026", account: "FSA", amount: "$19.50", processedDate: "04/18/2026", description: "Prescription Medicine", planYear: "2026", availableBalance: "$890.09", runningBalance: "$870.59", status: "complete" },
-      { merchant: "Dr. Smith Family Med", date: "3/18/2026", account: "FSA", amount: "$30.00", processedDate: "03/18/2026", description: "Primary Care Visit", planYear: "2026", availableBalance: "$920.09", runningBalance: "$890.09", status: "complete" },
-    ],
+    transactions: fsaTransactionsData.map((t) => mapConsumerFsaRowToTransactionRow(t, "FSA")),
   },
   dcfsa: {
-    title: "DCFSA",
+    title: "Dependent Care FSA",
     icon: Baby,
-    balanceSubtitle: "DCFSA Available Balance",
-    balance: "$620.00",
+    balanceSubtitle: "Available Balance",
+    balance: "$0.00",
     balanceRows: [
-      { label: "Plan Year", value: "01/01/2026 - 12/31/2026" },
-      { label: "Eligible Amount", value: "$1,500.00" },
-      { label: "Use it or Lose It", value: "$620.00", valueColor: CRITICAL_RED },
-      { label: "File by 3/1/27" },
+      { label: "Plan Year", value: "Jan 1, 2026 - Dec 31, 2026" },
+      { label: "Eligible Amount", value: "$5,000.00" },
+      { label: "Plan Year Balance", value: "$1,153.86" },
+      { label: "File by 3/31/27" },
     ],
     effectiveDate: "January 1, 2026",
     planDuration: "Jan 1, 2026 - Dec 31, 2026",
     finalServiceDate: "December 31, 2026",
-    finalFilingDate: "March 1, 2027",
+    finalFilingDate: "March 31, 2027",
     finalFilingDescription: "Last date to submit claims for the 2026 plan year",
-    debitCardAllowed: "No",
+    debitCardAllowed: "Yes",
     maxPerTransaction: "No maximum",
     claimsStats: [
-      { value: "$880.00", label: "Total Paid" },
-      { value: "$880.00", label: "Total Submitted" },
+      { value: "$1,153.86", label: "Total Paid" },
+      { value: "$1,153.86", label: "Total Submitted" },
       { value: "$0.00", label: "Total Pending" },
       { value: "$0.00", label: "Total Denied" },
     ],
-    electionAmount: "$1,500.00",
+    electionAmount: "$5,000.00",
+    electionAmountLabel: "Annual Election",
     contributions: [
       { label: "Employer", value: "$0.00" },
-      { label: "My Contribution to Date", value: "$1,500.00" },
+      { label: "My Contribution to Date", value: "$1,153.86" },
     ],
     status: [
-      { label: "Eligible Amount", value: "$1,500.00" },
-      { label: "Estimated Payroll Deductible", value: "$192.31" },
+      { label: "Eligible Amount", value: "$5,000.00" },
+      { label: "Estimated Payroll Deduction", value: "$192.31" },
     ],
-    transactions: [
-      { merchant: "Bright Horizons Daycare", date: "4/27/2026", account: "DCFSA", amount: "$185.00", processedDate: "04/27/2026", description: "Childcare", planYear: "2025", availableBalance: "$620.00", runningBalance: "$435.00", status: "complete" },
-      { merchant: "KinderCare", date: "4/22/2026", account: "DCFSA", amount: "$210.00", processedDate: "04/22/2026", description: "Daycare", planYear: "2025", availableBalance: "$830.00", runningBalance: "$620.00", status: "complete" },
-      { merchant: "Camp Discovery", date: "3/10/2026", account: "DCFSA", amount: "$150.00", processedDate: "03/10/2026", description: "Day Camp", planYear: "2025", availableBalance: "$980.00", runningBalance: "$830.00", status: "complete" },
-      { merchant: "Little Stars Preschool", date: "2/15/2026", account: "DCFSA", amount: "$320.00", processedDate: "02/15/2026", description: "Preschool", planYear: "2025", availableBalance: "$1,300.00", runningBalance: "$980.00", status: "complete" },
-      { merchant: "YMCA After School", date: "1/28/2026", account: "DCFSA", amount: "$175.00", processedDate: "01/28/2026", description: "After School Care", planYear: "2025", availableBalance: "$1,475.00", runningBalance: "$1,300.00", status: "complete" },
-    ],
+    transactions: dcfsaTransactionsData.map((t) => mapConsumerFsaRowToTransactionRow(t, "DCFSA")),
   },
 };
 
@@ -735,7 +737,11 @@ export default function AppLpfsaDetail() {
             </span>
           </div>
 
-          <InfoRow label="Elections Amount" value={data.electionAmount} showSeparator={false} />
+          <InfoRow
+            label={data.electionAmountLabel ?? "Election Amount"}
+            value={data.electionAmount}
+            showSeparator={false}
+          />
 
           <ElectionSubCard
             title="Contributions"
@@ -797,7 +803,7 @@ export default function AppLpfsaDetail() {
           </div>
 
           {data.transactions.map((tx, i) => (
-            <div key={`${tx.merchant}-${i}`}>
+            <div key={`${tx.date}-${tx.merchant}-${tx.amount}-${i}`}>
               <div style={{ height: 1, background: SEPARATOR }} />
               <div
                 onClick={() => setSelectedTransaction(tx)}

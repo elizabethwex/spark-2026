@@ -887,7 +887,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
                 >
                   <Sparkles className="h-3.5 w-3.5 text-[#5f6a94]" />
                   <span className="text-[14px] font-semibold leading-[24px] tracking-[-0.084px] text-[#5f6a94]">
-                    WEXly
+                    Assist IQ
                   </span>
                 </button>
               )}
@@ -904,7 +904,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
                 onClick={isDocked ? handleStartNewChat : undefined}
                 className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-[14px] font-bold leading-[24px] text-[#14182c] ${isDocked ? "hover:opacity-80 transition-opacity" : ""}`}
               >
-                {isDocked ? "WEXly" : (chatPhase === "new_chat" ? "New Chat" : currentMessage)}
+                {isDocked ? "Assist IQ" : (chatPhase === "new_chat" ? "New Chat" : currentMessage)}
               </motion.button>
             </AnimatePresence>
 
@@ -971,7 +971,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
                             backgroundClip: "text",
                           }}
                         >
-                          WEXly
+                          Assist IQ
                         </strong>
                         , your Benefits helper. How can I help you today?
                       </p>
@@ -1027,7 +1027,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
                             backgroundClip: "text",
                           }}
                         >
-                          WEXly
+                          Assist IQ
                         </strong>
                         , your Benefits helper. How can I help you today?
                       </p>
@@ -1490,9 +1490,9 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
                   </div>
                 </div>
                 <p className="mt-3 text-center text-[12px] leading-[21px] text-[#515e6c]">
-                  WEXly may make mistakes.{" "}
+                  Assist IQ may make mistakes.{" "}
                   <button type="button" className="underline decoration-solid">
-                    See how WEXly works
+                    See how Assist IQ works
                   </button>
                   .
                 </p>

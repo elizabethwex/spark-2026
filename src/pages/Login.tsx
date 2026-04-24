@@ -533,12 +533,12 @@ export default function Login({ onLoginSuccess }: LoginProps) {
       {/* Main Content */}
       <div className="relative z-10 flex min-h-screen min-h-[100dvh] flex-col">
         {/* Login Card — same top alignment + padding as account selector / linking so fixed bg matches */}
-        <div className="flex flex-1 flex-col items-center justify-start px-4 py-8">
+        <div className="flex flex-1 flex-col items-center px-4 py-8">
           {/* variant="elevated" = large shadow (shadow-lg, hover:shadow-xl) per ben-ui-kit; inline radius overrides kit token */}
           <Card
             variant="elevated"
             className={cn(
-              "w-full overflow-hidden border-0",
+              "my-auto w-full overflow-hidden border-0",
               step === 5 || step === 6 || step === 7 || step === 8 || step === 10 || step === 11
                 ? "max-w-[464px]"
                 : "max-w-[402px]"
