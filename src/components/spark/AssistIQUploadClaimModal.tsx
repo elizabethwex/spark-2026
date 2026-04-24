@@ -675,7 +675,7 @@ export function AssistIQUploadClaimModal({ open, onOpenChange, initialMessage = 
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.8 }}
           onClick={() => onOpenChange(true)}
-          className="fixed bottom-6 right-6 z-[300] flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-[0_4px_20px_rgba(43,49,78,0.15)] hover:scale-105 transition-transform overflow-hidden"
+          className="fixed bottom-6 right-6 z-40 flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-[0_4px_20px_rgba(43,49,78,0.15)] hover:scale-105 transition-transform overflow-hidden"
           aria-label="Resume chat"
         >
           <AssistIQAvatar size={64} />
