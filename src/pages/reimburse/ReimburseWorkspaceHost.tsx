@@ -1,16 +1,5 @@
+import { type Dispatch, type ReactNode, type SetStateAction, useEffect, useMemo, useState } from "react";
 import {
-  type ChangeEvent,
-  type Dispatch,
-  type ReactNode,
-  type SetStateAction,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -21,72 +10,40 @@ import {
   Button,
   Card,
   CardContent,
-  Checkbox,
-  FloatLabel,
-  FloatLabelSelect,
-  Separator,
-  Spinner,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
   Workspace,
 } from "@wexinc-healthbenefits/ben-ui-kit";
-import type { Step } from "@wexinc-healthbenefits/ben-ui-kit";
-import {
-  ArrowRight,
-  Banknote,
-  Check,
-  CheckCircle2,
-  Clock,
-  FileText,
-  Info,
-  Mail,
-  Plus,
-  ShieldCheck,
-  Trash2,
-  Upload,
-  X,
-  Zap,
-} from "lucide-react";
+import { ArrowRight, CheckCircle2, Mail, Plus, X, Zap } from "lucide-react";
 import { useReimburseWorkspace } from "@/context/ReimburseWorkspaceContext";
 import type { ReimburseWorkspaceStep } from "@/context/ReimburseWorkspaceContext";
-import { ReimburseDocumentationHelpDialog } from "@/pages/reimburse/ReimburseDocumentationHelpDialog";
-import confetti from "canvas-confetti";
-
-// ─── Types ──────────────────────────────────────────────────────────────────────
-type PlanId = "health-fsa" | "dependent-care-fsa";
-type DestinationId = "bank" | "check" | "instant";
-type ValidationState = "pass" | "needs-info" | "doc-required";
-
-interface UploadedDoc {
-  name: string;
-  size: string;
-  isDummy?: boolean;
-}
-
-interface ClaimData {
-  amount: string;
-  serviceDateStart: string;
-  serviceDateEnd: string;
-  provider: string;
-  category: string;
-  patient: string;
-}
-
-/** Extracted receipt row; eligibility is inferred from plan rules in this prototype. */
-interface ReceiptLineItem {
-  id: string;
-  description: string;
-  /** Dollar amount for this line */
-  amount: number;
-  eligible: boolean;
-  selected: boolean;
-}
+import { SendPaymentWorkspaceSession } from "@/pages/reimburse/SendPaymentWorkspaceHost";
+import {
+  AccountStep,
+  ConfirmationStep,
+  CustomStepper,
+  DetailsStep,
+  type DestinationId,
+  type PlanId,
+  PLAN_LABELS,
+  ProcessingStep,
+  REIMBURSE_FLOW_STEPS,
+  type ReceiptLineItem,
+  type UploadedDoc,
+  type ClaimData,
+  type ValidationState,
+  WorkspaceUploadStartStep,
+  createDefaultReceiptLineItems,
+  fmtDate,
+  sumSelectedReceiptLines,
+  toReimburseStepperId,
+  usd,
+  validationStatusFromState,
+} from "@/pages/reimburse/reimburseWorkspaceShared";
 
 interface ReimburseFlowState {
   step: ReimburseWorkspaceStep;
   uploadedDocs: UploadedDoc[];
   entryMode: "upload" | "manual" | "no-doc";
+  autoAnalyze: boolean;
   selectedPlan: PlanId;
   destination: DestinationId;
   processingStep: number;
@@ -95,52 +52,12 @@ interface ReimburseFlowState {
   receiptLineItems: ReceiptLineItem[];
 }
 
-// ─── Stepper steps (matches screenshot) ─────────────────────────────────────────
-const FLOW_STEPS: Step[] = [
-  { id: "upload",   label: "Upload Documentation" },
-  { id: "analyze",  label: "Analyze Documentation" },
-  { id: "account",  label: "Select Plans" },
-  { id: "details",  label: "Confirm Details" },
-  { id: "transfer", label: "Transfer Method" },
-  { id: "review",   label: "Review" },
-];
-
-function toStepperId(step: ReimburseWorkspaceStep): string {
-  const map: Partial<Record<ReimburseWorkspaceStep, string>> = {
-    start:        "upload",
-    processing:   "analyze",
-    account:      "account",
-    review:       "details",
-    manual:       "details",
-    destination:  "transfer",
-    validation:   "review",
-    confirmation: "review",
-  };
-  return map[step] ?? "upload";
-}
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────────
-function sumSelectedReceiptLines(lines: ReceiptLineItem[]): string {
-  const total = lines.filter((l) => l.selected).reduce((s, l) => s + l.amount, 0);
-  return total.toFixed(2);
-}
-
-/** Mock extraction aligned with Health FSA rules: medical care eligible; supplements & parking not. */
-function createDefaultReceiptLineItems(): ReceiptLineItem[] {
-  return [
-    { id: "line-1", description: "ATORVASTATIN 10MG", amount: 20.00, eligible: true, selected: true },
-    { id: "line-2", description: "LISINOPRIL 20MG", amount: 35.00, eligible: true, selected: true },
-    { id: "line-3", description: "RX AMORICIL 500MG", amount: 12.45, eligible: true, selected: true },
-    { id: "line-4", description: "ORBIT GUM 14PC", amount: 1.89, eligible: false, selected: false },
-    { id: "line-5", description: "DIET COKE 20OZ", amount: 2.39, eligible: false, selected: false },
-  ];
-}
-
 function createInitialState(step: ReimburseWorkspaceStep): ReimburseFlowState {
   return {
     step,
     uploadedDocs: [],
     entryMode: "upload",
+    autoAnalyze: true,
     selectedPlan: "health-fsa",
     destination: "bank",
     processingStep: 0,
@@ -157,107 +74,29 @@ function createInitialState(step: ReimburseWorkspaceStep): ReimburseFlowState {
   };
 }
 
-function validationStatusFromState(s: ReimburseFlowState): ValidationState {
-  if (
-    !s.claim.amount ||
-    !s.claim.serviceDateStart ||
-    !s.claim.serviceDateEnd ||
-    !s.claim.category
-  ) {
-    return "needs-info";
-  }
-  if (s.uploadedDocs.length === 0 && Number.parseFloat(s.claim.amount) > 100) return "doc-required";
-  return "pass";
-}
-
-function usd(amount: string) {
-  return Number.parseFloat(amount || "0").toLocaleString("en-US", {
-    style: "currency",
-    currency: "USD",
-  });
-}
-
-function fmtDate(isoDate: string) {
-  if (!isoDate) return "—";
-  const [y, m, d] = isoDate.split("-");
-  return `${m}/${d}/${y}`;
-}
-
-const CATEGORIES = [
-  { value: "physical-therapy", label: "Physical therapy" },
-  { value: "medical",          label: "Medical / Doctor visit" },
-  { value: "dental",           label: "Dental" },
-  { value: "vision",           label: "Vision / Eye care" },
-  { value: "pharmacy",         label: "Pharmacy / Prescription" },
-  { value: "mental-health",    label: "Mental health" },
-  { value: "other",            label: "Other medical" },
-];
-
-function CustomStepper({ steps, currentStepId }: { steps: Step[], currentStepId: string }) {
-  const currentIndex = steps.findIndex(s => s.id === currentStepId);
-
-  return (
-    <div
-      className="flex h-full min-h-0 min-w-0 w-full flex-1 flex-col gap-[24px] overflow-x-hidden bg-[var(--neutral-50)] p-6"
-    >
-      {steps.map((step, index) => {
-        const isCompleted = index < currentIndex;
-        const isActive = index === currentIndex;
-        const isLast = index === steps.length - 1;
-
-        return (
-          <div key={step.id} className="relative flex min-w-0 w-full flex-col gap-[16px] items-start">
-            <div className="relative z-10 flex min-w-0 w-full items-center gap-[12px]">
-              {/* Circle */}
-              <div className={`
-                flex items-center justify-center w-[24px] h-[24px] rounded-full text-[14px] shrink-0
-                ${isActive ? 'border border-[#0058a3] text-[#0058a3] font-semibold bg-transparent' : ''}
-                ${isCompleted ? 'border border-[#009b89] text-[#009b89] font-semibold bg-transparent' : ''}
-                ${!isActive && !isCompleted ? 'bg-[#e4e6e9] text-[#7c858e] font-medium' : ''}
-              `}>
-                {isCompleted ? (
-                  <Check className="h-4 w-4" strokeWidth={2} />
-                ) : (
-                  index + 1
-                )}
-              </div>
-              
-              {/* Label */}
-              <span className={`
-                min-w-0 flex-1 text-[14px] leading-snug tracking-[-0.084px] break-words
-                ${isActive ? 'font-semibold text-[#243746]' : 'font-medium text-[#7c858e]'}
-              `}>
-                {step.label}
-              </span>
-            </div>
-
-            {/* Vertical line */}
-            {!isLast && (
-              <div 
-                className="absolute left-[11.5px] top-[24px] h-[24px] w-[1px] bg-[#e4e6e9]"
-              />
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-// ─── Main export ──────────────────────────────────────────────────────────────────
 export function ReimburseWorkspaceHost() {
-  const { isOpen, initialStep, sessionKey, closeReimburseWorkspace } = useReimburseWorkspace();
+  const { isOpen, activeWorkspace, initialStep, sessionKey, closeReimburseWorkspace } = useReimburseWorkspace();
   if (!isOpen) return null;
+
+  if (activeWorkspace === "sendPayment") {
+    return (
+      <SendPaymentWorkspaceSession
+        key={`send-${sessionKey}-${initialStep}`}
+        initialStep={initialStep}
+        onClose={closeReimburseWorkspace}
+      />
+    );
+  }
+
   return (
     <ReimburseWorkspaceSession
-      key={`${sessionKey}-${initialStep}`}
+      key={`reimburse-${sessionKey}-${initialStep}`}
       initialStep={initialStep}
       onClose={closeReimburseWorkspace}
     />
   );
 }
 
-// ─── Session ──────────────────────────────────────────────────────────────────────
 function ReimburseWorkspaceSession({
   initialStep,
   onClose,
@@ -280,7 +119,6 @@ function ReimburseWorkspaceSession({
     }
   };
 
-  // Auto-advance through processing
   useEffect(() => {
     if (state.step !== "processing") return;
 
@@ -320,12 +158,17 @@ function ReimburseWorkspaceSession({
     };
   }, [state.step]);
 
-  // ── Stepper sidebar ────────────────────────────────────────────────────────────
   const stepperContent = (
-    <CustomStepper steps={FLOW_STEPS} currentStepId={toStepperId(state.step)} />
+    <CustomStepper
+      steps={REIMBURSE_FLOW_STEPS}
+      currentStepId={toReimburseStepperId(state.step)}
+      skippedStepIds={[
+        ...(state.entryMode === "no-doc" ? ["upload"] : []),
+        ...(!state.autoAnalyze ? ["analyze"] : []),
+      ]}
+    />
   );
 
-  // ── Footer buttons per step ───────────────────────────────────────────────────
   let primaryBtn: ReactNode = null;
   let secondaryBtn: ReactNode = null;
   let tertiaryBtn: ReactNode = null;
@@ -348,7 +191,27 @@ function ReimburseWorkspaceSession({
       <Button
         intent="primary"
         disabled={state.uploadedDocs.length === 0}
-        onClick={() => setState((prev) => ({ ...prev, step: "processing", processingStep: 1 }))}
+        onClick={() =>
+          setState((prev) => {
+            if (prev.autoAnalyze) {
+              return { ...prev, step: "processing", processingStep: 1 };
+            }
+            return {
+              ...prev,
+              step: "account",
+              processingStep: 0,
+              receiptLineItems: [],
+              claim: {
+                amount: "",
+                serviceDateStart: "",
+                serviceDateEnd: "",
+                provider: "",
+                category: "",
+                patient: "",
+              },
+            };
+          })
+        }
         className="px-4 py-2"
       >
         Continue
@@ -365,7 +228,7 @@ function ReimburseWorkspaceSession({
         Continue
       </Button>
     );
-  } else if (state.step === "review" || state.step === "manual") {
+  } else if (state.step === "review") {
     const canContinue = !!(
       state.claim.amount &&
       state.claim.serviceDateStart &&
@@ -376,19 +239,14 @@ function ReimburseWorkspaceSession({
       <Button
         intent="secondary"
         variant="outline"
-        onClick={() => goTo(state.step === "manual" ? "start" : "account")}
+        onClick={() => goTo("account")}
         className="px-4 py-2"
       >
         Back
       </Button>
     );
     primaryBtn = (
-      <Button
-        intent="primary"
-        disabled={!canContinue}
-        onClick={() => goTo("destination")}
-        className="px-4 py-2"
-      >
+      <Button intent="primary" disabled={!canContinue} onClick={() => goTo("destination")} className="px-4 py-2">
         Continue
       </Button>
     );
@@ -397,7 +255,7 @@ function ReimburseWorkspaceSession({
       <Button
         intent="secondary"
         variant="outline"
-        onClick={() => goTo(state.entryMode === "upload" ? "review" : "manual")}
+        onClick={() => goTo(state.entryMode === "upload" && state.autoAnalyze ? "review" : "review")}
         className="px-4 py-2"
       >
         Back
@@ -420,12 +278,7 @@ function ReimburseWorkspaceSession({
     );
   } else if (state.step === "validation") {
     secondaryBtn = (
-      <Button
-        intent="secondary"
-        variant="outline"
-        onClick={() => goTo("destination")}
-        className="px-4 py-2"
-      >
+      <Button intent="secondary" variant="outline" onClick={() => goTo("destination")} className="px-4 py-2">
         Back
       </Button>
     );
@@ -457,14 +310,13 @@ function ReimburseWorkspaceSession({
     );
   }
 
-  // ── Summary rows ──────────────────────────────────────────────────────────────
   const summaryRows = useMemo(
     () => [
-      { label: "Amount",                value: state.claim.amount ? usd(state.claim.amount) : "$0.00" },
+      { label: "Amount", value: state.claim.amount ? usd(state.claim.amount) : "—" },
       { label: "Start date of service", value: fmtDate(state.claim.serviceDateStart) },
-      { label: "End date of service",   value: fmtDate(state.claim.serviceDateEnd) },
-      { label: "Provider",              value: state.claim.provider || "—" },
-      { label: "Account",      value: state.selectedPlan === "health-fsa" ? "Health FSA" : "Dependent Care FSA" },
+      { label: "End date of service", value: fmtDate(state.claim.serviceDateEnd) },
+      { label: "Provider", value: state.claim.provider || "—" },
+      { label: "Account", value: state.selectedPlan === "health-fsa" ? "Health FSA" : "Dependent Care FSA" },
       {
         label: "Destination",
         value:
@@ -498,20 +350,14 @@ function ReimburseWorkspaceSession({
         tertiaryButton={tertiaryBtn}
       >
         {state.step === "start" && (
-          <StartStep state={state} setState={setState} />
+          <WorkspaceUploadStartStep variant="reimburse" state={state} setState={setState} />
         )}
-        {state.step === "processing" && (
-          <ProcessingStep processingStep={state.processingStep} />
-        )}
-        {state.step === "account" && (
-          <AccountStep state={state} setState={setState} />
-        )}
-        {(state.step === "review" || state.step === "manual") && (
+        {state.step === "processing" && <ProcessingStep processingStep={state.processingStep} />}
+        {state.step === "account" && <AccountStep state={state} setState={setState} />}
+        {state.step === "review" && (
           <DetailsStep state={state} setState={setState} />
         )}
-        {state.step === "destination" && (
-          <DestinationStep state={state} setState={setState} />
-        )}
+        {state.step === "destination" && <DestinationStep state={state} setState={setState} />}
         {state.step === "validation" && (
           <ValidationStep
             state={state}
@@ -520,11 +366,10 @@ function ReimburseWorkspaceSession({
           />
         )}
         {state.step === "confirmation" && (
-          <ConfirmationStep summaryRows={summaryRows} />
+          <ConfirmationStep variant="reimburse" summaryRows={summaryRows} />
         )}
       </Workspace>
 
-      {/* Cancel confirmation dialog */}
       <AlertDialog open={isCancelDialogOpen} onOpenChange={setIsCancelDialogOpen}>
         <AlertDialogContent className="w-[448px] p-0">
           <div className="flex items-center justify-between p-[17.5px]">
@@ -572,703 +417,6 @@ function ReimburseWorkspaceSession({
   );
 }
 
-// ─── Step 1: Upload Documentation ────────────────────────────────────────────────
-function StartStep({
-  state,
-  setState,
-}: {
-  state: ReimburseFlowState;
-  setState: Dispatch<SetStateAction<ReimburseFlowState>>;
-}) {
-  const [docsHelpOpen, setDocsHelpOpen] = useState(false);
-  const hasDocs = state.uploadedDocs.length > 0;
-
-  const handleSimulateUpload = () =>
-    setState((prev) => ({
-      ...prev,
-      entryMode: "upload",
-      uploadedDocs: [
-        ...prev.uploadedDocs,
-        { name: "CVS_Pharmacy_receipt.jpg", size: "1.2 MB", isDummy: true },
-      ],
-    }));
-
-  const handleRemoveDoc = (index: number) =>
-    setState((prev) => ({
-      ...prev,
-      uploadedDocs: prev.uploadedDocs.filter((_, i) => i !== index),
-    }));
-
-  return (
-    <>
-      <ReimburseDocumentationHelpDialog open={docsHelpOpen} onOpenChange={setDocsHelpOpen} />
-      <div className="flex justify-center pt-10 px-8 pb-10">
-      <div className="w-full max-w-[480px] flex flex-col gap-5">
-        {/* Page header */}
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Reimburse myself</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Submit an out-of-pocket expense for reimbursement.
-          </p>
-        </div>
-
-        {/* Upload / uploaded card */}
-        <Card className="overflow-hidden">
-          {!hasDocs ? (
-            <CardContent className="flex flex-col items-center gap-4 py-10 px-8 text-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-neutral-50">
-                <Upload className="h-6 w-6 text-neutral-700" strokeWidth={1.5} />
-              </div>
-              <div className="flex flex-col gap-1">
-                <p className="font-semibold text-foreground">Upload a receipt</p>
-                <p className="text-sm text-muted-foreground">
-                  You'll review everything before submitting.
-                </p>
-              </div>
-              <Button intent="primary" className="w-full" onClick={handleSimulateUpload}>
-                Upload Document
-              </Button>
-            </CardContent>
-          ) : (
-            <CardContent className="p-6 flex flex-col gap-4">
-              <p className="text-[13px] font-semibold uppercase tracking-[0.5px] text-[#5e6a75] mb-1">
-                Uploaded document(s)
-              </p>
-              <div className="flex flex-col gap-3">
-                {state.uploadedDocs.map((doc, i) => (
-                  <div
-                    key={`${doc.name}-${i}`}
-                    className="relative rounded-lg overflow-hidden border border-[#e4e6e9] bg-white h-[180px]"
-                  >
-                    {doc.isDummy ? (
-                      <DummyReceiptPreview />
-                    ) : (
-                      <div className="w-full h-full flex flex-col items-center justify-center gap-2 bg-secondary/40">
-                        <FileText className="h-6 w-6 text-muted-foreground" />
-                        <p className="text-sm font-medium text-foreground truncate max-w-[200px]">
-                          {doc.name}
-                        </p>
-                        <p className="text-xs text-muted-foreground">{doc.size}</p>
-                      </div>
-                    )}
-                    <button
-                      onClick={() => handleRemoveDoc(i)}
-                      className="absolute bottom-3 left-3 h-10 w-10 rounded-md border border-[#e4e6e9] bg-white shadow-sm flex items-center justify-center hover:bg-gray-50 transition-colors"
-                      aria-label="Remove document"
-                    >
-                      <Trash2 className="h-[18px] w-[18px] text-[#c8102e]" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-              <button
-                onClick={handleSimulateUpload}
-                className="flex items-center gap-1.5 text-[15px] font-semibold text-[#0055a5] hover:underline mt-2"
-              >
-                <Plus className="h-4 w-4" strokeWidth={2.5} />
-                Add another document
-              </button>
-            </CardContent>
-          )}
-        </Card>
-
-        {/* What documents link */}
-        <div className="flex justify-center">
-          <button
-            type="button"
-            className="flex items-center gap-1.5 text-sm text-primary hover:underline underline-offset-2"
-            onClick={() => setDocsHelpOpen(true)}
-          >
-            <FileText className="h-4 w-4" />
-            What documents work best?
-          </button>
-        </div>
-
-        <Separator />
-
-        <div className="flex justify-center">
-          <button
-            type="button"
-            className="text-sm font-semibold text-foreground hover:underline underline-offset-2 transition-colors"
-            onClick={() =>
-              setState((prev) => ({ ...prev, entryMode: "no-doc", step: "manual" }))
-            }
-          >
-            I don't have documentation
-          </button>
-        </div>
-      </div>
-      </div>
-    </>
-  );
-}
-
-function DummyReceiptPreview() {
-  return (
-    <div className="w-full h-full overflow-hidden bg-[#e4e6e9] flex items-center justify-center">
-      <img src={`${import.meta.env.BASE_URL}reimburse-docs/cvs-receipt.png`} alt="Receipt preview" className="object-cover w-full h-full" />
-    </div>
-  );
-}
-
-// ─── Step 2: Analyze Documentation ───────────────────────────────────────────────
-const PROCESSING_STEPS = [
-  { label: "Uploading",                 detail: "Sending your document securely" },
-  { label: "Reading your document",     detail: "Identifying text and layout" },
-  { label: "Finding date and total",    detail: "Extracting key details" },
-  { label: "Preparing details to review", detail: "Almost ready for you" },
-];
-
-function ProcessingStep({ processingStep }: { processingStep: number }) {
-  return (
-    <div className="flex justify-center pt-16 pb-16 px-8">
-      <div className="w-full max-w-md flex flex-col gap-8">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-foreground">Getting your claim ready</h1>
-          <p className="text-sm text-muted-foreground mt-1">This usually takes a few seconds.</p>
-        </div>
-
-        <Card>
-          <CardContent className="p-8 flex flex-col gap-5">
-            {PROCESSING_STEPS.map((step, i) => {
-              const isDone   = processingStep > i + 1;
-              const isActive = processingStep === i + 1;
-              return (
-                <div key={step.label} className="flex items-start gap-4">
-                  <div className="flex-shrink-0 mt-0.5">
-                    {isDone ? (
-                      <CheckCircle2 className="h-5 w-5 text-success" />
-                    ) : isActive ? (
-                      <Spinner className="h-5 w-5" />
-                    ) : (
-                      <div className="h-5 w-5 rounded-full border-2 border-border" />
-                    )}
-                  </div>
-                  <div>
-                    <p
-                      className={`text-sm font-medium ${
-                        !isDone && !isActive ? "text-muted-foreground" : "text-foreground"
-                      }`}
-                    >
-                      {step.label}
-                    </p>
-                    {isActive && (
-                      <p className="text-xs text-muted-foreground mt-0.5 animate-pulse">
-                        {step.detail}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-            {processingStep >= PROCESSING_STEPS.length && (
-              <div className="flex items-center gap-2 text-sm text-success bg-success/10 rounded-lg py-3 px-4">
-                <CheckCircle2 className="h-4 w-4" />
-                Details ready — choosing account…
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <p className="text-center text-xs text-muted-foreground">
-          You'll be able to review and edit everything before submitting.
-        </p>
-      </div>
-    </div>
-  );
-}
-
-// ─── Step 3: Select Plans ─────────────────────────────────────────────────────────
-interface AccountOption {
-  id: PlanId;
-  name: string;
-  balance: number;
-  autoSelected?: boolean;
-  planYearStart: string;
-  planYearEnd: string;
-  finalFilingDate: string;
-  finalServiceDate: string;
-}
-
-const SOURCE_ACCOUNTS: AccountOption[] = [
-  {
-    id: "health-fsa",
-    name: "Health FSA",
-    balance: 850,
-    autoSelected: true,
-    planYearStart: "01/01/2026",
-    planYearEnd: "12/31/2026",
-    finalFilingDate: "04/30/2027",
-    finalServiceDate: "12/31/2026",
-  },
-  {
-    id: "dependent-care-fsa",
-    name: "Dependent Care FSA",
-    balance: 2100,
-    planYearStart: "01/01/2026",
-    planYearEnd: "12/31/2026",
-    finalFilingDate: "04/30/2027",
-    finalServiceDate: "12/31/2026",
-  },
-];
-
-function AccountStep({
-  state,
-  setState,
-}: {
-  state: ReimburseFlowState;
-  setState: Dispatch<SetStateAction<ReimburseFlowState>>;
-}) {
-  const claimAmount = Number.parseFloat(state.claim.amount || "127.43");
-
-  return (
-    <div className="flex justify-center pt-10 px-8 pb-10">
-      <div className="w-full max-w-[480px] flex flex-col gap-6">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">
-            Choose the account to reimburse from
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Based on your receipt, we've recommended the best match. You can change it if needed.
-          </p>
-        </div>
-
-        {/* Claim amount pill */}
-        <div className="inline-flex items-center gap-2 text-sm text-neutral-700 bg-neutral-100 rounded-lg px-3 py-2 w-fit">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                type="button"
-                className="shrink-0 rounded-full text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                aria-label="About claim amount"
-              >
-                <Info className="h-3.5 w-3.5 text-current" aria-hidden />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent side="top" className="max-w-sm text-left">
-              <p className="text-sm">
-                This amount was detected from your uploaded document. You can update it on the review
-                screen if needed.
-              </p>
-            </TooltipContent>
-          </Tooltip>
-          Claim amount:{" "}
-          <span className="font-semibold text-foreground">
-            {usd(state.claim.amount || "127.43")}*
-          </span>
-        </div>
-
-        {state.selectedPlan === "dependent-care-fsa" && (
-          <Alert intent="warning">
-            <Info className="h-4 w-4" />
-            <AlertTitle>Plan mismatch</AlertTitle>
-            <AlertDescription>
-              By selecting this plan, your claim could be denied as the items in your document aren't
-              best suited for this plan type.
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {/* Account cards */}
-        <div className="flex flex-col gap-3" role="radiogroup" aria-label="Benefit accounts">
-          {SOURCE_ACCOUNTS.map((acct) => {
-            const isSelected = state.selectedPlan === acct.id;
-            const acctLow    = acct.balance < claimAmount;
-            return (
-              <button
-                key={acct.id}
-                role="radio"
-                aria-checked={isSelected}
-                type="button"
-                onClick={() => setState((prev) => ({ ...prev, selectedPlan: acct.id }))}
-                className={`w-full text-left p-5 rounded-2xl border-2 transition-all ${
-                  acctLow && isSelected
-                    ? "border-amber-400 bg-amber-50/40"
-                    : isSelected
-                      ? "border-primary bg-white"
-                      : "border-border/60 bg-white hover:border-border"
-                }`}
-              >
-                {/* Name + badge + radio */}
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-base font-bold text-foreground">{acct.name}</span>
-                    {acct.autoSelected && (
-                      <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-[12px] bg-primary/10 text-primary text-[11px] font-semibold leading-none whitespace-nowrap">
-                        Best match
-                      </span>
-                    )}
-                  </div>
-                  <div
-                    className={`mt-0.5 h-5 w-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${
-                      isSelected ? "border-primary" : "border-muted-foreground/40"
-                    }`}
-                  >
-                    {isSelected && <div className="h-2.5 w-2.5 rounded-full bg-primary" />}
-                  </div>
-                </div>
-
-                {/* Balance */}
-                <p
-                  className={`text-2xl font-bold mt-2 mb-3 ${
-                    acctLow ? "text-amber-600" : "text-foreground"
-                  }`}
-                >
-                  {usd(String(acct.balance))}
-                  {acctLow && (
-                    <span className="ml-2 text-xs font-normal text-amber-600">
-                      · May not cover full amount
-                    </span>
-                  )}
-                </p>
-
-                {/* Dates */}
-                <div className="space-y-1 text-sm text-muted-foreground">
-                  <p className="flex items-center gap-2">
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <span
-                          role="button"
-                          tabIndex={0}
-                          className="inline-flex shrink-0 cursor-help rounded-full text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                          aria-label="What is final filing date?"
-                          onClick={(e) => e.stopPropagation()}
-                          onPointerDown={(e) => e.stopPropagation()}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" || e.key === " ") e.stopPropagation();
-                          }}
-                        >
-                          <Info className="h-3.5 w-3.5 text-current" aria-hidden />
-                        </span>
-                      </TooltipTrigger>
-                      <TooltipContent side="top" className="max-w-sm text-left">
-                        <p className="text-sm">
-                          The final filing date is the paperwork deadline — it is the very last day you
-                          are allowed to submit a claim and upload your documentation to get reimbursed
-                          for the expenses you incurred.
-                        </p>
-                      </TooltipContent>
-                    </Tooltip>
-                    <span>
-                      <span className="font-medium text-foreground/80">Final Filing Date:</span>{" "}
-                      {acct.finalFilingDate}
-                    </span>
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <span
-                          role="button"
-                          tabIndex={0}
-                          className="inline-flex shrink-0 cursor-help rounded-full text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                          aria-label="What is final service date?"
-                          onClick={(e) => e.stopPropagation()}
-                          onPointerDown={(e) => e.stopPropagation()}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" || e.key === " ") e.stopPropagation();
-                          }}
-                        >
-                          <Info className="h-3.5 w-3.5 text-current" aria-hidden />
-                        </span>
-                      </TooltipTrigger>
-                      <TooltipContent side="top" className="max-w-sm text-left">
-                        <p className="text-sm">
-                          The final service date is the absolute last day you can actually receive a medical
-                          service, purchase an item, or incur an eligible expense that will be covered by
-                          your current plan year&apos;s funds.
-                        </p>
-                      </TooltipContent>
-                    </Tooltip>
-                    <span>
-                      <span className="font-medium text-foreground/80">Final Service Date:</span>{" "}
-                      {acct.finalServiceDate}
-                    </span>
-                  </p>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Step 4: Confirm Details ──────────────────────────────────────────────────────
-function DetailsStep({
-  state,
-  setState,
-}: {
-  state: ReimburseFlowState;
-  setState: Dispatch<SetStateAction<ReimburseFlowState>>;
-}) {
-  const isManual = state.step === "manual";
-  const isNoDoc  = state.entryMode === "no-doc";
-
-  const hasIneligibleSelected = useMemo(
-    () => state.receiptLineItems.some((item) => !item.eligible && item.selected),
-    [state.receiptLineItems]
-  );
-
-  const selectedReceiptTotal = useMemo(() => {
-    const sum = state.receiptLineItems
-      .filter((l) => l.selected)
-      .reduce((s, l) => s + l.amount, 0);
-    return sum.toFixed(2);
-  }, [state.receiptLineItems]);
-
-  const updateClaim = (update: Partial<ClaimData>) =>
-    setState((prev) => ({ ...prev, claim: { ...prev.claim, ...update } }));
-
-  const setReceiptLineSelected = (id: string, selected: boolean) => {
-    setState((prev) => {
-      const receiptLineItems = prev.receiptLineItems.map((item) =>
-        item.id === id ? { ...item, selected } : item
-      );
-      return {
-        ...prev,
-        receiptLineItems,
-        claim: {
-          ...prev.claim,
-          amount: sumSelectedReceiptLines(receiptLineItems),
-        },
-      };
-    });
-  };
-
-  /** Keep end in sync with start while they still match (default single-day service). */
-  const handleStartDateChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const next = e.target.value;
-    setState((prev) => {
-      const { serviceDateStart: prevStart, serviceDateEnd: prevEnd } = prev.claim;
-      const stillPaired = !prevEnd || prevEnd === prevStart;
-      return {
-        ...prev,
-        claim: {
-          ...prev.claim,
-          serviceDateStart: next,
-          serviceDateEnd: stillPaired ? next : prevEnd,
-        },
-      };
-    });
-  };
-
-  return (
-    <div className="flex h-full">
-      {/* Left: scrollable form */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="max-w-[520px] mx-auto px-8 py-8 flex flex-col gap-5">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">
-              {isManual ? "Enter claim details" : "Review claim details"}
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              {isManual
-                ? "You can add documentation now or later."
-                : "Confirm what we found. You can edit anything before submitting."}
-            </p>
-          </div>
-
-          {isNoDoc && (
-            <Alert intent="info">
-              <Info className="h-4 w-4" />
-              <AlertTitle>No documentation? That's okay.</AlertTitle>
-              <AlertDescription>
-                You can submit without documentation. If required, we'll notify you.
-              </AlertDescription>
-            </Alert>
-          )}
-
-          {!isManual && state.uploadedDocs.length > 0 && (
-            <Alert intent="info">
-              <Info className="h-4 w-4" />
-              <AlertDescription>
-                We extracted these details from your document — please review and confirm.
-              </AlertDescription>
-            </Alert>
-          )}
-
-          <Card>
-            <CardContent className="p-6 flex flex-col gap-5">
-              <h2 className="text-lg font-semibold text-foreground">Claim details</h2>
-              <FloatLabel
-                label="Total amount"
-                type="number"
-                step="0.01"
-                value={state.claim.amount}
-                onChange={(e) => updateClaim({ amount: e.target.value })}
-              />
-              <FloatLabel
-                label="Start date of service"
-                type="date"
-                value={state.claim.serviceDateStart}
-                onChange={handleStartDateChange}
-              />
-              <FloatLabel
-                label="End date of service"
-                type="date"
-                value={state.claim.serviceDateEnd}
-                onChange={(e) => updateClaim({ serviceDateEnd: e.target.value })}
-              />
-              <FloatLabel
-                label="Provider / merchant name"
-                type="text"
-                value={state.claim.provider}
-                onChange={(e) => updateClaim({ provider: e.target.value })}
-              />
-              <FloatLabelSelect
-                value={state.claim.category}
-                onValueChange={(v) => updateClaim({ category: v })}
-              >
-                <FloatLabelSelect.Trigger label="Category / service type">
-                  <FloatLabelSelect.Value placeholder=" " />
-                </FloatLabelSelect.Trigger>
-                <FloatLabelSelect.Content>
-                  {CATEGORIES.map((c) => (
-                    <FloatLabelSelect.Item key={c.value} value={c.value}>
-                      {c.label}
-                    </FloatLabelSelect.Item>
-                  ))}
-                </FloatLabelSelect.Content>
-              </FloatLabelSelect>
-
-              <FloatLabelSelect
-                value={state.claim.patient}
-                onValueChange={(v) => updateClaim({ patient: v })}
-              >
-                <FloatLabelSelect.Trigger label="Patient">
-                  <FloatLabelSelect.Value placeholder=" " />
-                </FloatLabelSelect.Trigger>
-                <FloatLabelSelect.Content>
-                  <FloatLabelSelect.Item value="self">Self</FloatLabelSelect.Item>
-                  <FloatLabelSelect.Item value="spouse">Spouse</FloatLabelSelect.Item>
-                  <FloatLabelSelect.Item value="dependent">Dependent</FloatLabelSelect.Item>
-                </FloatLabelSelect.Content>
-              </FloatLabelSelect>
-            </CardContent>
-          </Card>
-
-          {state.receiptLineItems.length > 0 && (
-            <Card className="shadow-sm border-border/80">
-              <CardContent className="p-6 flex flex-col gap-4">
-                <div>
-                  <h2 className="text-base font-semibold text-[#243746] tracking-tight">
-                    Items found on your receipt
-                  </h2>
-                  <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">
-                    We found these items on your receipt. Items that look eligible are selected. You can
-                    include any item or add one manually.
-                  </p>
-                </div>
-
-                {hasIneligibleSelected && (
-                  <Alert intent="warning">
-                    <Info className="h-4 w-4" />
-                    <AlertTitle>Ineligible items selected</AlertTitle>
-                    <AlertDescription>
-                      By selecting an item that is not eligible under your plan, this claim will not be
-                      auto-approved and may be denied completely.
-                    </AlertDescription>
-                  </Alert>
-                )}
-
-                <div className="flex flex-col rounded-lg border border-border/60 divide-y divide-border bg-card">
-                  {state.receiptLineItems.map((item) => (
-                    <div
-                      key={item.id}
-                      className="flex items-center gap-3 px-3 py-3 sm:gap-4 sm:px-4"
-                    >
-                      <Checkbox
-                        checkboxSize="md"
-                        checked={item.selected}
-                        disabled={!item.eligible}
-                        onCheckedChange={(c) => {
-                          if (c === "indeterminate") return;
-                          setReceiptLineSelected(item.id, c === true);
-                        }}
-                        aria-label={`Include ${item.description}`}
-                      />
-                      <span className={`flex-1 min-w-0 text-sm font-medium ${!item.eligible ? "text-muted-foreground" : "text-foreground"}`}>
-                        {item.description}
-                      </span>
-                      <div
-                        className={`inline-flex items-center gap-[3.5px] px-[7px] py-[3.5px] rounded-[12px] shrink-0 ${
-                          item.eligible
-                            ? "bg-[#dcfce7] text-[#008375]"
-                            : "bg-[#ffecc7] text-[#b37a2b] opacity-75"
-                        }`}
-                      >
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <span
-                              role="button"
-                              tabIndex={0}
-                              className="cursor-help flex items-center outline-none"
-                              onClick={(e) => e.stopPropagation()}
-                              onPointerDown={(e) => e.stopPropagation()}
-                              onKeyDown={(e) => e.stopPropagation()}
-                            >
-                              <Info className="h-[10.5px] w-[10.5px] text-current" strokeWidth={2.5} aria-hidden />
-                            </span>
-                          </TooltipTrigger>
-                          <TooltipContent side="top" className="max-w-xs text-left">
-                            <p className="text-sm">
-                              {item.eligible
-                                ? "This item is considered an eligible expense under your current plan."
-                                : "This item is not covered by your current plan and cannot be reimbursed."}
-                            </p>
-                          </TooltipContent>
-                        </Tooltip>
-                        <span className="text-[11px] font-semibold leading-none whitespace-nowrap">
-                          {item.eligible ? "Eligible" : "Ineligible"}
-                        </span>
-                      </div>
-                      <span className={`shrink-0 text-sm font-semibold tabular-nums w-[4.5rem] text-right ${!item.eligible ? "text-muted-foreground" : "text-foreground"}`}>
-                        {usd(String(item.amount))}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-
-                <Separator />
-
-                <div className="flex items-center justify-between text-sm font-semibold text-foreground">
-                  <span>Selected total:</span>
-                  <span className="tabular-nums">{usd(selectedReceiptTotal)}</span>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-      </div>
-
-      {/* Right: sticky receipt preview (upload path, large screens) */}
-      {!isManual && state.uploadedDocs.some((d) => d.isDummy) && (
-        <aside className="hidden lg:flex w-[42%] flex-shrink-0 border-l border-border bg-muted/20 flex-col overflow-hidden">
-          <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border bg-background/80 flex-shrink-0">
-            <FileText className="h-3.5 w-3.5 text-muted-foreground" />
-            <span className="text-xs font-medium text-foreground truncate">
-              {state.uploadedDocs[0]?.name ?? "Receipt.jpg"}
-            </span>
-          </div>
-          <div className="flex-1 overflow-y-auto px-6 py-6">
-            <ReceiptPreviewFull />
-          </div>
-        </aside>
-      )}
-    </div>
-  );
-}
-
-function ReceiptPreviewFull() {
-  return (
-    <div className="w-full bg-white rounded-lg shadow-sm border border-border/50 p-4 flex items-center justify-center">
-      <img src={`${import.meta.env.BASE_URL}reimburse-docs/cvs-receipt.png`} alt="Receipt preview" className="object-contain w-full h-full max-h-[70vh]" />
-    </div>
-  );
-}
-
-// ─── Step 5: Transfer Method ──────────────────────────────────────────────────────
 function DestinationStep({
   state,
   setState,
@@ -1278,7 +426,7 @@ function DestinationStep({
 }) {
   const options = [
     {
-      id: "bank"    as const,
+      id: "bank" as const,
       icon: (
         <svg
           width="22"
@@ -1304,7 +452,7 @@ function DestinationStep({
       accountMask: "•••• 5423 Checking",
     },
     {
-      id: "check"   as const,
+      id: "check" as const,
       icon: <Mail className="h-[22px] w-[22px]" />,
       label: "Check by Mail",
       sublabel: "2-4 business days after approval.",
@@ -1323,11 +471,9 @@ function DestinationStep({
     <div className="flex justify-center pt-10 px-8 pb-10">
       <div className="w-full max-w-[480px] flex flex-col gap-6">
         <div>
-          <h1 className="text-[24px] font-bold text-[#1d2c38]">
-            How would you like to get reimbursed?
-          </h1>
+          <h1 className="text-[24px] font-bold text-[#1d2c38]">How would you like to get reimbursed?</h1>
           <p className="text-[16px] text-[#515f6b] mt-2 leading-relaxed">
-            Select how you'd like to receive the money for your reimbursement.
+            Select how you&apos;d like to receive the money for your reimbursement.
           </p>
         </div>
 
@@ -1349,9 +495,7 @@ function DestinationStep({
               >
                 <div className="flex items-start gap-4">
                   <div
-                    className={`mt-0.5 flex-shrink-0 ${
-                      isSelected ? "text-neutral-700" : "text-[#515f6b]"
-                    }`}
+                    className={`mt-0.5 flex-shrink-0 ${isSelected ? "text-neutral-700" : "text-[#515f6b]"}`}
                   >
                     {opt.icon}
                   </div>
@@ -1365,7 +509,7 @@ function DestinationStep({
                       )}
                     </div>
                     <p className="text-[14px] text-[#515f6b] mt-1">{opt.sublabel}</p>
-                    
+
                     {opt.bankName && (
                       <div className="mt-5">
                         <p className="text-[15px] font-bold text-[#7c858e]">{opt.bankName}</p>
@@ -1395,14 +539,9 @@ function DestinationStep({
   );
 }
 
-// ─── Step 6: Review (Validation) ─────────────────────────────────────────────────
-const PLAN_LABELS: Record<string, string> = {
-  "health-fsa":         "Health FSA",
-  "dependent-care-fsa": "Dependent Care FSA",
-};
 const DEST_LABELS: Record<string, string> = {
-  bank:    "Bank account ending in 1234",
-  check:   "Check by mail",
+  bank: "Bank account ending in 1234",
+  check: "Check by mail",
   instant: "Instant payment",
 };
 
@@ -1410,15 +549,14 @@ function ValidationStep({
   state,
   onNav,
 }: {
-  state:       ReimburseFlowState;
+  state: ReimburseFlowState;
   summaryRows: { label: string; value: string }[];
-  onNav:       (_step: string) => void;
+  onNav: (_step: string) => void;
 }) {
   const planLabel = PLAN_LABELS[state.selectedPlan] ?? state.selectedPlan;
-  const destLabel = DEST_LABELS[state.destination]   ?? state.destination;
-  const amountFmt = state.claim.amount ? usd(state.claim.amount) : "$127.43";
-
-  const selectedItems = state.receiptLineItems.filter(item => item.selected);
+  const destLabel = DEST_LABELS[state.destination] ?? state.destination;
+  const amountFmt = state.claim.amount ? usd(state.claim.amount) : "—";
+  const selectedItems = state.receiptLineItems.filter((item) => item.selected);
 
   return (
     <div className="flex justify-center pt-10 px-8 pb-10">
@@ -1439,7 +577,6 @@ function ValidationStep({
           </div>
         )}
 
-        {/* Summary Card */}
         <Card className="shadow-sm border-[#e4e6e9] rounded-xl">
           <CardContent className="p-6">
             <div className="flex items-stretch justify-between gap-4">
@@ -1475,9 +612,7 @@ function ValidationStep({
                     -{amountFmt}
                   </span>
                 </div>
-                <p className="text-[15px] text-[#515f6b] mt-1 font-medium ml-7">
-                  $850.00
-                </p>
+                <p className="text-[15px] text-[#515f6b] mt-1 font-medium ml-7">$850.00</p>
               </div>
 
               <ArrowRight className="h-5 w-5 text-[#7c858e] shrink-0 self-center" />
@@ -1530,18 +665,17 @@ function ValidationStep({
           </CardContent>
         </Card>
 
-        {/* Items Card */}
         <Card className="shadow-sm border-[#e4e6e9] rounded-xl relative">
           <button
             type="button"
-            onClick={() => onNav(state.entryMode === "upload" ? "review" : "manual")}
+            onClick={() => onNav("review")}
             className="absolute top-6 right-6 text-[14px] font-semibold text-[var(--system-link)] hover:underline"
           >
             Edit
           </button>
           <CardContent className="p-6">
             <h2 className="text-[18px] font-bold text-[#1d2c38] mb-6">Items submitting</h2>
-            
+
             <div className="flex flex-col gap-5">
               {selectedItems.length > 0 ? (
                 selectedItems.map((item) => (
@@ -1555,9 +689,7 @@ function ValidationStep({
               ) : (
                 <div className="flex items-start justify-between gap-4">
                   <span className="text-[16px] text-[#1d2c38]">Claim amount</span>
-                  <span className="text-[16px] text-[#515f6b] tabular-nums shrink-0">
-                    {amountFmt}
-                  </span>
+                  <span className="text-[16px] text-[#515f6b] tabular-nums shrink-0">{amountFmt}</span>
                 </div>
               )}
             </div>
@@ -1568,135 +700,6 @@ function ValidationStep({
             </div>
           </CardContent>
         </Card>
-      </div>
-    </div>
-  );
-}
-
-// ─── Confirmation ─────────────────────────────────────────────────────────────────
-type TimelineStatus = "completed" | "active" | "pending";
-
-const TIMELINE_EVENTS: { label: string; description: string; icon: any; status: TimelineStatus }[] = [
-  { label: "Submitted",    description: "We received your claim.",        icon: CheckCircle2, status: "completed" },
-  { label: "Under review", description: "We're checking the details.",    icon: ShieldCheck,  status: "completed" },
-  { label: "Approved",     description: "Your claim is approved.",        icon: CheckCircle2, status: "active" },
-  { label: "Payment sent", description: "Reimbursement is on the way.",   icon: Banknote,     status: "pending" },
-];
-
-function ConfirmationStep({
-  summaryRows,
-}: {
-  summaryRows: { label: string; value: string }[];
-}) {
-  useEffect(() => {
-    // Fire a subtle confetti burst from the top of the screen
-    confetti({
-      particleCount: 60,
-      spread: 60,
-      origin: { y: 0.1 },
-      colors: ["#0055a5", "#009b89", "#3958c3", "#e11d48"],
-      disableForReducedMotion: true,
-      zIndex: 100,
-    });
-  }, []);
-
-  return (
-    <div className="flex justify-center pt-10 px-8 pb-10">
-      <div className="w-full max-w-[480px] flex flex-col gap-5">
-        {/* Success header */}
-        <div className="text-center flex flex-col items-center gap-3">
-          <div className="flex items-center justify-center w-16 h-16 rounded-full bg-success/10">
-            <CheckCircle2 className="h-8 w-8 text-success" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Claim approved</h1>
-          </div>
-        </div>
-
-        {/* What happens next */}
-        <Card>
-          <CardContent className="p-6">
-            <p className="text-sm font-semibold text-foreground mb-5">What happens next</p>
-            <div className="flex flex-col gap-0">
-              {TIMELINE_EVENTS.map((event, i) => {
-                const Icon   = event.icon;
-                const isLast = i === TIMELINE_EVENTS.length - 1;
-                const isCompleted = event.status === "completed";
-                const isActive = event.status === "active";
-                const isPending = event.status === "pending";
-
-                return (
-                  <div key={event.label} className="flex gap-4">
-                    <div className="flex flex-col items-center">
-                      <div
-                        className={`flex h-[24px] w-[24px] items-center justify-center rounded-full flex-shrink-0 mt-0.5 ${
-                          isActive ? "border border-[var(--theme-primary)] text-[var(--neutral-700)] bg-white" : ""
-                        } ${
-                          isCompleted ? "border border-[#009b89] text-[#009b89] bg-white" : ""
-                        } ${
-                          isPending ? "bg-[var(--neutral-100)] text-[var(--neutral-700)]" : ""
-                        }`}
-                      >
-                        {isCompleted ? (
-                          <Check className="h-3.5 w-3.5" strokeWidth={2.5} />
-                        ) : (
-                          <Icon className="h-3.5 w-3.5" strokeWidth={isPending ? 2 : 2.5} />
-                        )}
-                      </div>
-                      {!isLast && <div className="w-[1px] flex-1 bg-[#e4e6e9] my-1" />}
-                    </div>
-                    <div className="pb-6">
-                      <div className="flex items-center gap-2">
-                        <p
-                          className={`text-[14px] tracking-[-0.084px] leading-tight ${
-                            isActive ? "font-semibold text-[#243746]" : "font-medium text-[var(--neutral-700)]"
-                          }`}
-                        >
-                          {event.label}
-                        </p>
-                        {isActive && (
-                          <span className="inline-flex items-center px-[7px] py-[3.5px] rounded-[12px] bg-[var(--theme-secondary-ramp-50)] text-[var(--theme-secondary)] text-[11px] font-semibold leading-none whitespace-nowrap">
-                            Now
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-[13px] text-[var(--neutral-700)] mt-1">{event.description}</p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-            <p className="text-xs text-[var(--neutral-700)] mt-4">
-              Final amount and timing depend on approval.
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* Claim summary */}
-        <Card>
-          <CardContent className="p-6">
-            <p className="text-sm font-semibold text-foreground mb-4">Claim summary</p>
-            <div className="flex flex-col gap-3">
-              {summaryRows.map((row) => (
-                <div key={row.label} className="flex items-start justify-between gap-4">
-                  <span className="text-xs text-muted-foreground">{row.label}</span>
-                  <span className="text-sm font-medium text-foreground text-right">{row.value}</span>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Actions */}
-        <div className="flex flex-col sm:flex-row gap-3">
-          <Button
-            intent="primary"
-            className="flex-1 flex items-center justify-center gap-2"
-          >
-            <Clock className="h-4 w-4 text-white" />
-            View claim status
-          </Button>
-        </div>
       </div>
     </div>
   );

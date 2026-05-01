@@ -28,7 +28,7 @@ const softEaseOut: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
  */
 export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 }) {
   const navigate = useNavigate();
-  const { openReimburseWorkspace } = useReimburseWorkspace();
+  const { openReimburseWorkspace, openSendPaymentWorkspace } = useReimburseWorkspace();
   const prefersReducedMotion = useReducedMotion();
   const [uploadPhase, setUploadPhase] = useState<UploadPhase>("default");
   const [isTaskVisible, setIsTaskVisible] = useState(() => {
@@ -389,6 +389,10 @@ export function SparkAiForwardHero({ activeView = 1 }: { activeView?: 1 | 2 | 3 
                     }
                     if (action.href === "/reimburse") {
                       openReimburseWorkspace();
+                      return;
+                    }
+                    if (action.href === "/send-payment") {
+                      openSendPaymentWorkspace();
                       return;
                     }
                     if (/^https?:\/\//i.test(action.href)) {

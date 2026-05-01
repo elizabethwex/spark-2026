@@ -9,6 +9,7 @@ import {
   HeartPulse,
   Baby,
   Receipt,
+  Send,
   Clock,
   ChevronRight,
 } from "lucide-react";
@@ -21,6 +22,7 @@ import { useDeviceMockup } from "@/hooks/useDeviceMockup";
 import { FsaStoreBrowser } from "@/components/app-shell/FsaStoreBrowser";
 import { ScheduledMaintenanceMessage } from "@/components/app-shell/ScheduledMaintenanceMessage";
 import { useAppVariant, type AppVariant } from "@/context/AppVariantContext";
+import { useReimburseWorkspace } from "@/context/ReimburseWorkspaceContext";
 import { TransactionDetailSheet, type TransactionRow as TransactionData } from "./AppAccountOverview";
 
 const FSA_STORE_LOGO = `${import.meta.env.BASE_URL}app-ui/fsastore-logo.svg`;
@@ -286,6 +288,7 @@ function TransactionRow({ title, subtitle, amount, onClick }: TransactionRowProp
 
 export default function AppHome() {
   const navigate = useNavigate();
+  const { openSendPaymentWorkspace } = useReimburseWorkspace();
   const { deviceOn, isMobileDevice } = useDeviceMockup();
   const shellMatchesFrame = deviceOn || !isMobileDevice;
   const [showFsaStore, setShowFsaStore] = useState(false);
@@ -501,8 +504,10 @@ export default function AppHome() {
               </span>
             </button>
 
-            {/* Lost or stolen card */}
+            {/* Send Payment */}
             <button
+              type="button"
+              onClick={() => openSendPaymentWorkspace()}
               style={{
                 background: "#fff",
                 borderRadius: 24,
@@ -515,6 +520,51 @@ export default function AppHome() {
                 alignItems: "center",
                 gap: 8,
                 fontFamily: "var(--app-font)",
+              }}
+            >
+              <div
+                style={{
+                  width: 64,
+                  height: 64,
+                  borderRadius: 9999,
+                  background: TINT_50,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Send size={26} strokeWidth={1.75} style={{ color: TINT }} />
+              </div>
+              <span
+                style={{
+                  fontSize: 15,
+                  fontWeight: 600,
+                  color: TEXT_PRIMARY,
+                  letterSpacing: -0.23,
+                  lineHeight: "20px",
+                  textAlign: "center",
+                }}
+              >
+                Send Payment
+              </span>
+            </button>
+
+            {/* Lost or stolen card */}
+            <button
+              type="button"
+              style={{
+                background: "#fff",
+                borderRadius: 24,
+                boxShadow: CARD_SHADOW,
+                border: "none",
+                cursor: "pointer",
+                padding: 16,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 8,
+                fontFamily: "var(--app-font)",
+                gridColumn: "1 / -1",
               }}
             >
               <div

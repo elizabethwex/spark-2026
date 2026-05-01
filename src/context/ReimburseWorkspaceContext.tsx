@@ -8,14 +8,19 @@ export type ReimburseWorkspaceStep =
   | "review"
   | "manual"
   | "destination"
+  | "payee"
   | "validation"
   | "confirmation";
 
+export type WorkspaceFlowKind = "reimburse" | "sendPayment";
+
 interface ReimburseWorkspaceContextValue {
   isOpen: boolean;
+  activeWorkspace: WorkspaceFlowKind | null;
   initialStep: ReimburseWorkspaceStep;
   sessionKey: number;
   openReimburseWorkspace: (step?: ReimburseWorkspaceStep) => void;
+  openSendPaymentWorkspace: (step?: ReimburseWorkspaceStep) => void;
   openReimburseWorkspaceFromPath: (path: string) => void;
   closeReimburseWorkspace: () => void;
 }
@@ -34,6 +39,7 @@ function stepFromPath(path: string): ReimburseWorkspaceStep {
   if (subPath === "review") return "review";
   if (subPath === "manual") return "manual";
   if (subPath === "destination") return "destination";
+  if (subPath === "payee") return "payee";
   if (subPath === "validation") return "validation";
   if (subPath === "confirmation") return "confirmation";
   return "start";
@@ -41,10 +47,19 @@ function stepFromPath(path: string): ReimburseWorkspaceStep {
 
 export function ReimburseWorkspaceProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [activeWorkspace, setActiveWorkspace] = useState<WorkspaceFlowKind | null>(null);
   const [initialStep, setInitialStep] = useState<ReimburseWorkspaceStep>("start");
   const [sessionKey, setSessionKey] = useState(0);
 
   const openReimburseWorkspace = useCallback((step: ReimburseWorkspaceStep = "start") => {
+    setActiveWorkspace("reimburse");
+    setInitialStep(step);
+    setSessionKey((prev) => prev + 1);
+    setIsOpen(true);
+  }, []);
+
+  const openSendPaymentWorkspace = useCallback((step: ReimburseWorkspaceStep = "start") => {
+    setActiveWorkspace("sendPayment");
     setInitialStep(step);
     setSessionKey((prev) => prev + 1);
     setIsOpen(true);
@@ -59,18 +74,30 @@ export function ReimburseWorkspaceProvider({ children }: { children: ReactNode }
 
   const closeReimburseWorkspace = useCallback(() => {
     setIsOpen(false);
+    setActiveWorkspace(null);
   }, []);
 
   const value = useMemo(
     () => ({
       isOpen,
+      activeWorkspace,
       initialStep,
       sessionKey,
       openReimburseWorkspace,
+      openSendPaymentWorkspace,
       openReimburseWorkspaceFromPath,
       closeReimburseWorkspace,
     }),
-    [closeReimburseWorkspace, initialStep, isOpen, openReimburseWorkspace, openReimburseWorkspaceFromPath, sessionKey]
+    [
+      activeWorkspace,
+      closeReimburseWorkspace,
+      initialStep,
+      isOpen,
+      openReimburseWorkspace,
+      openReimburseWorkspaceFromPath,
+      openSendPaymentWorkspace,
+      sessionKey,
+    ]
   );
 
   return (

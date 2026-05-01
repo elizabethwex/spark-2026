@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Image as ImageIcon, Info, CheckCircle2, Check, Search, Trash2 } from "lucide-react";
@@ -805,24 +805,35 @@ function StepReadyToSubmit({ onNext }: { onNext: () => void }) {
 // ─── Step 8 — Success ─────────────────────────────────────────────────────────
 function StepSuccess({ onGoHome }: { onGoHome: () => void }) {
   const [completedSteps, setCompletedSteps] = useState(0);
+  const headingRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
     const timers = [
       setTimeout(() => setCompletedSteps(1), 800),
       setTimeout(() => setCompletedSteps(2), 1600),
       setTimeout(() => setCompletedSteps(3), 2400),
+      setTimeout(triggerConfetti, 400)
     ];
     
-    // Fire confetti!
-    confetti({
-      particleCount: 150,
-      spread: 80,
-      origin: { y: 0.4 },
-      colors: ["#34C759", "#007AFF", "#FF9500", "#FFCC00", "#FF3B30"]
-    });
-
     return () => timers.forEach(clearTimeout);
   }, []);
+
+  const triggerConfetti = () => {
+    if (!headingRef.current) return;
+    
+    const rect = headingRef.current.getBoundingClientRect();
+    const x = rect.width > 0 ? (rect.left + rect.width / 2) / window.innerWidth : 0.5;
+    const y = rect.height > 0 ? (rect.top + rect.height / 2) / window.innerHeight : 0.2;
+
+    const defaults = {
+      origin: { x, y },
+      colors: ["#34C759", "#007AFF", "#FF9500", "#FFCC00", "#FF3B30"],
+      zIndex: 10000,
+    };
+
+    // Single premium burst
+    confetti({ ...defaults, particleCount: 120, spread: 100, startVelocity: 45, scalar: 1.1 });
+  };
 
   return (
     <div style={{ flex: 1, overflowY: "auto", background: BG_TINT, display: "flex", flexDirection: "column" }}>
@@ -855,19 +866,14 @@ function StepSuccess({ onGoHome }: { onGoHome: () => void }) {
           <CheckCircle2 size={40} color={SUCCESS_GREEN} style={{ position: "relative", zIndex: 1 }} />
         </motion.div>
 
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          style={{ textAlign: "center", width: "100%" }}
-        >
-          <h2 style={{ margin: "0 0 8px", fontSize: 22, fontWeight: 600, color: "var(--app-text)", letterSpacing: -0.44, fontFamily: "var(--app-font)" }}>
+        <div style={{ textAlign: "center", width: "100%" }}>
+          <h2 ref={headingRef} style={{ margin: "0 0 8px", fontSize: 22, fontWeight: 600, color: "var(--app-text)", letterSpacing: -0.44, fontFamily: "var(--app-font)" }}>
             Claim approved!
           </h2>
           <p style={{ margin: 0, fontSize: 16, color: TEXT_SECONDARY, lineHeight: "24px", fontFamily: "var(--app-font)" }}>
             Your document has been verified and your claim is approved for reimbursement.
           </p>
-        </motion.div>
+        </div>
 
         {/* Approved amount & Balance */}
         <motion.div

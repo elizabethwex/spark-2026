@@ -63,6 +63,10 @@ const ReimburseWorkspaceRouteBridge = React.lazy(
   () => import("@/pages/reimburse/ReimburseWorkspaceRouteBridge")
 );
 
+const SendPaymentWorkspaceRouteBridge = React.lazy(
+  () => import("@/pages/reimburse/SendPaymentWorkspaceRouteBridge")
+);
+
 // Login page - standalone route
 const LoginPage = React.lazy(() => import("@/pages/Login"));
 
@@ -171,6 +175,12 @@ export function AppRoutes() {
           element={
             withConsumerLight(<ReimburseWorkspaceRouteBridge />)
           }
+        />
+
+        {/* Send Payment workspace (opens overlay; avoids 404 on /send-payment mock links) */}
+        <Route
+          path="send-payment"
+          element={withConsumerLight(<SendPaymentWorkspaceRouteBridge />)}
         />
         
         {/* Theming Engine - no LightModeBoundary so preview can toggle dark */}

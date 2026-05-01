@@ -9,7 +9,7 @@ import { useReimburseWorkspace } from "@/context/ReimburseWorkspaceContext";
 
 export function AIChatSection() {
   const navigate = useNavigate();
-  const { openReimburseWorkspace } = useReimburseWorkspace();
+  const { openReimburseWorkspace, openSendPaymentWorkspace } = useReimburseWorkspace();
 
   return (
     <div className="space-y-3">
@@ -86,11 +86,17 @@ export function AIChatSection() {
             {quickActions.map((action) => (
               <button
                 key={action.href}
-                onClick={() =>
-                  action.href === "/reimburse"
-                    ? openReimburseWorkspace()
-                    : navigate(action.href)
-                }
+                onClick={() => {
+                  if (action.href === "/reimburse") {
+                    openReimburseWorkspace();
+                    return;
+                  }
+                  if (action.href === "/send-payment") {
+                    openSendPaymentWorkspace();
+                    return;
+                  }
+                  navigate(action.href);
+                }}
                 className="rounded-full px-4 py-2.5 min-h-[44px] text-sm font-semibold text-foreground bg-white border border-slate-200/60 shadow-[0_1px_3px_rgb(0,0,0,0.04)] hover:shadow-md hover:-translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--wex-focus-ring-color))] focus-visible:ring-offset-2 motion-reduce:transition-none motion-reduce:transform-none transition-all duration-200"
               >
                 {action.label}
